@@ -1,0 +1,180 @@
+/* Background 
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+/* Container 
+.container {
+  text-align: center;
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+}
+
+/* Title 
+h1 {
+  color: white;
+  margin-bottom: 20px;
+}
+
+/* Card 
+.card {
+  background: white;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  text-align: left;
+}
+
+/* Button 
+button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+}
+*/
+
+/* button:hover { 
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Input 
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-right: 10px;
+  width: 65%;
+  outline: none;
+}
+
+/* Queue list 
+.card p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+/* Highlight current user 
+.highlight {
+  color: green;
+  font-weight: bold;
+}
+
+/* Status message 
+.status {
+  color: white;
+  font-weight: bold;
+  margin-top: 10px;
+}
+  /* Background */
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #f5f7fa, #e4ecf7);
+  color: #333;
+}
+
+/* Container */
+.container {
+  text-align: center;
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+}
+
+/* Title */
+ h1{
+  color: #2c3e50;
+  margin-bottom: 18px; 
+   font-size: 35px;     /* control size */
+  line-height: 1.2; 
+} 
+
+
+/* Card */
+.card {
+  background: #ffffff;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+.card h2{
+  color: black;
+}
+/* Card text */
+.card p {
+  margin: 8px 0;
+  font-size: 16px;
+  color: #444;
+}
+
+/* Input 
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+  width: 65%;
+  outline: none;
+  background: #f9f9f9;
+}
+  
+
+/* Button */
+button {
+  padding: 10px 20px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 500;
+}
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+  width: 65%;
+  outline: none;
+  background: #ffffff;   /* CHANGE THIS */
+  color: #333;           /* ADD THIS */
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+/* Focus effect (VERY IMPORTANT) */
+input:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 6px rgba(108, 99, 255, 0.3);
+}
+
+button:hover {
+  background: #5548e0;
+  transform: scale(1.05);
+}
+
+/* Highlight current user */
+.highlight {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+/* Status message */
+.status {
+  color: #555;
+  font-weight: 500;
+  margin-top: 10px;
+}
