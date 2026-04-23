@@ -20,7 +20,8 @@ import ManageServices from "./pages/owner/ManageServices";
 import AdminLogin from "./pages/admin/AdminLogin"; 
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 
-
+//SalonDetailPage
+import SalonDetailPage from "./components/SalonDetailPage";
 function App() {
   return (
     <BrowserRouter>
