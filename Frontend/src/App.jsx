@@ -29,8 +29,8 @@ import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
 import AddonServices from "./pages/customer/AddonServices";
 import BarberSelection from "./pages/customer/BarberSelection";
-import CustomerDetails from "./pages/customer/CustomerDetails";
-import Booking from "./pages/customer/Booking";
+import CustomerDetails from "./pages/customer/CustomerDetails";   // ✅ added
+import Booking from "./pages/customer/Booking";                   // ✅ added
 
 // ✅ YOUR PAGE
 import SalonDetailPage from "./components/SalonDetailPage";
