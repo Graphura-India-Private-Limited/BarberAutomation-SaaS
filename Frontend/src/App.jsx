@@ -23,11 +23,19 @@ import ManageServices from "./pages/owner/ManageServices";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 
-// ✅ Salon Detail Page (your work)
+// 🔥 Booking Flow (team code)
+import ServiceCategories from "./pages/customer/ServiceCategories";
+import MenServices from "./pages/customer/MenServices";
+import WomenServices from "./pages/customer/WomenServices";
+import AddonServices from "./pages/customer/AddonServices";
+import BarberSelection from "./pages/customer/BarberSelection";
+import CustomerDetails from "./pages/customer/CustomerDetails";
+import Booking from "./pages/customer/Booking";
+
+// ✅ YOUR PAGE
 import SalonDetailPage from "./components/SalonDetailPage";
 
 function App() {
-  // Demo data (until backend integration)
   const demoBooking = {
     status: "completed",
     barberName: "Rahul",
@@ -36,16 +44,26 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* Customer Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
 
-        {/* Review Route */}
+        {/* Review */}
         <Route
           path="/write-review"
           element={<ReviewSystem bookingData={demoBooking} />}
         />
+
+        {/* 🔥 Booking Flow */}
+        <Route path="/customer/services" element={<ServiceCategories />} />
+        <Route path="/customer/services/men" element={<MenServices />} />
+        <Route path="/customer/services/women" element={<WomenServices />} />
+        <Route path="/customer/services/addon" element={<AddonServices />} />
+        <Route path="/customer/barber" element={<BarberSelection />} />
+        <Route path="/customer/details" element={<CustomerDetails />} />
+        <Route path="/customer/booking" element={<Booking />} />
 
         {/* Barber Routes */}
         <Route path="/barber/login" element={<BarberLogin />} />
@@ -61,8 +79,9 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/requests" element={<AdminOnboarding />} />
 
-        {/* ✅ Your Salon Detail Page Route */}
+        {/* ✅ YOUR ROUTE */}
         <Route path="/salon-detail" element={<SalonDetailPage />} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -1,11 +1,72 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
 
-body{
-  margin:0;
-  padding:0;
-  background:#0F0F0F;
-  color:white;
-  font-family:Arial, sans-serif;
+/* CARD */
+.category-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: 0.3s;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+}
+
+/* IMAGE */
+.category-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* CONTENT */
+.category-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.category-content h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #111;
+}
+
+.category-content p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* PUSH BUTTON TO BOTTOM */
+.category-content button {
+  margin-top: auto;
+}
+
+/* BUTTON */
+.btn {
+  background: #c89b5e;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn:hover {
+  background: #b88a4f;
+}
+.category-card:hover {
+  transform: translateY(-5px) scale(1.01);
 }
