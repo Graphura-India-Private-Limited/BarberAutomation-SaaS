@@ -28,6 +28,8 @@ import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
 import AddonServices from "./pages/customer/AddonServices";
 import BarberSelection from "./pages/customer/BarberSelection";
+import CustomerDetails from "./pages/customer/CustomerDetails";
+import Booking from "./pages/customer/Booking";
 
 function App() {
   return (
@@ -45,6 +47,8 @@ function App() {
         <Route path="/customer/services/women" element={<WomenServices />} />
         <Route path="/customer/services/addon" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
+        <Route path="/customer/details" element={<CustomerDetails />} />
+        <Route path="/customer/booking" element={<Booking />} /> 
 
         {/* Barber Routes */}
         <Route path="/barber/login" element={<BarberLogin />} />

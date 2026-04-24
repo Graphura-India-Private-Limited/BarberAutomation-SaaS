@@ -36,6 +36,16 @@ export default function BarberSelection() {
     }
   ];
 
+  // 🔥 Auto Assign Logic (select first available)
+  const handleAutoAssign = () => {
+    const availableBarber = barbers.find(b => b.status === "Available");
+    if (availableBarber) {
+      setSelectedBarber(availableBarber);
+    } else {
+      alert("No barbers available right now");
+    }
+  };
+
   return (
     <div className="container">
       <h2>Select Barber</h2>
@@ -55,7 +65,7 @@ export default function BarberSelection() {
       <button
         className="btn"
         style={{ marginBottom: "20px" }}
-        onClick={() => alert("Best available barber assigned")}
+        onClick={handleAutoAssign}
       >
         Auto Assign Barber
       </button>
@@ -71,7 +81,7 @@ export default function BarberSelection() {
             {/* IMAGE */}
             <img src={b.img} className="service-img" alt={b.name} />
 
-            {/* STATUS */}
+            {/* STATUS BELOW IMAGE */}
             <div className="status-row">
               <span
                 className={
@@ -102,13 +112,13 @@ export default function BarberSelection() {
         ))}
       </div>
 
-      {/* 🔥 NEXT BUTTON */}
+      {/* 🔥 CONTINUE TO CUSTOMER DETAILS */}
       {selectedBarber && (
-        <div style={{ marginTop: "30px" }}>
+        <div style={{ marginTop: "30px", textAlign: "center" }}>
           <button
             className="btn"
             onClick={() =>
-              navigate("/customer/booking", {
+              navigate("/customer/details", {
                 state: {
                   service: selectedService,
                   barber: selectedBarber
@@ -116,7 +126,7 @@ export default function BarberSelection() {
               })
             }
           >
-            Continue Booking →
+            Continue →
           </button>
         </div>
       )}
