@@ -2,9 +2,13 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import CustomerProfile from './pages/auth/CustomerProfile';
 
+// homepage
+import Homepage from "./pages/homepage/Homepage";
+
 // Auth Pages
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+
 
 // Barber Pages
 import BarberLogin from "./pages/barber/BarberLogin";
@@ -26,7 +30,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Customer Routes */}
-        <Route path="/" element={<Login />} />
+        {/* HOMEPAGE */}
+        <Route path="/" element={<Homepage />} />
+
+        {/* AUTH */}
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
         
