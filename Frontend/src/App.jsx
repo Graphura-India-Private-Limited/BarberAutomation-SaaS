@@ -30,7 +30,9 @@ import WomenServices from "./pages/customer/WomenServices";
 import AddonServices from "./pages/customer/AddonServices";
 import BarberSelection from "./pages/customer/BarberSelection";
 import CustomerDetails from "./pages/customer/CustomerDetails";   // ✅ added
-import Booking from "./pages/customer/Booking";                   // ✅ added
+import Booking from "./pages/customer/Booking";    
+import BookingHistory from './pages/customer/BookingHistory';   
+import CustomerBookingFlow from './pages/customer/CustomerBookingFlow';           
 
 // ✅ YOUR PAGE
 import SalonDetailPage from "./components/SalonDetailPage";
@@ -49,6 +51,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
+        <Route path="/booking" element={<CustomerBookingFlow />} />
 
         {/* Review */}
         <Route
@@ -64,6 +67,7 @@ function App() {
         <Route path="/customer/barber" element={<BarberSelection />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
         <Route path="/customer/booking" element={<Booking />} />
+        <Route path="/history" element={<BookingHistory />} />
 
         {/* Barber Routes */}
         <Route path="/barber/login" element={<BarberLogin />} />
