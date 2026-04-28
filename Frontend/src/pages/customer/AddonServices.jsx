@@ -1,7 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import SearchFilterHeader from "../../Components/SearchFilterHeader";
 
 export default function AddonServices() {
   const navigate = useNavigate();
+
+  const [filters, setFilters] = useState({
+    search: "",
+    cost: "",
+    distance: "",
+    rating: ""
+  });
 
   const services = [
     {
@@ -21,12 +30,31 @@ export default function AddonServices() {
     }
   ];
 
+  const getPriceRange = (cost) => {
+    switch (cost) {
+      case "under200": return [0, 200];
+      case "200-500": return [200, 500];
+      case "500-1000": return [500, 1000];
+      case "above1000": return [1000, Infinity];
+      default: return [0, Infinity];
+    }
+  };
+
+  const filteredServices = services.filter((s) => {
+    const [minPrice, maxPrice] = getPriceRange(filters.cost);
+    return (
+      s.name.toLowerCase().includes(filters.search.toLowerCase()) &&
+      s.price >= minPrice && s.price <= maxPrice
+    );
+  });
+
   return (
     <div className="container">
+      <SearchFilterHeader onFiltersChange={setFilters} />
       <h2>Add-On Services</h2>
 
       <div className="grid">
-        {services.map((s, i) => (
+        {filteredServices.map((s, i) => (
           <div key={i} className="service-card">
             <img src={s.img} className="service-img" alt={s.name} />
             <h3>{s.name}</h3>
