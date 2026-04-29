@@ -5,6 +5,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import CustomerProfile from "./pages/auth/CustomerProfile";
+import OTPLogin from "./pages/auth/OTPLogin";
+import OTPVerify from "./pages/auth/OTPVerify";
+import Register from "./pages/auth/Register";
+import DuplicateAccount from "./pages/auth/DuplicateAccount";
+import RateLimit from "./pages/auth/RateLimit";
+import Payment from "./pages/auth/Payment";
 
 // Review Component
 import ReviewSystem from "./components/ReviewSystem";
@@ -52,6 +58,12 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
         <Route path="/booking" element={<CustomerBookingFlow />} />
+        <Route path="/otp-login" element={<OTPLogin />} />
+         <Route path="/otp-verify" element={<OTPVerify />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/duplicate-account" element={<DuplicateAccount />} />
+        <Route path="/rate-limit" element={<RateLimit />} />
+        <Route path="/payment" element={<Payment />} />
 
         {/* Review */}
         <Route
