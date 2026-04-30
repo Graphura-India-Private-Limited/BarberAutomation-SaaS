@@ -7,7 +7,7 @@ import Signup from "./pages/auth/Signup";
 import CustomerProfile from "./pages/auth/CustomerProfile";
 
 // Review Component
-import ReviewSystem from "./components/ReviewSystem";
+import ReviewSystem from './components/ReviewSystem';
 
 // Barber Pages
 import BarberLogin from "./pages/barber/BarberLogin";
@@ -51,24 +51,10 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
-        <Route path="/booking" element={<CustomerBookingFlow />} />
-
-        {/* Review */}
-        <Route
-          path="/write-review"
-          element={<ReviewSystem bookingData={demoBooking} />}
-        />
-
-        {/* 🔥 Booking Flow */}
-        <Route path="/customer/services" element={<ServiceCategories />} />
-        <Route path="/customer/services/men" element={<MenServices />} />
-        <Route path="/customer/services/women" element={<WomenServices />} />
-        <Route path="/customer/services/addon" element={<AddonServices />} />
-        <Route path="/customer/barber" element={<BarberSelection />} />
-        <Route path="/customer/details" element={<CustomerDetails />} />
-        <Route path="/customer/booking" element={<Booking />} />
-        <Route path="/history" element={<BookingHistory />} />
-
+        
+        {/* Review Route) */}
+        <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
+        
         {/* Barber Routes */}
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber/profile" element={<BarberProfile />} />
