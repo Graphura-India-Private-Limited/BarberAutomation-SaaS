@@ -16,22 +16,22 @@ export default function WomenServices() {
     {
       name: "Haircut & Styling",
       price: 500,
-      img: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=400"
+      img: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800"
     },
     {
       name: "Hair Coloring",
       price: 800,
-      img: "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400"
+      img: "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800"
     },
     {
       name: "Highlights & Balayage",
       price: 1000,
-      img: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400"
+      img: "https://static.showit.co/1200/jkhBAC8zTjOGSVP2KgBdTQ/219521/hair_on_2nd_avenue_balayage_and_coloring.jpg?w=800"
     },
     {
       name: "Hair Spa Treatment",
       price: 700,
-      img: "https://images.unsplash.com/photo-1552693673-1bf958298935?w=400"
+      img: "https://res.klook.com/image/upload/w_750,h_469,c_fill,q_85/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/fchn5h7dfr2mmbbw3nq4.jpg?w=800"
     }
   ];
 
@@ -54,30 +54,70 @@ export default function WomenServices() {
   });
 
   return (
-    <div className="container">
-      <SearchFilterHeader onFiltersChange={setFilters} />
-      <h2>Women Services</h2>
+    <div style={{ background: "#F9F7F4", minHeight: "100vh", fontFamily: "'DM Sans','Segoe UI',sans-serif", color: "#1C1410" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+        .hcard { transition: all 0.3s ease; }
+        .hcard:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important; transform: translateY(-6px); }
+        .btn-gold { background: #C9882A; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(201,136,42,0.2); }
+        .btn-gold:hover { background: #b87a22; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,136,42,0.3); }
+      `}</style>
 
-      <div className="grid">
-        {filteredServices.map((s, i) => (
-          <div key={i} className="service-card">
-            <img src={s.img} className="service-img" alt={s.name} />
-            <h3>{s.name}</h3>
-            <p>₹{s.price}</p>
+      {/* Hero Section */}
+      <div style={{ position: "relative", height: 340, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", marginBottom: 48 }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "url(https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=1600&q=80)", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.65)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, #F9F7F4, transparent)" }} />
+        <div style={{ position: "relative", zIndex: 1, textAlign: "center", padding: "0 20px" }}>
+          <h1 style={{ fontSize: 56, fontWeight: 900, color: "#fff", fontFamily: "'Cormorant Garamond',serif", letterSpacing: -1, marginBottom: 12, textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
+            Women Services
+          </h1>
+          <p style={{ fontSize: 16, color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,0.6)", maxWidth: 600, margin: "0 auto", lineHeight: 1.6 }}>
+            Beautiful styling, nourishing treatments, and elegant color services designed to elevate every look.
+          </p>
+        </div>
+      </div>
 
-            <button
-              className="btn"
-              onClick={() =>
-                navigate("/customer/barber", {
-                  state: { service: s }
-                })
-              }
-            >
-              Select
-            </button>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px 80px" }}>
+        <div style={{ marginBottom: 40 }}>
+          <SearchFilterHeader onFiltersChange={setFilters} />
+        </div>
 
-          </div>
-        ))}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 28 }}>
+          {filteredServices.map((s, i) => (
+            <div key={i} className="hcard" style={{ background: "#fff", borderRadius: 16, overflow: "hidden", border: "1px solid #E8E0D6", boxShadow: "0 4px 16px rgba(0,0,0,0.04)", display: "flex", flexDirection: "column" }}>
+              <div style={{ height: 220, overflow: "hidden", position: "relative" }}>
+                <img src={s.img} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
+                  onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+                  onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} alt={s.name} loading="lazy" />
+              </div>
+              <div style={{ padding: "24px", display: "flex", flexDirection: "column", flexGrow: 1, justifyContent: "space-between" }}>
+                <div style={{ marginBottom: 20 }}>
+                  <h3 style={{ fontSize: 22, fontWeight: 800, color: "#1C1410", fontFamily: "'Cormorant Garamond',serif", marginBottom: 8 }}>{s.name}</h3>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                    <span style={{ fontSize: 14, color: "#7C6E60" }}>Starting at</span>
+                    <span style={{ fontSize: 20, fontWeight: 800, color: "#1C1410" }}>₹{s.price}</span>
+                  </div>
+                </div>
+                <button
+                  className="btn-gold"
+                  style={{ width: "100%" }}
+                  onClick={() =>
+                    navigate("/customer/barber", {
+                      state: { service: s }
+                    })
+                  }
+                >
+                  SELECT SERVICE
+                </button>
+              </div>
+            </div>
+          ))}
+          {filteredServices.length === 0 && (
+            <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "60px 0", color: "#7C6E60", fontSize: 16 }}>
+              No services found matching your criteria.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
