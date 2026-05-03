@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import HomePage from "./pages/HomePage";
+
 // Auth Pages
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
@@ -13,6 +15,7 @@ import ReviewSystem from './components/ReviewSystem';
 import BarberLogin from "./pages/barber/BarberLogin";
 import BarberProfile from "./pages/barber/BarberProfile";
 import BarberDashboard from "./pages/barber/BarberDashboard";
+import ServiceConsole from './pages/barber/ServiceConsole';
 
 // Owner Pages
 import SalonRegistration from "./pages/owner/SalonRegistration";
@@ -51,6 +54,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
+
+          <Route path="/HomePage" element={<HomePage />} />
         
         {/* Review Route) */}
         <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
@@ -59,6 +64,7 @@ function App() {
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber/profile" element={<BarberProfile />} />
         <Route path="/barber/dashboard" element={<BarberDashboard />} />
+        <Route path="live-session" element={<ServiceConsole />} />
 
         {/* Owner Routes */}
         <Route path="/register-salon" element={<SalonRegistration />} />
