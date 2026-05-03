@@ -7,9 +7,15 @@ export default {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        // Premium Button Shine Effect sathi he keyframes vapra
+        shine: {
+          '100%': { left: '125%' },
+        },
       },
       animation: {
-        shimmer: 'shimmer 2s infinite', // This line is crucial
+        shimmer: 'shimmer 2s infinite',
+        // 'animate-shine' class vaprun tu button la shiny banavu shaktes
+        shine: 'shine 1.5s ease-out infinite',
       },
     },
   },

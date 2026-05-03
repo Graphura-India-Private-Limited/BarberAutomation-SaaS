@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
+import Footer from "./pages/Footer";
+import NearbyBarbers from "./components/NearbyBarbers";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -26,18 +28,17 @@ import ManageServices from "./pages/owner/ManageServices";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 
-// 🔥 Booking Flow (team code)
+//  Booking Flow (team code)
 import ServiceCategories from "./pages/customer/ServiceCategories";
 import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
 import AddonServices from "./pages/customer/AddonServices";
 import BarberSelection from "./pages/customer/BarberSelection";
-import CustomerDetails from "./pages/customer/CustomerDetails";   // ✅ added
+import CustomerDetails from "./pages/customer/CustomerDetails";   
 import Booking from "./pages/customer/Booking";    
 import BookingHistory from './pages/customer/BookingHistory';   
 import CustomerBookingFlow from './pages/customer/CustomerBookingFlow';           
 
-// ✅ YOUR PAGE
 import SalonDetailPage from "./components/SalonDetailPage";
 
 function App() {
@@ -55,7 +56,10 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
 
+{/* HomePage & Discovery */}
           <Route path="/HomePage" element={<HomePage />} />
+          <Route path="/nearby" element={<NearbyBarbers />} />
+            
         
         {/* Review Route) */}
         <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
@@ -64,7 +68,7 @@ function App() {
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber/profile" element={<BarberProfile />} />
         <Route path="/barber/dashboard" element={<BarberDashboard />} />
-        <Route path="live-session" element={<ServiceConsole />} />
+        <Route path="/live-session" element={<ServiceConsole />} />
 
         {/* Owner Routes */}
         <Route path="/register-salon" element={<SalonRegistration />} />
@@ -75,10 +79,11 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/requests" element={<AdminOnboarding />} />
 
-        {/* ✅ YOUR ROUTE */}
+        {/* YOUR ROUTE */}
         <Route path="/salon-detail" element={<SalonDetailPage />} />
 
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
