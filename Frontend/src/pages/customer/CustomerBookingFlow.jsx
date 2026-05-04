@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SlotSelection from '../../Components/SlotSelection';
 import BookingForm from '../../Components/BookingForm';
 import ConfirmationPage from '../../Components/ConfirmationPage';
+import SmartWaitTimeCard from '../../Components/SmartWaitTimeCard';
+import DelayAlertBanner from '../../Components/DelayAlertBanner';
+
+const SESSION_START = Date.now();
 
 export default function Wrapper() {
   const [bookingData, setBookingData] = useState({
@@ -12,40 +16,71 @@ export default function Wrapper() {
     timeSlot: null,
   });
 
-  const [currentStep, setCurrentStep] = useState(3); 
+  const [queueState, setQueueState] = useState({
+    queueLength: 4,
+    barbers: 2,
+    avgServiceTime: 20,
+  });
+
+  const [currentStep, setCurrentStep] = useState(3);
 
   const handleSlotSelected = (date, time) => {
     setBookingData({ ...bookingData, date, timeSlot: time });
     setCurrentStep(4);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setQueueState((current) => ({
+        ...current,
+        queueLength: Math.max(1, current.queueLength + (Math.random() > 0.5 ? 1 : -1)),
+      }));
+    }, 12000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const estimatedWait = Math.round(
+    (queueState.queueLength * queueState.avgServiceTime) / queueState.barbers,
+  );
+
   return (
-    // Premium soft background covering the whole screen
-    <div className="min-h-screen py-12 px-4 font-sans text-gray-800" style={{position:"relative"}}>
-      {/* Background Image with soft overlay */}
-      <div style={{position:"fixed",inset:0,zIndex:-1,backgroundImage:"url(https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1600&q=80)",backgroundSize:"cover",backgroundPosition:"center"}} />
-      <div style={{position:"fixed",inset:0,zIndex:-1,background:"rgba(249,247,244,0.85)",backdropFilter:"blur(8px)"}} />
-      
-      <div className="max-w-2xl mx-auto" style={{position:"relative",zIndex:1}}>
+    <div className="min-h-screen bg-salonBg py-12 px-4 font-sans text-gray-800">
+      <div className="max-w-2xl mx-auto space-y-5">
+
+        {/* ── AI FEATURES ───────────────────────────────────── */}
+        <DelayAlertBanner
+          estimatedMinutes={estimatedWait}
+          startTime={SESSION_START}
+        />
+
+        <SmartWaitTimeCard
+          queueLength={queueState.queueLength}
+          barbers={queueState.barbers}
+          avgServiceTime={queueState.avgServiceTime}
+        />
+        {/* ─────────────────────────────────────────────────── */}
+
         {currentStep === 3 && (
-          <SlotSelection 
-            bookingData={bookingData} 
-            onNext={handleSlotSelected} 
+          <SlotSelection
+            bookingData={bookingData}
+            onNext={handleSlotSelected}
           />
         )}
-        
+
         {currentStep === 4 && (
-          <BookingForm 
-            bookingData={bookingData} 
-            onBack={() => setCurrentStep(3)} 
+          <BookingForm
+            bookingData={bookingData}
+            onBack={() => setCurrentStep(3)}
             onConfirm={() => setCurrentStep(5)}
           />
         )}
+
         {currentStep === 5 && (
-          <ConfirmationPage 
-            bookingData={bookingData} 
+          <ConfirmationPage
+            bookingData={bookingData}
             onReset={() => setCurrentStep(3)}
-            />
+          />
         )}
       </div>
     </div>

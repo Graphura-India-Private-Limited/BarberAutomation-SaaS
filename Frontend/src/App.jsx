@@ -82,6 +82,9 @@ function App() {
         {/* YOUR ROUTE */}
         <Route path="/salon-detail" element={<SalonDetailPage />} />
 
+        {/* Customer Booking Flow */}
+        <Route path="/booking-flow" element={<CustomerBookingFlow />} />
+
       </Routes>
       <Footer />
     </BrowserRouter>

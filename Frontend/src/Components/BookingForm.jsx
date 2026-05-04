@@ -120,7 +120,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
           ))}
         </div>
 
-        <button type="submit" className="w-full bg-salonGold hover:bg-salonGoldHover text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 mt-8">
+        <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 mt-8">
           Confirm & Pay ₹{tokenTotal}
         </button>
       </form>

@@ -33,8 +33,8 @@ export default function SlotSelection({ bookingData, onNext }) {
               onClick={() => setSelectedDate(date)}
               className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                 selectedDate === date 
-                  ? 'bg-salonGold text-white shadow-md transform -translate-y-0.5' 
-                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
+                  ? 'bg-slate-900 text-white shadow-md transform -translate-y-0.5' 
+                  : 'bg-slate-100 text-slate-900 hover:bg-slate-200 border border-slate-300'
               }`}
             >
               {date}
@@ -68,7 +68,7 @@ export default function SlotSelection({ bookingData, onNext }) {
         disabled={!selectedTime}
         className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
           selectedTime 
-            ? 'bg-salonGold hover:bg-salonGoldHover text-white shadow-md' 
+            ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-md' 
             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
         }`}
       >
