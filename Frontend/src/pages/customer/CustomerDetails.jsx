@@ -49,7 +49,14 @@ export default function CustomerDetails() {
           Enter Details
         </h1>
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 380px",gap:40,alignItems:"flex-start"}}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: service ? "1fr 380px" : "1fr",
+          gap: 40,
+          alignItems: "flex-start",
+          maxWidth: service ? "100%" : 500,
+          margin: "0 auto"
+        }}>
           {/* Left Column: Form Details */}
           <div style={{background:"#fff",borderRadius:24,padding:"40px",border:"1px solid #E8E0D6",boxShadow:"0 12px 40px rgba(0,0,0,0.04)"}}>
             
@@ -89,9 +96,11 @@ export default function CustomerDetails() {
           </div>
 
           {/* Right Column: Service Summary */}
-          <div style={{position:"sticky",top:40}}>
-            <ServiceSummary service={service} barber={barber} />
-          </div>
+          {service && (
+            <div style={{position:"sticky",top:40}}>
+              <ServiceSummary service={service} barber={barber} />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -57,10 +57,20 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
 
-{/* HomePage & Discovery */}
-          <Route path="/HomePage" element={<HomePage />} />
-          <Route path="/nearby" element={<NearbyBarbers />} />
+        {/* HomePage & Discovery */}
+        <Route path="/HomePage" element={<HomePage />} />
+        <Route path="/nearby" element={<NearbyBarbers />} />
             
+        {/* 🔥 Booking Flow Routes */}
+        <Route path="/customer/services" element={<ServiceCategories />} />
+        <Route path="/customer/services/men" element={<MenServices />} />
+        <Route path="/customer/services/women" element={<WomenServices />} />
+        <Route path="/customer/services/addons" element={<AddonServices />} />
+        <Route path="/customer/barber" element={<BarberSelection />} />
+        <Route path="/customer/details" element={<CustomerDetails />} />
+        <Route path="/customer/booking" element={<Booking />} />
+        <Route path="/customer/history" element={<BookingHistory />} />
+        <Route path="/customer/flow" element={<CustomerBookingFlow />} />
         
         {/* Review Route) */}
         <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />

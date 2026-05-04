@@ -25,7 +25,8 @@ export default function BarberSelection() {
       rating: 4.8,
       status: "Available",
       distance: 2,
-      img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400"
+      img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400",
+      aiWaitTime: { queueLength: 0, past7DaysAvg: "15 mins/cut", estimatedWait: "0 mins" }
     },
     {
       id: 2,
@@ -34,7 +35,8 @@ export default function BarberSelection() {
       rating: 4.5,
       status: "Busy",
       distance: 5,
-      img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400"
+      img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400",
+      aiWaitTime: { queueLength: 3, past7DaysAvg: "25 mins/cut", estimatedWait: "75 mins" }
     },
     {
       id: 3,
@@ -43,7 +45,8 @@ export default function BarberSelection() {
       rating: 4.9,
       status: "Available",
       distance: 1,
-      img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400"
+      img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400",
+      aiWaitTime: { queueLength: 1, past7DaysAvg: "12 mins/cut", estimatedWait: "12 mins" }
     }
   ];
 
@@ -132,7 +135,29 @@ export default function BarberSelection() {
                       <span style={{fontSize:14,fontWeight:700,color:"#1C1410"}}>{b.rating}</span>
                     </div>
                     <div style={{fontSize:13,color:"#7C6E60",marginBottom:4}}>{b.experience} experience</div>
-                    <div style={{fontSize:13,color:"#7C6E60"}}>{b.distance} km away</div>
+                    <div style={{fontSize:13,color:"#7C6E60",marginBottom:16}}>{b.distance} km away</div>
+
+                    {/* AI WAIT TIME PREDICTION VIEW */}
+                    <div className="bg-orange-50" style={{padding:"12px",borderRadius:"8px",border:"1px solid #FED7AA",textAlign:"left"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"8px"}}>
+                        <span style={{fontSize:"14px"}}>✨</span>
+                        <span style={{fontSize:"11px",fontWeight:800,color:"#9A3412",letterSpacing:"0.5px"}}>AI WAIT TIME PREDICTION</span>
+                      </div>
+                      <div style={{display:"flex",flexDirection:"column",gap:"4px",fontSize:"12px",color:"#7C2D12"}}>
+                        <div style={{display:"flex",justifyContent:"space-between"}}>
+                          <span>Queue Length:</span>
+                          <span style={{fontWeight:600}}>{b.aiWaitTime.queueLength} persons</span>
+                        </div>
+                        <div style={{display:"flex",justifyContent:"space-between"}}>
+                          <span>7-Day Avg Speed:</span>
+                          <span style={{fontWeight:600}}>{b.aiWaitTime.past7DaysAvg}</span>
+                        </div>
+                        <div style={{display:"flex",justifyContent:"space-between",marginTop:"4px",paddingTop:"4px",borderTop:"1px solid #FDBA74",fontWeight:700}}>
+                          <span>Est. Wait Time:</span>
+                          <span>{b.aiWaitTime.estimatedWait}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   {b.status === "Available" ? (
                     <button
