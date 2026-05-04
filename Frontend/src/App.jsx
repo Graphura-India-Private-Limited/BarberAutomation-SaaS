@@ -19,6 +19,7 @@ import BarberProfile from "./pages/barber/BarberProfile";
 import BarberDashboard from "./pages/barber/BarberDashboard";
 import ServiceConsole from './pages/barber/ServiceConsole';
 import BreakManagement from './pages/barber/BreakManagement';
+import { StatusProvider } from "./context/StatusContext";
 
 // Owner Pages
 import SalonRegistration from "./pages/owner/SalonRegistration";
@@ -35,10 +36,10 @@ import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
 import AddonServices from "./pages/customer/AddonServices";
 import BarberSelection from "./pages/customer/BarberSelection";
-import CustomerDetails from "./pages/customer/CustomerDetails";   
-import Booking from "./pages/customer/Booking";    
-import BookingHistory from './pages/customer/BookingHistory';   
-import CustomerBookingFlow from './pages/customer/CustomerBookingFlow';           
+import CustomerDetails from "./pages/customer/CustomerDetails";
+import Booking from "./pages/customer/Booking";
+import BookingHistory from './pages/customer/BookingHistory';
+import CustomerBookingFlow from './pages/customer/CustomerBookingFlow';
 
 import SalonDetailPage from "./components/SalonDetailPage";
 
@@ -49,8 +50,9 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <StatusProvider>
+      <BrowserRouter>
+        <Routes>
 
         {/* Customer Routes */}
         <Route path="/" element={<Login />} />
@@ -60,7 +62,7 @@ function App() {
         {/* HomePage & Discovery */}
         <Route path="/HomePage" element={<HomePage />} />
         <Route path="/nearby" element={<NearbyBarbers />} />
-            
+
         {/* 🔥 Booking Flow Routes */}
         <Route path="/customer/services" element={<ServiceCategories />} />
         <Route path="/customer/services/men" element={<MenServices />} />
@@ -71,10 +73,10 @@ function App() {
         <Route path="/customer/booking" element={<Booking />} />
         <Route path="/customer/history" element={<BookingHistory />} />
         <Route path="/customer/flow" element={<CustomerBookingFlow />} />
-        
+
         {/* Review Route) */}
         <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
-        
+
         {/* Barber Routes */}
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber/profile" element={<BarberProfile />} />
@@ -94,9 +96,10 @@ function App() {
         {/* YOUR ROUTE */}
         <Route path="/salon-detail" element={<SalonDetailPage />} />
 
-      </Routes>
-      <Footer />
-    </BrowserRouter>
+        </Routes>
+        <Footer />
+      </BrowserRouter>
+    </StatusProvider>
   );
 }
 

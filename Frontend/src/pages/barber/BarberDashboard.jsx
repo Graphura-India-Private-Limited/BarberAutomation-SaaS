@@ -1,23 +1,39 @@
 import React, { useState } from "react";
+import StatusToggle from "../../Components/StatusToggle";
+import StatusBadge from "../../Components/StatusBadge";
+import { useBarberStatus } from "../../context/StatusContext";
 
 function BarberDashboard() {
- 
+
   const [appointments, setAppointments] = useState([
     { id: 1, customer: "Rahul Jagtap", service: "Premium Haircut", time: "10:30 AM", status: "Pending" },
     { id: 2, customer: "Aryan", service: "Kid's Styling", time: "11:15 AM", status: "In-Progress" },
     { id: 3, customer: "Snehal", service: "Hair Spa", time: "01:00 PM", status: "Upcoming" },
   ]);
 
-  const updateStatus = (id, newStatus) => {
-    setAppointments(appointments.map(app => 
-      app.id === id ? { ...app, status: newStatus } : app
-    ));
+  const { status, statusText, startService, completeService, isOffline, isOnBreak } = useBarberStatus();
+
+  const updateAppointmentStatus = (id, newStatus) => {
+    setAppointments((current) =>
+      current.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
+    );
+  };
+
+  const handleStartBooking = (id) => {
+    if (isOffline) return;
+    startService();
+    updateAppointmentStatus(id, "In-Progress");
+  };
+
+  const handleFinishBooking = (id) => {
+    completeService();
+    updateAppointmentStatus(id, "Completed");
   };
 
   return (
     <div className="min-h-screen bg-[#FFFBF2] p-4 md:p-10 font-sans text-[#3E362E]">
       <div className="max-w-5xl mx-auto">
-        
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 border-b border-[#EAD8C0] pb-8">
           <div>
@@ -33,7 +49,7 @@ function BarberDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Left: Quick Stats & Profile Summary */}
           <div className="space-y-6">
             <div className="bg-[#3E362E] text-white p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden">
@@ -42,8 +58,8 @@ function BarberDashboard() {
                 <p className="text-xl font-bold">Sameer Khan</p>
                 <p className="text-xs text-white/60 mt-1 italic">Senior Stylist • The Royal Groom</p>
                 <div className="mt-6 flex gap-2">
-                   <span className="px-3 py-1 bg-white/10 rounded-full text-[8px] font-bold uppercase">Haircut Expert</span>
-                   <span className="px-3 py-1 bg-white/10 rounded-full text-[8px] font-bold uppercase">Beard Pro</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-[8px] font-bold uppercase">Haircut Expert</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-[8px] font-bold uppercase">Beard Pro</span>
                 </div>
               </div>
               <div className="absolute -right-4 -bottom-4 opacity-10">
@@ -52,13 +68,17 @@ function BarberDashboard() {
             </div>
 
             <div className="bg-white p-6 rounded-[2rem] border border-[#EAD8C0] shadow-sm">
-                <h3 className="text-[10px] font-black uppercase text-[#8D7B68] mb-4 tracking-widest">Shift Status</h3>
-                <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold">Duty On</span>
-                    <div className="w-12 h-6 bg-green-500 rounded-full relative p-1 cursor-pointer">
-                        <div className="w-4 h-4 bg-white rounded-full ml-auto"></div>
-                    </div>
+              <h3 className="text-[10px] font-black uppercase text-[#8D7B68] mb-4 tracking-widest">Shift Status</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-4 mb-2">
+                  <span className="text-sm font-bold">Current Status</span>
+                  <StatusBadge status={status} />
                 </div>
+                <p className="text-xs text-[#8D7B68]">{statusText}</p>
+                {isOffline && <p className="text-xs text-red-600">Offline mode blocks new booking actions.</p>}
+                {isOnBreak && <p className="text-xs text-amber-600">On Break – new customers cannot be accepted.</p>}
+                <StatusToggle />
+              </div>
             </div>
           </div>
 
@@ -68,7 +88,7 @@ function BarberDashboard() {
               <h2 className="text-xl font-black uppercase mb-8 flex items-center gap-3">
                 <span className="w-8 h-[2px] bg-[#C5A059]"></span> Today's Queue
               </h2>
-              
+
               <div className="space-y-4">
                 {appointments.map((app) => (
                   <div key={app.id} className="bg-white border border-[#EAD8C0] p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center group hover:border-[#C5A059] transition-all">
@@ -89,18 +109,19 @@ function BarberDashboard() {
                           {app.status}
                         </p>
                       </div>
-                      
+
                       <div className="flex gap-2">
                         {app.status !== 'Completed' && (
-                          <button 
-                            onClick={() => updateStatus(app.id, 'In-Progress')}
-                            className="px-4 py-2 bg-[#FDF5E6] text-[#3E362E] rounded-lg text-[9px] font-black uppercase hover:bg-[#C5A059] hover:text-white transition-all"
+                          <button
+                            onClick={() => handleStartBooking(app.id)}
+                            disabled={isOffline || app.status === 'In-Progress' || app.status === 'Completed'}
+                            className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${isOffline || app.status === 'In-Progress' || app.status === 'Completed' ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-[#FDF5E6] text-[#3E362E] hover:bg-[#C5A059] hover:text-white'}`}
                           >
                             Start
                           </button>
                         )}
-                        <button 
-                          onClick={() => updateStatus(app.id, 'Completed')}
+                        <button
+                          onClick={() => handleFinishBooking(app.id)}
                           className="px-4 py-2 bg-[#3E362E] text-white rounded-lg text-[9px] font-black uppercase hover:bg-black transition-all"
                         >
                           Finish
