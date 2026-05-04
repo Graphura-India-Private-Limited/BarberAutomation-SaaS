@@ -44,7 +44,7 @@ export default function BreakManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 font-sans text-gray-800">
+    <div className="min-h-screen bg-orange-50 py-10 px-4 font-sans text-gray-800">
       <div className="max-w-4xl mx-auto space-y-8">
         
         <div className="mb-8">
