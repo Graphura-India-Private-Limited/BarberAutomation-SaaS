@@ -55,7 +55,7 @@ export default function BreakManagement() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           {/* --- 8.1 LUNCH TIME SETUP CARD --- */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-orange-100">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Daily Lunch Schedule</h2>
             <form onSubmit={handleLunchSubmit} className="space-y-4">
               <div>
