@@ -18,6 +18,7 @@ import BarberLogin from "./pages/barber/BarberLogin";
 import BarberProfile from "./pages/barber/BarberProfile";
 import BarberDashboard from "./pages/barber/BarberDashboard";
 import ServiceConsole from './pages/barber/ServiceConsole';
+import BreakManagement from './pages/barber/BreakManagement';
 
 // Owner Pages
 import SalonRegistration from "./pages/owner/SalonRegistration";
@@ -69,6 +70,7 @@ function App() {
         <Route path="/barber/profile" element={<BarberProfile />} />
         <Route path="/barber/dashboard" element={<BarberDashboard />} />
         <Route path="/live-session" element={<ServiceConsole />} />
+        <Route path="/barber/breaks" element={<BreakManagement />} />
 
         {/* Owner Routes */}
         <Route path="/register-salon" element={<SalonRegistration />} />
