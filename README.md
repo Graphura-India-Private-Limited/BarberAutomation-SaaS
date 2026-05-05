@@ -50,5 +50,5 @@ npm run dev
 
 - `.env` file is NOT in repo — create it manually
 - `node_modules` is NOT in repo — run `npm install`
-- Need **VPN** or **College WiFi** for MongoDB connection
+- Need **VPN**  for MongoDB connection
 - First time only — run `node createTestData.js` in Backend folder
