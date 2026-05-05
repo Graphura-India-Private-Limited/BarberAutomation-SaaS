@@ -1,101 +1,91 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import HomePage from "./pages/HomePage";
-import Footer from "./pages/Footer";
-import NearbyBarbers from "./components/NearbyBarbers";
+import HomePage            from "./pages/HomePage";
+import Login               from "./pages/auth/Login";
+import Signup              from "./pages/auth/Signup";
+import CustomerProfile     from "./pages/auth/CustomerProfile";
+import BarberLogin         from "./pages/barber/BarberLogin";
+import BarberProfile       from "./pages/barber/BarberProfile";
+import BarberDashboard     from "./pages/barber/BarberDashboard";
+import ServiceConsole      from "./pages/barber/ServiceConsole";
+import BreakManagement     from "./pages/barber/BreakManagement";
+import SalonRegistration   from "./pages/owner/SalonRegistration";
+import OwnerDashboard      from "./pages/owner/OwnerDashboard";
+import ManageServices      from "./pages/owner/ManageServices";
+import AdminLogin          from "./pages/admin/AdminLogin";
+import AdminOnboarding     from "./pages/admin/AdminOnboarding";
+import ServiceCategories   from "./pages/customer/ServiceCategories";
+import MenServices         from "./pages/customer/MenServices";
+import WomenServices       from "./pages/customer/WomenServices";
+import AddonServices       from "./pages/customer/AddonServices";
+import BarberSelection     from "./pages/customer/BarberSelection";
+import CustomerDetails     from "./pages/customer/CustomerDetails";
+import Booking             from "./pages/customer/Booking";
+import BookingHistory      from "./pages/customer/BookingHistory";
+import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
 
-// Auth Pages
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
-import CustomerProfile from "./pages/auth/CustomerProfile";
+/* ── Capital C Components (our folder) ── */
+import ReviewSystem    from "./Components/ReviewSystem";
+import SalonDetailPage from "./Components/SalonDetailPage";
+import NearbyBarbers   from "./Components/NearbyBarbers";
+import NoShowDelayPage from "./Components/NoShowDelayPage";
 
-// Review Component
-import ReviewSystem from './components/ReviewSystem';
-
-// Barber Pages
-import BarberLogin from "./pages/barber/BarberLogin";
-import BarberProfile from "./pages/barber/BarberProfile";
-import BarberDashboard from "./pages/barber/BarberDashboard";
-import ServiceConsole from './pages/barber/ServiceConsole';
-import BreakManagement from './pages/barber/BreakManagement';
-
-// Owner Pages
-import SalonRegistration from "./pages/owner/SalonRegistration";
-import OwnerDashboard from "./pages/owner/OwnerDashboard";
-import ManageServices from "./pages/owner/ManageServices";
-
-// Admin Pages
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminOnboarding from "./pages/admin/AdminOnboarding";
-
-//  Booking Flow (team code)
-import ServiceCategories from "./pages/customer/ServiceCategories";
-import MenServices from "./pages/customer/MenServices";
-import WomenServices from "./pages/customer/WomenServices";
-import AddonServices from "./pages/customer/AddonServices";
-import BarberSelection from "./pages/customer/BarberSelection";
-import CustomerDetails from "./pages/customer/CustomerDetails";   
-import Booking from "./pages/customer/Booking";    
-import BookingHistory from './pages/customer/BookingHistory';   
-import CustomerBookingFlow from './pages/customer/CustomerBookingFlow';           
-
-import SalonDetailPage from "./components/SalonDetailPage";
+const demoBooking = { status:"completed", barberName:"Rahul" };
 
 function App() {
-  const demoBooking = {
-    status: "completed",
-    barberName: "Rahul",
-  };
-
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Customer Routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        {/* ── HOME — our HomePage at / ── */}
+        <Route path="/"         element={<HomePage />} />
+        <Route path="/home"     element={<HomePage />} />
+        <Route path="/HomePage" element={<HomePage />} />
+
+        {/* ── AUTH ── */}
+        <Route path="/login"           element={<Login />} />
+        <Route path="/signup"          element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
 
-        {/* HomePage & Discovery */}
-        <Route path="/HomePage" element={<HomePage />} />
-        <Route path="/nearby" element={<NearbyBarbers />} />
-            
-        {/* 🔥 Booking Flow Routes */}
-        <Route path="/customer/services" element={<ServiceCategories />} />
-        <Route path="/customer/services/men" element={<MenServices />} />
-        <Route path="/customer/services/women" element={<WomenServices />} />
+        {/* ── CUSTOMER BOOKING (sir's routes) ── */}
+        <Route path="/customer/services"        element={<ServiceCategories />} />
+        <Route path="/customer/services/men"    element={<MenServices />} />
+        <Route path="/customer/services/women"  element={<WomenServices />} />
+        <Route path="/customer/services/addon"  element={<AddonServices />} />
         <Route path="/customer/services/addons" element={<AddonServices />} />
-        <Route path="/customer/barber" element={<BarberSelection />} />
-        <Route path="/customer/details" element={<CustomerDetails />} />
-        <Route path="/customer/booking" element={<Booking />} />
-        <Route path="/customer/history" element={<BookingHistory />} />
-        <Route path="/customer/flow" element={<CustomerBookingFlow />} />
-        
-        {/* Review Route) */}
-        <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
-        
-        {/* Barber Routes */}
-        <Route path="/barber/login" element={<BarberLogin />} />
-        <Route path="/barber/profile" element={<BarberProfile />} />
-        <Route path="/barber/dashboard" element={<BarberDashboard />} />
-        <Route path="/live-session" element={<ServiceConsole />} />
-        <Route path="/barber/breaks" element={<BreakManagement />} />
+        <Route path="/customer/barber"          element={<BarberSelection />} />
+        <Route path="/customer/details"         element={<CustomerDetails />} />
+        <Route path="/customer/booking"         element={<Booking />} />
+        <Route path="/customer/history"         element={<BookingHistory />} />
+        <Route path="/customer/flow"            element={<CustomerBookingFlow />} />
+        <Route path="/booking-history"          element={<BookingHistory />} />
+        <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
 
-        {/* Owner Routes */}
-        <Route path="/register-salon" element={<SalonRegistration />} />
-        <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+        {/* ── DISCOVERY ── */}
+        <Route path="/nearby"       element={<NearbyBarbers />} />
+        <Route path="/salon-detail" element={<SalonDetailPage />} />
+        <Route path="/salon/:id"    element={<SalonDetailPage />} />
+        <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
+
+        {/* ── BARBER ── */}
+        <Route path="/barber/login"     element={<BarberLogin />} />
+        <Route path="/barber/profile"   element={<BarberProfile />} />
+        <Route path="/barber/dashboard" element={<BarberDashboard />} />
+        <Route path="/barber/breaks"    element={<BreakManagement />} />
+        <Route path="/live-session"     element={<ServiceConsole />} />
+        <Route path="/noshow-delay"     element={<NoShowDelayPage />} />
+
+        {/* ── OWNER ── */}
+        <Route path="/register-salon"        element={<SalonRegistration />} />
+        <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminOnboarding />} />
-
-        {/* YOUR ROUTE */}
-        <Route path="/salon-detail" element={<SalonDetailPage />} />
+        {/* ── ADMIN ── */}
+        <Route path="/admin/login"     element={<AdminLogin />} />
+        <Route path="/admin/requests"  element={<AdminOnboarding />} />
 
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 }
