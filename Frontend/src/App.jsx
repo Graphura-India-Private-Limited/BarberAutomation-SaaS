@@ -1,47 +1,64 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import HomePage            from "./pages/HomePage";
-import Login               from "./pages/auth/Login";
-import Signup              from "./pages/auth/Signup";
-import CustomerProfile     from "./pages/auth/CustomerProfile";
-import BarberLogin         from "./pages/barber/BarberLogin";
-import BarberProfile       from "./pages/barber/BarberProfile";
-import BarberDashboard     from "./pages/barber/BarberDashboard";
-import ServiceConsole      from "./pages/barber/ServiceConsole";
-import BreakManagement     from "./pages/barber/BreakManagement";
-import SalonRegistration   from "./pages/owner/SalonRegistration";
-import OwnerDashboard      from "./pages/owner/OwnerDashboard";
-import ManageServices      from "./pages/owner/ManageServices";
-import AdminLogin          from "./pages/admin/AdminLogin";
-import AdminOnboarding     from "./pages/admin/AdminOnboarding";
-import ServiceCategories   from "./pages/customer/ServiceCategories";
-import MenServices         from "./pages/customer/MenServices";
-import WomenServices       from "./pages/customer/WomenServices";
-import AddonServices       from "./pages/customer/AddonServices";
-import BarberSelection     from "./pages/customer/BarberSelection";
-import CustomerDetails     from "./pages/customer/CustomerDetails";
-import Booking             from "./pages/customer/Booking";
-import BookingHistory      from "./pages/customer/BookingHistory";
-import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
+// Auth Pages
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
+import CustomerProfile from "./pages/auth/CustomerProfile";
+import OTPLogin from "./pages/auth/OTPLogin";
+import OTPVerify from "./pages/auth/OTPVerify";
+import Register from "./pages/auth/Register";
+import DuplicateAccount from "./pages/auth/DuplicateAccount";
+import RateLimit from "./pages/auth/RateLimit";
+import Payment from "./pages/auth/Payment";
 
-/* ── Capital C Components (our folder) ── */
-import ReviewSystem    from "./Components/ReviewSystem";
-import SalonDetailPage from "./Components/SalonDetailPage";
-import NearbyBarbers   from "./Components/NearbyBarbers";
-import NoShowDelayPage from "./Components/NoShowDelayPage";
+// Review Component
+import ReviewSystem from "./components/ReviewSystem";
 
-const demoBooking = { status:"completed", barberName:"Rahul" };
+// Barber Pages
+import BarberLogin from "./pages/barber/BarberLogin";
+import BarberProfile from "./pages/barber/BarberProfile";
+import BarberDashboard from "./pages/barber/BarberDashboard";
+
+// Owner Pages
+import SalonRegistration from "./pages/owner/SalonRegistration";
+import OwnerDashboard from "./pages/owner/OwnerDashboard";
+import ManageServices from "./pages/owner/ManageServices";
+
+// Admin Pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminOnboarding from "./pages/admin/AdminOnboarding";
+
+// 🔥 Booking Flow (team code)
+import ServiceCategories from "./pages/customer/ServiceCategories";
+import MenServices from "./pages/customer/MenServices";
+import WomenServices from "./pages/customer/WomenServices";
+import AddonServices from "./pages/customer/AddonServices";
+import BarberSelection from "./pages/customer/BarberSelection";
+import CustomerDetails from "./pages/customer/CustomerDetails";   // ✅ added
+import Booking from "./pages/customer/Booking";    
+import BookingHistory from './pages/customer/BookingHistory';   
+import CustomerBookingFlow from './pages/customer/CustomerBookingFlow';           
+
+// ✅ YOUR PAGE
+import SalonDetailPage from "./components/SalonDetailPage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* ── HOME — our HomePage at / ── */}
-        <Route path="/"         element={<HomePage />} />
-        <Route path="/home"     element={<HomePage />} />
-        <Route path="/HomePage" element={<HomePage />} />
+        {/* Customer Routes */}
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/customerprofile" element={<CustomerProfile />} />
+        <Route path="/booking" element={<CustomerBookingFlow />} />
+        <Route path="/otp-login" element={<OTPLogin />} />
+         <Route path="/otp-verify" element={<OTPVerify />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/duplicate-account" element={<DuplicateAccount />} />
+        <Route path="/rate-limit" element={<RateLimit />} />
+        <Route path="/payment" element={<Payment />} />
 
         {/* ── AUTH ── */}
         <Route path="/login"           element={<Login />} />
