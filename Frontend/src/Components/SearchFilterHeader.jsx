@@ -52,7 +52,7 @@ export default function SearchFilterHeader({ onFiltersChange }) {
       <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
         <input
           type="text"
-          placeholder="Search services..."
+          placeholder="Search "
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{

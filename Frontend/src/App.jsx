@@ -44,11 +44,6 @@ import CustomerBookingFlow from './pages/customer/CustomerBookingFlow';
 import SalonDetailPage from "./components/SalonDetailPage";
 
 function App() {
-  const demoBooking = {
-    status: "completed",
-    barberName: "Rahul",
-  };
-
   return (
     <BrowserRouter>
       <Routes>
@@ -65,38 +60,47 @@ function App() {
         <Route path="/rate-limit" element={<RateLimit />} />
         <Route path="/payment" element={<Payment />} />
 
-        {/* Review */}
-        <Route
-          path="/write-review"
-          element={<ReviewSystem bookingData={demoBooking} />}
-        />
+        {/* ── AUTH ── */}
+        <Route path="/login"           element={<Login />} />
+        <Route path="/signup"          element={<Signup />} />
+        <Route path="/customerprofile" element={<CustomerProfile />} />
 
-        {/* 🔥 Booking Flow */}
-        <Route path="/customer/services" element={<ServiceCategories />} />
-        <Route path="/customer/services/men" element={<MenServices />} />
-        <Route path="/customer/services/women" element={<WomenServices />} />
-        <Route path="/customer/services/addon" element={<AddonServices />} />
-        <Route path="/customer/barber" element={<BarberSelection />} />
-        <Route path="/customer/details" element={<CustomerDetails />} />
-        <Route path="/customer/booking" element={<Booking />} />
-        <Route path="/history" element={<BookingHistory />} />
+        {/* ── CUSTOMER BOOKING (sir's routes) ── */}
+        <Route path="/customer/services"        element={<ServiceCategories />} />
+        <Route path="/customer/services/men"    element={<MenServices />} />
+        <Route path="/customer/services/women"  element={<WomenServices />} />
+        <Route path="/customer/services/addon"  element={<AddonServices />} />
+        <Route path="/customer/services/addons" element={<AddonServices />} />
+        <Route path="/customer/barber"          element={<BarberSelection />} />
+        <Route path="/customer/details"         element={<CustomerDetails />} />
+        <Route path="/customer/booking"         element={<Booking />} />
+        <Route path="/customer/history"         element={<BookingHistory />} />
+        <Route path="/customer/flow"            element={<CustomerBookingFlow />} />
+        <Route path="/booking-history"          element={<BookingHistory />} />
+        <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
 
-        {/* Barber Routes */}
-        <Route path="/barber/login" element={<BarberLogin />} />
-        <Route path="/barber/profile" element={<BarberProfile />} />
+        {/* ── DISCOVERY ── */}
+        <Route path="/nearby"       element={<NearbyBarbers />} />
+        <Route path="/salon-detail" element={<SalonDetailPage />} />
+        <Route path="/salon/:id"    element={<SalonDetailPage />} />
+        <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
+
+        {/* ── BARBER ── */}
+        <Route path="/barber/login"     element={<BarberLogin />} />
+        <Route path="/barber/profile"   element={<BarberProfile />} />
         <Route path="/barber/dashboard" element={<BarberDashboard />} />
+        <Route path="/barber/breaks"    element={<BreakManagement />} />
+        <Route path="/live-session"     element={<ServiceConsole />} />
+        <Route path="/noshow-delay"     element={<NoShowDelayPage />} />
 
-        {/* Owner Routes */}
-        <Route path="/register-salon" element={<SalonRegistration />} />
-        <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+        {/* ── OWNER ── */}
+        <Route path="/register-salon"        element={<SalonRegistration />} />
+        <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminOnboarding />} />
-
-        {/* ✅ YOUR ROUTE */}
-        <Route path="/salon-detail" element={<SalonDetailPage />} />
+        {/* ── ADMIN ── */}
+        <Route path="/admin/login"     element={<AdminLogin />} />
+        <Route path="/admin/requests"  element={<AdminOnboarding />} />
 
       </Routes>
     </BrowserRouter>
