@@ -24,6 +24,7 @@ import CustomerDetails     from "./pages/customer/CustomerDetails";
 import Booking             from "./pages/customer/Booking";
 import BookingHistory      from "./pages/customer/BookingHistory";
 import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
+import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
 
 /* ── Capital C Components (our folder) ── */
 import ReviewSystem    from "./Components/ReviewSystem";
@@ -61,6 +62,7 @@ function App() {
         <Route path="/customer/flow"            element={<CustomerBookingFlow />} />
         <Route path="/booking-history"          element={<BookingHistory />} />
         <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
+        <Route path="/customer/interactions" element={<CustomerInteractionView />} />
 
         {/* ── DISCOVERY ── */}
         <Route path="/nearby"       element={<NearbyBarbers />} />
