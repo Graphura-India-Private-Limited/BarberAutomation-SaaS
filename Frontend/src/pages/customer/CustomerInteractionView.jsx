@@ -1,8 +1,7 @@
-
 import { useState } from 'react'
 import { CUSTOMERS } from '../../data'
-import CustomerCard from '../Components/CustomerCard'
-import DetailPanel from '../Components/DetailPanel'
+import CustomerCard from '../../Components/CustomerCard'
+import DetailPanel from '../../Components/DetailPanel'
 
 export default function CustomerInteractionView() {
   const [customers, setCustomers] = useState(CUSTOMERS)
