@@ -1,8 +1,6 @@
+
 import { useState } from 'react'
 import { CUSTOMERS } from '../data'
-// import CustomerCard from '../components/CustomerCard'
-// import DetailPanel from '../components/DetailPanel'
-
 import CustomerCard from '../Components/CustomerCard'
 import DetailPanel from '../Components/DetailPanel'
 
