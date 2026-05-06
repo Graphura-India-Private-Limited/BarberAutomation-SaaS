@@ -21,8 +21,12 @@ export default function Wrapper() {
 
   return (
     // Premium soft background covering the whole screen
-    <div className="min-h-screen bg-salonBg py-12 px-4 font-sans text-gray-800">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen py-12 px-4 font-sans text-gray-800" style={{position:"relative"}}>
+      {/* Background Image with soft overlay */}
+      <div style={{position:"fixed",inset:0,zIndex:-1,backgroundImage:"url(https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1600&q=80)",backgroundSize:"cover",backgroundPosition:"center"}} />
+      <div style={{position:"fixed",inset:0,zIndex:-1,background:"rgba(249,247,244,0.85)",backdropFilter:"blur(8px)"}} />
+      
+      <div className="max-w-2xl mx-auto" style={{position:"relative",zIndex:1}}>
         {currentStep === 3 && (
           <SlotSelection 
             bookingData={bookingData} 
