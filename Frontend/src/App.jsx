@@ -24,6 +24,7 @@ import CustomerDetails     from "./pages/customer/CustomerDetails";
 import Booking             from "./pages/customer/Booking";
 import BookingHistory      from "./pages/customer/BookingHistory";
 import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
+import ServiceHandler from "./pages/barber/ServiceHandler";
 
 /* ── Capital C Components (our folder) ── */
 import ReviewSystem    from "./Components/ReviewSystem";
@@ -75,6 +76,7 @@ function App() {
         <Route path="/barber/breaks"    element={<BreakManagement />} />
         <Route path="/live-session"     element={<ServiceConsole />} />
         <Route path="/noshow-delay"     element={<NoShowDelayPage />} />
+        <Route path="/service-handler"   element={<ServiceHandler />} />
 
         {/* ── OWNER ── */}
         <Route path="/register-salon"        element={<SalonRegistration />} />
