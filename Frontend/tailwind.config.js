@@ -34,6 +34,11 @@ export default {
         "ok-txt": "#047857",
 
         "warn-bg": "#fff7ed",
+
+        // Salon booking flow colors
+        salonGold:     "#c89b5e",
+        salonGoldHover:"#b88a4f",
+        salonBg:       "#fdf6ee",
       },
     },
   },

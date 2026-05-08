@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { connectSocket, listenEvent, removeEvent, sendEvent } from "../../services/socket";
 
 function OwnerDashboard() {
   const navigate = useNavigate();
@@ -18,6 +19,59 @@ function OwnerDashboard() {
     { id: 1, name: "Premium Haircut", price: "499" },
     { id: 2, name: "Beard Styling", price: "299" }
   ]);
+
+  const [isConnected, setIsConnected] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [barbers, setBarbers] = useState([
+    { id: 1, name: "Sameer Khan", status: "Available", queueLength: 3, currentCustomer: "Aryan" }
+  ]);
+
+  useEffect(() => {
+    const socket = connectSocket();
+    setIsConnected(socket.connected);
+
+    const onConnect = () => {
+      setIsConnected(true);
+      showToast("Live sync active", "success");
+    };
+    const onDisconnect = () => setIsConnected(false);
+    
+    const onStatusUpdate = (data) => {
+      setBarbers(prev => prev.map(b => b.id === data.barberId ? { ...b, status: data.status } : b));
+      showToast(`${data.name} is now ${data.status}`);
+    };
+    const onServiceStart = (data) => {
+      setBarbers(prev => prev.map(b => b.id === data.barberId ? { ...b, currentCustomer: data.customer } : b));
+    };
+    const onServiceEnd = (data) => {
+      setBarbers(prev => prev.map(b => b.id === data.barberId ? { ...b, currentCustomer: null } : b));
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    listenEvent('status:update', onStatusUpdate);
+    listenEvent('service:start', onServiceStart);
+    listenEvent('service:end', onServiceEnd);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      removeEvent('status:update', onStatusUpdate);
+      removeEvent('service:start', onServiceStart);
+      removeEvent('service:end', onServiceEnd);
+    };
+  }, []);
+
+  const showToast = (message, type = "info") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const overrideBarberStatus = (barberId, newStatus) => {
+    setBarbers(prev => prev.map(b => b.id === barberId ? { ...b, status: newStatus } : b));
+    sendEvent('owner:overrideStatus', { barberId, status: newStatus });
+    showToast(`Status updated to ${newStatus}`);
+  };
 
 
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -38,8 +92,21 @@ function OwnerDashboard() {
   }, [imagePreviews]);
 
   return (
-    <div className="min-h-screen bg-[#FFFBF2] p-4 md:p-10 font-sans text-[#3E362E]">
+    <div className="min-h-screen bg-[#FFFBF2] p-4 md:p-10 font-sans text-[#3E362E] relative">
       
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-full text-white font-bold text-sm shadow-xl transition-all animate-bounce ${toast.type === 'success' ? 'bg-green-500' : 'bg-[#3E362E]'}`}>
+          {toast.message}
+        </div>
+      )}
+      
+      {!isConnected && (
+        <div className="fixed bottom-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-xs shadow-lg animate-pulse">
+          ⚠️ Live sync disconnected
+        </div>
+      )}
+
       {/* Top Header Section */}
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
         <div>
@@ -61,6 +128,50 @@ function OwnerDashboard() {
           <button className="flex-1 md:flex-none px-6 py-3 bg-[#3E362E] text-white rounded-xl text-[10px] font-black tracking-widest shadow-lg hover:opacity-90 transition-all">
             EDIT PROFILE
           </button>
+        </div>
+      </div>
+
+      {/* Live Monitoring Panel */}
+      <div className="max-w-7xl mx-auto mb-10 bg-[#3E362E] text-white p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="w-8 h-[2px] bg-[#C5A059]"></span>
+          <h2 className="text-xl font-black uppercase flex items-center gap-2">
+            Live Monitoring
+            {isConnected && <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse ml-2"></span>}
+          </h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {barbers.map(barber => (
+            <div key={barber.id} className="bg-white/10 border border-white/20 p-5 rounded-2xl flex flex-col justify-between">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-bold text-lg">{barber.name}</h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`w-2 h-2 rounded-full ${barber.status === 'Available' ? 'bg-green-500' : barber.status === 'Break' ? 'bg-yellow-500' : 'bg-gray-400'}`}></span>
+                    <span className="text-[10px] uppercase tracking-widest">{barber.status}</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] uppercase tracking-widest text-[#C5A059]">Queue</p>
+                  <p className="font-black text-xl">{barber.queueLength}</p>
+                </div>
+              </div>
+              
+              {barber.currentCustomer && (
+                <div className="mb-4 bg-white/5 p-3 rounded-xl border border-white/10">
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 mb-1">Serving Now</p>
+                  <p className="font-bold text-sm text-[#C5A059]">{barber.currentCustomer}</p>
+                </div>
+              )}
+
+              <div className="flex gap-2 mt-auto">
+                <button onClick={() => overrideBarberStatus(barber.id, 'Break')} className="flex-1 py-2 bg-yellow-500/20 text-yellow-500 text-[9px] font-black uppercase rounded-lg hover:bg-yellow-500 hover:text-white transition-all">Force Break</button>
+                <button onClick={() => overrideBarberStatus(barber.id, 'Offline')} className="flex-1 py-2 bg-red-500/20 text-red-400 text-[9px] font-black uppercase rounded-lg hover:bg-red-500 hover:text-white transition-all">Offline</button>
+                <button onClick={() => overrideBarberStatus(barber.id, 'Available')} className="flex-1 py-2 bg-green-500/20 text-green-400 text-[9px] font-black uppercase rounded-lg hover:bg-green-500 hover:text-white transition-all">Available</button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

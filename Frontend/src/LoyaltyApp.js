@@ -1,12 +1,12 @@
 
 import React, { useState, useRef, useCallback } from 'react';
-import { Toast } from './components/Atoms';
-import StatsBar from './components/StatsBar';
-import CustomerList from './components/CustomerList';
-import EarnModal from './components/EarnModal';
-import RedeemModal from './components/RedeemModal';
-import PlansTab from './components/PlansTab';
-import HistoryTab from './components/HistoryTab';
+import { Toast } from './Components/Atoms';
+import StatsBar from './Components/StatsBar';
+import CustomerList from './Components/CustomerList';
+import EarnModal from './Components/EarnModal';
+import RedeemModal from './Components/RedeemModal';
+import PlansTab from './Components/PlansTab';
+import HistoryTab from './Components/HistoryTab';
 import { initCustomers, initHistory, nextId, PLANS } from './constants';
 import { nowTime } from './utils';
 
