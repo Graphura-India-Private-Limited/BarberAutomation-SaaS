@@ -1,18 +1,55 @@
 import React, { useState } from "react";
+import PerformanceView from "../../Components/PerformanceView";
 
 function BarberDashboard() {
+  const [serviceHistory, setServiceHistory] = useState([
+    { id: 101, customer: "Nikhil Patil", service: "Classic Cut", duration: 28, rating: 4.8 },
+    { id: 102, customer: "Manav Shah", service: "Beard Styling", duration: 22, rating: 4.6 },
+    { id: 103, customer: "Aarav Mehta", service: "Hair Spa", duration: 45, rating: 4.9 },
+    { id: 104, customer: "Kabir Rao", service: "Premium Haircut", duration: 34, rating: 4.7 },
+  ]);
  
   const [appointments, setAppointments] = useState([
-    { id: 1, customer: "Rahul Jagtap", service: "Premium Haircut", time: "10:30 AM", status: "Pending" },
-    { id: 2, customer: "Aryan", service: "Kid's Styling", time: "11:15 AM", status: "In-Progress" },
-    { id: 3, customer: "Snehal", service: "Hair Spa", time: "01:00 PM", status: "Upcoming" },
+    { id: 1, customer: "Rahul Jagtap", service: "Premium Haircut", time: "10:30 AM", status: "Pending", duration: 32, rating: 4.8 },
+    { id: 2, customer: "Aryan", service: "Kid's Styling", time: "11:15 AM", status: "In-Progress", duration: 25, rating: 4.6 },
+    { id: 3, customer: "Snehal", service: "Hair Spa", time: "01:00 PM", status: "Upcoming", duration: 45, rating: 4.9 },
   ]);
 
   const updateStatus = (id, newStatus) => {
-    setAppointments(appointments.map(app => 
+    const appointment = appointments.find(app => app.id === id);
+
+    setAppointments(appointments.map(app =>
       app.id === id ? { ...app, status: newStatus } : app
     ));
+
+    if (newStatus === "Completed" && appointment?.status !== "Completed") {
+      setServiceHistory(history => [
+        ...history,
+        {
+          id: Date.now(),
+          customer: appointment.customer,
+          service: appointment.service,
+          duration: appointment.duration,
+          rating: appointment.rating,
+        },
+      ]);
+    }
   };
+
+  const completedServices = serviceHistory.length;
+  const averageServiceTime = completedServices
+    ? Math.round(serviceHistory.reduce((total, service) => total + service.duration, 0) / completedServices)
+    : 0;
+  const averageRating = completedServices
+    ? (serviceHistory.reduce((total, service) => total + service.rating, 0) / completedServices).toFixed(1)
+    : "N/A";
+
+  const performanceMetrics = [
+    { label: "Customers Served", value: completedServices },
+    { label: "Avg Service Time", value: `${averageServiceTime}m` },
+    { label: "Completed Services", value: completedServices },
+    { label: "Customer Rating", value: averageRating === "N/A" ? "N/A" : `${averageRating}/5` },
+  ];
 
   return (
     <div className="min-h-screen bg-[#FFFBF2] p-4 md:p-10 font-sans text-[#3E362E]">
@@ -60,6 +97,12 @@ function BarberDashboard() {
                     </div>
                 </div>
             </div>
+
+            <PerformanceView
+              title="Performance View"
+              subtitle="Sameer Khan"
+              metrics={performanceMetrics}
+            />
           </div>
 
           {/* Right: Appointment Queue */}
