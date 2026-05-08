@@ -134,10 +134,12 @@ function SalonRegistration() {
               <label className="text-[10px] font-black uppercase tracking-widest text-[#8D7B68] ml-1">Support No. *</label>
               <input 
                 required type="tel" value={formData.supportNumber}
-                onInput={(e) => {
-                  e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
-                  setFormData({...formData, supportNumber: e.target.value});
-                }}
+                onChange={(e) => {
+  // 1. Grab the raw text and clean it in a separate variable
+                  const cleanedNumber = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+  // 2. Update the state with the clean variable
+                  setFormData({ ...formData, supportNumber: cleanedNumber });
+}}
                 placeholder="Helpline No."
                 className="w-full bg-[#FDF5E6]/50 border border-[#EAD8C0] p-4 rounded-2xl focus:border-[#C5A059] focus:bg-white outline-none text-[#3E362E]" 
               />

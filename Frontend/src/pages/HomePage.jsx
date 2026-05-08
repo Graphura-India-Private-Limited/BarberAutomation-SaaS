@@ -110,7 +110,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#3E362E] font-sans overflow-x-hidden">
+    <div className="relative w-full bg-[#f7d693] text-[#312b26] font-sans overflow-x-hidden">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-orange-200/40 blur-[120px]"></div>
+    <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-amber-100/40 blur-[120px]"></div>
+  </div>
       <style dangerouslySetInnerHTML={{ __html:`
         @keyframes border-beam{0%{left:-100%}100%{left:100%}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
@@ -123,6 +127,7 @@ export default function HomePage() {
         .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#C5A059;transition:width .3s}
         .nav-link:hover::after{width:100%}
       `}} />
+      <div className="relative z-10"></div>
 
       {/* ══ NAVBAR ══ */}
       <nav className={`sticky top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-[#EADDCA]/80 bg-white/95 shadow-md backdrop-blur-xl" : "border-[#EADDCA]/30 bg-white/80 backdrop-blur-xl"}`}>
@@ -227,7 +232,7 @@ export default function HomePage() {
             <Star className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
             <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#8D7B68]">Elite Grooming Experience</span>
           </div>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-[1.1] text-[#3E362E] tracking-tighter uppercase">
+          <h1 className="text-2xl sm:text-4xl md:text-3xl lg:text-5xl font-extrabold leading-[1.1] text-[#3E362E] tracking-tighter uppercase">
             Mastering<br />
             <span className="text-[#C5A059] font-light italic font-serif">THE ART OF YOU.</span>
           </h1>
@@ -305,7 +310,7 @@ export default function HomePage() {
 
           <div>
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">About Us</span>
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3 mb-6">
+            <h2 className="text-3xl md:text-4.7xl font-black uppercase tracking-tight text-[#3E362E] mt-3 mb-6">
               We Are The Art Of <span className="text-[#C5A059] italic font-serif">Grooming</span>
             </h2>
             <p className="text-stone-600 leading-relaxed mb-4 font-serif italic">
@@ -343,7 +348,7 @@ export default function HomePage() {
       </section>
 
       {/* ══ SERVICES ══ */}
-      <section id="services" className="bg-[#F9F5EF] py-20 md:py-28">
+      <section id="services" className="bg-[#f5e1c3] py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-14">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What We Offer</span>
@@ -429,7 +434,7 @@ export default function HomePage() {
 
       {/* ══ NEARBY SALONS ══ */}
       {salons.length > 0 && (
-        <section className="bg-[#F9F5EF] py-20">
+        <section className="bg-[#f5e4c9] py-20">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-14">
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Find Us</span>
@@ -569,6 +574,7 @@ export default function HomePage() {
                   ["Booking History", "/booking-history"],
                   ["Salon Detail",    "/salon-detail"],
                   ["Nearby Salons",   "/nearby"],
+                  ["Owner Login",     "/owner/login"],
                   ["Barber Login",    "/barber/login"],
                   ["Salon Register",  "/register-salon"],
                   ["Admin Panel",     "/admin/login"],

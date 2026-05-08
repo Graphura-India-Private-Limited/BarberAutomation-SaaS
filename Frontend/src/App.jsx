@@ -10,6 +10,7 @@ import BarberProfile       from "./pages/barber/BarberProfile";
 import BarberDashboard     from "./pages/barber/BarberDashboard";
 import ServiceConsole      from "./pages/barber/ServiceConsole";
 import BreakManagement     from "./pages/barber/BreakManagement";
+import OwnerLogin          from "./pages/owner/OwnerLogin";
 import SalonRegistration   from "./pages/owner/SalonRegistration";
 import OwnerDashboard      from "./pages/owner/OwnerDashboard";
 import ManageServices      from "./pages/owner/ManageServices";
@@ -77,6 +78,7 @@ function App() {
         <Route path="/noshow-delay"     element={<NoShowDelayPage />} />
 
         {/* ── OWNER ── */}
+        <Route path="/owner/login"           element={<OwnerLogin />} />
         <Route path="/register-salon"        element={<SalonRegistration />} />
         <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
