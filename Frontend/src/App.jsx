@@ -49,7 +49,8 @@ import CustomerDetails from "./pages/customer/CustomerDetails";   // ✅ added
 import Booking from "./pages/customer/Booking";    
 import BookingHistory from './pages/customer/BookingHistory';   
 import CustomerBookingFlow from './pages/customer/CustomerBookingFlow'; 
-import CustomerInteractionView from "./pages/customer/CustomerInteractionView";          
+import CustomerInteractionView from "./pages/customer/CustomerInteractionView";   
+import SmartQueue from "./pages/customer/SmartQueue";       
 
 // ✅ YOUR PAGE
 import SalonDetailPage from "./Components/SalonDetailPage";
@@ -93,6 +94,7 @@ function App() {
         <Route path="/booking-history"          element={<BookingHistory />} />
         <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
         <Route path="/customer/interactions" element={<CustomerInteractionView />} />
+        <Route path="/smart-queue" element={<SmartQueue />} />
 
         {/* ── DISCOVERY ── */}
         <Route path="/nearby"       element={<NearbyBarbers />} />
