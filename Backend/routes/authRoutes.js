@@ -12,62 +12,115 @@ const { protect } = require("../middleware/authMiddleware");
 const genToken = (id, role = "customer") =>
   jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
+/* ══ SMS via Fast2SMS (free Indian SMS) ══ */
+const sendSMS = async (mobile, otp) => {
+  try {
+    if (!process.env.FAST2SMS_KEY) {
+      console.log(`\n OTP for ${mobile}: ${otp}\n`);
+      return;
+    }
+    const res = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+      method: "POST",
+      headers: {
+        "authorization": process.env.FAST2SMS_KEY,
+        "Content-Type":  "application/json",
+      },
+      body: JSON.stringify({
+        route:     "otp",
+        variables_values: otp,
+        numbers:   mobile,
+      }),
+    });
+    const data = await res.json();
+    console.log("SMS sent:", data);
+  } catch (err) {
+    console.log("SMS failed, OTP:", otp, err.message);
+  }
+};
+
 /* ══════════════════════════════════════
    CUSTOMER AUTH — OTP Based
 ══════════════════════════════════════ */
 
+/* ── Send OTP — only for REGISTERED users ── */
 router.post("/send-otp", async (req, res) => {
   try {
     const { mobile } = req.body;
     if (!mobile || mobile.length !== 10)
       return res.status(400).json({ success:false, message:"Enter valid 10-digit mobile" });
+
+    /* Check if customer exists */
+    const customer = await Customer.findOne({ mobile });
+    if (!customer)
+      return res.status(400).json({
+        success: false,
+        message: "Mobile not registered. Please create an account first.",
+        notRegistered: true,
+      });
+
     const otp     = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000);
     await OtpStore.deleteMany({ mobile });
-    await OtpStore.create({ mobile, otp, expires_at:expires });
-    console.log(`\n🔐 OTP for ${mobile}: ${otp}\n`);
+    await OtpStore.create({ mobile, otp, expires_at: expires });
+
+    /* Send real SMS */
+    await sendSMS(mobile, otp);
+
     res.json({ success:true, message:`OTP sent to ${mobile}`, otp });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
 });
 
+/* ── Verify OTP ── */
 router.post("/verify-otp", async (req, res) => {
   try {
     const { mobile, otp } = req.body;
     if (!mobile || !otp)
       return res.status(400).json({ success:false, message:"Mobile and OTP required" });
+
     const record = await OtpStore.findOne({ mobile, otp });
     if (!record)
       return res.status(400).json({ success:false, message:"Invalid OTP. Please try again." });
+
     if (new Date() > record.expires_at) {
       await OtpStore.deleteMany({ mobile });
       return res.status(400).json({ success:false, message:"OTP expired. Request a new one." });
     }
+
     await OtpStore.deleteMany({ mobile });
-    let customer = await Customer.findOne({ mobile });
-    const isNew  = !customer;
-    if (!customer) customer = await Customer.create({ mobile });
+
+    const customer = await Customer.findOne({ mobile });
+    if (!customer)
+      return res.status(400).json({ success:false, message:"User not found. Please register first." });
+
     const token = genToken(customer._id, "customer");
-    res.json({ success:true, token, isNew, user:customer });
+    res.json({ success:true, token, isNew:false, user:customer });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
 });
 
+/* ── Signup — creates new account ── */
 router.post("/signup", async (req, res) => {
   try {
     const { mobile, name, email } = req.body;
-    let customer = await Customer.findOne({ mobile });
-    if (customer) {
-      customer.name  = name  || customer.name;
-      customer.email = email || customer.email;
-      await customer.save();
-    } else {
-      customer = await Customer.create({ mobile, name, email });
-    }
-    const token = genToken(customer._id, "customer");
-    res.json({ success:true, token, user:customer });
+    if (!mobile || mobile.length !== 10)
+      return res.status(400).json({ success:false, message:"Enter valid 10-digit mobile" });
+    if (!name || !name.trim())
+      return res.status(400).json({ success:false, message:"Name is required" });
+
+    /* Check if already registered */
+    const exists = await Customer.findOne({ mobile });
+    if (exists)
+      return res.status(400).json({
+        success:  false,
+        message:  "This mobile number is already registered. Please login instead.",
+        alreadyExists: true,
+      });
+
+    const customer = await Customer.create({ mobile, name: name.trim(), email: email||"" });
+    res.status(201).json({ success:true, user:customer, message:"Account created! Please login with OTP." });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
@@ -120,7 +173,7 @@ router.delete("/family-member/:id", protect, async (req, res) => {
 });
 
 /* ══════════════════════════════════════
-   OWNER AUTH — Mobile + Password
+   OWNER AUTH
 ══════════════════════════════════════ */
 
 router.post("/owner/send-otp", async (req, res) => {
@@ -132,7 +185,7 @@ router.post("/owner/send-otp", async (req, res) => {
     const expires = new Date(Date.now() + 10 * 60 * 1000);
     await OtpStore.deleteMany({ mobile });
     await OtpStore.create({ mobile, otp, expires_at:expires });
-    console.log(`\n🏪 Owner OTP for ${mobile}: ${otp}\n`);
+    await sendSMS(mobile, otp);
     res.json({ success:true, message:`OTP sent to ${mobile}`, otp });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
@@ -201,7 +254,7 @@ router.get("/owner/profile", protect, async (req, res) => {
 });
 
 /* ══════════════════════════════════════
-   BARBER AUTH — Mobile + Password
+   BARBER AUTH
 ══════════════════════════════════════ */
 
 router.post("/barber/register", protect, async (req, res) => {
@@ -256,10 +309,9 @@ router.put("/barber/change-password", protect, async (req, res) => {
 });
 
 /* ══════════════════════════════════════
-   ADMIN AUTH — Mobile + Password + MPIN
+   ADMIN AUTH
 ══════════════════════════════════════ */
 
-/* ── Admin Login by Email (old) ── */
 router.post("/admin/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -278,7 +330,6 @@ router.post("/admin/login", async (req, res) => {
   }
 });
 
-/* ── Admin Login by Mobile (new) ── */
 router.post("/admin/login/mobile", async (req, res) => {
   try {
     const { mobile, password } = req.body;
@@ -297,7 +348,6 @@ router.post("/admin/login/mobile", async (req, res) => {
   }
 });
 
-/* ── Admin Verify MPIN ── */
 router.post("/admin/verify-mpin", protect, async (req, res) => {
   try {
     const { mpin } = req.body;
@@ -311,7 +361,6 @@ router.post("/admin/verify-mpin", protect, async (req, res) => {
   }
 });
 
-/* ── Create Admin ── */
 router.post("/admin/create", async (req, res) => {
   try {
     const { email, password, mpin, mobile } = req.body;
