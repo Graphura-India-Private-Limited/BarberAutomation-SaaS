@@ -74,7 +74,6 @@ function BarberProfile() {
                   value={profile.mobile}
                   onInput={(e) => e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10)}
                   onChange={(e) => setProfile({...profile, mobile: e.target.value})}
-                  className="w-full bg-white/[0.03] border border-white/10 p-5 rounded-2xl focus:border-[#D4AF37] focus:bg-white/[0.05] outline-none transition-all text-lg font-medium"
                   placeholder="Enter Mobile Number"
                 className="w-full bg-black/50 border border-gray-700 p-4 rounded-xl focus:border-[#D4AF37] outline-none text-white" 
                 />
