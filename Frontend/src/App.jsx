@@ -12,6 +12,7 @@ import Register            from "./pages/auth/Register";
 import DuplicateAccount    from "./pages/auth/DuplicateAccount";
 import RateLimit           from "./pages/auth/RateLimit";
 import Payment             from "./pages/auth/Payment";
+import StaffLogin          from "./pages/auth/StaffLogin";
 
 import BarberLogin         from "./pages/barber/BarberLogin";
 import BarberProfile       from "./pages/barber/BarberProfile";
@@ -19,11 +20,15 @@ import BarberDashboard     from "./pages/barber/BarberDashboard";
 import ServiceConsole      from "./pages/barber/ServiceConsole";
 import ServiceHandler      from "./pages/barber/ServiceHandler";
 import BreakManagement     from "./pages/barber/BreakManagement";
+import QueuePage           from "./pages/barber/QueuePage";
 
 import OwnerLogin          from "./pages/owner/OwnerLogin";
 import SalonRegistration   from "./pages/owner/SalonRegistration";
 import OwnerDashboard      from "./pages/owner/OwnerDashboard";
 import ManageServices      from "./pages/owner/ManageServices";
+import HomeOverview        from "./pages/owner/HomeOverview";
+import FinancePage         from "./pages/owner/FinancePage";
+import SettingsPage        from "./pages/owner/SettingsPage";
 
 import AdminLogin          from "./pages/admin/AdminLogin";
 import AdminOnboarding     from "./pages/admin/AdminOnboarding";
@@ -45,6 +50,7 @@ import SalonDetailPage from "./Components/SalonDetailPage";
 import NearbyBarbers   from "./Components/NearbyBarbers";
 import NoShowDelayPage from "./Components/NoShowDelayPage";
 import MembershipSection from "./Components/MembershipSection";
+// import Navbar             from "./Components/Navbar";
 
 const demoBooking = { status:"completed", barberName:"Rahul" };
 
@@ -110,6 +116,14 @@ function App() {
         {/* ── ADMIN ── */}
         <Route path="/admin/login"    element={<AdminLogin />} />
         <Route path="/admin/requests" element={<AdminOnboarding />} />
+
+         {/* ── SECURITY & ACCESS CONTROL ── */}
+        <Route path="/staff-login"    element={<StaffLogin />} />
+        <Route path="/owner/overview" element={<HomeOverview />} />
+        <Route path="/barber/queue"   element={<QueuePage />} />
+        <Route path="/owner/finance"  element={<FinancePage />} />
+        <Route path="/owner/settings" element={<SettingsPage />} />
+
 
       </Routes>
     </BrowserRouter>
