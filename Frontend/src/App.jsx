@@ -47,6 +47,55 @@ import NoShowDelayPage from "./Components/NoShowDelayPage";
 import MembershipSection from "./Components/MembershipSection";
 
 const demoBooking = { status:"completed", barberName:"Rahul" };
+// Auth Pages
+import Login  from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
+import CustomerProfile from "./pages/auth/CustomerProfile";
+import OTPLogin from "./pages/auth/OTPLogin";
+import OTPVerify from "./pages/auth/OTPVerify";
+import Register from "./pages/auth/Register";
+import DuplicateAccount from "./pages/auth/DuplicateAccount";
+import RateLimit from "./pages/auth/RateLimit";
+import Payment from "./pages/auth/Payment";
+
+// Review Component
+import ReviewSystem from "./Components/ReviewSystem";
+
+// Barber Pages
+import BreakManagement from "./pages/barber/BreakManagement";
+import BarberLogin from "./pages/barber/BarberLogin";
+import BarberProfile from "./pages/barber/BarberProfile";
+import BarberDashboard from "./pages/barber/BarberDashboard";
+import ServiceConsole from "./pages/barber/ServiceConsole";
+import ServiceHandler from "./pages/barber/ServiceHandler";
+
+// Owner Pages
+import OwnerLogin from "./pages/owner/OwnerLogin";
+import SalonRegistration from "./pages/owner/SalonRegistration";
+import OwnerDashboard from "./pages/owner/OwnerDashboard";
+import ManageServices from "./pages/owner/ManageServices";
+
+
+// Admin Pages
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminOnboarding from "./pages/admin/AdminOnboarding";
+
+// 🔥 Booking Flow (team code)
+import ServiceCategories from "./pages/customer/ServiceCategories";
+import MenServices from "./pages/customer/MenServices";
+import WomenServices from "./pages/customer/WomenServices";
+import AddonServices from "./pages/customer/AddonServices";
+import BarberSelection from "./pages/customer/BarberSelection";
+import CustomerDetails from "./pages/customer/CustomerDetails";   // ✅ added
+import Booking from "./pages/customer/Booking";    
+import BookingHistory from './pages/customer/BookingHistory';   
+import CustomerBookingFlow from './pages/customer/CustomerBookingFlow'; 
+import CustomerInteractionView from "./pages/customer/CustomerInteractionView";   
+import SmartQueue from "./pages/customer/SmartQueue";       
+
+// ✅ YOUR PAGE
+import SalonDetailPage from "./Components/SalonDetailPage";
+import MembershipSection from "./Components/MembershipSection"
 
 function App() {
   return (
@@ -84,6 +133,8 @@ function App() {
         <Route path="/booking"                  element={<CustomerBookingFlow />} />
         <Route path="/booking-history"          element={<BookingHistory />} />
         <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
+        <Route path="/customer/interactions" element={<CustomerInteractionView />} />
+        <Route path="/smart-queue" element={<SmartQueue />} />
 
         {/* ── DISCOVERY ── */}
         <Route path="/nearby"       element={<NearbyBarbers />} />
