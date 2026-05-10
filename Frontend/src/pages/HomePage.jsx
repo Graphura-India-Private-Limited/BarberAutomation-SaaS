@@ -569,6 +569,7 @@ export default function HomePage() {
                   ["Booking History", "/booking-history"],
                   ["Salon Detail",    "/salon-detail"],
                   ["Nearby Salons",   "/nearby"],
+                  ["Staff Login",     "/staff-login"],
                   ["Barber Login",    "/barber/login"],
                   ["Salon Register",  "/register-salon"],
                   ["Admin Panel",     "/admin/login"],

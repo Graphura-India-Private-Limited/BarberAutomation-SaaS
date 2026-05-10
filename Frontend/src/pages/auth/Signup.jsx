@@ -50,15 +50,43 @@ function Signup() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (mobile.length !== 10) {
       setMobileError("10 digit number is required");
       return;
     }
     if (emailError) return;
-    console.log("Form Submitted:", { fullName, email, mobile, password });
-  };
+    try {
+    // This part sends the data to your backend
+    const response = await fetch("http://localhost:5000/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: fullName,
+        email: email,
+        mobile : mobile,
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert("Registration Successful!");
+      // Send them to the login page you defined in App.jsx
+      window.location.href = "/login"; 
+    } else {
+      // Show the error message your teammate wrote in authRoutes.js
+      alert(data.message || "Registration failed. Try again.");
+    }
+  } catch (error) {
+    console.error("Connection error:", error);
+    alert("Backend is not responding. Make sure your server is running on port 5000.");
+  }
+};
 
   return (
     <div className="h-screen w-full grid md:grid-cols-2 bg-[#FFFBF2] overflow-hidden font-sans text-[#3E362E]">
