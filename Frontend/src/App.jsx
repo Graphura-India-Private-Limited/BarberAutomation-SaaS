@@ -50,6 +50,7 @@ import SalonDetailPage from "./Components/SalonDetailPage";
 import NearbyBarbers   from "./Components/NearbyBarbers";
 import NoShowDelayPage from "./Components/NoShowDelayPage";
 import MembershipSection from "./Components/MembershipSection";
+import LiveQueue from "./pages/owner/LiveQueue";
 // import Navbar             from "./Components/Navbar";
 
 
@@ -132,7 +133,7 @@ function App() {
         <Route path="/barber/queue"   element={<QueuePage />} />
         <Route path="/owner/finance"  element={<FinancePage />} />
         <Route path="/owner/settings" element={<SettingsPage />} />
-
+         <Route path="/owner/queue" element={<LiveQueue />} /> 
       </Routes>
     </BrowserRouter>
   );

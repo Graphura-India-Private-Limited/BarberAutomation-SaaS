@@ -573,6 +573,7 @@ export default function HomePage() {
                   ["Barber Login",    "/barber/login"],
                   ["Salon Register",  "/register-salon"],
                   ["Admin Panel",     "/admin/login"],
+                  ["Owner Dashboard", "/owner/dashboard"],
                 ].map(([l,p]) => (
                   <li key={p}><button onClick={() => navigate(p)} className="text-stone-400 hover:text-[#C5A059] text-sm transition">{l}</button></li>
                 ))}
