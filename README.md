@@ -45,6 +45,20 @@ npm run dev
 | Admin MPIN | — | 123456 |
 
 ---
+## Staff Login Credentials
+
+| Role   | Email                                     | Password  |
+| ------ | ----------------------------------------- | --------- |
+| Owner  | [ravi@salon.com](mailto:ravi@salon.com)   | owner123  |
+| Barber | [ajay@salon.com](mailto:ajay@salon.com)   | barber123 |
+| Barber | [kiran@salon.com](mailto:kiran@salon.com) | kiran123  |
+
+```bash
+http://localhost:5173/staff-login
+```
+
+
+---
 
 ## ⚠️ Notes
 
