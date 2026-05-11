@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SearchFilterHeader from "../../Components/SearchFilterHeader";
+import { useServices } from "../../context/ServiceContext";
 
 export default function MenServices() {
   const navigate = useNavigate();
+  const { services: allServices } = useServices();
 
   const [filters, setFilters] = useState({
     search: "",
@@ -12,27 +14,16 @@ export default function MenServices() {
     rating: ""
   });
 
-  const services = [
-    {
-      name: "Classic Haircut",
-      price: 200,
-      img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=800"
-    },
-    {
-      name: "Skin Fade",
-      price: 250,
-      img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=800"
-    },
-    {
-      name: "Beard Trim",
-      price: 100,
-      img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800"
-    },
-    {
-      name: "Hot Towel Shave",
-      price: 150,
-      img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=800"
-    }
+  // Pull active Hair/Beard/Combo services from context; fall back to static if none
+  const contextServices = allServices.filter(s =>
+    s.active && ["Hair", "Beard", "Combo"].includes(s.category)
+  );
+
+  const services = contextServices.length > 0 ? contextServices : [
+    { name: "Classic Haircut", price: 200, img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=800", icon: "✂️" },
+    { name: "Skin Fade",       price: 250, img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=800", icon: "✂️" },
+    { name: "Beard Trim",      price: 100, img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800", icon: "🧔" },
+    { name: "Hot Towel Shave", price: 150, img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=800", icon: "🪒" },
   ];
 
   const getPriceRange = (cost) => {

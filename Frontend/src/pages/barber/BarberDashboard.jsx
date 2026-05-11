@@ -4,6 +4,10 @@ import {
   IndianRupee, Star, Settings, LogOut,
   Clock3, WifiOff, Menu, X, Wifi,
 } from "lucide-react";
+import BarberServiceList from "../../Components/BarberServiceList";
+
+// Barber ID for this dashboard — in a real app this comes from auth context
+const MY_BARBER_ID = 1;
 
 /* ─── Sidebar nav ────────────────────────────────────────────────── */
 const NAV = [
@@ -188,7 +192,6 @@ export default function BarberDashboard() {
 
             {/* ════ LEFT PANEL ════ */}
             <div className="w-full xl:w-72 2xl:w-80 flex-shrink-0 space-y-5">
-
               {/* Profile card */}
               <div className="bg-white border border-[#f3dfcf] rounded-3xl p-6 relative overflow-hidden">
                 <div className="absolute right-4 top-4 text-7xl opacity-[0.04] select-none leading-none">✂</div>
@@ -221,7 +224,6 @@ export default function BarberDashboard() {
 
               {/* Availability & Status card */}
               <div className="bg-white border border-[#f3dfcf] rounded-3xl p-6">
-
                 <div className="flex items-center gap-2.5 mb-5">
                   <Clock3 size={18} className="text-orange-500" />
                   <p className="text-sm font-black text-gray-700 uppercase tracking-widest">
@@ -261,6 +263,17 @@ export default function BarberDashboard() {
                     <Clock3 size={15} /> {breakMins} mins
                   </span>
                 </div>
+              </div>
+
+              {/* ── My Services card ── */}
+              <div className="bg-white border border-[#f3dfcf] rounded-3xl p-6">
+                <div className="flex items-center gap-2.5 mb-4">
+                  <Scissors size={18} className="text-orange-500" />
+                  <p className="text-sm font-black text-gray-700 uppercase tracking-widest">
+                    My Services
+                  </p>
+                </div>
+                <BarberServiceList barberId={MY_BARBER_ID} compact />
               </div>
             </div>
 

@@ -7,6 +7,7 @@ import {
   Bell, UserCircle, Clock, MapPin,
   AlertTriangle, PlusCircle, Pencil,
 } from "lucide-react";
+import { useServices } from "../../context/ServiceContext";
 
 /* ─── Sidebar nav ────────────────────────────────────────────────── */
 const NAV = [
@@ -49,11 +50,15 @@ const SVC_ICON = ["✂️", "🧔", "💆"];
 export default function OwnerDashboard() {
   const navigate = useNavigate();
   const fileRef = useRef(null);
+  const { services: ctxServices } = useServices();
 
   const [sideOpen, setSideOpen] = useState(false);
   const [liveSync, setLiveSync] = useState(false);
   const [toast, setToast] = useState(null);
   const [gallery, setGallery] = useState(GALLERY);
+
+  // Use context services (live, first 3 for preview)
+  const services = ctxServices.filter(s => s.active).slice(0, 3);
 
   const [salon] = useState({
     name: "The Royal Groom",
@@ -61,12 +66,6 @@ export default function OwnerDashboard() {
     address: "Koregaon Park, Pune",
     status: "Approved",
   });
-
-  const [services, setServices] = useState([
-    { id: 1, name: "Premium Haircut", price: "499" },
-    { id: 2, name: "Beard Styling", price: "299" },
-    { id: 3, name: "Hair Spa", price: "699" },
-  ]);
 
   const [barbers, setBarbers] = useState([
     {
@@ -381,15 +380,19 @@ export default function OwnerDashboard() {
                   <div key={s.id}
                     className="flex items-center gap-4 p-4 bg-orange-50/50 border border-orange-100 rounded-2xl hover:border-orange-300 transition-all group">
                     <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
-                      {SVC_ICON[i] || "✂️"}
+                      {s.icon || SVC_ICON[i] || "✂️"}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-gray-800 text-sm">{s.name}</p>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Standard Service</p>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">
+                        {s.category} · {s.duration} mins
+                      </p>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-lg font-black text-gray-800">₹{s.price}</p>
-                      <button className="flex items-center gap-1 text-[10px] font-bold text-orange-500 hover:underline mt-0.5">
+                      <button
+                        onClick={() => navigate("/owner/manage-services")}
+                        className="flex items-center gap-1 text-[10px] font-bold text-orange-500 hover:underline mt-0.5">
                         <Pencil size={10} /> Edit
                       </button>
                     </div>

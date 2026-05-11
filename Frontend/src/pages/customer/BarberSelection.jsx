@@ -1,10 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SearchFilterHeader from "../../Components/SearchFilterHeader";
+import { useServices } from "../../context/ServiceContext";
 
 export default function BarberSelection() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { getServicesForBarber } = useServices();
 
   const selectedService = location.state?.service;
 
@@ -50,13 +52,24 @@ export default function BarberSelection() {
     }
   ];
 
-  // 🔥 FILTER LOGIC
+  // Filter: search/rating/distance + only barbers who offer the selected service
   const filteredBarbers = barbers.filter((b) => {
-    return (
+    const matchesFilters =
       b.name.toLowerCase().includes(filters.search.toLowerCase()) &&
       (filters.rating === "" || b.rating >= Number(filters.rating)) &&
-      (filters.distance === "" || b.distance <= Number(filters.distance))
-    );
+      (filters.distance === "" || b.distance <= Number(filters.distance));
+
+    // If a service is selected, only show barbers who offer it
+    if (selectedService && matchesFilters) {
+      const barberServices = getServicesForBarber(b.id);
+      const offersService = barberServices.some(
+        s => s.name.toLowerCase() === selectedService.name?.toLowerCase() ||
+             s.id === selectedService.id
+      );
+      // If context has services for this barber, filter; otherwise show all
+      return barberServices.length === 0 ? matchesFilters : offersService;
+    }
+    return matchesFilters;
   });
 
   // 🔥 AUTO ASSIGN
