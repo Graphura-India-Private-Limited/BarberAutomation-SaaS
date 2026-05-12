@@ -1,5 +1,5 @@
-const express=require("express");const router=express.Router();const Service=require("../models/Service");const{protect}=require("../middleware/authMiddleware");
+const express=require("express");const router=express.Router();const Service=require("../models/Service");const Salon=require("../models/Salon");const{protect}=require("../middleware/authMiddleware");
 router.get("/:salon_id",async(req,res)=>{try{const services=await Service.find({salon_id:req.params.salon_id,is_active:true});res.json({success:true,services});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.post("/",protect,async(req,res)=>{try{const service=await Service.create(req.body);res.status(201).json({success:true,service});}catch(err){res.status(500).json({success:false,message:err.message});}});
+router.post("/",protect,async(req,res)=>{try{const salon=await Salon.findById(req.body.salon_id);if(!salon||salon.status!=="approved")return res.status(403).json({success:false,message:"Salon approval required before managing services"});const service=await Service.create(req.body);res.status(201).json({success:true,service});}catch(err){res.status(500).json({success:false,message:err.message});}});
 router.delete("/:id",protect,async(req,res)=>{try{await Service.findByIdAndUpdate(req.params.id,{is_active:false});res.json({success:true,message:"Deleted"});}catch(err){res.status(500).json({success:false,message:err.message});}});
 module.exports=router;

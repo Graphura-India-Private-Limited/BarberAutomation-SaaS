@@ -47,6 +47,9 @@ export default function OwnerLogin() {
         } else if (data.status === "approved") {
           setSuccess("Welcome back! Redirecting to dashboard...");
           setTimeout(() => navigate("/owner/dashboard"), 1200);
+        } else if (data.status === "rejected") {
+          setSuccess("Login successful. Please review rejection details and resubmit.");
+          setTimeout(() => navigate("/owner/dashboard"), 1500);
         } else {
           setError(`Account ${data.status}. Contact admin.`);
         }
