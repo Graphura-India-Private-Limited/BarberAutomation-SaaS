@@ -192,27 +192,58 @@ router.post("/owner/send-otp", async (req, res) => {
   }
 });
 
+const pickSalonProfile = (body) => ({
+  owner_name: body.owner_name || body.ownerName || "",
+  salon_name: body.salon_name || body.salonName || "",
+  mobile: body.mobile || body.mobileNumber || "",
+  email: body.email || "",
+  address: body.address || "",
+  latitude: Number(body.latitude ?? body.location?.lat ?? 0) || 0,
+  longitude: Number(body.longitude ?? body.location?.lng ?? 0) || 0,
+  opening_time: body.opening_time || body.openingTime || "09:00",
+  closing_time: body.closing_time || body.closingTime || "21:00",
+  services_offered: Array.isArray(body.services_offered)
+    ? body.services_offered
+    : String(body.servicesOffered || body.services_offered || "")
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean),
+  basic_pricing: Number(body.basic_pricing ?? body.pricing ?? 0) || 0,
+  number_of_barbers: Number(body.number_of_barbers ?? body.numBarbers ?? 0) || 0,
+  support_number: body.support_number || body.supportNumber || "",
+  images: Array.isArray(body.images) ? body.images.filter(Boolean) : [],
+  about: body.about || "",
+});
+
 router.post("/owner/register", async (req, res) => {
   try {
-    const { mobile, otp, owner_name, salon_name, email, address, password } = req.body;
-    const record = await OtpStore.findOne({ mobile, otp });
-    if (!record)
-      return res.status(400).json({ success:false, message:"Invalid OTP" });
-    if (new Date() > record.expires_at) {
+    const profile = pickSalonProfile(req.body);
+    const { mobile } = profile;
+    const { otp, password } = req.body;
+    if (!profile.salon_name || !profile.owner_name || !mobile)
+      return res.status(400).json({ success:false, message:"Salon name, owner name and mobile are required" });
+    if (!password)
+      return res.status(400).json({ success:false, message:"Password is required for owner login" });
+    if (otp) {
+      const record = await OtpStore.findOne({ mobile, otp });
+      if (!record)
+        return res.status(400).json({ success:false, message:"Invalid OTP" });
+      if (new Date() > record.expires_at) {
+        await OtpStore.deleteMany({ mobile });
+        return res.status(400).json({ success:false, message:"OTP expired" });
+      }
       await OtpStore.deleteMany({ mobile });
-      return res.status(400).json({ success:false, message:"OTP expired" });
     }
-    await OtpStore.deleteMany({ mobile });
     const exists = await Salon.findOne({ mobile });
     if (exists)
       return res.status(400).json({ success:false, message:"Salon already registered with this mobile" });
     const password_hash = await bcrypt.hash(password, 10);
     const salon = await Salon.create({
-      owner_name, salon_name, mobile,
-      email:    email   || "",
-      address:  address || "",
+      ...profile,
       password_hash,
-      status: "pending"
+      status: "pending",
+      rejection_reason: "",
+      submitted_at: new Date(),
     });
     const token = genToken(salon._id, "owner");
     res.status(201).json({ success:true, token, salon, message:"Salon registered! Awaiting admin approval." });
@@ -234,8 +265,6 @@ router.post("/owner/login", async (req, res) => {
     const ok = await bcrypt.compare(password, salon.password_hash);
     if (!ok)
       return res.status(400).json({ success:false, message:"Wrong password" });
-    if (salon.status === "rejected")
-      return res.status(400).json({ success:false, message:`Registration rejected: ${salon.rejection_reason}` });
     const token = genToken(salon._id, "owner");
     res.json({ success:true, token, salon, status:salon.status });
   } catch (err) {
@@ -248,6 +277,41 @@ router.get("/owner/profile", protect, async (req, res) => {
     const salon = await Salon.findById(req.user.id);
     if (!salon) return res.status(404).json({ success:false, message:"Not found" });
     res.json({ success:true, salon });
+  } catch (err) {
+    res.status(500).json({ success:false, message:err.message });
+  }
+});
+
+router.put("/owner/profile", protect, async (req, res) => {
+  try {
+    if (req.user.role !== "owner")
+      return res.status(403).json({ success:false, message:"Owner access only" });
+    const updates = pickSalonProfile(req.body);
+    delete updates.mobile;
+    Object.keys(updates).forEach(key => {
+      if (updates[key] === "" || updates[key] === null || updates[key] === undefined) delete updates[key];
+    });
+    const salon = await Salon.findByIdAndUpdate(req.user.id, updates, { new:true });
+    if (!salon) return res.status(404).json({ success:false, message:"Salon not found" });
+    res.json({ success:true, salon, message:"Salon profile updated" });
+  } catch (err) {
+    res.status(500).json({ success:false, message:err.message });
+  }
+});
+
+router.put("/owner/resubmit", protect, async (req, res) => {
+  try {
+    if (req.user.role !== "owner")
+      return res.status(403).json({ success:false, message:"Owner access only" });
+    const updates = pickSalonProfile(req.body);
+    delete updates.mobile;
+    const salon = await Salon.findByIdAndUpdate(
+      req.user.id,
+      { ...updates, status:"pending", rejection_reason:"", submitted_at:new Date(), approved_at:null },
+      { new:true }
+    );
+    if (!salon) return res.status(404).json({ success:false, message:"Salon not found" });
+    res.json({ success:true, salon, message:"Profile resubmitted for approval" });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
@@ -284,6 +348,8 @@ router.post("/barber/login", async (req, res) => {
       .populate("salon_id", "salon_name address status");
     if (!barber)
       return res.status(400).json({ success:false, message:"Barber not found. Contact your salon owner." });
+    if (barber.salon_id?.status !== "approved")
+      return res.status(403).json({ success:false, message:"Salon is not approved yet. Barber access is locked." });
     const ok = await barber.matchPassword(password);
     if (!ok)
       return res.status(400).json({ success:false, message:"Wrong password" });

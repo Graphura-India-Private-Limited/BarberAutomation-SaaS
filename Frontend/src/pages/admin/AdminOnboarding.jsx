@@ -132,7 +132,7 @@ export default function AdminOnboarding() {
       });
       const d = await r.json();
       if (d.success) {
-        setSalons(p => p.map(s => s._id===id ? {...s, status, rejection_reason} : s));
+        setSalons(p => p.map(s => s._id===id ? d.salon || {...s, status, rejection_reason} : s));
         pop(`Salon ${status}!`, status==="approved"?"success":"error");
         setModal(null); setReason("");
       } else pop(d.message||"Failed","error");
@@ -501,7 +501,7 @@ export default function AdminOnboarding() {
                   {SALONS_FILTERED.map((s,i)=>(
                     <div key={s._id} style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                       <div style={{ height:140, overflow:"hidden", position:"relative" }}>
-                        <img src={salonImg(i)} alt={s.salon_name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                        <img src={s.images?.[0] || salonImg(i)} alt={s.salon_name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,.5),transparent)" }}/>
                         <div style={{ position:"absolute", bottom:10, left:12 }}>
                           <div style={{ fontSize:14, fontWeight:800, color:"#fff", fontFamily:"'Cormorant Garamond',serif" }}>{s.salon_name}</div>
@@ -513,6 +513,27 @@ export default function AdminOnboarding() {
                       <div style={{ padding:"14px 16px" }}>
                         <div style={{ fontSize:12, fontWeight:700, color:C.ink }}>{s.owner_name}</div>
                         <div style={{ fontSize:11, color:C.muted, marginBottom:6 }}>{s.mobile} · {s.address||"No address"}</div>
+                        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:10 }}>
+                          <div style={{ background:"#F7F5F2", borderRadius:8, padding:"7px 8px" }}>
+                            <div style={{ fontSize:9, color:C.muted, fontWeight:800, textTransform:"uppercase" }}>Pricing</div>
+                            <div style={{ fontSize:12, color:C.ink, fontWeight:800 }}>Rs. {s.basic_pricing || 0}+</div>
+                          </div>
+                          <div style={{ background:"#F7F5F2", borderRadius:8, padding:"7px 8px" }}>
+                            <div style={{ fontSize:9, color:C.muted, fontWeight:800, textTransform:"uppercase" }}>Barbers</div>
+                            <div style={{ fontSize:12, color:C.ink, fontWeight:800 }}>{s.number_of_barbers || 0}</div>
+                          </div>
+                        </div>
+                        {(s.services_offered?.length > 0 || s.support_number) && (
+                          <div style={{ fontSize:10, color:C.muted, marginBottom:10, lineHeight:1.5 }}>
+                            {s.services_offered?.length > 0 && <div><strong style={{ color:C.ink }}>Services:</strong> {s.services_offered.join(", ")}</div>}
+                            {s.support_number && <div><strong style={{ color:C.ink }}>Support:</strong> {s.support_number}</div>}
+                          </div>
+                        )}
+                        {salonTab==="rejected" && s.rejection_reason && (
+                          <div style={{ fontSize:10, color:C.red, background:`${C.red}10`, border:`1px solid ${C.red}25`, borderRadius:8, padding:8, marginBottom:10 }}>
+                            Rejection reason: {s.rejection_reason}
+                          </div>
+                        )}
                         <div style={{ fontSize:10, color:C.muted, marginBottom:12 }}>
                           Registered: {s.created_at ? new Date(s.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "—"}
                         </div>

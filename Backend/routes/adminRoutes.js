@@ -35,7 +35,12 @@ router.get("/salons", protect, adminOnly, async (req, res) => {
 router.put("/salon/:id/status", protect, adminOnly, async (req, res) => {
   try {
     const { status, rejection_reason } = req.body;
-    const salon = await Salon.findByIdAndUpdate(req.params.id, { status, rejection_reason: rejection_reason || "" }, { new: true });
+    const updates = {
+      status,
+      rejection_reason: status === "rejected" ? rejection_reason || "Rejected by admin" : "",
+      approved_at: status === "approved" ? new Date() : null,
+    };
+    const salon = await Salon.findByIdAndUpdate(req.params.id, updates, { new: true });
     res.json({ success: true, salon });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });

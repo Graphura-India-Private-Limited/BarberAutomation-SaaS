@@ -1,135 +1,164 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function ManageServices() {
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+export default function ManageServices() {
   const navigate = useNavigate();
-  
-
-  const [services, setServices] = useState([
-    { id: 1, name: "Premium Haircut", price: "499", duration: "45 min" },
-    { id: 2, name: "Beard Styling", price: "299", duration: "30 min" },
-    { id: 3, name: "Hair Spa & Massage", price: "899", duration: "60 min" }
-  ]);
-
-  const [newService, setNewService] = useState({ name: "", price: "", duration: "" });
+  const [salon, setSalon] = useState(null);
+  const [services, setServices] = useState([]);
+  const [newService, setNewService] = useState({ name: "", price: "", duration: "30", category: "men" });
   const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const token = localStorage.getItem("token");
 
-  const handleAddService = (e) => {
-    e.preventDefault();
-    if (newService.name && newService.price) {
-      setServices([...services, { id: Date.now(), ...newService }]);
-      setNewService({ name: "", price: "", duration: "" });
-      setIsAdding(false);
+  useEffect(() => {
+    if (!token) {
+      navigate("/owner/login");
+      return;
+    }
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const profile = await fetch(`${API}/auth/owner/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then(r => r.json());
+      if (!profile.success) throw new Error(profile.message || "Unable to load salon profile");
+      setSalon(profile.salon);
+      if (profile.salon?.status === "approved") {
+        const serviceData = await fetch(`${API}/services/${profile.salon._id}`).then(r => r.json());
+        if (serviceData.success) setServices(serviceData.services || []);
+      }
+    } catch (err) {
+      setError(err.message || "Unable to load services");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const deleteService = (id) => {
-    setServices(services.filter(s => s.id !== id));
+  const handleAddService = async (event) => {
+    event.preventDefault();
+    setError("");
+    try {
+      const res = await fetch(`${API}/services`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          ...newService,
+          salon_id: salon._id,
+          price: Number(newService.price),
+          duration: Number(newService.duration) || 30,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || "Unable to add service");
+      setServices(prev => [...prev, data.service]);
+      setNewService({ name: "", price: "", duration: "30", category: "men" });
+      setIsAdding(false);
+    } catch (err) {
+      setError(err.message || "Unable to add service");
+    }
   };
 
+  const deleteService = async (id) => {
+    try {
+      const res = await fetch(`${API}/services/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || "Unable to delete service");
+      setServices(prev => prev.filter(service => service._id !== id));
+    } catch (err) {
+      setError(err.message || "Unable to delete service");
+    }
+  };
+
+  if (loading) {
+    return <div className="min-h-screen bg-[#FFFBF2] p-10 text-center font-black text-[#3E362E]">Loading services...</div>;
+  }
+
+  if (salon?.status !== "approved") {
+    return (
+      <div className="min-h-screen bg-[#FFFBF2] p-6 font-sans text-[#3E362E]">
+        <div className="mx-auto max-w-2xl rounded-[2rem] border border-yellow-200 bg-yellow-50 p-8 text-center">
+          <h1 className="text-2xl font-black uppercase">Approval Required</h1>
+          <p className="mt-3 text-sm font-semibold text-yellow-800">
+            Barber management, queue controls and service pricing unlock after admin approval.
+          </p>
+          <button onClick={() => navigate("/owner/dashboard")} className="mt-6 rounded-xl bg-[#3E362E] px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white">
+            Back to Status
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#FFFBF2] p-4 md:p-10 font-sans text-[#3E362E]">
-      <div className="max-w-4xl mx-auto">
-        
-        {/* Navigation & Header */}
-        <button 
-          onClick={() => navigate("/owner/dashboard")}
-          className="text-[10px] font-black tracking-widest text-[#C5A059] mb-8 flex items-center gap-2 hover:translate-x-[-5px] transition-all"
-        >
-          ← BACK TO CONSOLE
+    <div className="min-h-screen bg-[#FFFBF2] p-4 font-sans text-[#3E362E] md:p-10">
+      <div className="mx-auto max-w-4xl">
+        <button onClick={() => navigate("/owner/dashboard")} className="mb-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#C5A059] transition hover:-translate-x-1">
+          Back to Console
         </button>
 
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+        <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter italic">
+            <h1 className="text-3xl font-black uppercase tracking-tight md:text-5xl">
               Manage <span className="text-[#C5A059]">Services</span>
             </h1>
-            <p className="text-[10px] font-bold text-[#8D7B68] uppercase tracking-[0.4em] mt-2 text-center md:text-left">
-              Menu & Pricing Control
+            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#8D7B68]">
+              {salon?.salon_name}
             </p>
           </div>
-          
           {!isAdding && (
-            <button 
-              onClick={() => setIsAdding(true)}
-              className="w-full md:w-auto px-8 py-4 bg-[#3E362E] text-white rounded-2xl font-black text-[10px] tracking-widest shadow-xl hover:scale-105 transition-all"
-            >
-              + ADD NEW CATEGORY
+            <button onClick={() => setIsAdding(true)} className="rounded-2xl bg-[#3E362E] px-8 py-4 text-[10px] font-black uppercase tracking-widest text-white shadow-xl transition hover:scale-105">
+              Add New Service
             </button>
           )}
         </div>
 
-        {/* Add Service Form (Requirement 2.2) */}
+        {error && <p className="mb-5 rounded-xl bg-red-50 p-3 text-center text-xs font-bold text-red-600">{error}</p>}
+
         {isAdding && (
-          <div className="bg-white border-2 border-[#C5A059] p-8 rounded-[2.5rem] mb-12 animate-in fade-in zoom-in duration-300">
-            <h2 className="text-xl font-black uppercase mb-6">New Service Details</h2>
-            <form onSubmit={handleAddService} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <label className="text-[9px] font-black text-[#C5A059] uppercase tracking-widest">Service Name</label>
-                <input 
-                  required
-                  placeholder="e.g. Hair Coloring"
-                  value={newService.name}
-                  onChange={(e) => setNewService({...newService, name: e.target.value})}
-                  className="w-full bg-[#FFFBF2] border border-[#EAD8C0] p-4 rounded-xl outline-none focus:border-[#C5A059] font-bold text-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] font-black text-[#C5A059] uppercase tracking-widest">Price (₹)</label>
-                <input 
-                  required
-                  type="number"
-                  placeholder="999"
-                  value={newService.price}
-                  onChange={(e) => setNewService({...newService, price: e.target.value})}
-                  className="w-full bg-[#FFFBF2] border border-[#EAD8C0] p-4 rounded-xl outline-none focus:border-[#C5A059] font-bold text-sm"
-                />
-              </div>
-              <div className="flex items-end gap-3">
-                <button type="submit" className="flex-1 bg-[#C5A059] text-white py-4 rounded-xl font-black text-[10px] tracking-widest hover:bg-[#A68648]">
-                  SAVE
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => setIsAdding(false)}
-                  className="px-6 py-4 bg-red-50 text-red-500 rounded-xl font-black text-[10px] tracking-widest"
-                >
-                  X
-                </button>
+          <div className="mb-10 rounded-[2rem] border-2 border-[#C5A059] bg-white p-7">
+            <h2 className="mb-5 text-xl font-black uppercase">New Service Details</h2>
+            <form onSubmit={handleAddService} className="grid gap-4 md:grid-cols-5">
+              <input required placeholder="Service name" value={newService.name} onChange={e => setNewService(prev => ({ ...prev, name: e.target.value }))} className="rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-3 text-sm font-bold outline-none focus:border-[#C5A059] md:col-span-2" />
+              <input required type="number" min="1" placeholder="Price" value={newService.price} onChange={e => setNewService(prev => ({ ...prev, price: e.target.value }))} className="rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-3 text-sm font-bold outline-none focus:border-[#C5A059]" />
+              <input type="number" min="5" placeholder="Minutes" value={newService.duration} onChange={e => setNewService(prev => ({ ...prev, duration: e.target.value }))} className="rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-3 text-sm font-bold outline-none focus:border-[#C5A059]" />
+              <select value={newService.category} onChange={e => setNewService(prev => ({ ...prev, category: e.target.value }))} className="rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-3 text-sm font-bold outline-none focus:border-[#C5A059]">
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+                <option value="addon">Addon</option>
+              </select>
+              <div className="flex gap-3 md:col-span-5">
+                <button className="rounded-xl bg-[#C5A059] px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white">Save</button>
+                <button type="button" onClick={() => setIsAdding(false)} className="rounded-xl bg-red-50 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-red-500">Cancel</button>
               </div>
             </form>
           </div>
         )}
 
-        {/* Services List */}
         <div className="space-y-4">
-          {services.map((service) => (
-            <div 
-              key={service.id} 
-              className="bg-white border border-[#EAD8C0] p-6 rounded-[2rem] flex flex-col md:flex-row justify-between items-center group hover:shadow-lg transition-all"
-            >
-              <div className="flex items-center gap-6 mb-4 md:mb-0">
-                <div className="w-14 h-14 bg-[#FDF5E6] rounded-2xl flex items-center justify-center text-xl shadow-inner group-hover:rotate-6 transition-transform">
-                  ✂️
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-[#3E362E]">{service.name}</h3>
-                  <p className="text-[10px] text-[#8D7B68] font-bold uppercase tracking-widest">Estimated: {service.duration || "N/A"}</p>
-                </div>
+          {services.map(service => (
+            <div key={service._id} className="flex flex-col gap-4 rounded-[2rem] border border-[#EAD8C0] bg-white p-6 transition hover:shadow-lg md:flex-row md:items-center md:justify-between">
+              <div>
+                <h3 className="text-lg font-black">{service.name}</h3>
+                <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-[#8D7B68]">
+                  {service.category} | {service.duration || 30} min
+                </p>
               </div>
-              
-              <div className="flex items-center gap-8">
+              <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <p className="text-2xl font-black text-[#3E362E]">₹{service.price}</p>
-                  <p className="text-[9px] text-[#C5A059] font-black tracking-widest uppercase">Base Price</p>
+                  <p className="text-2xl font-black">Rs. {service.price}</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-[#C5A059]">Base Price</p>
                 </div>
-                <button 
-                  onClick={() => deleteService(service.id)}
-                  className="p-3 bg-red-50 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                <button onClick={() => deleteService(service._id)} className="rounded-xl bg-red-50 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white">
+                  Delete
                 </button>
               </div>
             </div>
@@ -137,13 +166,11 @@ function ManageServices() {
         </div>
 
         {services.length === 0 && (
-          <div className="text-center py-20 opacity-40">
-            <p className="text-sm font-black uppercase tracking-[0.3em]">No services added yet.</p>
+          <div className="rounded-[2rem] border border-dashed border-[#EAD8C0] bg-white p-12 text-center text-sm font-black uppercase tracking-[0.3em] text-[#8D7B68]">
+            No services added yet.
           </div>
         )}
       </div>
     </div>
   );
 }
-
-export default ManageServices;
