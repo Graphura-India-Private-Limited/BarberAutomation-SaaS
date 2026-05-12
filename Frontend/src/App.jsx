@@ -19,6 +19,7 @@ import BarberDashboard     from "./pages/barber/BarberDashboard";
 import ServiceConsole      from "./pages/barber/ServiceConsole";
 import ServiceHandler      from "./pages/barber/ServiceHandler";
 import BreakManagement     from "./pages/barber/BreakManagement";
+import NoShowHandle from "./pages/barber/NoShowHandle";
 import QueuePage           from "./pages/barber/QueuePage";
 import SmartQueue          from "./pages/customer/SmartQueue";
 import OwnerLogin          from "./pages/owner/OwnerLogin";
@@ -28,6 +29,7 @@ import ManageServices      from "./pages/owner/ManageServices";
 import HomeOverview        from "./pages/owner/HomeOverview";
 import FinancePage         from "./pages/owner/FinancePage";
 import SettingsPage        from "./pages/owner/SettingsPage";
+import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import AdminLogin          from "./pages/admin/AdminLogin";
 import AdminOnboarding     from "./pages/admin/AdminOnboarding";
 import ServiceCategories   from "./pages/customer/ServiceCategories";
@@ -113,6 +115,7 @@ function App() {
         <Route path="/live-session"     element={<ServiceConsole />} />
         <Route path="/service-handler"  element={<ServiceHandler />} />
         <Route path="/noshow-delay"     element={<NoShowDelayPage />} />
+        <Route path="/barber/noshow-handle" element={<NoShowHandle />} />
 
         {/* ── OWNER ── */}
 
@@ -120,6 +123,7 @@ function App() {
         <Route path="/register-salon"        element={<SalonRegistration />} />
         <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
+        <Route path="/owner/approvals"       element={<BreakApprovalDashboard />} />
 
         {/* ── ADMIN ── */}
 
