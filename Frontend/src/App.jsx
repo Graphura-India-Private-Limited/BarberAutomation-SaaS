@@ -30,6 +30,7 @@ import HomeOverview        from "./pages/owner/HomeOverview";
 import FinancePage         from "./pages/owner/FinancePage";
 import SettingsPage        from "./pages/owner/SettingsPage";
 import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
+import AnalyticsDashboard    from "./pages/owner/AnalyticsDashboard";
 import AdminLogin          from "./pages/admin/AdminLogin";
 import AdminOnboarding     from "./pages/admin/AdminOnboarding";
 import ServiceCategories   from "./pages/customer/ServiceCategories";
@@ -122,6 +123,7 @@ function App() {
         <Route path="/owner/login"           element={<OwnerLogin />} />
         <Route path="/register-salon"        element={<SalonRegistration />} />
         <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
+        <Route path="/owner/analytics"       element={<AnalyticsDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
         <Route path="/owner/approvals"       element={<BreakApprovalDashboard />} />
 
