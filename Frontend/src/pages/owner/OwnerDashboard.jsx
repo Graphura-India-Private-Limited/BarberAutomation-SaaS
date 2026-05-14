@@ -10,6 +10,7 @@ import {
 import { useServices } from "../../context/ServiceContext";
 import NotificationCenter from "../../Components/notifications/NotificationCenter";
 import AnnouncementComposer from "../../Components/notifications/AnnouncementComposer";
+import AnnouncementHistory from "../../Components/notifications/AnnouncementHistory";
 
 /* ─── Sidebar nav ────────────────────────────────────────────────── */
 const NAV = [
@@ -418,8 +419,9 @@ export default function OwnerDashboard() {
           </div>
 
           {/* ════ COMMUNICATION HUB ════ */}
-          <div className="mt-5">
+          <div className="mt-5 grid grid-cols-1 xl:grid-cols-2 gap-5">
             <AnnouncementComposer />
+            <AnnouncementHistory />
           </div>
 
         </main>

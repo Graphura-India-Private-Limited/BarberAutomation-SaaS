@@ -26,6 +26,7 @@ import BreakManagement     from "./pages/barber/BreakManagement";
 import SalonRegistration   from "./pages/owner/SalonRegistration";
 import OwnerDashboard      from "./pages/owner/OwnerDashboard";
 import ManageServices      from "./pages/owner/ManageServices";
+import OwnerNotifications  from "./pages/owner/OwnerNotifications";
 // import HomeOverview        from "./pages/owner/HomeOverview";
 // import FinancePage         from "./pages/owner/FinancePage";
 // import SettingsPage        from "./pages/owner/SettingsPage";
@@ -127,6 +128,7 @@ function App() {
         <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
         {/* <Route path="/owner/analytics"       element={<AnalyticsDashboard />} /> */}
         <Route path="/owner/manage-services" element={<ManageServices />} />
+        <Route path="/owner/notifications"   element={<OwnerNotifications />} />
         {/* <Route path="/owner/approvals"       element={<BreakApprovalDashboard />} /> */}
 
         {/* ── ADMIN ── */}
