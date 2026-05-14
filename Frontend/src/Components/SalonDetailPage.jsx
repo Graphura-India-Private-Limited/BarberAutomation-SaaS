@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNotification } from "../context/NotificationContext";
 
 /* ── ICONS ───────────────────────────────────────── */
 const Ic = {
@@ -115,6 +116,7 @@ export default function SalonDetailPage() {
   const [reviewFilter,setReviewFilter] = useState(0);
   const [helpful,   setHelpful]   = useState({});
   const [mounted,   setMounted]   = useState(false);
+  const { addNotification } = useNotification();
 
   useEffect(()=>{setTimeout(()=>setMounted(true),80);},[]);
   useEffect(()=>{
@@ -141,7 +143,15 @@ export default function SalonDetailPage() {
   const cnt        = Object.keys(selection).length;
   const canBook    = cnt>0;
 
-  const confirm = ()=>{setBooked(true);setTimeout(()=>{setBooked(false);setSelection({});setModal(false);},3000);};
+  const confirm = ()=>{
+    setBooked(true);
+    addNotification({
+      type: "booking",
+      title: "Booking Confirmed successfully",
+      message: `Your appointment at ${SALON.name} is confirmed. You are at position #${queue+1}.`
+    });
+    setTimeout(()=>{setBooked(false);setSelection({});setModal(false);},3000);
+  };
 
   const rv = (d=0)=>({
     opacity:mounted?1:0,

@@ -8,6 +8,8 @@ import {
   AlertTriangle, PlusCircle, Pencil,
 } from "lucide-react";
 import { useServices } from "../../context/ServiceContext";
+import NotificationCenter from "../../Components/notifications/NotificationCenter";
+import AnnouncementComposer from "../../Components/notifications/AnnouncementComposer";
 
 /* ─── Sidebar nav ────────────────────────────────────────────────── */
 const NAV = [
@@ -205,6 +207,7 @@ export default function OwnerDashboard() {
               <BarChart2 size={16} className="text-orange-500" />
               <span className="hidden sm:block">View Analytics</span>
             </button>
+            <NotificationCenter />
             <button className="flex items-center gap-2 px-4 py-2.5 bg-[#1e1a14] text-white rounded-xl text-sm font-bold hover:bg-black transition-all">
               <UserCircle size={16} />
               <span className="hidden sm:block">Edit Profile</span>
@@ -413,6 +416,12 @@ export default function OwnerDashboard() {
             </div>
 
           </div>
+
+          {/* ════ COMMUNICATION HUB ════ */}
+          <div className="mt-5">
+            <AnnouncementComposer />
+          </div>
+
         </main>
       </div>
     </div>

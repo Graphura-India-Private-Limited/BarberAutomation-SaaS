@@ -4,8 +4,11 @@ import {
   Scissors, CalendarDays, Sparkles, User, Palette,
   Star, Menu, X, ChevronDown, MapPin, Clock, Phone,
   Mail, ArrowRight, Shield, Award, Users, CheckCircle,
-  Heart, Send, CreditCard, Coffee, Layers, Smile
+  Heart, Send, CreditCard, Coffee, Layers, Smile, Bell
 } from "lucide-react";
+import NotificationCenter from "../Components/notifications/NotificationCenter";
+import AnnouncementCard from "../Components/notifications/AnnouncementCard";
+import { useNotification } from "../context/NotificationContext";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -85,6 +88,7 @@ export default function HomePage() {
   const [salons,    setSalons]    = useState([]);
   const [scrolled,  setScrolled]  = useState(false);
   const dropRef = useRef(null);
+  const { announcements } = useNotification();
 
   useEffect(() => {
     fetch(`${API}/salon/nearby`)
@@ -185,7 +189,9 @@ export default function HomePage() {
               <div className="absolute top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-[#C5A059] to-transparent animate-border-beam opacity-50" />
               Book Now
             </button>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-[#3E362E]">
+            <div className="hidden sm:block border-l border-[#EADDCA] h-6 mx-1" />
+            <NotificationCenter />
+            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-[#3E362E] ml-2">
               {menuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
@@ -267,6 +273,19 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ══ ANNOUNCEMENTS ══ */}
+      {announcements && announcements.length > 0 && (
+        <section className="bg-white py-8 border-b border-[#EADDCA]/50 relative z-10">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {announcements.slice(0, 3).map((announcement) => (
+                <AnnouncementCard key={announcement.id} announcement={announcement} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ══ STATS ══ */}
       <section className="bg-[#3E362E] py-12">
@@ -569,9 +588,11 @@ export default function HomePage() {
                   ["Booking History", "/booking-history"],
                   ["Salon Detail",    "/salon-detail"],
                   ["Nearby Salons",   "/nearby"],
+                  ["Staff Login",     "/staff-login"],
                   ["Barber Login",    "/barber/login"],
                   ["Salon Register",  "/register-salon"],
                   ["Admin Panel",     "/admin/login"],
+                  ["Owner Dashboard", "/owner/dashboard"],
                 ].map(([l,p]) => (
                   <li key={p}><button onClick={() => navigate(p)} className="text-stone-400 hover:text-[#C5A059] text-sm transition">{l}</button></li>
                 ))}
