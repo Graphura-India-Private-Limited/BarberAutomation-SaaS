@@ -1,7 +1,39 @@
-const express=require("express");const router=express.Router();const Razorpay=require("razorpay");const crypto=require("crypto");const Payment=require("../models/Payment");const Booking=require("../models/Booking");const{protect}=require("../middleware/authMiddleware");
-const rzp=new Razorpay({key_id:process.env.RAZORPAY_KEY_ID,key_secret:process.env.RAZORPAY_KEY_SECRET});
-router.post("/create-order",protect,async(req,res)=>{try{const{booking_id,amount,payment_type}=req.body;const paise=Math.round(parseFloat(amount)*100);const order=await rzp.orders.create({amount:paise,currency:"INR",receipt:`bkg_${booking_id}_${Date.now()}`});const booking=await Booking.findById(booking_id).populate("salon_id","_id");await Payment.create({booking_id,customer_id:req.user.id,salon_id:booking?.salon_id?._id,amount,payment_type:payment_type||"token",status:"pending",razorpay_order_id:order.id});res.json({success:true,order,key:process.env.RAZORPAY_KEY_ID});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.post("/verify",protect,async(req,res)=>{try{const{razorpay_order_id,razorpay_payment_id,razorpay_signature,booking_id}=req.body;const sign=razorpay_order_id+"|"+razorpay_payment_id;const expected=crypto.createHmac("sha256",process.env.RAZORPAY_KEY_SECRET).update(sign).digest("hex");if(expected!==razorpay_signature)return res.status(400).json({success:false,message:"Invalid signature"});await Payment.findOneAndUpdate({razorpay_order_id},{status:"captured",razorpay_payment_id,razorpay_signature});await Booking.findByIdAndUpdate(booking_id,{status:"confirmed"});res.json({success:true,message:"Payment verified!"});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.get("/history",protect,async(req,res)=>{try{const payments=await Payment.find().populate("customer_id","name mobile").populate("salon_id","salon_name").populate("booking_id","booking_type total_amount").sort({created_at:-1}).limit(50);res.json({success:true,payments});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.post("/refund",protect,async(req,res)=>{try{const{payment_id}=req.body;const payment=await Payment.findById(payment_id);if(!payment)return res.status(404).json({success:false,message:"Not found"});await rzp.payments.refund(payment.razorpay_payment_id,{amount:Math.round(payment.amount*100)});await Payment.findByIdAndUpdate(payment_id,{status:"refunded"});res.json({success:true,message:"Refund initiated!"});}catch(err){res.status(500).json({success:false,message:err.message});}});
-module.exports=router;
+const express = require("express");
+const paymentController = require("../controllers/paymentController");
+const revenueController = require("../controllers/revenueController");
+const { protect } = require("../middleware/authMiddleware");
+const { requireRoles } = require("../middleware/roleMiddleware");
+const { verifyPaymentSignature } = require("../middleware/paymentVerificationMiddleware");
+const { verifyRazorpayWebhook } = require("../middleware/razorpayWebhookMiddleware");
+
+const router = express.Router();
+
+router.post("/webhook", verifyRazorpayWebhook, paymentController.handleWebhook);
+
+router.use(protect);
+
+router.post("/create-order", paymentController.createRazorpayOrder);
+router.post("/verify", verifyPaymentSignature, paymentController.verifyPayment);
+router.post("/refund", requireRoles("owner", "admin"), paymentController.refundPayment);
+router.post("/:id/retry", paymentController.retryFailedPayment);
+router.patch("/:id/failed", paymentController.markFailedPayment);
+
+router.get("/history", requireRoles("owner", "admin"), paymentController.listPayments);
+router.get("/", requireRoles("owner", "admin"), paymentController.listPayments);
+router.get("/token", requireRoles("owner", "admin"), paymentController.getTokenPayments);
+router.get("/full", requireRoles("owner", "admin"), paymentController.getFullPayments);
+router.get("/pending", requireRoles("owner", "admin"), paymentController.getPendingPayments);
+router.get("/salon/:salonId", requireRoles("owner", "admin"), paymentController.getPaymentsBySalon);
+router.get("/barber/:barberId", requireRoles("owner", "admin"), paymentController.getPaymentsByBarber);
+router.get("/date-range", requireRoles("owner", "admin"), paymentController.getPaymentsByDateRange);
+
+router.get("/revenue/dashboard", requireRoles("owner", "admin"), revenueController.getRevenueDashboard);
+router.get("/revenue/daily", requireRoles("owner", "admin"), revenueController.getDailyRevenue);
+router.get("/revenue/total", requireRoles("owner", "admin"), revenueController.getTotalRevenue);
+router.get("/revenue/services", requireRoles("owner", "admin"), revenueController.getServiceWiseRevenue);
+router.get("/revenue/barbers", requireRoles("owner", "admin"), revenueController.getBarberWiseRevenue);
+router.get("/revenue/monthly", requireRoles("owner", "admin"), revenueController.getMonthlyRevenue);
+router.get("/revenue/trends", requireRoles("owner", "admin"), revenueController.getRevenueTrends);
+router.get("/:id", requireRoles("owner", "admin"), paymentController.getPaymentById);
+
+module.exports = router;

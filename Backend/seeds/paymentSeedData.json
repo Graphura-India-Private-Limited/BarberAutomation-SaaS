@@ -1,0 +1,55 @@
+{
+  "payments": [
+    {
+      "booking_id": "664000000000000000000101",
+      "customer_id": "664000000000000000000201",
+      "salon_id": "664000000000000000000301",
+      "barber_id": "664000000000000000000401",
+      "amount": 150,
+      "payment_type": "TOKEN",
+      "status": "SUCCESS",
+      "razorpay_order_id": "order_seed_token_001",
+      "razorpay_payment_id": "pay_seed_token_001",
+      "service_ids": ["664000000000000000000501"],
+      "booking_type": "QUEUE"
+    },
+    {
+      "booking_id": "664000000000000000000102",
+      "customer_id": "664000000000000000000202",
+      "salon_id": "664000000000000000000301",
+      "barber_id": "664000000000000000000402",
+      "amount": 850,
+      "payment_type": "FULL",
+      "status": "SUCCESS",
+      "razorpay_order_id": "order_seed_full_001",
+      "razorpay_payment_id": "pay_seed_full_001",
+      "service_ids": ["664000000000000000000502", "664000000000000000000503"],
+      "booking_type": "SLOT"
+    },
+    {
+      "booking_id": "664000000000000000000103",
+      "customer_id": "664000000000000000000203",
+      "salon_id": "664000000000000000000301",
+      "barber_id": "664000000000000000000401",
+      "amount": 300,
+      "payment_type": "TOKEN",
+      "status": "PENDING",
+      "razorpay_order_id": "order_seed_pending_001",
+      "service_ids": ["664000000000000000000504"],
+      "booking_type": "PRIORITY"
+    },
+    {
+      "booking_id": "664000000000000000000104",
+      "customer_id": "664000000000000000000204",
+      "salon_id": "664000000000000000000301",
+      "barber_id": "664000000000000000000402",
+      "amount": 500,
+      "payment_type": "FULL",
+      "status": "FAILED",
+      "razorpay_order_id": "order_seed_failed_001",
+      "service_ids": ["664000000000000000000501"],
+      "booking_type": "QUEUE",
+      "failure_reason": "Card authentication failed"
+    }
+  ]
+}

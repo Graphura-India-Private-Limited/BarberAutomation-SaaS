@@ -28,6 +28,8 @@ import OwnerDashboard      from "./pages/owner/OwnerDashboard";
 import ManageServices      from "./pages/owner/ManageServices";
 import HomeOverview        from "./pages/owner/HomeOverview";
 import FinancePage         from "./pages/owner/FinancePage";
+import PaymentDashboard    from "./pages/owner/PaymentDashboard";
+import RevenueDashboard    from "./pages/owner/RevenueDashboard";
 import SettingsPage        from "./pages/owner/SettingsPage";
 import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import AnalyticsDashboard    from "./pages/owner/AnalyticsDashboard";
@@ -124,6 +126,8 @@ function App() {
         <Route path="/register-salon"        element={<SalonRegistration />} />
         <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
         <Route path="/owner/analytics"       element={<AnalyticsDashboard />} />
+        <Route path="/owner/payments"        element={<PaymentDashboard />} />
+        <Route path="/owner/revenue"         element={<RevenueDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
         <Route path="/owner/approvals"       element={<BreakApprovalDashboard />} />
 
