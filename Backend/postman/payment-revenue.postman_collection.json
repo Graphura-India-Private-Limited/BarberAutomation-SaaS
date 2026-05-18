@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "Salon SaaS - Payment & Revenue",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "bookingId", "value": "" },
+    { "key": "paymentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Create Razorpay Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/payment/create-order",
+        "body": { "mode": "raw", "raw": "{\n  \"bookingId\": \"{{bookingId}}\",\n  \"amount\": 250,\n  \"paymentType\": \"TOKEN\"\n}" }
+      }
+    },
+    {
+      "name": "Verify Razorpay Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/payment/verify",
+        "body": { "mode": "raw", "raw": "{\n  \"razorpayOrderId\": \"order_xxx\",\n  \"razorpayPaymentId\": \"pay_xxx\",\n  \"razorpaySignature\": \"signature_xxx\"\n}" }
+      }
+    },
+    {
+      "name": "Get Payments",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/payment?paymentType=ALL&status=ALL&page=1&limit=10"
+      }
+    },
+    {
+      "name": "Get Revenue Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/payment/revenue/dashboard"
+      }
+    },
+    {
+      "name": "Get Daily Revenue",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/payment/revenue/daily"
+      }
+    },
+    {
+      "name": "Retry Failed Payment",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/payment/{{paymentId}}/retry"
+      }
+    }
+  ]
+}

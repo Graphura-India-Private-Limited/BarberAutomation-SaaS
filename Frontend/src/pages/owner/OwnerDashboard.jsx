@@ -170,6 +170,12 @@ export default function OwnerDashboard() {
             <button onClick={() => navigate("/owner/manage-services")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
               Barber & Service Management
             </button>
+            <button onClick={() => navigate("/owner/payments")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+              Payments
+            </button>
+            <button onClick={() => navigate("/owner/revenue")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+              Revenue
+            </button>
             <button onClick={() => setEditing(prev => !prev)} className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition hover:opacity-90">
               {editing ? "Close Editor" : "Edit Profile"}
             </button>
