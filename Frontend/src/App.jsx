@@ -19,7 +19,7 @@ import BarberDashboard     from "./pages/barber/BarberDashboard";
 import ServiceConsole      from "./pages/barber/ServiceConsole";
 import ServiceHandler      from "./pages/barber/ServiceHandler";
 import BreakManagement     from "./pages/barber/BreakManagement";
-import NoShowHandle from "./pages/barber/NoShowHandle";
+import NoShowHandle        from "./pages/barber/NoShowHandle";
 import QueuePage           from "./pages/barber/QueuePage";
 import SmartQueue          from "./pages/customer/SmartQueue";
 import OwnerLogin          from "./pages/owner/OwnerLogin";
@@ -51,9 +51,9 @@ import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
 import ReviewSystem    from "./Components/ReviewSystem";
 import SalonDetailPage from "./Components/SalonDetailPage";
 import NearbyBarbers   from "./Components/NearbyBarbers";
-import NoShowDelayPage from "./Components/NoShowDelayPage";
 import MembershipSection from "./Components/MembershipSection";
 import LiveQueue from "./pages/owner/LiveQueue";
+import NoShowDelayPage     from "./Components/NoShowDelayPage";
 // import Navbar             from "./Components/Navbar";
 
 
@@ -97,7 +97,7 @@ function App() {
         <Route path="/booking-history"          element={<BookingHistory />} />
         <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
         <Route path="/customer/interactions" element={<CustomerInteractionView />} />
-        <Route path="/smart-queue" element={<SmartQueue />} />
+        <Route path="/smart-queue"                element={<SmartQueue />} />
 
         {/* ── DISCOVERY ── */}
 
@@ -126,6 +126,7 @@ function App() {
         <Route path="/owner/analytics"       element={<AnalyticsDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
         <Route path="/owner/approvals"       element={<BreakApprovalDashboard />} />
+
 
         {/* ── ADMIN ── */}
 
