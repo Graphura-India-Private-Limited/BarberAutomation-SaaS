@@ -48,6 +48,7 @@ import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
 import BookingManagement from "./pages/owner/BookingManagement";
 import SalonManagement from "./pages/admin/SalonManagement";
 import SalonViewPage from "./pages/admin/SalonViewPage";
+import CustomerManagement from "./pages/customer/CustomerManagement";
 
 
 
@@ -101,6 +102,7 @@ function App() {
         <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
         <Route path="/customer/interactions" element={<CustomerInteractionView />} />
         <Route path="/smart-queue" element={<SmartQueue />} />
+        <Route path="/customer/customers" element={<CustomerManagement />} />
 
         {/* ── DISCOVERY ── */}
 
