@@ -12,62 +12,115 @@ const { protect } = require("../middleware/authMiddleware");
 const genToken = (id, role = "customer") =>
   jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "30d" });
 
+/* ══ SMS via Fast2SMS (free Indian SMS) ══ */
+const sendSMS = async (mobile, otp) => {
+  try {
+    if (!process.env.FAST2SMS_KEY) {
+      console.log(`\n OTP for ${mobile}: ${otp}\n`);
+      return;
+    }
+    const res = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+      method: "POST",
+      headers: {
+        "authorization": process.env.FAST2SMS_KEY,
+        "Content-Type":  "application/json",
+      },
+      body: JSON.stringify({
+        route:     "otp",
+        variables_values: otp,
+        numbers:   mobile,
+      }),
+    });
+    const data = await res.json();
+    console.log("SMS sent:", data);
+  } catch (err) {
+    console.log("SMS failed, OTP:", otp, err.message);
+  }
+};
+
 /* ══════════════════════════════════════
    CUSTOMER AUTH — OTP Based
 ══════════════════════════════════════ */
 
+/* ── Send OTP — only for REGISTERED users ── */
 router.post("/send-otp", async (req, res) => {
   try {
     const { mobile } = req.body;
     if (!mobile || mobile.length !== 10)
       return res.status(400).json({ success:false, message:"Enter valid 10-digit mobile" });
+
+    /* Check if customer exists */
+    const customer = await Customer.findOne({ mobile });
+    if (!customer)
+      return res.status(400).json({
+        success: false,
+        message: "Mobile not registered. Please create an account first.",
+        notRegistered: true,
+      });
+
     const otp     = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000);
     await OtpStore.deleteMany({ mobile });
-    await OtpStore.create({ mobile, otp, expires_at:expires });
-    console.log(`\n🔐 OTP for ${mobile}: ${otp}\n`);
+    await OtpStore.create({ mobile, otp, expires_at: expires });
+
+    /* Send real SMS */
+    await sendSMS(mobile, otp);
+
     res.json({ success:true, message:`OTP sent to ${mobile}`, otp });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
 });
 
+/* ── Verify OTP ── */
 router.post("/verify-otp", async (req, res) => {
   try {
     const { mobile, otp } = req.body;
     if (!mobile || !otp)
       return res.status(400).json({ success:false, message:"Mobile and OTP required" });
+
     const record = await OtpStore.findOne({ mobile, otp });
     if (!record)
       return res.status(400).json({ success:false, message:"Invalid OTP. Please try again." });
+
     if (new Date() > record.expires_at) {
       await OtpStore.deleteMany({ mobile });
       return res.status(400).json({ success:false, message:"OTP expired. Request a new one." });
     }
+
     await OtpStore.deleteMany({ mobile });
-    let customer = await Customer.findOne({ mobile });
-    const isNew  = !customer;
-    if (!customer) customer = await Customer.create({ mobile });
+
+    const customer = await Customer.findOne({ mobile });
+    if (!customer)
+      return res.status(400).json({ success:false, message:"User not found. Please register first." });
+
     const token = genToken(customer._id, "customer");
-    res.json({ success:true, token, isNew, user:customer });
+    res.json({ success:true, token, isNew:false, user:customer });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
 });
 
+/* ── Signup — creates new account ── */
 router.post("/signup", async (req, res) => {
   try {
     const { mobile, name, email } = req.body;
-    let customer = await Customer.findOne({ mobile });
-    if (customer) {
-      customer.name  = name  || customer.name;
-      customer.email = email || customer.email;
-      await customer.save();
-    } else {
-      customer = await Customer.create({ mobile, name, email });
-    }
-    const token = genToken(customer._id, "customer");
-    res.json({ success:true, token, user:customer });
+    if (!mobile || mobile.length !== 10)
+      return res.status(400).json({ success:false, message:"Enter valid 10-digit mobile" });
+    if (!name || !name.trim())
+      return res.status(400).json({ success:false, message:"Name is required" });
+
+    /* Check if already registered */
+    const exists = await Customer.findOne({ mobile });
+    if (exists)
+      return res.status(400).json({
+        success:  false,
+        message:  "This mobile number is already registered. Please login instead.",
+        alreadyExists: true,
+      });
+
+    const customer = await Customer.create({ mobile, name: name.trim(), email: email||"" });
+    res.status(201).json({ success:true, user:customer, message:"Account created! Please login with OTP." });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
@@ -120,7 +173,7 @@ router.delete("/family-member/:id", protect, async (req, res) => {
 });
 
 /* ══════════════════════════════════════
-   OWNER AUTH — Mobile + Password
+   OWNER AUTH
 ══════════════════════════════════════ */
 
 router.post("/owner/send-otp", async (req, res) => {
@@ -132,34 +185,65 @@ router.post("/owner/send-otp", async (req, res) => {
     const expires = new Date(Date.now() + 10 * 60 * 1000);
     await OtpStore.deleteMany({ mobile });
     await OtpStore.create({ mobile, otp, expires_at:expires });
-    console.log(`\n🏪 Owner OTP for ${mobile}: ${otp}\n`);
+    await sendSMS(mobile, otp);
     res.json({ success:true, message:`OTP sent to ${mobile}`, otp });
   } catch (err) {
     res.status(500).json({ success:false, message:err.message });
   }
 });
 
+const pickSalonProfile = (body) => ({
+  owner_name: body.owner_name || body.ownerName || "",
+  salon_name: body.salon_name || body.salonName || "",
+  mobile: body.mobile || body.mobileNumber || "",
+  email: body.email || "",
+  address: body.address || "",
+  latitude: Number(body.latitude ?? body.location?.lat ?? 0) || 0,
+  longitude: Number(body.longitude ?? body.location?.lng ?? 0) || 0,
+  opening_time: body.opening_time || body.openingTime || "09:00",
+  closing_time: body.closing_time || body.closingTime || "21:00",
+  services_offered: Array.isArray(body.services_offered)
+    ? body.services_offered
+    : String(body.servicesOffered || body.services_offered || "")
+        .split(",")
+        .map(s => s.trim())
+        .filter(Boolean),
+  basic_pricing: Number(body.basic_pricing ?? body.pricing ?? 0) || 0,
+  number_of_barbers: Number(body.number_of_barbers ?? body.numBarbers ?? 0) || 0,
+  support_number: body.support_number || body.supportNumber || "",
+  images: Array.isArray(body.images) ? body.images.filter(Boolean) : [],
+  about: body.about || "",
+});
+
 router.post("/owner/register", async (req, res) => {
   try {
-    const { mobile, otp, owner_name, salon_name, email, address, password } = req.body;
-    const record = await OtpStore.findOne({ mobile, otp });
-    if (!record)
-      return res.status(400).json({ success:false, message:"Invalid OTP" });
-    if (new Date() > record.expires_at) {
+    const profile = pickSalonProfile(req.body);
+    const { mobile } = profile;
+    const { otp, password } = req.body;
+    if (!profile.salon_name || !profile.owner_name || !mobile)
+      return res.status(400).json({ success:false, message:"Salon name, owner name and mobile are required" });
+    if (!password)
+      return res.status(400).json({ success:false, message:"Password is required for owner login" });
+    if (otp) {
+      const record = await OtpStore.findOne({ mobile, otp });
+      if (!record)
+        return res.status(400).json({ success:false, message:"Invalid OTP" });
+      if (new Date() > record.expires_at) {
+        await OtpStore.deleteMany({ mobile });
+        return res.status(400).json({ success:false, message:"OTP expired" });
+      }
       await OtpStore.deleteMany({ mobile });
-      return res.status(400).json({ success:false, message:"OTP expired" });
     }
-    await OtpStore.deleteMany({ mobile });
     const exists = await Salon.findOne({ mobile });
     if (exists)
       return res.status(400).json({ success:false, message:"Salon already registered with this mobile" });
     const password_hash = await bcrypt.hash(password, 10);
     const salon = await Salon.create({
-      owner_name, salon_name, mobile,
-      email:    email   || "",
-      address:  address || "",
+      ...profile,
       password_hash,
-      status: "pending"
+      status: "pending",
+      rejection_reason: "",
+      submitted_at: new Date(),
     });
     const token = genToken(salon._id, "owner");
     res.status(201).json({ success:true, token, salon, message:"Salon registered! Awaiting admin approval." });
@@ -181,8 +265,6 @@ router.post("/owner/login", async (req, res) => {
     const ok = await bcrypt.compare(password, salon.password_hash);
     if (!ok)
       return res.status(400).json({ success:false, message:"Wrong password" });
-    if (salon.status === "rejected")
-      return res.status(400).json({ success:false, message:`Registration rejected: ${salon.rejection_reason}` });
     const token = genToken(salon._id, "owner");
     res.json({ success:true, token, salon, status:salon.status });
   } catch (err) {
@@ -200,8 +282,43 @@ router.get("/owner/profile", protect, async (req, res) => {
   }
 });
 
+router.put("/owner/profile", protect, async (req, res) => {
+  try {
+    if (req.user.role !== "owner")
+      return res.status(403).json({ success:false, message:"Owner access only" });
+    const updates = pickSalonProfile(req.body);
+    delete updates.mobile;
+    Object.keys(updates).forEach(key => {
+      if (updates[key] === "" || updates[key] === null || updates[key] === undefined) delete updates[key];
+    });
+    const salon = await Salon.findByIdAndUpdate(req.user.id, updates, { new:true });
+    if (!salon) return res.status(404).json({ success:false, message:"Salon not found" });
+    res.json({ success:true, salon, message:"Salon profile updated" });
+  } catch (err) {
+    res.status(500).json({ success:false, message:err.message });
+  }
+});
+
+router.put("/owner/resubmit", protect, async (req, res) => {
+  try {
+    if (req.user.role !== "owner")
+      return res.status(403).json({ success:false, message:"Owner access only" });
+    const updates = pickSalonProfile(req.body);
+    delete updates.mobile;
+    const salon = await Salon.findByIdAndUpdate(
+      req.user.id,
+      { ...updates, status:"pending", rejection_reason:"", submitted_at:new Date(), approved_at:null },
+      { new:true }
+    );
+    if (!salon) return res.status(404).json({ success:false, message:"Salon not found" });
+    res.json({ success:true, salon, message:"Profile resubmitted for approval" });
+  } catch (err) {
+    res.status(500).json({ success:false, message:err.message });
+  }
+});
+
 /* ══════════════════════════════════════
-   BARBER AUTH — Mobile + Password
+   BARBER AUTH
 ══════════════════════════════════════ */
 
 router.post("/barber/register", protect, async (req, res) => {
@@ -231,6 +348,8 @@ router.post("/barber/login", async (req, res) => {
       .populate("salon_id", "salon_name address status");
     if (!barber)
       return res.status(400).json({ success:false, message:"Barber not found. Contact your salon owner." });
+    if (barber.salon_id?.status !== "approved")
+      return res.status(403).json({ success:false, message:"Salon is not approved yet. Barber access is locked." });
     const ok = await barber.matchPassword(password);
     if (!ok)
       return res.status(400).json({ success:false, message:"Wrong password" });
@@ -256,10 +375,9 @@ router.put("/barber/change-password", protect, async (req, res) => {
 });
 
 /* ══════════════════════════════════════
-   ADMIN AUTH — Mobile + Password + MPIN
+   ADMIN AUTH
 ══════════════════════════════════════ */
 
-/* ── Admin Login by Email (old) ── */
 router.post("/admin/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -278,7 +396,6 @@ router.post("/admin/login", async (req, res) => {
   }
 });
 
-/* ── Admin Login by Mobile (new) ── */
 router.post("/admin/login/mobile", async (req, res) => {
   try {
     const { mobile, password } = req.body;
@@ -297,7 +414,6 @@ router.post("/admin/login/mobile", async (req, res) => {
   }
 });
 
-/* ── Admin Verify MPIN ── */
 router.post("/admin/verify-mpin", protect, async (req, res) => {
   try {
     const { mpin } = req.body;
@@ -311,7 +427,6 @@ router.post("/admin/verify-mpin", protect, async (req, res) => {
   }
 });
 
-/* ── Create Admin ── */
 router.post("/admin/create", async (req, res) => {
   try {
     const { email, password, mpin, mobile } = req.body;
