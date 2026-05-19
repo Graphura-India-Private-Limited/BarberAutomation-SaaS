@@ -45,6 +45,9 @@ import Booking             from "./pages/customer/Booking";
 import BookingHistory      from "./pages/customer/BookingHistory";
 import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
 import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
+import BookingManagement from "./pages/owner/BookingManagement";
+import SalonManagement from "./pages/admin/SalonManagement";
+import SalonViewPage from "./pages/admin/SalonViewPage";
 
 
 
@@ -68,8 +71,6 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* ── HOME ── */}
-        <Route path="/"         element={<HomePage />} />
-        <Route path="/home"     element={<HomePage />} />
         <Route path="/HomePage" element={<HomePage />} />
         {/* ── CUSTOMER AUTH ── */}
         <Route path="/login"            element={<Login />} />
@@ -130,12 +131,18 @@ function App() {
         <Route path="/owner/revenue"         element={<RevenueDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
         <Route path="/owner/approvals"       element={<BreakApprovalDashboard />} />
+        <Route path="/owner/bookings"        element={<BookingManagement />} />
 
         {/* ── ADMIN ── */}
 
         <Route path="/admin/login"    element={<AdminLogin />} />
         <Route path="/admin/requests" element={<AdminOnboarding />} />
-
+       <Route
+  path="/admin/salon-management"
+  element={<SalonManagement />}
+/>    
+        <Route path="/admin/salon-view" element={<SalonViewPage />} />
+  
          {/* ── SECURITY & ACCESS CONTROL ── */}
 
         <Route path="/staff-login"    element={<StaffLogin />} />
