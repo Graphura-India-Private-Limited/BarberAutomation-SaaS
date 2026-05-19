@@ -32,6 +32,7 @@ import SettingsPage from "./pages/owner/SettingsPage";
 import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
+import AdminExperienceMonitor from "./pages/admin/AdminExperienceMonitor";
 import ServiceCategories from "./pages/customer/ServiceCategories";
 import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
@@ -132,6 +133,7 @@ function App() {
 
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/requests" element={<AdminOnboarding />} />
+        <Route path="/admin/experience" element={<AdminExperienceMonitor />} />
 
         {/* ── SECURITY & ACCESS CONTROL ── */}
 
