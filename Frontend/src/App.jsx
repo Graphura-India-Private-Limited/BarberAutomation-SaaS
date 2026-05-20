@@ -47,6 +47,10 @@ import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
 import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
 import AdminUserManagement from "./pages/admin/AdminUserManagement";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import BookingManagement from "./pages/owner/BookingManagement";
+import SalonManagement from "./pages/admin/SalonManagement";
+import SalonViewPage from "./pages/admin/SalonViewPage";
+import CustomerManagement from "./pages/customer/CustomerManagement";
 
 
 
@@ -66,89 +70,82 @@ const demoBooking = { status:"completed", barberName:"Rahul" };
 
 
 function App() {
-  return (
+ return (
     <BrowserRouter>
       <Routes>
-        {/* ── HOME ── */}
-        <Route path="/"         element={<HomePage />} />
-        <Route path="/home"     element={<HomePage />} />
+        {/* --- HOME --- */}
+        <Route path="/" element={<HomePage />} />
         <Route path="/HomePage" element={<HomePage />} />
-        {/* ── CUSTOMER AUTH ── */}
-        <Route path="/login"            element={<Login />} />
-        <Route path="/signup"           element={<Signup />} />
-        <Route path="/customerprofile"  element={<CustomerProfile />} />
-        <Route path="/otp-login"        element={<OTPLogin />} />
-        <Route path="/otp-verify"       element={<OTPVerify />} />
-        <Route path="/register"         element={<Register />} />
-        <Route path="/duplicate-account"element={<DuplicateAccount />} />
-        <Route path="/rate-limit"       element={<RateLimit />} />
-        <Route path="/payment"          element={<Payment />} />
 
-        {/* ── CUSTOMER BOOKING ── */}
+        {/* --- CUSTOMER AUTH --- */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/customerprofile" element={<CustomerProfile />} />
+        <Route path="/otp-login" element={<OTPLogin />} />
+        <Route path="/otp-verify" element={<OTPVerify />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/duplicate-account" element={<DuplicateAccount />} />
+        <Route path="/rate-limit" element={<RateLimit />} />
+        <Route path="/payment" element={<Payment />} />
 
-        <Route path="/customer/services"        element={<ServiceCategories />} />
-        <Route path="/customer/services/men"    element={<MenServices />} />
-        <Route path="/customer/services/women"  element={<WomenServices />} />
-        <Route path="/customer/services/addon"  element={<AddonServices />} />
+        {/* --- CUSTOMER BOOKING & DASHBOARD --- */}
+        <Route path="/customer/services" element={<ServiceCategories />} />
+        <Route path="/customer/services/men" element={<MenServices />} />
+        <Route path="/customer/services/women" element={<WomenServices />} />
+        <Route path="/customer/services/addon" element={<AddonServices />} />
         <Route path="/customer/services/addons" element={<AddonServices />} />
-        <Route path="/customer/barber"          element={<BarberSelection />} />
-        <Route path="/customer/details"         element={<CustomerDetails />} />
-        <Route path="/customer/booking"         element={<Booking />} />
-        <Route path="/customer/history"         element={<BookingHistory />} />
-        <Route path="/customer/flow"            element={<CustomerBookingFlow />} />
-        <Route path="/customer/interactions"    element={<CustomerInteractionView />} />
-        <Route path="/booking"                  element={<CustomerBookingFlow />} />
-        <Route path="/booking-history"          element={<BookingHistory />} />
-        <Route path="/booking-flow"             element={<CustomerBookingFlow />} />
+        <Route path="/customer/barber" element={<BarberSelection />} />
+        <Route path="/customer/details" element={<CustomerDetails />} />
+        <Route path="/customer/booking" element={<CustomerBookingFlow />} />
+        <Route path="/customer/history" element={<BookingHistory />} />
+        <Route path="/customer/flow" element={<CustomerBookingFlow />} />
         <Route path="/customer/interactions" element={<CustomerInteractionView />} />
-        <Route path="/smart-queue"                element={<SmartQueue />} />
+        <Route path="/smart-queue" element={<SmartQueue />} />
+        <Route path="/customer/customers" element={<CustomerManagement />} />
 
-        {/* ── DISCOVERY ── */}
-
-        <Route path="/nearby"       element={<NearbyBarbers />} />
+        {/* --- DISCOVERY & REVIEWS --- */}
+        <Route path="/nearby" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
-        <Route path="/salon/:id"    element={<SalonDetailPage />} />
+        <Route path="/salon/:id" element={<SalonDetailPage />} />
         <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
-        <Route path="/membership"   element={<MembershipSection />} />
+        <Route path="/membership" element={<MembershipSection />} />
 
-        {/* ── BARBER ── */}
-
-        <Route path="/barber/login"     element={<BarberLogin />} />
-        <Route path="/barber/profile"   element={<BarberProfile />} />
+        {/* --- BARBER PROFILE & ACTIONS --- */}
+        <Route path="/barber/login" element={<BarberLogin />} />
+        <Route path="/barber/profile" element={<BarberProfile />} />
         <Route path="/barber/dashboard" element={<BarberDashboard />} />
-        <Route path="/barber/breaks"    element={<BreakManagement />} />
-        <Route path="/live-session"     element={<ServiceConsole />} />
-        <Route path="/service-handler"  element={<ServiceHandler />} />
-        <Route path="/noshow-delay"     element={<NoShowDelayPage />} />
+        <Route path="/barber/breaks" element={<BreakManagement />} />
+        <Route path="/barber/live-session" element={<ServiceConsole />} />
+        <Route path="/barber/service-handler" element={<ServiceHandler />} />
+        <Route path="/barber/noshow-delay" element={<NoShowDelayPage />} />
         <Route path="/barber/noshow-handle" element={<NoShowHandle />} />
 
-        {/* ── OWNER ── */}
-
-        <Route path="/owner/login"           element={<OwnerLogin />} />
-        <Route path="/register-salon"        element={<SalonRegistration />} />
-        <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
-        <Route path="/owner/analytics"       element={<AnalyticsDashboard />} />
-        <Route path="/owner/payments"        element={<PaymentDashboard />} />
-        <Route path="/owner/revenue"         element={<RevenueDashboard />} />
+        {/* --- OWNER HUB CONTROL --- */}
+        <Route path="/owner/login" element={<OwnerLogin />} />
+        <Route path="/register-salon" element={<SalonRegistration />} />
+        <Route path="/owner/dashboard" element={<OwnerDashboard />} />
+        <Route path="/owner/analytics" element={<AnalyticsDashboard />} />
+        <Route path="/owner/payments" element={<PaymentDashboard />} />
+        <Route path="/owner/revenue" element={<RevenueDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
-        <Route path="/owner/approvals"       element={<BreakApprovalDashboard />} />
+        <Route path="/owner/approvals" element={<BreakApprovalDashboard />} />
+        <Route path="/owner/bookings" element={<BookingManagement />} />
 
-
-        {/* ── ADMIN ── */}
-
-        <Route path="/admin/login"    element={<AdminLogin />} />
+        {/* --- SUPER ADMIN CENTRAL PANEL --- */}
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/requests" element={<AdminOnboarding />} />
         <Route path="/admin/user-management" element={<AdminUserManagement />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
+        <Route path="/admin/salon-management" element={<SalonManagement />} />
+        <Route path="/admin/salon-view" element={<SalonViewPage />} />
 
-         {/* ── SECURITY & ACCESS CONTROL ── */}
-
-        <Route path="/staff-login"    element={<StaffLogin />} />
+        {/* --- UTILITY & FALLBACK SECURITY CORE --- */}
+        <Route path="/staff-login" element={<StaffLogin />} />
         <Route path="/owner/overview" element={<HomeOverview />} />
-        <Route path="/barber/queue"   element={<QueuePage />} />
-        <Route path="/owner/finance"  element={<FinancePage />} />
+        <Route path="/barber/queue" element={<QueuePage />} />
+        <Route path="/owner/finance" element={<FinancePage />} />
         <Route path="/owner/settings" element={<SettingsPage />} />
-         <Route path="/owner/queue" element={<LiveQueue />} /> 
+        <Route path="/owner/queue" element={<LiveQueue />} />
       </Routes>
     </BrowserRouter>
   );

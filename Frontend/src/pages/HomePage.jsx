@@ -310,10 +310,10 @@ export default function HomePage() {
             <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#FFFFFF] mt-3 mb-6">
               We Are The Art Of <span className="text-[#C5A059] italic font-serif">Grooming</span>
             </h2>
-            <p className="text-stone-600 leading-relaxed mb-4 font-serif italic text-[#FFFFFF]">
+            <p className="leading-relaxed mb-4 font-serif italic text-[#FFFFFF]">
               BarberPro is Pune's premier grooming destination, where tradition meets modern luxury. We combine precision barbering with cutting-edge technology to deliver an unmatched experience.
             </p>
-            <p className="text-stone-600 leading-relaxed mb-8 text-[#FFFFFF]">
+            <p className="leading-relaxed mb-8 text-[#FFFFFF]">
               Our platform connects customers with the best barbers in the city, offering seamless booking, real-time queue management, and premium grooming services — all in one place.
             </p>
             <div className="space-y-3 mb-8 ">
@@ -326,7 +326,7 @@ export default function HomePage() {
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 ">
                   <CheckCircle className="w-5 h-5 text-[#C5A059] flex-shrink-0" />
-                  <span className="text-sm text-stone-600 text-[#FFFFFF]">{item}</span>
+                  <span className="text-sm text-[#FFFFFF]">{item}</span>
                 </div>
               ))}
             </div>
