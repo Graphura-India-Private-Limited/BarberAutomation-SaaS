@@ -45,6 +45,8 @@ import Booking             from "./pages/customer/Booking";
 import BookingHistory      from "./pages/customer/BookingHistory";
 import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
 import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
+import AdminUserManagement from "./pages/admin/AdminUserManagement";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 
 
 
@@ -136,6 +138,8 @@ function App() {
 
         <Route path="/admin/login"    element={<AdminLogin />} />
         <Route path="/admin/requests" element={<AdminOnboarding />} />
+        <Route path="/admin/user-management" element={<AdminUserManagement />} />
+        <Route path="/admin/analytics" element={<AdminAnalytics />} />
 
          {/* ── SECURITY & ACCESS CONTROL ── */}
 
