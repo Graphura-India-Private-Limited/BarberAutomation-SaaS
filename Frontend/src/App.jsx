@@ -49,7 +49,7 @@ import BookingManagement from "./pages/owner/BookingManagement";
 import SalonManagement from "./pages/admin/SalonManagement";
 import SalonViewPage from "./pages/admin/SalonViewPage";
 import CustomerManagement from "./pages/customer/CustomerManagement";
-
+import AllReviews from "./pages/AllReviews";
 
 
 /* ── Components (Capital C) ── */
@@ -72,7 +72,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* ── HOME ── */}
-        <Route path="/HomePage" element={<HomePage />} />
+        {/* ── HOME ── */}
+<Route path="/"         element={<HomePage />} />
+<Route path="/home"     element={<HomePage />} />
+<Route path="/HomePage" element={<HomePage />} />
         {/* ── CUSTOMER AUTH ── */}
         <Route path="/login"            element={<Login />} />
         <Route path="/signup"           element={<Signup />} />
@@ -152,7 +155,8 @@ function App() {
         <Route path="/barber/queue"   element={<QueuePage />} />
         <Route path="/owner/finance"  element={<FinancePage />} />
         <Route path="/owner/settings" element={<SettingsPage />} />
-         <Route path="/owner/queue" element={<LiveQueue />} /> 
+         <Route path="/owner/queue" element={<LiveQueue />} />
+         <Route path="/reviews" element={<AllReviews />} /> 
       </Routes>
     </BrowserRouter>
   );

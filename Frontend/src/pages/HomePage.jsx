@@ -40,6 +40,7 @@ const STATS = [
   { icon:Shield,  val:"100%",    label:"Satisfaction"    },
 ];
 
+/* Fallback testimonials shown only if no real reviews exist yet */
 const TESTIMONIALS = [
   { name:"Rahul Mehta",   role:"Regular Customer", rating:5, text:"Best grooming experience in the city! The fade is always perfect.",     avatar:"RM" },
   { name:"Priya Singh",   role:"Loyal Customer",   rating:5, text:"Love the women's styling section. Always leave feeling amazing!",       avatar:"PS" },
@@ -86,13 +87,23 @@ export default function HomePage() {
   const [dropOpen,  setDropOpen]  = useState(false);
   const [salons,    setSalons]    = useState([]);
   const [scrolled,  setScrolled]  = useState(false);
+  const [reviews,         setReviews]         = useState([]);
+  const [selectedReview,  setSelectedReview]  = useState(null);
   const dropRef = useRef(null);
 
   useEffect(() => {
+    /* Nearby salons */
     fetch(`${API}/salon/nearby`)
       .then(r => r.json())
       .then(d => { if (d.success) setSalons(d.salons?.slice(0, 3) || []); })
       .catch(() => {});
+
+    /* Real reviews */
+    fetch(`${API}/review`)
+      .then(r => r.json())
+      .then(d => { if (d.success) setReviews(d.reviews || []); })
+      .catch(() => {});
+
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -124,6 +135,7 @@ export default function HomePage() {
         .nav-link{position:relative}
         .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#C5A059;transition:width .3s}
         .nav-link:hover::after{width:100%}
+        .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
       `}} />
 
       {/* ══ NAVBAR ══ */}
@@ -346,42 +358,42 @@ export default function HomePage() {
 
       {/* ══ SERVICES ══ */}
      <section id="services" className="bg-[#F9F5EF] py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-14">
-            <span className="text-[14px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What We Offer</span>
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">Our Services</h2>
-            <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map(f => (
-              <div key={f.title} onClick={() => navigate(f.path)}
-                className="group relative h-80 md:h-96 rounded-3xl border border-[#EADDCA] bg-white overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl cursor-pointer">
-                <div className="absolute inset-0 z-0">
-                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-150 group-hover:opacity-100 transition-all duration-700" /> 
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center mb-14">
+            <span className="text-[14px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What We Offer</span>
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">Our Services</h2>
+            <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {FEATURES.map(f => (
+              <div key={f.title} onClick={() => navigate(f.path)}
+                className="group relative h-80 md:h-96 rounded-3xl border border-[#EADDCA] bg-white overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl cursor-pointer">
+                <div className="absolute inset-0 z-0">
+                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-150 group-hover:opacity-100 transition-all duration-700" /> 
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent opacity-80" /> 
-                </div>
-                <div className="relative z-10 p-6 md:p-8 flex flex-col h-full justify-end">
-                  <div className="mb-4 inline-flex w-fit rounded-xl bg-[#FDFBF7] p-3 text-[#C5A059] shadow-sm border border-[#EADDCA]/30 group-hover:bg-[#C5A059] group-hover:text-white transition-all">
-                    <f.icon size={22} />
-                  </div>
-                  <h3 className="mb-2 text-xs md:text-sm font-black uppercase tracking-widest text-[#3E362E]">{f.title}</h3>
-                  <p className="text-[10px] md:text-xs leading-relaxed text-stone-600 italic font-serif mb-3">{f.description}</p>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                    Book Now <ArrowRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-center mt-10">
-            <button onClick={() => navigate("/customer/services")}
-              className="inline-flex items-center gap-3 bg-[#3E362E] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] transition-all hover:scale-105">
-              View All Services <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent opacity-80" /> 
+                </div>
+                <div className="relative z-10 p-6 md:p-8 flex flex-col h-full justify-end">
+                  <div className="mb-4 inline-flex w-fit rounded-xl bg-[#FDFBF7] p-3 text-[#C5A059] shadow-sm border border-[#EADDCA]/30 group-hover:bg-[#C5A059] group-hover:text-white transition-all">
+                    <f.icon size={22} />
+                  </div>
+                  <h3 className="mb-2 text-xs md:text-sm font-black uppercase tracking-widest text-[#3E362E]">{f.title}</h3>
+                  <p className="text-[10px] md:text-xs leading-relaxed text-stone-600 italic font-serif mb-3">{f.description}</p>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    Book Now <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <button onClick={() => navigate("/customer/services")}
+              className="inline-flex items-center gap-3 bg-[#3E362E] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] transition-all hover:scale-105">
+              View All Services <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* ══ HOW IT WORKS — proper SVG icons ══ */}
       <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
@@ -479,31 +491,51 @@ export default function HomePage() {
 
       <MembershipSection />
 
-      {/* ══ TESTIMONIALS ══ */}
+      {/* ══ TESTIMONIALS — Real Reviews from backend ══ */}
       <section className="mx-auto max-w-7xl px-6 py-20 md:py-28 bg-[#121212]">
         <div className="text-center mb-14">
           <span className="text-[14px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What They Say</span>
           <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#FFFFFF] mt-3">Customer Reviews</h2>
           <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
         </div>
+
         <div className="grid gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map(t => (
-            <div key={t.name} className="bg-white rounded-2xl p-8 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all">
-              <div className="flex gap-1 mb-4">
-                {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#C5A059] text-[#C5A059]" />)}
-              </div>
-              <p className="text-sm text-stone-600 italic font-serif leading-relaxed mb-6">"{t.text}"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8A840] flex items-center justify-center text-white font-black text-sm">{t.avatar}</div>
-                <div>
-                  <p className="font-black text-[#3E362E] text-sm">{t.name}</p>
-                  <p className="text-[10px] text-[#8D7B68] uppercase tracking-widest">{t.role}</p>
+          {(reviews.length > 0 ? reviews.slice(0, 3) : TESTIMONIALS).map((item) => {
+            const isReal = !!item._id;
+            const name   = isReal ? (item.customer_id?.name || "Anonymous") : item.name;
+            const text   = isReal ? (item.review_text || "(No written feedback)") : item.text;
+            const rating = isReal ? Math.max(item.salon_rating || 0, item.barber_rating || 0) : (item.rating || 5);
+            const role   = isReal
+              ? new Date(item.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" })
+              : item.role;
+            const avatar = isReal ? (name[0] || "?").toUpperCase() : item.avatar;
+
+            return (
+              <div key={item._id || item.name}
+                onClick={() => isReal && setSelectedReview(item)}
+                className={`bg-white rounded-2xl p-8 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all ${isReal ? "cursor-pointer" : ""}`}>
+                <div className="flex gap-1 mb-4">
+                  {[...Array(rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#C5A059] text-[#C5A059]" />)}
+                </div>
+                <p className="text-sm text-stone-600 italic font-serif leading-relaxed mb-6 line-clamp-3">"{text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8A840] flex items-center justify-center text-white font-black text-sm">{avatar}</div>
+                  <div>
+                    <p className="font-black text-[#3E362E] text-sm">{name}</p>
+                    <p className="text-[10px] text-[#8D7B68] uppercase tracking-widest">{role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-        <div className="text-center mt-8">
+
+        {/* See All + Write Review buttons */}
+        <div className="text-center mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+          <button onClick={() => navigate("/reviews")}
+            className="inline-flex items-center gap-2 bg-[#C5A059] text-white px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105">
+            See All Reviews{reviews.length > 0 && ` (${reviews.length})`} <ArrowRight className="w-4 h-4" />
+          </button>
           <button onClick={() => navigate("/write-review")}
             className="inline-flex items-center gap-2 border-2 border-[#EADDCA] text-[#FFFFFF] px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition">
             <Heart className="w-4 h-4" /> Write a Review
@@ -600,6 +632,8 @@ export default function HomePage() {
           {[
             ["My Profile", "/customerprofile"],
             ["Booking History", "/booking-history"],
+            ["All Reviews", "/reviews"],
+            ["Write Review", "/write-review"],
             ["Nearby Salons", "/nearby"],
             ["Barber Login", "/barber/login"],
             ["Salon Register", "/register-salon"],
@@ -659,6 +693,74 @@ export default function HomePage() {
     </div>
   </div>
 </footer>
+
+      {/* ══ REVIEW DETAIL MODAL ══ */}
+      {selectedReview && (
+        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
+          style={{ animation: "fadeUp 0.3s ease forwards" }}
+          onClick={() => setSelectedReview(null)}>
+          <div className="bg-white rounded-3xl p-8 md:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA]"
+            onClick={e => e.stopPropagation()}>
+
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8A840] flex items-center justify-center text-white font-black text-lg">
+                  {(selectedReview.customer_id?.name?.[0] || "?").toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-black text-[#3E362E] text-base">{selectedReview.customer_id?.name || "Anonymous"}</p>
+                  <p className="text-[9px] tracking-[0.2em] uppercase text-[#8D7B68] font-bold mt-0.5">
+                    {new Date(selectedReview.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })}
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedReview(null)} className="text-[#8D7B68] hover:text-[#3E362E] transition">
+                <X className="w-5 h-5"/>
+              </button>
+            </div>
+
+            {(selectedReview.salon_rating > 0 || selectedReview.barber_rating > 0) && (
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                {selectedReview.salon_rating > 0 && (
+                  <div className="bg-[#FEF3E2] rounded-xl p-3 text-center border border-[#EADDCA]">
+                    <p className="text-[9px] tracking-widest uppercase text-[#C5A059] font-black mb-1">Salon</p>
+                    <p className="text-2xl text-[#C5A059]">
+                      {"★".repeat(selectedReview.salon_rating)}
+                      <span className="text-[#EADDCA]">{"★".repeat(5-selectedReview.salon_rating)}</span>
+                    </p>
+                  </div>
+                )}
+                {selectedReview.barber_rating > 0 && (
+                  <div className="bg-[#FEF3E2] rounded-xl p-3 text-center border border-[#EADDCA]">
+                    <p className="text-[9px] tracking-widest uppercase text-[#C5A059] font-black mb-1">Barber</p>
+                    <p className="text-2xl text-[#C5A059]">
+                      {"★".repeat(selectedReview.barber_rating)}
+                      <span className="text-[#EADDCA]">{"★".repeat(5-selectedReview.barber_rating)}</span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="text-[#C5A059] text-5xl font-serif italic leading-none mb-2">"</div>
+            <p className="font-serif italic text-base leading-[1.7] text-[#3E362E] mb-6">
+              {selectedReview.review_text || "No written feedback"}
+            </p>
+
+            {selectedReview.barber_id?.name && (
+              <div className="bg-[#FDFBF7] rounded-xl p-3 mb-5 border border-[#EADDCA]/50">
+                <p className="text-[9px] tracking-[0.2em] uppercase text-[#8D7B68] font-bold mb-0.5">Stylist</p>
+                <p className="text-sm font-black text-[#C5A059]">{selectedReview.barber_id.name}</p>
+              </div>
+            )}
+
+            <button onClick={() => setSelectedReview(null)}
+              className="w-full bg-[#3E362E] text-white py-3.5 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-[#C5A059] transition">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
