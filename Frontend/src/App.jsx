@@ -34,6 +34,8 @@ import OwnerNotifications  from "./pages/owner/OwnerNotifications";
 // import AnalyticsDashboard    from "./pages/owner/AnalyticsDashboard";
 import AdminLogin          from "./pages/admin/AdminLogin";
 import AdminOnboarding     from "./pages/admin/AdminOnboarding";
+import AdminSubscriptionDashboard from "./subscription/pages/AdminSubscriptionDashboard";
+import OwnerBillingPage    from "./subscription/pages/OwnerBillingPage";
 import ServiceCategories   from "./pages/customer/ServiceCategories";
 import MenServices         from "./pages/customer/MenServices";
 import WomenServices       from "./pages/customer/WomenServices";
@@ -133,8 +135,12 @@ function App() {
 
         {/* ── ADMIN ── */}
 
-        <Route path="/admin/login"    element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminOnboarding />} />
+        <Route path="/admin/login"         element={<AdminLogin />} />
+        <Route path="/admin/requests"      element={<AdminOnboarding />} />
+        <Route path="/admin/subscription"  element={<AdminSubscriptionDashboard />} />
+
+        {/* ── OWNER BILLING ── */}
+        <Route path="/owner/billing"       element={<OwnerBillingPage />} />
 
          {/* ── SECURITY & ACCESS CONTROL ── */}
 

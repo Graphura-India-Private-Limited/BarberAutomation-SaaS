@@ -5,24 +5,28 @@ import {
   IndianRupee, Star, UserCog, BarChart2,
   Settings, LogOut, Menu, WifiOff,
   Bell, UserCircle, Clock, MapPin,
-  AlertTriangle, PlusCircle, Pencil,
+  AlertTriangle, PlusCircle, Pencil, CreditCard,
 } from "lucide-react";
 import { useServices } from "../../context/ServiceContext";
 import NotificationCenter from "../../Components/notifications/NotificationCenter";
 import AnnouncementComposer from "../../Components/notifications/AnnouncementComposer";
 import AnnouncementHistory from "../../Components/notifications/AnnouncementHistory";
+import RenewalBanner from "../../subscription/components/RenewalBanner";
+import SubscriptionStatusCard from "../../subscription/components/SubscriptionStatusCard";
+import { useSubscription } from "../../context/SubscriptionContext";
 
 /* ─── Sidebar nav ────────────────────────────────────────────────── */
 const NAV = [
-  { label: "Dashboard", Icon: LayoutDashboard, active: true },
+  { label: "Dashboard",    Icon: LayoutDashboard, active: true },
   { label: "Appointments", Icon: Calendar },
-  { label: "Customers", Icon: Users },
-  { label: "Services", Icon: Scissors },
-  { label: "Earnings", Icon: IndianRupee },
-  { label: "Reviews", Icon: Star },
-  { label: "Staff", Icon: UserCog },
-  { label: "Reports", Icon: BarChart2 },
-  { label: "Settings", Icon: Settings },
+  { label: "Customers",    Icon: Users },
+  { label: "Services",     Icon: Scissors },
+  { label: "Earnings",     Icon: IndianRupee },
+  { label: "Reviews",      Icon: Star },
+  { label: "Staff",        Icon: UserCog },
+  { label: "Reports",      Icon: BarChart2 },
+  { label: "Billing",      Icon: CreditCard },
+  { label: "Settings",     Icon: Settings },
 ];
 
 /* ─── Status dot colors ──────────────────────────────────────────── */
@@ -54,6 +58,10 @@ export default function OwnerDashboard() {
   const navigate = useNavigate();
   const fileRef = useRef(null);
   const { services: ctxServices } = useServices();
+  const { renewSubscription } = useSubscription();
+
+  // In production, get from auth context / localStorage
+  const salonId = localStorage.getItem("salonId") || "s1";
 
   const [sideOpen, setSideOpen] = useState(false);
   const [liveSync, setLiveSync] = useState(false);
@@ -136,6 +144,10 @@ export default function OwnerDashboard() {
         <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
           {NAV.map(({ label, Icon, active }) => (
             <button key={label}
+              onClick={() => {
+                if (label === "Billing") navigate("/owner/billing");
+                if (label === "Services") navigate("/owner/manage-services");
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all text-left
                 ${active
                   ? "bg-orange-500 text-white"
@@ -158,6 +170,9 @@ export default function OwnerDashboard() {
           MAIN
       ══════════════════════════════════════ */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        {/* Renewal banner — shown when subscription is expiring/expired */}
+        <RenewalBanner salonId={salonId} onRenew={(sid) => renewSubscription(sid)} />
 
         {/* ── Top bar ── */}
         <header className="bg-[#faf8f5] border-b border-orange-100 px-4 sm:px-6 xl:px-8 py-4 flex items-center justify-between gap-4 flex-shrink-0">
@@ -219,8 +234,36 @@ export default function OwnerDashboard() {
         {/* ── Scrollable body ── */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-5 xl:p-7 space-y-5">
 
-          {/* ════ LIVE MONITORING ════ */}
-          <div className="bg-[#1e1a14] rounded-3xl p-5 sm:p-6 xl:p-7">
+          {/* ════ SUBSCRIPTION STATUS WIDGET ════ */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2">
+              <SubscriptionStatusCard
+                salonId={salonId}
+                onRenew={(sid) => renewSubscription(sid)}
+              />
+            </div>
+            <div className="bg-white border border-orange-100 rounded-3xl p-5 flex flex-col justify-between">
+              <div>
+                <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Quick Actions</p>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => navigate("/owner/billing")}
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-[#FDF5E6] border border-[#EAD8C0] rounded-2xl text-sm font-bold text-[#3E362E] hover:border-[#C5A059] transition-all text-left">
+                    <CreditCard size={16} className="text-[#C5A059]" />
+                    Manage Billing
+                  </button>
+                  <button
+                    onClick={() => navigate("/owner/billing")}
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-[#FDF5E6] border border-[#EAD8C0] rounded-2xl text-sm font-bold text-[#3E362E] hover:border-[#C5A059] transition-all text-left">
+                    <Star size={16} className="text-[#C5A059]" />
+                    Upgrade Plan
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ════ LIVE MONITORING ════ */}          <div className="bg-[#1e1a14] rounded-3xl p-5 sm:p-6 xl:p-7">
             <div className="flex items-center gap-3 mb-5">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />

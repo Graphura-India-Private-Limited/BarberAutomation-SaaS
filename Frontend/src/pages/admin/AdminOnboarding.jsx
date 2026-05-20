@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import adminBg from "../../assets/adminlogin.jpg"; 
 
 const ScissorIcon = ({ className }) => (
@@ -8,6 +9,7 @@ const ScissorIcon = ({ className }) => (
 );
 
 function AdminOnboarding() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState([
     { id: 1, salonName: "Vintage Velvet", ownerName: "Rahul Sharma", mobile: "9823456789", address: "Kothrud, Pune", services: "Haircut, Beard Trim", date: "2026-04-20", status: "Pending" },
     { id: 2, salonName: "The Groom Room", ownerName: "Amit Verma", mobile: "9123450011", address: "Baner, Pune", services: "Facial, Hair Color", date: "2026-04-21", status: "Approved" },
@@ -61,9 +63,16 @@ function AdminOnboarding() {
             <p className="text-[#EAD8C0] text-[10px] font-bold uppercase tracking-[0.4em] mt-2">Platform Control Panel</p>
           </div>
           
-          <div className="bg-white/90 px-8 py-4 rounded-3xl border border-[#C5A059] shadow-lg min-w-[150px] text-center">
-            <p className="text-[10px] font-black uppercase text-[#8D7B68]">Total Entries</p>
-            <p className="text-2xl font-black text-[#3E362E]">{requests.length}</p>
+          <div className="flex flex-col sm:flex-row gap-3 items-center">
+            <button
+              onClick={() => navigate("/admin/subscription")}
+              className="bg-[#C5A059] text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#b8924e] shadow-lg transition-all whitespace-nowrap">
+              💳 Subscription &amp; Billing
+            </button>
+            <div className="bg-white/90 px-8 py-4 rounded-3xl border border-[#C5A059] shadow-lg min-w-[150px] text-center">
+              <p className="text-[10px] font-black uppercase text-[#8D7B68]">Total Entries</p>
+              <p className="text-2xl font-black text-[#3E362E]">{requests.length}</p>
+            </div>
           </div>
         </div>
 
