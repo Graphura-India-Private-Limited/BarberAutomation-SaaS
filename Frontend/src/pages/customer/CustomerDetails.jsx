@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import ServiceSummary from "../../Components/ServiceSummary";
+import ServiceSummary from "../../components/booking/ServiceSummary";
 
 export default function CustomerDetails() {
   const navigate = useNavigate();

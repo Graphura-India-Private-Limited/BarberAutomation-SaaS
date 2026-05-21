@@ -1,7 +1,7 @@
 
 import React from "react";
-import { useAuth, financeData } from "../../AppContext";
-import Navbar from "../../Components/Navbar";
+import { useAuth, financeData } from "../../contexts/AppContext";
+import Navbar from "../../components/layout/Navbar";
 
 function StatCard({ label, value }) {
   return (

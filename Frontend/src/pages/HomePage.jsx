@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import MembershipSection from "../components/MembershipSection";
+import MembershipSection from "../components/membership/MembershipSection";
 
 import {
   Scissors, CalendarDays, Sparkles, User, Palette,

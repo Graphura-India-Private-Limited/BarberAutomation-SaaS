@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import SearchFilterHeader from "../../Components/SearchFilterHeader";
+import SearchFilterHeader from "../../components/booking/SearchFilterHeader";
 
 export default function WomenServices() {
   const navigate = useNavigate();

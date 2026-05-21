@@ -1,5 +1,5 @@
 // import React from "react";
-// import { useAuth } from "../AppContext";
+// import { useAuth } from "../../contexts/AppContext";
 
 // export default function Navbar({ activePage, setActivePage }) {
 //   const { currentUser, logout, canViewFinance } = useAuth();
@@ -47,7 +47,7 @@
 // }
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../AppContext";
+import { useAuth } from "../../contexts/AppContext";
 
 export default function Navbar() {
   const { currentUser, logout, canViewFinance } = useAuth();

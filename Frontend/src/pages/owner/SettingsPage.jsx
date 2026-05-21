@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
-import { useAuth, users as initialUsers, SALARY_MODELS } from "../../AppContext";
-import Navbar from "../../Components/Navbar";
+import { useAuth, users as initialUsers, SALARY_MODELS } from "../../contexts/AppContext";
+import Navbar from "../../components/layout/Navbar";
 
 export default function SettingsPage() {
   const { currentUser } = useAuth();

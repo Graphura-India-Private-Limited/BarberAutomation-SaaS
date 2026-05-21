@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import StatusBadge from './StatusBadge'
-import { SERVICES, BOOKING_TYPES } from '../data'
+import StatusBadge from '../common/StatusBadge'
+import { SERVICES, BOOKING_TYPES } from '../../config/data'
 
 function SectionLabel({ children }) {
   return (

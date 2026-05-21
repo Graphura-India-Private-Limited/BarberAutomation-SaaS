@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Frame, Brand, Title, Sub, Field, Label, PhoneRow, Btn, ErrBox, Divider } from "../../components"
+import { Frame, Brand, Title, Sub, Field, Label, PhoneRow, Btn, ErrBox, Divider } from "../../components/common/FormAtoms"
 
 export default function OTPLogin({ onSendOTP, onRegister }) {
   const [phone, setPhone] = useState('')
