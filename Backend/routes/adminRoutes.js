@@ -12,6 +12,114 @@ const Admin    = require("../models/Admin");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 
 /* ══ STATS ══ */
+router.get("/global-metrics", async (req, res) => {
+  try {
+    // 1. Core Platform Metrics Count
+    const totalSalons = await Salon.countDocuments();
+    const totalUsers = await Customer.countDocuments();
+
+    // 2. Aggregate Peak Usage Hours (Based on Booking Time data)
+    const peakHoursData = await Booking.aggregate([
+      {
+        $project: {
+          // Extracts the numeric hour from your booking time slot/created timestamp string
+          hour: { $hour: "$created_at" } 
+        }
+      },
+      {
+        $group: {
+          _id: "$hour",
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 5 } // Top 5 busiest hours
+    ]);
+
+    // Format peak hours nicely for charts (e.g., "14" becomes "02:00 PM")
+    const formattedPeakHours = peakHoursData.map(item => {
+      const hr = item._id ?? 12;
+      const ampm = hr >= 12 ? "PM" : "AM";
+      const displayHour = hr % 12 === 0 ? 12 : hr % 12;
+      return {
+        hourString: `${displayHour}:00 ${ampm}`,
+        bookingsCount: item.count
+      };
+    });
+
+    // 3. High-Performing Salons (Top 3 shops sorted by total bookings processed)
+    const topSalonsData = await Booking.aggregate([
+      {
+        $group: {
+          _id: "$salon_id",
+          totalBookings: { $sum: 1 }
+        }
+      },
+      { $sort: { totalBookings: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "salons", // Matches your exact salon collection lower-case name
+          localField: "_id",
+          foreignField: "_id",
+          as: "salonDetails"
+        }
+      },
+      { $unwind: "$salonDetails" },
+      {
+        $project: {
+          salonName: "$salonDetails.salon_name",
+          ownerName: "$salonDetails.owner_name",
+          totalBookings: 1
+        }
+      }
+    ]);
+
+    res.json({
+      success: true,
+      metrics: {
+        totalUsers,
+        totalSalons,
+        peakHours: formattedPeakHours,
+        highPerformingSalons: topSalonsData
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.get("/users-overview", async (req, res) => {
+  try {
+    const salons = await Salon.find({}, "salon_name owner_name email max_barbers_limit status");
+    const barbers = await Barber.find({}, "name email phone salon_id status");
+    const customers = await Customer.find({}, "name phone email created_at");
+
+    res.json({
+      success: true,
+      data: { salons, barbers, customers }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 2. Update the barber capacity limit for a shop branch
+router.put("/salon-limit/:id", async (req, res) => {
+  const { max_barbers_limit } = req.body;
+  try {
+    const updatedSalon = await Salon.findByIdAndUpdate(
+      req.params.id,
+      { max_barbers_limit: Number(max_barbers_limit) },
+      { new: true }
+    );
+    if (!updatedSalon) return res.status(404).json({ success: false, message: "Salon profile not found" });
+    
+    res.json({ success: true, data: updatedSalon });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 router.get("/stats", protect, adminOnly, async (req, res) => {
   try {
     const [customers, salons, bookings, payments] = await Promise.all([

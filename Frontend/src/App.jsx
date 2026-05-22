@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 /* ── Pages ── */
 
 import HomePage            from "./pages/HomePage";
@@ -66,6 +66,8 @@ import NoShowDelayPage     from "./Components/NoShowDelayPage";
 
 
 
+
+
 const demoBooking = { status:"completed", barberName:"Rahul" };
 
 
@@ -73,8 +75,10 @@ function App() {
  return (
     <BrowserRouter>
       <Routes>
+        
         {/* --- HOME --- */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/home"     element={<HomePage />} />
         <Route path="/HomePage" element={<HomePage />} />
 
         {/* --- CUSTOMER AUTH --- */}

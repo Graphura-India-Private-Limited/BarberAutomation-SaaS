@@ -26,6 +26,7 @@ const salonSchema = new mongoose.Schema({
   images:             [String],
   about:              { type:String, default:"" },
   created_at:         { type:Date, default:Date.now },
+  max_barbers_limit: { type: Number, default: 3 }
 });
 
-module.exports = mongoose.model("Salon", salonSchema);
+module.exports = mongoose.model("Salon", mongoose.modelNames().includes("Salon") ? mongoose.model("Salon").schema : salonSchema);

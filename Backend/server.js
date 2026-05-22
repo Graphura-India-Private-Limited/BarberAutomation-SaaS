@@ -3,6 +3,8 @@ const cors      = require("cors");
 const morgan    = require("morgan");
 const connectDB = require("./config/db");
 const breakRoutes = require("./routes/breakRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+
 require("dotenv").config();
 
 const app = express();
@@ -25,6 +27,8 @@ app.use("/api/services", require("./routes/serviceRoutes"));
 app.use("/api/reminder", require("./routes/reminderRoutes"));
 app.use("/api/noshow",   require("./routes/noshowRoutes"));
 app.use("/api/breaks", breakRoutes);
+app.use("/api/admin", adminRoutes);
+
 
 app.get("/", (req, res) => res.json({ message:"Graphura Barber SaaS API v2.0", database:"MongoDB", status:"running" }));
 app.use((err, req, res, next) => {

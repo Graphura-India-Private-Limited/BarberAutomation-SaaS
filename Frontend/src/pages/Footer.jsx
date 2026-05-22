@@ -1,36 +1,37 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Added router navigation link hooks
 import * as Icons from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate(); // ✅ Initialize the navigation router hook
 
   // Icons check
   const Instagram = Icons.Instagram || Icons.Camera; 
   const Twitter = Icons.Twitter || Icons.Bird;
   const Mail = Icons.Mail;
   const MapPin = Icons.MapPin;
-  const Phone = Icons.Phone;
   const Scissors = Icons.Scissors;
   const ExternalLink = Icons.ExternalLink;
 
   return (
     <footer className="relative bg-[#1A1612] text-[#FDFBF7] pt-20 pb-10 px-6 overflow-hidden border-t border-[#C5A059]/20">
       
-      {/* BACKGROUND SHINE EFFECT - लग्झरी फीलसाठी */}
+      {/* BACKGROUND SHINE EFFECT */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-[#C5A059] to-transparent opacity-50"></div>
       <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#C5A059]/5 blur-[100px] rounded-full"></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           
-          {/* BRANDING - Shiny Gold Effect */}
+          {/* BRANDING */}
           <div className="space-y-6">
             <div className="group cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-[#C5A059]/10 rounded-lg group-hover:rotate-12 transition-transform duration-500">
                    {Scissors && <Scissors className="text-[#C5A059] w-6 h-6" />}
                 </div>
-                <h2 className="text-2xl font-black tracking-[0.2em] uppercase italic">
+                <h2 className="text-2xl font-black tracking-[0.2em] uppercase italic cursor-pointer" onClick={() => navigate("/")}>
                   BARBER <span className="text-[#C5A059] not-italic drop-shadow-[0_0_8px_rgba(197,160,89,0.4)]">PRO</span>
                 </h2>
               </div>
@@ -39,7 +40,7 @@ const Footer = () => {
               </p>
             </div>
 
-            {/* SOCIALS - Glow on Hover */}
+            {/* SOCIALS */}
             <div className="flex gap-4">
               {[Instagram, Twitter, Mail].map((Icon, idx) => (
                 Icon && (
@@ -51,24 +52,38 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* QUICK LINKS - Animated Underline */}
+          {/* QUICK LINKS - Fully Wired with Router Links */}
           <div>
             <h3 className="text-[#C5A059] text-[10px] font-black uppercase tracking-[0.4em] mb-8 flex items-center gap-2">
               <span className="w-4 h-[1px] bg-[#C5A059]"></span> Navigation
             </h3>
             <ul className="space-y-4">
-              {["Services", "Our Masters", "Membership", "Privacy Policy"].map((item) => (
-                <li key={item} className="group overflow-hidden">
-                  <a href="#" className="text-sm text-stone-300 hover:text-[#C5A059] flex items-center gap-2 transition-all duration-300">
+              {[
+                ["Services", "/customer/services"],
+                ["My Profile", "/customerprofile"],
+                ["Booking History", "/customer/history"],
+                ["Nearby Salons", "/nearby"],
+                ["Barber Login", "/barber/login"],
+                ["Owner Login", "/owner/login"],
+                ["Staff Login", "/staff-login"],
+                ["Salon Register", "/register-salon"],
+                ["Admin Panel", "/admin/login"],
+                ["Write Review", "/write-review"],
+              ].map(([label, path]) => (
+                <li key={label} className="group overflow-hidden">
+                  <button 
+                    onClick={() => navigate(path)} 
+                    className="text-sm text-stone-300 hover:text-[#C5A059] flex items-center gap-2 transition-all duration-300 bg-transparent border-none p-0 cursor-pointer"
+                  >
                     <span className="w-0 h-[1px] bg-[#C5A059] group-hover:w-4 transition-all duration-500"></span>
-                    {item}
-                  </a>
+                    {label}
+                  </button>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* WORKING HOURS - Glass Card Style */}
+          {/* WORKING HOURS */}
           <div className="bg-stone-800/20 p-6 rounded-2xl border border-stone-700/30 backdrop-blur-sm shadow-xl">
             <h3 className="text-[#C5A059] text-[10px] font-black uppercase tracking-[0.4em] mb-6 flex items-center gap-2">
               <span className="w-4 h-[1px] bg-[#C5A059]"></span> Availability
@@ -89,7 +104,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* CONTACT & LOCATION - Shiny Button */}
+          {/* CONTACT & LOCATION */}
           <div>
             <h3 className="text-[#C5A059] text-[10px] font-black uppercase tracking-[0.4em] mb-8 flex items-center gap-2">
               <span className="w-4 h-[1px] bg-[#C5A059]"></span> The Sanctuary
@@ -104,17 +119,17 @@ const Footer = () => {
                 </p>
               </div>
               
-              <button className="relative w-full group overflow-hidden bg-transparent border border-[#C5A059] px-6 py-4 rounded-xl transition-all duration-500">
-                {/* Shine Animation Effect */}
-                <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shine" />
-                
-                <span className="relative z-10 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059] group-hover:text-white transition-colors">
+              <a 
+                href="https://maps.google.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="relative block w-full group overflow-hidden bg-transparent border border-[#C5A059] px-6 py-4 rounded-xl transition-all duration-500 text-center"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059] group-hover:text-white transition-colors">
                   Get Directions {ExternalLink && <ExternalLink size={14} />}
                 </span>
-                
-                {/* Background Fill on Hover */}
                 <div className="absolute inset-0 bg-[#C5A059] translate-y-full group-hover:translate-y-0 transition-transform duration-500 -z-0"></div>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -132,8 +147,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      
-      {/* Tailwind Config मध्ये 'shine' animation ॲड करायला विसरू नका */}
     </footer>
   );
 };
