@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Frame, Brand, Title, Sub, Btn, ErrBox, OkBox } from "../../components"
+import { Frame, Brand, Title, Sub, Btn, ErrBox, OkBox } from "../../components/common/FormAtoms"
 
 const PLAN_ROWS = [
   ['Membership plan',  'Silver'],

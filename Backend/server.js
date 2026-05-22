@@ -24,7 +24,8 @@ app.use("/api/admin",    require("./routes/adminRoutes"));
 app.use("/api/services", require("./routes/serviceRoutes"));
 app.use("/api/reminder", require("./routes/reminderRoutes"));
 app.use("/api/noshow",   require("./routes/noshowRoutes"));
-app.use("/api/breaks", breakRoutes);
+app.use("/api/review",   require("./routes/reviewRoutes"));
+app.use("/api/breaks",   breakRoutes);
 
 app.get("/", (req, res) => res.json({ message:"Graphura Barber SaaS API v2.0", database:"MongoDB", status:"running" }));
 app.use((err, req, res, next) => {

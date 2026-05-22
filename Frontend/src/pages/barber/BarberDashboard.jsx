@@ -22,6 +22,7 @@ const NAV = [
   { id: "earnings",    label: "Earnings",         icon: IndianRupee },
   { id: "reviews",     label: "Reviews",          icon: Star },
   { id: "breaks",      label: "Break Requests",   icon: Coffee,    badge: 1 },
+  { id: "noshow",      label: "No-Show / Late",   icon: AlertCircle },
   { id: "services",    label: "Services",         icon: Scissors },
   { id: "profile",     label: "My Profile",       icon: User },
   { id: "settings",    label: "Settings",         icon: Settings },
@@ -231,7 +232,18 @@ export default function BarberDashboard() {
           {NAV.map(({ id, label, icon: Icon, badge }) => (
             <button
               key={id}
-              onClick={() => { setActive(id); setSideOpen(false); if (id === "profile") navigate("/barber/profile"); if (id === "settings") navigate("/barber/settings"); }}
+              onClick={() => {
+                setActive(id);
+                setSideOpen(false);
+                const routes = {
+                  profile:  "/barber/profile",
+                  settings: "/barber/settings",
+                  noshow:   "/barber/noshow-handle",
+                  breaks:   "/barber/breaks",
+                  queue:    "/barber/queue",
+                };
+                if (routes[id]) navigate(routes[id]);
+              }}
               className={`nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left ${active === id ? "active" : ""}`}
             >
               <Icon className={`w-4 h-4 flex-shrink-0 ${active === id ? "text-amber-400" : "text-zinc-500"}`} style={active === id ? { color: "#F5C842" } : {}} />
@@ -540,10 +552,10 @@ export default function BarberDashboard() {
           {/* ── QUICK ACTIONS STRIP ── */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: "Request Break",   icon: Coffee,    color: "#60A5FA", route: null },
-              { label: "View Profile",    icon: User,      color: "#F5C842", route: "/barber/profile" },
-              { label: "Manage Services", icon: Scissors,  color: "#34D399", route: "/live-session" },
-              { label: "Full Analytics",  icon: BarChart2, color: "#A78BFA", route: null },
+              { label: "Request Break",   icon: Coffee,      color: "#60A5FA", route: null },
+              { label: "View Profile",    icon: User,        color: "#F5C842", route: "/barber/profile" },
+              { label: "Manage Services", icon: Scissors,    color: "#34D399", route: "/live-session" },
+              { label: "Handle No-Show",  icon: AlertCircle, color: "#F87171", route: "/barber/noshow-handle" },
             ].map((a, i) => (
               <button key={i}
                 onClick={() => { if (a.route) navigate(a.route); else showToast(`${a.label} — coming soon`); }}

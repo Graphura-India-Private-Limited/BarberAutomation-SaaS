@@ -9,10 +9,18 @@ import {
   Timer, 
   UserX,
   Calendar,
-  Layers
+  Layers,
+  Filter,
+  BarChart3,
+  Store,
+  Crown
 } from 'lucide-react';
 
 const AnalyticsDashboard = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [timeFilter, setTimeFilter] = useState('daily');
+  const [reportType, setReportType] = useState('salon-wise');
+
   // --- Mock Data ---
   const performanceMetrics = [
     { title: 'Total Customers', value: '1,245', icon: Users, color: 'text-brand-orange', bg: 'bg-orange-50' },
@@ -32,14 +40,58 @@ const AnalyticsDashboard = () => {
     { id: 4, name: 'Vikram Gupta', served: 10, rating: 4.6, efficiency: 82, revenue: '₹2,800' },
   ];
 
+  const salonReports = [
+    { id: 1, name: 'Elite Cuts - Downtown', customers: 145, revenue: 18500, delayAvg: '5 mins', bookings: 160 },
+    { id: 2, name: 'Urban Barber - Westside', customers: 98, revenue: 12000, delayAvg: '12 mins', bookings: 105 },
+    { id: 3, name: 'Classic Shave - North', customers: 112, revenue: 14200, delayAvg: '8 mins', bookings: 125 },
+    { id: 4, name: 'Modern Fade - South', customers: 85, revenue: 10800, delayAvg: '15 mins', bookings: 90 },
+    { id: 5, name: 'Premium Trims - Central', customers: 130, revenue: 16500, delayAvg: '4 mins', bookings: 140 },
+  ];
+
+  const topSalons = {
+    leastDelay: [...salonReports].sort((a, b) => parseInt(a.delayAvg) - parseInt(b.delayAvg))[0],
+    mostCustomers: [...salonReports].sort((a, b) => b.customers - a.customers)[0],
+    highestRevenue: [...salonReports].sort((a, b) => b.revenue - a.revenue)[0],
+  };
+
+  const getFilteredData = () => {
+    // Mocking filter variations (in a real app, this would fetch from API based on timeFilter and reportType)
+    if (timeFilter === 'weekly') {
+      return salonReports.map(s => ({ ...s, customers: s.customers * 6, revenue: s.revenue * 6, bookings: s.bookings * 6 }));
+    } else if (timeFilter === 'monthly') {
+      return salonReports.map(s => ({ ...s, customers: s.customers * 24, revenue: s.revenue * 24, bookings: s.bookings * 24 }));
+    }
+    return salonReports;
+  };
+
+  const displayData = getFilteredData();
+
   return (
     <div className="min-h-screen bg-[#f8f9fa] p-6 font-sans">
       
       {/* Top Banner */}
       <div className="bg-gradient-to-r from-brand-dark to-slate-800 rounded-2xl p-6 mb-6 relative overflow-hidden shadow-md">
-        <div className="relative z-10 flex items-center">
-          <h1 className="text-2xl font-bold text-white tracking-tight mr-3">Owner Dashboard</h1>
-          <span className="text-slate-300 font-medium">Analytics & Performance Overview</span>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center">
+            <h1 className="text-2xl font-bold text-white tracking-tight mr-3">Owner Dashboard</h1>
+            <span className="text-slate-300 font-medium">Analytics & Reports</span>
+          </div>
+
+          {/* Tabs Navigation */}
+          <div className="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700/50 backdrop-blur-sm">
+            <button 
+              onClick={() => setActiveTab('overview')}
+              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'overview' ? 'bg-brand-orange text-white shadow-lg' : 'text-slate-300 hover:text-white'}`}
+            >
+              Salon Overview
+            </button>
+            <button 
+              onClick={() => setActiveTab('reports')}
+              className={`px-6 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'reports' ? 'bg-brand-orange text-white shadow-lg' : 'text-slate-300 hover:text-white'}`}
+            >
+              System Reports
+            </button>
+          </div>
         </div>
         {/* Decorative background element matching reference */}
         <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-20 transform rotate-12">
@@ -47,7 +99,9 @@ const AnalyticsDashboard = () => {
         </div>
       </div>
 
-      {/* Metrics Grid */}
+      {activeTab === 'overview' ? (
+        <>
+          {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {performanceMetrics.map((metric, index) => (
           <div key={index} className="bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-gray-100">
@@ -221,6 +275,156 @@ const AnalyticsDashboard = () => {
           </table>
         </div>
       </div>
+        </>
+      ) : (
+        /* REPORTS TAB CONTENT */
+        <div className="space-y-6">
+          
+          {/* Controls Bar */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            {/* Time Filter */}
+            <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto">
+              {['daily', 'weekly', 'monthly'].map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTimeFilter(t)}
+                  className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold capitalize transition-all duration-200 ${timeFilter === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            {/* Report Type Filter */}
+            <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto">
+              {['salon-wise', 'revenue-wise', 'booking-wise'].map(type => (
+                <button
+                  key={type}
+                  onClick={() => setReportType(type)}
+                  className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-bold capitalize transition-all duration-200 ${reportType === type ? 'bg-brand-dark text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  {type.replace('-', ' ')}
+                </button>
+              ))}
+            </div>
+            
+          </div>
+
+          {/* Top Performing Salons */}
+          <div className="mb-2">
+            <h3 className="text-lg font-black text-gray-900 uppercase flex items-center gap-2">
+              <Crown className="w-5 h-5 text-brand-orange" />
+              Top Performing Salons
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">Highlighted locations based on key operational metrics.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Delay Timings */}
+            <div className="bg-gradient-to-br from-green-50 to-white rounded-2xl p-6 border border-green-100 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Clock className="w-16 h-16 text-green-600" />
+              </div>
+              <p className="text-[11px] font-bold text-green-600 uppercase tracking-wider mb-2">Least Delay Timings</p>
+              <h4 className="text-xl font-bold text-gray-900 mb-1">{topSalons.leastDelay.name}</h4>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-green-700 leading-none">{topSalons.leastDelay.delayAvg}</span>
+                <span className="text-sm font-semibold text-gray-500 mb-1">avg delay</span>
+              </div>
+            </div>
+
+            {/* Number of Customers */}
+            <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-6 border border-blue-100 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Users className="w-16 h-16 text-blue-600" />
+              </div>
+              <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-2">Highest Customer Volume</p>
+              <h4 className="text-xl font-bold text-gray-900 mb-1">{topSalons.mostCustomers.name}</h4>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-blue-700 leading-none">{topSalons.mostCustomers.customers}</span>
+                <span className="text-sm font-semibold text-gray-500 mb-1">customers today</span>
+              </div>
+            </div>
+
+            {/* Revenue */}
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-6 border border-orange-100 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <TrendingUp className="w-16 h-16 text-brand-orange" />
+              </div>
+              <p className="text-[11px] font-bold text-brand-orange uppercase tracking-wider mb-2">Highest Revenue</p>
+              <h4 className="text-xl font-bold text-gray-900 mb-1">{topSalons.highestRevenue.name}</h4>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-orange-600 leading-none">₹{topSalons.highestRevenue.revenue.toLocaleString()}</span>
+                <span className="text-sm font-semibold text-gray-500 mb-1">earned</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Report Table */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <Store className="w-5 h-5 text-brand-orange" />
+                  {reportType.replace('-', ' ').toUpperCase()} REPORT
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">Detailed breakdown across all salon locations ({timeFilter})</p>
+              </div>
+              <button className="px-4 py-2 bg-brand-orange/10 text-brand-orange rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-brand-orange/20 transition-colors">
+                Export CSV
+              </button>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50">
+                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Salon Name</th>
+                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center border-b border-gray-100">Bookings</th>
+                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center border-b border-gray-100">Customers Served</th>
+                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center border-b border-gray-100">Avg Delay</th>
+                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right border-b border-gray-100">Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayData.map((salon) => (
+                    <tr key={salon.id} className="border-b border-gray-50 last:border-0 hover:bg-orange-50/30 transition-colors">
+                      <td className="py-4 px-6">
+                        <div className="font-bold text-gray-800 text-sm">{salon.name}</div>
+                      </td>
+                      <td className="py-4 px-6 text-center font-bold text-gray-700 text-sm">
+                        {salon.bookings}
+                      </td>
+                      <td className="py-4 px-6 text-center font-bold text-gray-700 text-sm">
+                        {salon.customers}
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${parseInt(salon.delayAvg) > 10 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                          {salon.delayAvg}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right font-bold text-gray-900 text-sm">
+                        ₹{salon.revenue.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Total Row */}
+                  <tr className="bg-gray-50 font-bold border-t-2 border-gray-200">
+                    <td className="py-4 px-6 text-gray-900">Total System Wide</td>
+                    <td className="py-4 px-6 text-center text-gray-900">{displayData.reduce((acc, curr) => acc + curr.bookings, 0)}</td>
+                    <td className="py-4 px-6 text-center text-gray-900">{displayData.reduce((acc, curr) => acc + curr.customers, 0)}</td>
+                    <td className="py-4 px-6 text-center text-gray-500">-</td>
+                    <td className="py-4 px-6 text-right text-brand-orange">
+                      ₹{displayData.reduce((acc, curr) => acc + curr.revenue, 0).toLocaleString()}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

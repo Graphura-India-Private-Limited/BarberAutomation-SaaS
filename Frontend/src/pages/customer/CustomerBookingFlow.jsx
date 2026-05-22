@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import SlotSelection from '../../Components/SlotSelection';
-import BookingForm from '../../Components/BookingForm';
-import ConfirmationPage from '../../Components/ConfirmationPage';
+import SlotSelection from '../../components/booking/SlotSelection';
+import BookingForm from '../../components/booking/BookingForm';
+import ConfirmationPage from '../../components/booking/ConfirmationPage';
 
 export default function Wrapper() {
   const [bookingData, setBookingData] = useState({

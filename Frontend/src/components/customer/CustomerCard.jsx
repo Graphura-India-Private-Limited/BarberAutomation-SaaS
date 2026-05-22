@@ -1,4 +1,4 @@
-import StatusBadge from './StatusBadge'
+import StatusBadge from '../common/StatusBadge'
 
 export default function CustomerCard({ customer, isSelected, onClick }) {
   return (

@@ -15,7 +15,7 @@ import {
   SourceTag,
   AddCustomerModal,
   DetailModal,
-}  from "../../Components/Modals";
+}  from "../../components/common/Modals";
 
 import "../../styles/smart-queue.css";
 
