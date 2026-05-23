@@ -1,153 +1,182 @@
 import React from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Added router navigation link hooks
-import * as Icons from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Scissors,
+  Phone,
+  Mail,
+  MapPin,
+  Send,
+} from "lucide-react";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-  const navigate = useNavigate(); // ✅ Initialize the navigation router hook
+  const navigate = useNavigate();
 
-  // Icons check
-  const Instagram = Icons.Instagram || Icons.Camera; 
-  const Twitter = Icons.Twitter || Icons.Bird;
-  const Mail = Icons.Mail;
-  const MapPin = Icons.MapPin;
-  const Scissors = Icons.Scissors;
-  const ExternalLink = Icons.ExternalLink;
+  // Demo Data
+  const SERVICE_LINKS = [
+    { label: "Men Services", path: "/customer/services/men" },
+    { label: "Women Services", path: "/customer/services/women" },
+    { label: "Addons", path: "/customer/services/addons" },
+  ];
+
+  const SocialSVG = [
+    { label: "Instagram", d: "IG" },
+    { label: "Twitter", d: "TW" },
+    { label: "Facebook", d: "FB" },
+  ];
 
   return (
-    <footer className="relative bg-[#1A1612] text-[#FDFBF7] pt-20 pb-10 px-6 overflow-hidden border-t border-[#C5A059]/20">
-      
-      {/* BACKGROUND SHINE EFFECT */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-[#C5A059] to-transparent opacity-50"></div>
-      <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#C5A059]/5 blur-[100px] rounded-full"></div>
+    <>
+      {/* ══ FOOTER ══ */}
+      <footer
+        id="contact"
+        className="relative bg-[#0D0D0D] py-20 px-6 overflow-hidden"
+      >
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-[#C5A059]/50 to-transparent" />
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          
-          {/* BRANDING */}
-          <div className="space-y-6">
-            <div className="group cursor-default">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-[#C5A059]/10 rounded-lg group-hover:rotate-12 transition-transform duration-500">
-                   {Scissors && <Scissors className="text-[#C5A059] w-6 h-6" />}
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 mb-16">
+
+            {/* LOGO */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="bg-[#C5A059] p-2 rounded-lg">
+                  <Scissors className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-black tracking-[0.2em] uppercase italic cursor-pointer" onClick={() => navigate("/")}>
-                  BARBER <span className="text-[#C5A059] not-italic drop-shadow-[0_0_8px_rgba(197,160,89,0.4)]">PRO</span>
-                </h2>
+
+                <span className="text-xl font-black text-white tracking-[0.2em] uppercase italic">
+                  BARBER <span className="text-[#C5A059]">PRO</span>
+                </span>
               </div>
-              <p className="text-sm text-stone-400 leading-relaxed font-serif italic border-l-2 border-[#C5A059]/30 pl-4 mt-4">
-                "Where tradition meets precision. Redefining grooming excellence since 2026."
+
+              <p className="text-stone-500 text-sm font-serif italic leading-relaxed">
+                Crafting confidence through precision. Mastering the art of grooming since 2026.
+              </p>
+
+              <div className="flex gap-4">
+                {SocialSVG.map((s) => (
+                  <button
+                    key={s.label}
+                    className="w-10 h-10 rounded-full border border-white/10 hover:border-[#C5A059] hover:bg-[#C5A059] flex items-center justify-center transition-all duration-300 text-white"
+                  >
+                    {s.d}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* SERVICES */}
+            <div>
+              <h4 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#C5A059] mb-6">
+                Services
+              </h4>
+
+              <ul className="space-y-3">
+                {SERVICE_LINKS.map((s) => (
+                  <li key={s.path}>
+                    <button
+                      onClick={() => navigate(s.path)}
+                      className="text-stone-400 hover:text-white text-sm transition-colors"
+                    >
+                      {s.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* EXPLORE */}
+            <div>
+              <h4 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#C5A059] mb-6">
+                Explore
+              </h4>
+
+              <ul className="space-y-3">
+                {[
+                  ["My Profile", "/customerprofile"],
+                  ["Booking History", "/customer/history"],
+                  ["Nearby Salons", "/nearby"],
+                  ["Write Review", "/write-review"],
+                  ["All Reviews", "/reviews"],
+                  ["FAQs", "/faq"],
+                ].map(([label, path]) => (
+                  <li key={path}>
+                    <button
+                      onClick={() => navigate(path)}
+                      className="text-stone-400 hover:text-white text-sm"
+                    >
+                      {label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* CONTACT */}
+            <div className="space-y-6">
+              <h4 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#C5A059] mb-6">
+                Contact Us
+              </h4>
+
+              <div className="space-y-4">
+                {[
+                  [Phone, "+91 98765 43210"],
+                  [Mail, "hello@barberpro.com"],
+                  [MapPin, "Pune, Maharashtra, India"],
+                ].map(([Icon, text], i) => (
+                  <div key={i} className="flex items-start gap-3 text-stone-400 text-sm">
+                    <Icon className="w-4 h-4 text-[#C5A059]" />
+                    <span>{text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4">
+                <div className="flex p-1 bg-white/5 border border-white/10 rounded-xl">
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    className="flex-1 bg-transparent px-3 py-2 text-white text-xs outline-none"
+                  />
+
+                  <button className="bg-[#C5A059] text-white p-2 rounded-lg">
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* BOTTOM */}
+          <div className="border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-6">
+              <p className="text-stone-600 text-[10px] uppercase tracking-[0.2em]">
+                © 2026 BarberPro
+              </p>
+
+              <p className="text-stone-600 text-[10px] uppercase tracking-[0.2em]">
+                Graphura India Pvt Ltd
               </p>
             </div>
 
-            {/* SOCIALS */}
-            <div className="flex gap-4">
-              {[Instagram, Twitter, Mail].map((Icon, idx) => (
-                Icon && (
-                  <a key={idx} href="#" className="p-3 rounded-xl bg-stone-800/40 border border-stone-700/50 hover:border-[#C5A059] hover:bg-[#C5A059] hover:text-[#1A1612] hover:shadow-[0_0_20px_rgba(197,160,89,0.3)] transition-all duration-500 group">
-                    <Icon size={18} className="group-hover:scale-110 transition-transform" />
-                  </a>
-                )
-              ))}
-            </div>
-          </div>
-
-          {/* QUICK LINKS - Fully Wired with Router Links */}
-          <div>
-            <h3 className="text-[#C5A059] text-[10px] font-black uppercase tracking-[0.4em] mb-8 flex items-center gap-2">
-              <span className="w-4 h-[1px] bg-[#C5A059]"></span> Navigation
-            </h3>
-            <ul className="space-y-4">
-              {[
-                ["Services", "/customer/services"],
-                ["My Profile", "/customerprofile"],
-                ["Booking History", "/customer/history"],
-                ["Nearby Salons", "/nearby"],
-                ["Barber Login", "/barber/login"],
-                ["Owner Login", "/owner/login"],
-                ["Staff Login", "/staff-login"],
-                ["Salon Register", "/register-salon"],
-                ["Admin Panel", "/admin/login"],
-                ["Write Review", "/write-review"],
-              ].map(([label, path]) => (
-                <li key={label} className="group overflow-hidden">
-                  <button 
-                    onClick={() => navigate(path)} 
-                    className="text-sm text-stone-300 hover:text-[#C5A059] flex items-center gap-2 transition-all duration-300 bg-transparent border-none p-0 cursor-pointer"
-                  >
-                    <span className="w-0 h-[1px] bg-[#C5A059] group-hover:w-4 transition-all duration-500"></span>
-                    {label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* WORKING HOURS */}
-          <div className="bg-stone-800/20 p-6 rounded-2xl border border-stone-700/30 backdrop-blur-sm shadow-xl">
-            <h3 className="text-[#C5A059] text-[10px] font-black uppercase tracking-[0.4em] mb-6 flex items-center gap-2">
-              <span className="w-4 h-[1px] bg-[#C5A059]"></span> Availability
-            </h3>
-            <div className="space-y-4 text-sm font-serif italic">
-              <div className="flex justify-between items-center border-b border-stone-700/50 pb-2 hover:translate-x-1 transition-transform">
-                <span className="text-stone-400">Mon - Fri</span>
-                <span className="text-[#FDFBF7] font-sans not-italic">09:00 - 21:00</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-stone-700/50 pb-2 hover:translate-x-1 transition-transform">
-                <span className="text-stone-400">Saturday</span>
-                <span className="text-[#FDFBF7] font-sans not-italic">10:00 - 19:00</span>
-              </div>
-              <div className="flex justify-between items-center text-[#C5A059] pt-1">
-                <span>Sunday</span>
-                <span className="font-sans font-bold tracking-tighter uppercase text-[10px] bg-[#C5A059]/10 px-2 py-1 rounded">Vip Only</span>
-              </div>
-            </div>
-          </div>
-
-          {/* CONTACT & LOCATION */}
-          <div>
-            <h3 className="text-[#C5A059] text-[10px] font-black uppercase tracking-[0.4em] mb-8 flex items-center gap-2">
-              <span className="w-4 h-[1px] bg-[#C5A059]"></span> The Sanctuary
-            </h3>
-            <div className="space-y-5">
-              <div className="flex items-start gap-4 group">
-                <div className="mt-1 p-1.5 bg-stone-800 rounded group-hover:text-[#C5A059] transition-colors">
-                  {MapPin && <MapPin size={16} />}
-                </div>
-                <p className="text-sm text-stone-400 leading-relaxed group-hover:text-stone-200 transition-colors">
-                  123 Luxury Row, Koregaon Park,<br />Pune, MH 411001
-                </p>
-              </div>
-              
-              <a 
-                href="https://maps.google.com" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="relative block w-full group overflow-hidden bg-transparent border border-[#C5A059] px-6 py-4 rounded-xl transition-all duration-500 text-center"
+            <div className="flex gap-8">
+              <Link
+                to="/privacy-policy"
+                className="text-stone-600 hover:text-[#C5A059] text-[10px] uppercase tracking-[0.2em] transition"
               >
-                <span className="relative z-10 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059] group-hover:text-white transition-colors">
-                  Get Directions {ExternalLink && <ExternalLink size={14} />}
-                </span>
-                <div className="absolute inset-0 bg-[#C5A059] translate-y-full group-hover:translate-y-0 transition-transform duration-500 -z-0"></div>
-              </a>
+                Privacy Policy
+              </Link>
+
+              <Link
+                to="/terms"
+                className="text-stone-600 hover:text-[#C5A059] text-[10px] uppercase tracking-[0.2em] transition"
+              >
+                Terms & Conditions
+              </Link>
             </div>
           </div>
         </div>
-
-        {/* FOOTER BOTTOM */}
-        <div className="pt-10 border-t border-stone-800/50 flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-[9px] text-stone-500 uppercase tracking-[0.4em]">
-            © {currentYear} <span className="text-[#C5A059]">Barber Pro</span> Studio. All Rights Reserved.
-          </p>
-          
-          <div className="flex items-center gap-3">
-             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#C5A059]/30"></div>
-             <span className="text-[10px] text-[#C5A059] font-serif italic font-bold">Handcrafted Excellence</span>
-             <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#C5A059]/30"></div>
-          </div>
-        </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 };
 

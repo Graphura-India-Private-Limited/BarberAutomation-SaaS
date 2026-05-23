@@ -60,6 +60,9 @@ import SalonManagement from "./pages/admin/SalonManagement";
 import SalonViewPage from "./pages/admin/SalonViewPage";
 import CustomerManagement from "./pages/customer/CustomerManagement";
 import AllReviews from "./pages/customer/AllReviews";
+import FaqPage from "./pages/FaqPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 
 /* ── Components (Capital C) ── */
@@ -190,6 +193,9 @@ function App() {
         <Route path="/owner/settings" element={<SettingsPage />} />
          <Route path="/owner/queue" element={<LiveQueue />} />
          <Route path="/reviews" element={<AllReviews />} /> 
+         <Route path="/faq" element={<FaqPage />} />
+         <Route path="/terms" element={<TermsPage />} />
+         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </BrowserRouter>
   );
