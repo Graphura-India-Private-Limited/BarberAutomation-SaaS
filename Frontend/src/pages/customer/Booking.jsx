@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import ServiceSummary from "../../Components/ServiceSummary";
+import ServiceSummary from "../../components/booking/ServiceSummary";
 
 export default function Booking() {
   const location = useLocation();

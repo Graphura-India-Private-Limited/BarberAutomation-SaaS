@@ -51,18 +51,18 @@ import BookingManagement from "./pages/owner/BookingManagement";
 import SalonManagement from "./pages/admin/SalonManagement";
 import SalonViewPage from "./pages/admin/SalonViewPage";
 import CustomerManagement from "./pages/customer/CustomerManagement";
-
+import AllReviews from "./pages/customer/AllReviews";
 
 
 /* ── Components (Capital C) ── */
 
-import ReviewSystem    from "./Components/ReviewSystem";
-import SalonDetailPage from "./Components/SalonDetailPage";
-import NearbyBarbers   from "./Components/NearbyBarbers";
-import MembershipSection from "./Components/MembershipSection";
+import ReviewSystem    from "./components/reviews/ReviewSystem";
+import SalonDetailPage from "./components/salon/SalonDetailPage";
+import NearbyBarbers   from "./components/queue/NearbyBarbers";
+import NoShowDelayPage from "./components/queue/NoShowDelayPage";
+import MembershipSection from "./components/membership/MembershipSection";
 import LiveQueue from "./pages/owner/LiveQueue";
-import NoShowDelayPage     from "./Components/NoShowDelayPage";
-// import Navbar             from "./Components/Navbar";
+// import Navbar             from "./components/layout/Navbar";
 
 
 
@@ -149,7 +149,8 @@ function App() {
         <Route path="/barber/queue" element={<QueuePage />} />
         <Route path="/owner/finance" element={<FinancePage />} />
         <Route path="/owner/settings" element={<SettingsPage />} />
-        <Route path="/owner/queue" element={<LiveQueue />} />
+         <Route path="/owner/queue" element={<LiveQueue />} />
+         <Route path="/reviews" element={<AllReviews />} /> 
       </Routes>
     </BrowserRouter>
   );

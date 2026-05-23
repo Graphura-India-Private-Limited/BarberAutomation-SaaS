@@ -13,24 +13,20 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
     ]);
   };
 
-  
   const handleRemoveFamilyMember = (id) => {
     setAttendees(attendees.filter(member => member.id !== id));
   };
 
-  
   const handleNameChange = (id, newName) => {
     setAttendees(attendees.map(member => 
       member.id === id ? { ...member, name: newName } : member
     ));
   };
 
- 
   const tokenTotal = attendees.length * 50;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Payload now includes the array of all users being booked
     console.log("Final Payload for Razorpay & Backend:", { 
       ...bookingData, 
       mobile, 
@@ -39,10 +35,11 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
     });
     onConfirm(); 
   };
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-2xl mx-auto">
       <div className="flex items-center mb-8 pb-4 border-b">
-        <button onClick={onBack} className="text-gray-400 hover:text-salonGold transition-colors mr-4">
+        <button type="button" onClick={onBack} className="text-gray-400 hover:text-stone-700 transition-colors mr-4">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -50,18 +47,18 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
         <h2 className="text-2xl font-bold text-gray-900">Confirm Details</h2>
       </div>
 
-      {/* Booking Summary */}
-      <div className="bg-salonBg p-6 rounded-xl mb-8 border border-gray-100">
-        <h3 className="font-semibold text-gray-800 mb-4">Booking Summary</h3>
-        <div className="space-y-2 text-sm text-gray-600">
-          <div className="flex justify-between"><span className="text-gray-500">Service:</span> <span className="font-medium text-gray-900">{bookingData.service}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Professional:</span> <span className="font-medium text-gray-900">{bookingData.barber}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Date & Time:</span> <span className="font-medium text-gray-900">{bookingData.date} at {bookingData.timeSlot}</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">Total People:</span> <span className="font-medium text-gray-900">{attendees.length}</span></div>
+      {/* 🧾 Booking Summary Panel (FIXED: Replaced unconfigured bg-salonBg with light theme container) */}
+      <div className="bg-[#FEF3E2] bg-opacity-40 p-6 rounded-xl mb-8 border border-[#FEF3E2]">
+        <h3 className="font-bold text-[#3E362E] mb-4 text-sm uppercase tracking-wider">Booking Summary</h3>
+        <div className="space-y-3 text-sm text-gray-600">
+          <div className="flex justify-between"><span className="text-stone-500">Service:</span> <span className="font-bold text-gray-900">{bookingData.service}</span></div>
+          <div className="flex justify-between"><span className="text-stone-500">Professional:</span> <span className="font-bold text-gray-900">{bookingData.barber}</span></div>
+          <div className="flex justify-between"><span className="text-stone-500">Date & Time:</span> <span className="font-bold text-gray-900">{bookingData.date} at {bookingData.time}</span></div>
+          <div className="flex justify-between"><span className="text-stone-500">Total People:</span> <span className="font-bold text-gray-900">{attendees.length}</span></div>
           
-          <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between items-center">
-            <span className="text-gray-500">Token Payment to Confirm:</span> 
-            <span className="font-bold text-lg text-gray-900">₹{tokenTotal}</span>
+          <div className="border-t border-stone-200 mt-3 pt-3 flex justify-between items-center border-dashed">
+            <span className="text-stone-500 font-medium">Token Payment to Confirm:</span> 
+            <span className="font-black text-xl text-stone-900">₹{tokenTotal}</span>
           </div>
         </div>
       </div>
@@ -74,7 +71,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
             type="tel" name="mobile" required
             value={mobile}
             onChange={(e) => setMobile(e.target.value)}
-            className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-salonGold focus:border-salonGold outline-none transition-all" 
+            className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none transition-all" 
             placeholder="10-digit mobile number for SMS updates"
           />
         </div>
@@ -85,7 +82,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
             <button 
               type="button" 
               onClick={handleAddFamilyMember}
-              className="text-sm text-salonGold hover:text-salonGoldHover font-semibold flex items-center gap-1"
+              className="text-sm text-[#C5A059] hover:text-stone-800 font-bold flex items-center gap-1 transition-colors"
             >
               <span>+ Add Family Member</span>
             </button>
@@ -98,12 +95,11 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
                   type="text" required
                   value={member.name}
                   onChange={(e) => handleNameChange(member.id, e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-salonGold focus:border-salonGold outline-none transition-all" 
+                  className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none transition-all" 
                   placeholder={`Name of ${member.type}`}
                 />
               </div>
               
-              {/* Only show remove button for added family members, not the primary user */}
               {index > 0 && (
                 <button 
                   type="button"
@@ -120,11 +116,14 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
           ))}
         </div>
 
-        <button type="submit" className="w-full bg-salonGold hover:bg-salonGoldHover text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 mt-8">
+        {/* 🏁 FIXED SUBMIT BUTTON: Hardcoded premium background */}
+        <button 
+          type="submit" 
+          className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 mt-8 cursor-pointer"
+        >
           Confirm & Pay ₹{tokenTotal}
         </button>
       </form>
     </div>
   );
 }
-    

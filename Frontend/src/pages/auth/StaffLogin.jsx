@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../AppContext";
+import { useAuth } from "../../contexts/AppContext";
 
 export default function StaffLogin() {
   const { login } = useAuth();

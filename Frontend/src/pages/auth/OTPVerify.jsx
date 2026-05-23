@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Frame, Brand, Title, Sub, Btn, ErrBox, OkBox } from "../../components"
+import { Frame, Brand, Title, Sub, Btn, ErrBox, OkBox } from "../../components/common/FormAtoms"
 
 const CORRECT_OTP = '1234'
 const MAX_ATTEMPTS = 3

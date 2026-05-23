@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, useQueue, salon, financeData } from "../../AppContext";
-import Navbar from "../../Components/Navbar";
+import { useAuth, useQueue, salon, financeData } from "../../contexts/AppContext";
+import Navbar from "../../components/layout/Navbar";
 
 export default function HomeOverview() {
   const { currentUser, canViewFinance } = useAuth();

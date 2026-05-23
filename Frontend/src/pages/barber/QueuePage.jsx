@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
-import { useAuth, useQueue } from "../../AppContext";
-import Navbar from "../../Components/Navbar";
+import { useAuth, useQueue } from "../../contexts/AppContext";
+import Navbar from "../../components/layout/Navbar";
 
 const STATUS_COLORS = {
   "waiting": "bg-orange-100 text-orange-800 border-orange-300",

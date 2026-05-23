@@ -167,11 +167,15 @@ export default function Login() {
                 <span className="text-[9px] text-[#A4907C] uppercase font-bold tracking-[0.3em]">Or</span>
                 <div className="h-[1px] flex-1 bg-[#EAD8C0]"/>
               </div>
-              <button type="button"
-                className="w-full py-4 bg-white border border-[#EAD8C0] rounded-2xl flex items-center justify-center gap-3 text-[#3E362E] text-[10px] font-black tracking-[0.2em] uppercase hover:bg-gray-50 transition shadow-sm">
-                <img src="https://www.svgrepo.com/show/475656/google.svg" className="w-4 h-4" alt="google"/>
-                Continue with Google
-              </button>
+            <button type="button"
+  onClick={() => setError("Google login coming soon! Please use mobile OTP.")}
+  className="w-full py-4 bg-white border border-[#EAD8C0] rounded-2xl flex items-center justify-center gap-3 text-[#3E362E] text-[10px] font-black tracking-[0.2em] uppercase hover:bg-gray-50 transition shadow-sm relative">
+  <img src="https://www.svgrepo.com/show/475656/google.svg" className="w-4 h-4 opacity-50" alt="google"/>
+  <span className="opacity-50">Continue with Google</span>
+  <span className="absolute -top-2 -right-2 bg-[#C5A059] text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">
+    Soon
+  </span>
+</button>
 
               {/* Moved the Create Profile link here so it's always visible */}
               <p className="text-[#8D7B68] text-[11px] font-bold uppercase tracking-widest text-center mt-6">

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-
-export default function SlotSelection({ bookingData, onNext }) {
+export default function SlotSelection({ bookingData = { barber: "Rahul", service: "Haircut" }, onNext }) {
   const [selectedDate, setSelectedDate] = useState('Today');
   const [selectedTime, setSelectedTime] = useState(null);
 
@@ -10,31 +9,34 @@ export default function SlotSelection({ bookingData, onNext }) {
 
   const handleContinue = () => {
     if (selectedDate && selectedTime) {
-      onNext(selectedDate, selectedTime);
+      if (onNext) onNext(selectedDate, selectedTime);
     } else {
       alert("Please select both a date and a time slot.");
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-xl mx-auto">
       <div className="mb-8 border-b pb-4">
         <h2 className="text-2xl font-bold text-gray-900">Select your slot</h2>
-        <p className="text-gray-500 mt-1">Booking with {bookingData.barber} for {bookingData.service}</p>
+        <p className="text-gray-500 mt-1">
+          Booking with {bookingData?.barber || "Rahul"} for {bookingData?.service || "Styling"}
+        </p>
       </div>
       
-      {/* Date Selection */}
+      {/* 📅 Date Selection */}
       <div className="mb-8">
         <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Select Date</h3>
         <div className="flex flex-wrap gap-3">
           {availableDates.map(date => (
             <button 
               key={date}
+              type="button"
               onClick={() => setSelectedDate(date)}
-              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex-1 min-w-[100px] text-center ${
                 selectedDate === date 
-                  ? 'bg-salonGold text-white shadow-md transform -translate-y-0.5' 
-                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
+                  ? 'bg-[#3E362E] text-white border-[#3E362E] shadow-md transform -translate-y-0.5' 
+                  : 'bg-stone-50 text-stone-600 hover:bg-stone-100 border border-stone-200'
               }`}
             >
               {date}
@@ -43,18 +45,19 @@ export default function SlotSelection({ bookingData, onNext }) {
         </div>
       </div>
 
-      {/* Time Selection */}
+      {/* ⏰ Time Selection */}
       <div className="mb-10">
         <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Available Times</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {timeSlots.map(time => (
             <button 
               key={time}
+              type="button"
               onClick={() => setSelectedTime(time)}
-              className={`p-3 rounded-xl font-medium border transition-all duration-200 ${
+              className={`p-3 rounded-xl font-bold border transition-all duration-200 text-sm text-center ${
                 selectedTime === time 
-                  ? 'border-salonGold bg-orange-50 text-salonGold' 
-                  : 'border-gray-200 text-gray-600 hover:border-salonGold hover:text-salonGold'
+                  ? 'border-[#C5A059] bg-[#FEF3E2] text-[#3E362E] shadow-sm font-black' 
+                  : 'border-gray-200 text-gray-600 hover:border-[#C5A059] hover:text-[#C5A059]'
               }`}
             >
               {time}
@@ -63,13 +66,15 @@ export default function SlotSelection({ bookingData, onNext }) {
         </div>
       </div>
 
+      {/* 🏁 Bottom Action Button */}
       <button 
+        type="button"
         onClick={handleContinue}
         disabled={!selectedTime}
         className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
           selectedTime 
-            ? 'bg-salonGold hover:bg-salonGoldHover text-white shadow-md' 
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            ? 'bg-[#3E362E] hover:bg-[#2A241F] text-white shadow-md cursor-pointer' 
+            : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
         }`}
       >
         Continue to Details
