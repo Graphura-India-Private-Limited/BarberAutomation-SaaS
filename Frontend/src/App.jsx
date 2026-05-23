@@ -23,6 +23,7 @@ import BreakManagement     from "./pages/barber/BreakManagement";
 // import QueuePage           from "./pages/barber/QueuePage";
 // import SmartQueue          from "./pages/customer/SmartQueue";
 // import OwnerLogin          from "./pages/owner/OwnerLogin";
+import OwnerLogin          from "./pages/owner/OwnerLogin";
 import SalonRegistration   from "./pages/owner/SalonRegistration";
 import OwnerDashboard      from "./pages/owner/OwnerDashboard";
 import ManageServices      from "./pages/owner/ManageServices";
@@ -125,7 +126,7 @@ function App() {
 
         {/* ── OWNER ── */}
 
-        {/* <Route path="/owner/login"           element={<OwnerLogin />} /> */}
+        <Route path="/owner/login"           element={<OwnerLogin />} />
         <Route path="/register-salon"        element={<SalonRegistration />} />
         <Route path="/owner/dashboard"       element={<OwnerDashboard />} />
         {/* <Route path="/owner/analytics"       element={<AnalyticsDashboard />} /> */}
