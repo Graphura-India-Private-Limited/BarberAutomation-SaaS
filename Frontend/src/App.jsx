@@ -43,6 +43,9 @@ import { ReportsPage }    from "./pages/admin/ReportsPage";
 import { AdminSettings }  from "./pages/admin/AdminSettings";
 import { useTickets } from "./utils/useTickets";
 import { TICKET_TYPE } from "./utils/tickets";
+import { AdminRequests }   from "./pages/admin/AdminRequests";
+// import AdminSubscriptionDashboard from "./subscription/pages/AdminSubscriptionDashboard";
+// import OwnerBillingPage    from "./subscription/pages/OwnerBillingPage";
 import ServiceCategories   from "./pages/customer/ServiceCategories";
 import MenServices         from "./pages/customer/MenServices";
 import WomenServices       from "./pages/customer/WomenServices";
@@ -164,7 +167,8 @@ function App() {
 
         {/* --- SUPER ADMIN CENTRAL PANEL --- */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminOnboarding />} />
+        <Route path="/admin/requests" element={<AdminRequests />} />
+        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
         <Route path="/admin/user-management" element={<AdminUserManagement />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
         <Route path="/admin/salon-management" element={<SalonManagement />} />
@@ -188,8 +192,11 @@ function App() {
         <Route path="/barber/queue" element={<QueuePage />} />
         <Route path="/owner/finance" element={<FinancePage />} />
         <Route path="/owner/settings" element={<SettingsPage />} />
-         <Route path="/owner/queue" element={<LiveQueue />} />
-         <Route path="/reviews" element={<AllReviews />} /> 
+        <Route path="/owner/queue" element={<LiveQueue />} />
+        <Route path="/reviews" element={<AllReviews />} /> 
+
+        {/* <Route path="/admin/subscription"  element={<AdminSubscriptionDashboard />} /> */}
+        {/* <Route path="/owner/billing"       element={<OwnerBillingPage />} /> */}
       </Routes>
     </BrowserRouter>
   );
