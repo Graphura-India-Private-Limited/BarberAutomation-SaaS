@@ -1,5 +1,6 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, Outlet  } from "react-router-dom";
 /* ── Pages ── */
 
 import HomePage            from "./pages/HomePage";
@@ -35,6 +36,13 @@ import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import AnalyticsDashboard    from "./pages/owner/AnalyticsDashboard";
 import AdminLogin          from "./pages/admin/AdminLogin";
 import AdminOnboarding     from "./pages/admin/AdminOnboarding";
+import { Sidebar, Header } from "./Components/AppLayout";
+import { DashboardPage }  from "./pages/admin/DashboardPage";
+import { TicketsPage }    from "./pages/admin/TicketsPage";
+import { ReportsPage }    from "./pages/admin/ReportsPage";
+import { AdminSettings }  from "./pages/admin/AdminSettings";
+import { useTickets } from "./utils/useTickets";
+import { TICKET_TYPE } from "./utils/tickets";
 import ServiceCategories   from "./pages/customer/ServiceCategories";
 import MenServices         from "./pages/customer/MenServices";
 import WomenServices       from "./pages/customer/WomenServices";
@@ -65,6 +73,24 @@ import LiveQueue from "./pages/owner/LiveQueue";
 // import Navbar             from "./components/layout/Navbar";
 
 
+function AdminLayout({ page, children }) {
+  const navigate = useNavigate();
+  // const pageMap = { dashboard:'/admin/dashboard', tickets:'/admin/tickets', reports:'/admin/reports', settings:'/admin/settings' };
+  const pageMap = { dashboard: '/admin/dashboard',tickets:   '/admin/tickets',customer:  '/admin/customer-issues', salon:     '/admin/salon-issues',reports:   '/admin/reports', settings:  '/admin/settings' };
+  return (
+    <div className="flex min-h-screen bg-orange-50">
+      <div className="hidden lg:flex shrink-0">
+        <Sidebar activePage={page} setActivePage={(p) => navigate(pageMap[p])} />
+      </div>
+      <div className="flex-1 flex flex-col">
+        {/* <Header activePage={page} unreadCount={0} onBellClick={() => {}} /> */}
+        <Header activePage={page} unreadCount={0} onBellClick={() => navigate('/admin/tickets')} />
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
+    </div>
+  );
+}
+
 
 
 
@@ -72,7 +98,8 @@ const demoBooking = { status:"completed", barberName:"Rahul" };
 
 
 function App() {
- return (
+   const ticketState = useTickets();
+  return (
     <BrowserRouter>
       <Routes>
         
@@ -141,6 +168,18 @@ function App() {
         <Route path="/admin/user-management" element={<AdminUserManagement />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
         <Route path="/admin/salon-management" element={<SalonManagement />} />
+        <Route path="/admin/dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
+        <Route path="/admin/tickets"   element={<AdminLayout page="tickets"><TicketsPage {...ticketState} /></AdminLayout>} />
+        <Route path="/admin/reports"   element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />
+        <Route path="/admin/settings"  element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
+        <Route path="/admin/customer-issues" element={<AdminLayout page="customer"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.CUSTOMER} /></AdminLayout>} />
+        <Route path="/admin/salon-issues"    element={<AdminLayout page="salon"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.SALON} /></AdminLayout>} />
+    
+       
+       <Route
+  path="/admin/salon-management"
+  element={<SalonManagement />}
+/>    
         <Route path="/admin/salon-view" element={<SalonViewPage />} />
 
         {/* --- UTILITY & FALLBACK SECURITY CORE --- */}
