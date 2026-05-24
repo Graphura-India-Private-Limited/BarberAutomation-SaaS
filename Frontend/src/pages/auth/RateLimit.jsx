@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Frame, Brand, Title, Sub, Btn } from "../../components"
+import { Frame, Brand, Title, Sub, Btn } from "../../components/common/FormAtoms"
 
 export default function RateLimit() {
   const [secs, setSecs]       = useState(59)

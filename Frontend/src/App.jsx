@@ -1,8 +1,10 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+
 /* ── Pages ── */
 
 import HomePage from "./pages/HomePage";
+
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import CustomerProfile from "./pages/auth/CustomerProfile";
@@ -13,6 +15,7 @@ import DuplicateAccount from "./pages/auth/DuplicateAccount";
 import RateLimit from "./pages/auth/RateLimit";
 import Payment from "./pages/auth/Payment";
 import StaffLogin from "./pages/auth/StaffLogin";
+
 import BarberLogin from "./pages/barber/BarberLogin";
 import BarberProfile from "./pages/barber/BarberProfile";
 import BarberDashboard from "./pages/barber/BarberDashboard";
@@ -21,7 +24,8 @@ import ServiceHandler from "./pages/barber/ServiceHandler";
 import BreakManagement from "./pages/barber/BreakManagement";
 import NoShowHandle from "./pages/barber/NoShowHandle";
 import QueuePage from "./pages/barber/QueuePage";
-import SmartQueue from "./pages/customer/SmartQueue";
+import MultiBarberSystem from "./pages/barber/MultiBarberSystem";
+
 import OwnerLogin from "./pages/owner/OwnerLogin";
 import SalonRegistration from "./pages/owner/SalonRegistration";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
@@ -30,47 +34,110 @@ import HomeOverview from "./pages/owner/HomeOverview";
 import FinancePage from "./pages/owner/FinancePage";
 import SettingsPage from "./pages/owner/SettingsPage";
 import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
+import PaymentDashboard from "./pages/owner/PaymentDashboard";
+import RevenueDashboard from "./pages/owner/RevenueDashboard";
+import AnalyticsDashboard from "./pages/owner/AnalyticsDashboard";
+import BookingManagement from "./pages/owner/BookingManagement";
+import LiveQueue from "./pages/owner/LiveQueue";
+
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import AdminExperienceMonitor from "./pages/admin/AdminExperienceMonitor";
+import AdminUserManagement from "./pages/admin/AdminUserManagement";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import SalonManagement from "./pages/admin/SalonManagement";
+import SalonViewPage from "./pages/admin/SalonViewPage";
+
+import { DashboardPage } from "./pages/admin/DashboardPage";
+import { TicketsPage } from "./pages/admin/TicketsPage";
+import { ReportsPage } from "./pages/admin/ReportsPage";
+import { AdminSettings } from "./pages/admin/AdminSettings";
+
 import ServiceCategories from "./pages/customer/ServiceCategories";
 import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
 import AddonServices from "./pages/customer/AddonServices";
 import BarberSelection from "./pages/customer/BarberSelection";
-import MultiBarberSystem from "./pages/barber/MultiBarberSystem";
 import CustomerDetails from "./pages/customer/CustomerDetails";
 import Booking from "./pages/customer/Booking";
 import BookingHistory from "./pages/customer/BookingHistory";
+import SmartQueue from "./pages/customer/SmartQueue";
 import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
 import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
+import CustomerManagement from "./pages/customer/CustomerManagement";
+import AllReviews from "./pages/customer/AllReviews";
 
+import FaqPage from "./pages/FaqPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
+/* ── Components ── */
 
-/* ── Components (Capital C) ── */
+import { Sidebar, Header } from "./Components/AppLayout";
 
-import ReviewSystem from "./Components/ReviewSystem";
-import SalonDetailPage from "./Components/SalonDetailPage";
-import NearbyBarbers from "./Components/NearbyBarbers";
-import NoShowDelayPage from "./Components/NoShowDelayPage";
-import MembershipSection from "./Components/MembershipSection";
-import LiveQueue from "./pages/owner/LiveQueue";
-// import Navbar             from "./Components/Navbar";
+import ReviewSystem from "./components/reviews/ReviewSystem";
+import SalonDetailPage from "./components/salon/SalonDetailPage";
+import NearbyBarbers from "./components/queue/NearbyBarbers";
+import NoShowDelayPage from "./components/queue/NoShowDelayPage";
+import MembershipSection from "./components/membership/MembershipSection";
 
+/* ── Utils ── */
 
+import { useTickets } from "./utils/useTickets";
+import { TICKET_TYPE } from "./utils/tickets";
 
-const demoBooking = { status: "completed", barberName: "Rahul" };
+function AdminLayout({ page, children }) {
+  const navigate = useNavigate();
 
+  const pageMap = {
+    dashboard: "/admin/dashboard",
+    tickets: "/admin/tickets",
+    customer: "/admin/customer-issues",
+    salon: "/admin/salon-issues",
+    reports: "/admin/reports",
+    settings: "/admin/settings",
+  };
+
+  return (
+    <div className="flex min-h-screen bg-orange-50">
+      <div className="hidden lg:flex shrink-0">
+        <Sidebar
+          activePage={page}
+          setActivePage={(p) => navigate(pageMap[p])}
+        />
+      </div>
+
+      <div className="flex-1 flex flex-col">
+        <Header
+          activePage={page}
+          unreadCount={0}
+          onBellClick={() => navigate("/admin/tickets")}
+        />
+
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
+    </div>
+  );
+}
+
+const demoBooking = {
+  status: "completed",
+  barberName: "Rahul",
+};
 
 function App() {
+  const ticketState = useTickets();
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* ── HOME ── */}
+
+        {/* HOME */}
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/HomePage" element={<HomePage />} />
-        {/* ── CUSTOMER AUTH ── */}
+
+        {/* CUSTOMER AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
@@ -81,70 +148,232 @@ function App() {
         <Route path="/rate-limit" element={<RateLimit />} />
         <Route path="/payment" element={<Payment />} />
 
-        {/* ── CUSTOMER BOOKING ── */}
-
+        {/* CUSTOMER */}
         <Route path="/customer/services" element={<ServiceCategories />} />
         <Route path="/customer/services/men" element={<MenServices />} />
         <Route path="/customer/services/women" element={<WomenServices />} />
         <Route path="/customer/services/addon" element={<AddonServices />} />
-        <Route path="/customer/services/addons" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
         <Route path="/customer/booking" element={<Booking />} />
         <Route path="/customer/history" element={<BookingHistory />} />
         <Route path="/customer/flow" element={<CustomerBookingFlow />} />
-        <Route path="/customer/interactions" element={<CustomerInteractionView />} />
+        <Route
+          path="/customer/interactions"
+          element={<CustomerInteractionView />}
+        />
+        <Route path="/customer/customers" element={<CustomerManagement />} />
+
         <Route path="/booking" element={<CustomerBookingFlow />} />
         <Route path="/booking-history" element={<BookingHistory />} />
         <Route path="/booking-flow" element={<CustomerBookingFlow />} />
-        <Route path="/customer/interactions" element={<CustomerInteractionView />} />
+
         <Route path="/smart-queue" element={<SmartQueue />} />
 
-        {/* ── DISCOVERY ── */}
-
+        {/* DISCOVERY */}
         <Route path="/nearby" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
-        <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
+
+        <Route
+          path="/write-review"
+          element={<ReviewSystem bookingData={demoBooking} />}
+        />
+
         <Route path="/membership" element={<MembershipSection />} />
+        <Route path="/reviews" element={<AllReviews />} />
 
-        {/* ── BARBER ── */}
-
+        {/* BARBER */}
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber/profile" element={<BarberProfile />} />
         <Route path="/barber/dashboard" element={<BarberDashboard />} />
         <Route path="/barber/breaks" element={<BreakManagement />} />
+
         <Route path="/live-session" element={<ServiceConsole />} />
         <Route path="/service-handler" element={<ServiceHandler />} />
         <Route path="/noshow-delay" element={<NoShowDelayPage />} />
-        <Route path="/barber/noshow-handle" element={<NoShowHandle />} />
-        <Route path="/barber/multi-queue" element={<MultiBarberSystem />} />
 
+        <Route
+          path="/barber/live-session"
+          element={<ServiceConsole />}
+        />
 
-        {/* ── OWNER ── */}
+        <Route
+          path="/barber/service-handler"
+          element={<ServiceHandler />}
+        />
 
-        <Route path="/owner/login" element={<OwnerLogin />} />
-        <Route path="/register-salon" element={<SalonRegistration />} />
-        <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-        <Route path="/owner/manage-services" element={<ManageServices />} />
-        <Route path="/owner/approvals" element={<BreakApprovalDashboard />} />
+        <Route
+          path="/barber/noshow-delay"
+          element={<NoShowDelayPage />}
+        />
 
-        {/* ── ADMIN ── */}
+        <Route
+          path="/barber/noshow-handle"
+          element={<NoShowHandle />}
+        />
 
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminOnboarding />} />
-        <Route path="/admin/experience" element={<AdminExperienceMonitor />} />
+        <Route
+          path="/barber/multi-queue"
+          element={<MultiBarberSystem />}
+        />
 
-        {/* ── SECURITY & ACCESS CONTROL ── */}
-
-        <Route path="/staff-login" element={<StaffLogin />} />
-        <Route path="/owner/overview" element={<HomeOverview />} />
         <Route path="/barber/queue" element={<QueuePage />} />
+
+        {/* OWNER */}
+        <Route path="/owner/login" element={<OwnerLogin />} />
+
+        <Route
+          path="/register-salon"
+          element={<SalonRegistration />}
+        />
+
+        <Route
+          path="/owner/dashboard"
+          element={<OwnerDashboard />}
+        />
+
+        <Route
+          path="/owner/dashboard/analytics"
+          element={<AnalyticsDashboard />}
+        />
+
+        <Route
+          path="/owner/payments"
+          element={<PaymentDashboard />}
+        />
+
+        <Route
+          path="/owner/revenue"
+          element={<RevenueDashboard />}
+        />
+
+        <Route
+          path="/owner/manage-services"
+          element={<ManageServices />}
+        />
+
+        <Route
+          path="/owner/approvals"
+          element={<BreakApprovalDashboard />}
+        />
+
+        <Route
+          path="/owner/bookings"
+          element={<BookingManagement />}
+        />
+
+        <Route path="/owner/overview" element={<HomeOverview />} />
         <Route path="/owner/finance" element={<FinancePage />} />
         <Route path="/owner/settings" element={<SettingsPage />} />
         <Route path="/owner/queue" element={<LiveQueue />} />
+
+        {/* ADMIN */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/requests" element={<AdminOnboarding />} />
+
+        <Route
+          path="/admin/experience"
+          element={<AdminExperienceMonitor />}
+        />
+
+        <Route
+          path="/admin/user-management"
+          element={<AdminUserManagement />}
+        />
+
+        <Route
+          path="/admin/analytics"
+          element={<AdminAnalytics />}
+        />
+
+        <Route
+          path="/admin/salon-management"
+          element={<SalonManagement />}
+        />
+
+        <Route
+          path="/admin/salon-view"
+          element={<SalonViewPage />}
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminLayout page="dashboard">
+              <DashboardPage
+                tickets={ticketState.tickets}
+                onSelectTicket={(t) =>
+                  ticketState.setSelectedTicket(t)
+                }
+              />
+            </AdminLayout>
+          }
+        />
+
+        <Route
+          path="/admin/tickets"
+          element={
+            <AdminLayout page="tickets">
+              <TicketsPage {...ticketState} />
+            </AdminLayout>
+          }
+        />
+
+        <Route
+          path="/admin/reports"
+          element={
+            <AdminLayout page="reports">
+              <ReportsPage tickets={ticketState.tickets} />
+            </AdminLayout>
+          }
+        />
+
+        <Route
+          path="/admin/settings"
+          element={
+            <AdminLayout page="settings">
+              <AdminSettings />
+            </AdminLayout>
+          }
+        />
+
+        <Route
+          path="/admin/customer-issues"
+          element={
+            <AdminLayout page="customer">
+              <TicketsPage
+                {...ticketState}
+                typeFilter={TICKET_TYPE.CUSTOMER}
+              />
+            </AdminLayout>
+          }
+        />
+
+        <Route
+          path="/admin/salon-issues"
+          element={
+            <AdminLayout page="salon">
+              <TicketsPage
+                {...ticketState}
+                typeFilter={TICKET_TYPE.SALON}
+              />
+            </AdminLayout>
+          }
+        />
+
+        {/* OTHER */}
+        <Route path="/staff-login" element={<StaffLogin />} />
+        <Route path="/faq" element={<FaqPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route
+          path="/privacy-policy"
+          element={<PrivacyPolicy />}
+        />
+
       </Routes>
     </BrowserRouter>
   );
 }
+
 export default App;

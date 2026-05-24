@@ -23,6 +23,7 @@ const emptyForm = {
 export default function OwnerDashboard() {
   const navigate = useNavigate();
 
+
   const [salon, setSalon] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [editing, setEditing] = useState(false);
@@ -253,10 +254,23 @@ export default function OwnerDashboard() {
               Barber & Service Management
             </button>
 
+
             <button
               onClick={() => setEditing((prev) => !prev)}
               className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition hover:opacity-90"
-            >
+            > </button>
+
+            <button onClick={() => navigate("/owner/dashboard/analytics")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+              Analytics
+            </button>
+            <button onClick={() => navigate("/owner/payments")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+              Payments
+            </button>
+            <button onClick={() => navigate("/owner/revenue")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+              Revenue
+            </button>
+            <button onClick={() => setEditing(prev => !prev)} className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition hover:opacity-90">
+
               {editing ? "Close Editor" : "Edit Profile"}
             </button>
           </div>
@@ -280,6 +294,7 @@ export default function OwnerDashboard() {
             )}
         </div>
 
+
         {/* Alerts */}
         {error && (
           <p className="mb-5 rounded-xl bg-red-50 p-3 text-center text-xs font-bold text-red-600">
@@ -292,6 +307,9 @@ export default function OwnerDashboard() {
             {message}
           </p>
         )}
+
+        {error && <p className="mb-5 rounded-xl bg-red-50 p-3 text-center text-xs font-bold text-red-600">{error}</p>}
+        {message && <p className="mb-5 rounded-xl bg-green-50 p-3 text-center text-xs font-bold text-green-700">{message}</p>}
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">

@@ -21,7 +21,6 @@ function CustomerProfile() {
     { id: 2, name: "Snehal", relation: "Wife", age: "32" }
   ]);
 
-
   const [appointments] = useState([
     { id: 101, service: "Classic Haircut", date: "24 April 2026", time: "10:30 AM", status: "Upcoming" },
     { id: 102, service: "Beard Trim & Spa", date: "15 April 2026", time: "02:15 PM", status: "Completed" },
@@ -38,11 +37,11 @@ function CustomerProfile() {
 
   return (
     <div className="min-h-screen bg-cover bg-center bg-fixed flex flex-col items-center justify-start p-4 md:p-10 relative font-sans text-[#3E362E]" style={{ backgroundImage: `url(${backgroundImage})` }}>
-      <div className="absolute inset-0 bg-[#FFFBF2]/90 backdrop-blur-md z-0"></div>
+      <div className="absolute inset-0 bg-[#FAF6F0]/90 backdrop-blur-md z-0"></div>
 
       {/* Logo Section */}
       <div className="absolute top-8 left-8 z-20 flex flex-col items-start hidden md:flex">
-        <h1 className="text-2xl font-black text-[#C5A059] tracking-[0.2em] uppercase flex items-center gap-2">
+        <h1 className="text-2xl font-black text-[#C5A059] tracking-normal uppercase flex items-center gap-2 font-serif">
           <ScissorIcon className="w-6 h-6 fill-[#C5A059]" />
           Barber <span className="text-[#3E362E]">Pro</span>
         </h1>
@@ -51,11 +50,11 @@ function CustomerProfile() {
       </div>
 
       <div className="max-w-7xl w-full mx-auto relative z-10 pb-10">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 mt-12 md:mt-20 gap-6 border-l-0 md:border-l-4 border-[#C5A059] pl-0 md:pl-6">
           <div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic text-[#3E362E]">
+            <h1 className="text-3xl md:text-5xl font-black tracking-normal uppercase italic text-[#3E362E] font-serif">
               User <span className="text-[#C5A059]">Dashboard</span>
             </h1>
             <p className="text-[#8D7B68] text-[9px] md:text-xs tracking-[0.5em] mt-2 uppercase font-bold text-center md:text-left">Premium Experience</p>
@@ -66,13 +65,13 @@ function CustomerProfile() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* LEFT COLUMN: Profile & Stats */}
           <div className="lg:col-span-4 space-y-6">
             {/* Identity Card */}
             <div className="bg-white/60 backdrop-blur-2xl border border-[#EAD8C0] p-8 rounded-[3rem] shadow-xl relative overflow-hidden">
               <div className="w-20 h-20 bg-gradient-to-tr from-[#C5A059] to-[#F8E4A0] rounded-3xl flex items-center justify-center mb-8 rotate-3 shadow-md">
-                 <span className="text-3xl font-black text-white">{profile.name[0]}</span>
+                <span className="text-3xl font-black text-white">{profile.name[0]}</span>
               </div>
               <div className="space-y-6">
                 <div>
@@ -86,22 +85,22 @@ function CustomerProfile() {
               </div>
             </div>
 
-            {/* Appointment History (Backup Data) */}
+            {/* Appointment History */}
             <div className="bg-[#3E362E] text-[#FFFBF2] p-8 rounded-[3rem] shadow-2xl relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10"></div>
-               <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-6 text-[#C5A059]">Recent Appointments</h3>
-               <div className="space-y-4">
-                 {appointments.map(app => (
-                   <div key={app.id} className="border-b border-white/10 pb-3 last:border-0">
-                     <div className="flex justify-between items-start">
-                       <p className="text-xs font-bold">{app.service}</p>
-                       <span className={`text-[8px] px-2 py-1 rounded-full uppercase font-black ${app.status === 'Upcoming' ? 'bg-[#C5A059] text-white' : 'bg-white/10 text-white/60'}`}>{app.status}</span>
-                     </div>
-                     <p className="text-[10px] text-white/50 mt-1">{app.date} • {app.time}</p>
-                   </div>
-                 ))}
-               </div>
-               <button className="w-full mt-6 py-3 border border-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">View All History</button>
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10"></div>
+              <h3 className="text-sm font-black tracking-normal mb-6 text-[#C5A059] font-serif">Recent Appointments</h3>
+              <div className="space-y-4">
+                {appointments.map(app => (
+                  <div key={app.id} className="border-b border-white/10 pb-3 last:border-0">
+                    <div className="flex justify-between items-start">
+                      <p className="text-xs font-bold">{app.service}</p>
+                      <span className={`text-[8px] px-2 py-1 rounded-full uppercase font-black ${app.status === 'Upcoming' ? 'bg-[#C5A059] text-white' : 'bg-white/10 text-white/60'}`}>{app.status}</span>
+                    </div>
+                    <p className="text-[10px] text-white/50 mt-1">{app.date} • {app.time}</p>
+                  </div>
+                ))}
+              </div>
+              <button className="w-full mt-6 py-3 border border-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">View All History</button>
             </div>
           </div>
 
@@ -110,7 +109,7 @@ function CustomerProfile() {
             <div className="bg-white/80 backdrop-blur-3xl border border-[#EAD8C0] p-6 md:p-10 rounded-[3.5rem] shadow-2xl h-full flex flex-col">
               <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#3E362E]">Family <span className="text-[#C5A059]">Access</span></h2>
+                  <h2 className="text-2xl md:text-3xl font-black tracking-normal text-[#3E362E] font-serif">Family <span className="text-[#C5A059]">Access</span></h2>
                   <div className="h-[2px] w-12 bg-[#C5A059] mt-2"></div>
                 </div>
                 <button onClick={addMember} className="w-full sm:w-auto bg-[#C5A059]/10 text-[#C5A059] border border-[#C5A059]/30 h-12 px-6 rounded-2xl font-black text-[10px] hover:bg-[#C5A059] hover:text-white transition-all">+ ADD MEMBER</button>
@@ -121,14 +120,14 @@ function CustomerProfile() {
                   <div key={member.id} className="relative bg-[#FDF5E6]/40 border border-[#EAD8C0] p-6 rounded-[2rem] group hover:bg-white transition-all shadow-sm">
                     <button onClick={() => removeMember(member.id)} className="absolute top-4 right-4 text-[#A4907C] hover:text-red-500 text-[9px] font-bold">REMOVE</button>
                     <div className="flex items-center gap-4 mb-4">
-                       <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-[#C5A059]/30 text-[#C5A059] font-bold">{member.relation[0]}</div>
-                       <input placeholder="Name" value={member.name} onChange={(e) => updateMember(member.id, "name", e.target.value)} className="bg-transparent border-b border-[#EAD8C0] py-1 text-sm font-bold outline-none w-full" />
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-[#C5A059]/30 text-[#C5A059] font-bold">{member.relation[0]}</div>
+                      <input placeholder="Name" value={member.name} onChange={(e) => updateMember(member.id, "name", e.target.value)} className="bg-transparent border-b border-[#EAD8C0] py-1 text-sm font-bold outline-none w-full" />
                     </div>
                     <div className="flex gap-3">
-                        <select value={member.relation} onChange={(e) => updateMember(member.id, "relation", e.target.value)} className="flex-1 bg-white border border-[#EAD8C0] text-[10px] rounded-lg px-2 py-2 outline-none">
-                          <option>Son</option><option>Daughter</option><option>Wife</option><option>Husband</option>
-                        </select>
-                        <input placeholder="Age" value={member.age} onChange={(e) => updateMember(member.id, "age", e.target.value)} className="w-14 bg-white border border-[#EAD8C0] rounded-lg text-[10px] text-center outline-none" />
+                      <select value={member.relation} onChange={(e) => updateMember(member.id, "relation", e.target.value)} className="flex-1 bg-white border border-[#EAD8C0] text-[10px] rounded-lg px-2 py-2 outline-none">
+                        <option>Son</option><option>Daughter</option><option>Wife</option><option>Husband</option>
+                      </select>
+                      <input placeholder="Age" value={member.age} onChange={(e) => updateMember(member.id, "age", e.target.value)} className="w-14 bg-white border border-[#EAD8C0] rounded-lg text-[10px] text-center outline-none" />
                     </div>
                   </div>
                 ))}

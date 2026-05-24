@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import MembershipSection from "../components/membership/MembershipSection";
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
+
 import {
   Scissors, CalendarDays, Sparkles, User, Palette,
   Star, Menu, X, ChevronDown, MapPin, Clock, Phone,
@@ -44,7 +49,6 @@ const TESTIMONIALS = [
   { name:"Amit Kulkarni", role:"Premium Member",   rating:5, text:"The combo package is incredible value. Highly recommend to everyone!", avatar:"AK" },
 ];
 
-/* ── How it works — proper SVG icons ── */
 const HOW_IT_WORKS = [
   {
     step:"01", title:"Choose Service", path:"/customer/services",
@@ -78,19 +82,31 @@ const SocialSVG = [
   { label:"Youtube",   d:<svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M23.498 6.186a2.99 2.99 0 0 0-2.105-2.118C19.618 3.5 12 3.5 12 3.5s-7.618 0-9.393.568A2.99 2.99 0 0 0 .502 6.186 31.32 31.32 0 0 0 0 12a31.32 31.32 0 0 0 .502 5.814 2.99 2.99 0 0 0 2.105 2.118C4.382 20.5 12 20.5 12 20.5s7.618 0 9.393-.568a2.99 2.99 0 0 0 2.105-2.118A31.32 31.32 0 0 0 24 12a31.32 31.32 0 0 0-.502-5.814zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg> },
 ];
 
+
+
+
 export default function HomePage() {
   const navigate    = useNavigate();
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [dropOpen,  setDropOpen]  = useState(false);
   const [salons,    setSalons]    = useState([]);
   const [scrolled,  setScrolled]  = useState(false);
+  const [reviews,         setReviews]         = useState([]);
+  const [selectedReview,  setSelectedReview]  = useState(null);
   const dropRef = useRef(null);
+
 
   useEffect(() => {
     fetch(`${API}/salon/nearby`)
       .then(r => r.json())
       .then(d => { if (d.success) setSalons(d.salons?.slice(0, 3) || []); })
       .catch(() => {});
+
+    fetch(`${API}/review`)
+      .then(r => r.json())
+      .then(d => { if (d.success) setReviews(d.reviews || []); })
+      .catch(() => {});
+
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -110,176 +126,206 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#3E362E] font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans overflow-x-hidden">
       <style dangerouslySetInnerHTML={{ __html:`
         @keyframes border-beam{0%{left:-100%}100%{left:100%}}
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
         .animate-border-beam{animation:border-beam 3s linear infinite}
         .fade-up{animation:fadeUp .6s ease forwards}
-        .float-anim{animation:float 3s ease-in-out infinite}
-        .dd-enter{animation:fadeUp .2s ease forwards}
         .nav-link{position:relative}
         .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#C5A059;transition:width .3s}
         .nav-link:hover::after{width:100%}
+        .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
       `}} />
+  <Navbar />    
+      
+ {/* ══ FULL-PAGE IMMERSIVE BLENDED HERO SECTION ══ */}
+      <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[550px] md:min-h-[650px] flex items-center">
+        
+        {/* 🌅 THE BACKGROUND IMAGE CANVAS: Spans the full section height on the right side */}
+        <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none">
+          <img 
+            src="/hero-interior.png" 
+            alt="Barber Pro Salon Immersive Background" 
+            className="w-full h-full object-cover object-[40%_center] md:object-[80%_center]"
+          />
+          
+          {/* 🪄 ULTRA-SMOOTH GRADIENT MASK: Blends the image directly into the main page color */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2] via-[#FAF7F2]/70 to-transparent w-full md:w-[20%] pointer-events-none" />
+          
+          {/* Subtle bottom fade to prevent harsh edges with the stats grid below */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/30 via-transparent to-transparent pointer-events-none" />
+        </div>
 
-      {/* ══ NAVBAR ══ */}
-      <nav className={`sticky top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-[#EADDCA]/80 bg-white/95 shadow-md backdrop-blur-xl" : "border-[#EADDCA]/30 bg-white/80 backdrop-blur-xl"}`}>
-        <div className="flex w-full items-center justify-between px-6 md:px-12 py-4 max-w-7xl mx-auto">
-          <div className="flex flex-col items-start cursor-pointer font-serif" onClick={() => navigate("/")}>
-            <div className="flex items-center gap-2.5">
-              <Scissors className="w-5 h-5 text-[#C5A059]" />
-              <h1 className="text-lg md:text-xl font-bold tracking-[0.2em] uppercase italic">BARBER <span className="text-[#C5A059] not-italic">PRO</span></h1>
-            </div>
-            <div className="hidden md:flex items-center gap-2 w-full mt-1">
-              <div className="h-[1px] flex-grow bg-[#C5A059] opacity-30" />
-              <span className="text-[8px] text-[#8D7B68] tracking-[0.3em] uppercase font-bold">Est. 2026</span>
-              <div className="h-[1px] flex-grow bg-[#C5A059] opacity-30" />
-            </div>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-8">
-            {NAV_ITEMS.map(item => (
-              item.hasDropdown ? (
-                <div key={item.label} className="relative" ref={dropRef}>
-                  <button onClick={() => setDropOpen(p => !p)}
-                    className="nav-link flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-stone-700 hover:text-[#C5A059] transition">
-                    {item.label}
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${dropOpen ? "rotate-180 text-[#C5A059]" : ""}`} />
-                  </button>
-                  {dropOpen && (
-                    <div className="dd-enter absolute top-8 left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border border-[#EADDCA] overflow-hidden z-50">
-                      <div className="p-2">
-                        {SERVICE_LINKS.map(svc => (
-                          <button key={svc.path} onClick={() => handleNav(svc.path)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-[#FEF3E2] transition-all group text-left">
-                            <span className="text-[#C5A059]">{svc.icon}</span>
-                            <div>
-                              <p className="text-[12px] font-bold text-[#3E362E] group-hover:text-[#C5A059]">{svc.label}</p>
-                              <p className="text-[10px] text-[#8D7B68]">{svc.desc}</p>
-                            </div>
-                            <ArrowRight className="w-3.5 h-3.5 text-[#C5A059] ml-auto opacity-0 group-hover:opacity-100 transition" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+        {/* 🧱 LAYOUT CONTENT GRID LAYER: Renders text elements dynamically over the background canvas */}
+        <div className="mx-auto max-w-7xl w-full px-6 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center relative z-10">
+          
+          {/* Left Column: Typography Content */}
+          <div className="space-y-6 max-w-xl fade-up">
+          <h1 className="text-4xl sm:text-5xl md:text-5xl font-black text-stone-900 tracking-wide uppercase leading-[1.15] font-serif">
+  Premium Services <br />
+  <span className="text-[#C5A059] font-light italic normal-case font-serif tracking-normal">at affordable prices</span>
+</h1>
+            
+        <p className="text-base md:text-lg text-stone-700 font-sans normal-case leading-relaxed">
+              Where Classic Barbering Meets Modern Salon Luxury. Expert grooming & styling for both men and women. Because great style has no gender.
+            </p>
+            
+            {/* 🏷️ ADDED START: Premium Category Badges */}
+            <div className="flex flex-wrap items-center gap-4 pt-2 text-left">
+              <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm border border-stone-200/60 p-2.5 px-4 rounded-xl shadow-sm">
+                <div className="p-1.5 bg-stone-900/10 rounded-lg text-stone-800"><Scissors size={14} /></div>
+                <div>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-stone-800 leading-tight">For Men</h4>
+                  <p className="text-[9px] text-stone-500 leading-none mt-0.5">Sharp. Confident.</p>
                 </div>
-              ) : (
-                <button key={item.label} onClick={() => handleNav(item.path)}
-                  className="nav-link text-[11px] font-bold uppercase tracking-widest text-stone-700 hover:text-[#C5A059] transition">
-                  {item.label}
-                </button>
-              )
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/login")}
-              className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-[#3E362E] border border-[#EADDCA] px-4 py-2 rounded-lg hover:bg-[#FEF3E2] hover:border-[#C5A059] transition">
-              Login
-            </button>
-            <button onClick={() => navigate("/customer/services")}
-              className="relative hidden sm:block overflow-hidden rounded-lg bg-[#3E362E] px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:scale-105 hover:bg-[#C5A059]">
-              <div className="absolute top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-[#C5A059] to-transparent animate-border-beam opacity-50" />
-              Book Now
-            </button>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-[#3E362E]">
-              {menuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
-        </div>
-
-        {menuOpen && (
-          <div className="lg:hidden bg-white border-t border-[#EADDCA] p-6 space-y-3 shadow-2xl">
-            {NAV_ITEMS.map(item => (
-              <div key={item.label}>
-                <button onClick={() => item.hasDropdown ? setDropOpen(p => !p) : handleNav(item.path)}
-                  className="flex items-center justify-between w-full text-left text-sm font-bold uppercase tracking-widest text-stone-700 py-2 border-b border-[#EADDCA]/50">
-                  {item.label}
-                  {item.hasDropdown && <ChevronDown className={`w-4 h-4 transition-transform ${dropOpen ? "rotate-180" : ""}`} />}
-                </button>
-                {item.hasDropdown && dropOpen && (
-                  <div className="pl-4 space-y-2 mt-2">
-                    {SERVICE_LINKS.map(svc => (
-                      <button key={svc.path} onClick={() => handleNav(svc.path)}
-                        className="flex items-center gap-2 w-full text-left text-sm text-[#8D7B68] hover:text-[#C5A059] py-1.5">
-                        <span className="text-[#C5A059]">{svc.icon}</span>{svc.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
-            ))}
-            <div className="pt-3 space-y-2">
-              <button onClick={() => navigate("/login")} className="w-full border border-[#EADDCA] text-[#3E362E] py-3 rounded-lg font-bold uppercase text-[10px] tracking-widest">Login</button>
-              <button onClick={() => navigate("/customer/services")} className="w-full bg-[#3E362E] text-white py-4 rounded-lg font-black uppercase text-[10px] tracking-widest hover:bg-[#C5A059] transition">Book Now</button>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* ══ HERO ══ */}
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:py-28 lg:grid-cols-2 items-center">
-        <div className="space-y-6 md:space-y-8 text-center lg:text-left fade-up">
-          <div className="inline-flex items-center gap-3 rounded-full border border-[#EADDCA] px-4 py-1.5 bg-white shadow-sm">
-            <Star className="w-3.5 h-3.5 fill-[#C5A059] text-[#C5A059]" />
-            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#8D7B68]">Elite Grooming Experience</span>
-          </div>
-          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-[1.1] text-[#3E362E] tracking-tighter uppercase">
-            Mastering<br />
-            <span className="text-[#C5A059] font-light italic font-serif">THE ART OF YOU.</span>
-          </h1>
-          <p className="text-base md:text-lg text-stone-600 leading-relaxed max-w-lg mx-auto lg:mx-0 italic font-serif">
-            Where tradition meets modern precision. Step into a grooming sanctuary designed exclusively for the modern individual.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button onClick={() => navigate("/customer/services")}
-              className="flex items-center justify-center gap-3 rounded-xl bg-[#3E362E] px-10 py-5 text-sm font-bold uppercase tracking-widest text-white shadow-2xl transition hover:bg-[#C5A059] hover:scale-105">
-              <CalendarDays className="w-5 h-5" /> Book Appointment
-            </button>
-            <button onClick={() => handleNav("#about")}
-              className="flex items-center justify-center gap-3 rounded-xl border-2 border-[#EADDCA] bg-white px-8 py-5 text-sm font-bold uppercase tracking-widest text-[#3E362E] transition hover:border-[#C5A059] hover:text-[#C5A059]">
-              <ArrowRight className="w-5 h-5" /> Learn More
-            </button>
-          </div>
-          <div className="flex gap-8 justify-center lg:justify-start pt-4">
-            {[["12K+","Customers"],["4.9","Rating"],["50+","Barbers"]].map(([v,l]) => (
-              <div key={l} className="text-center">
-                <p className="text-2xl font-black text-[#C5A059]">{v}</p>
-                <p className="text-[10px] uppercase tracking-widest text-[#8D7B68] font-bold">{l}</p>
+              
+              <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm border border-stone-200/60 p-2.5 px-4 rounded-xl shadow-sm">
+                <div className="p-1.5 bg-stone-900/10 rounded-lg text-stone-800"><Sparkles size={14} /></div>
+                <div>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-stone-800 leading-tight">For Women</h4>
+                  <p className="text-[9px] text-stone-500 leading-none mt-0.5">Stylish. Empowered.</p>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="relative group h-[400px] md:h-[600px] w-full float-anim">
-          <div className="absolute -inset-4 bg-[#EADDCA]/20 rounded-[50px] blur-2xl" />
-          <div className="relative h-full w-full overflow-hidden rounded-[2rem] border-[8px] md:border-[12px] border-white shadow-2xl">
-            <div className="absolute inset-0 w-full h-full lg:group-hover:w-1/2 transition-all duration-700 ease-in-out border-r border-white/20 z-10">
-              <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=1000" alt="Male" className="h-full w-full object-cover" />
+              <div className="flex items-center gap-3 bg-white/70 backdrop-blur-sm border border-stone-200/60 p-2.5 px-4 rounded-xl shadow-sm">
+                <div className="p-1.5 bg-[#C5A059]/10 rounded-lg text-[#C5A059]"><Award size={14} /></div>
+                <div>
+                  <h4 className="text-[11px] font-black uppercase tracking-wider text-stone-800 leading-tight">Premium Experience</h4>
+                  <p className="text-[9px] text-stone-500 leading-none mt-0.5">Personalized. Luxury.</p>
+                </div>
+              </div>
             </div>
-            <div className="absolute inset-0 w-0 h-full left-full lg:group-hover:left-1/2 lg:group-hover:w-1/2 transition-all duration-700 ease-in-out overflow-hidden z-20">
-              <img src="https://i.pinimg.com/736x/90/58/6b/90586b9445c43de32891a56d56e9447a.jpg" alt="Female" className="h-full w-[200%] max-w-none object-cover -translate-x-1/2" />
+            {/* 🏷️ ADDED END */}
+            <div className="flex items-center gap-4 bg-white/40 backdrop-blur-xs border border-stone-200/50 p-3 px-5 rounded-2xl w-fit shadow-xs my-2">
+      <div className="flex -space-x-3 overflow-hidden">
+        <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80" alt="Client" />
+        <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Client" />
+        <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=100&q=80" alt="Client" />
+        <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&q=80" alt="Client" />
+      </div>
+      <div>
+        <h5 className="text-xs font-black text-stone-900 tracking-tight leading-tight">10K+ Happy Clients</h5>
+        <p className="text-[10px] text-stone-500 leading-none mt-0.5">Join thousands who trust us for style & confidence.</p>
+      </div>
+    </div>
+
+            {/* Action Buttons Row */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
+              
+              {/* Primary Button: Book Appointment */}
+              <button 
+                onClick={() => navigate("/customer/services")}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-[#bb8d65] hover:bg-[#916b4a] text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              >
+                {/* Calendar Icon Layout Line */}
+                <svg className="w-4 h-4 text-white/90" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                BOOK APPOINTMENT
+              </button>
+              
+              {/* Secondary Button: Explore Services Outline */}
+              <button 
+                onClick={() => handleNav("#services")}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-white/40 backdrop-blur-xs border border-stone-400/60 hover:border-stone-500 text-stone-800 rounded-xl font-bold uppercase text-xs tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] group cursor-pointer"
+              >
+                {/* Play Triangle Icon Layout Line */}
+                <svg className="w-3.5 h-3.5 text-[#A37B58] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                </svg>
+                EXPLORE SERVICES
+              </button>
+
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#3E362E]/40 via-transparent to-transparent z-30 pointer-events-none" />
+            </div>
+            
+
+          {/* Right Column: Transparent Space that lifts up the Stylist Floating Card */}
+          <div className="relative h-full w-full min-h-[200px] md:min-h-[400px] flex items-end justify-center md:justify-end">
+            
+            {/* Elegant Floating Stylist Badge */}
+            <div className="w-full max-w-sm bg-white/85 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/40 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]">
+              <img 
+                src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?&w=100&q=80" 
+                alt="Rahul Sharma - Senior Stylist" 
+                className="w-14 h-14 rounded-xl object-cover border border-stone-200 shadow-sm"
+              />
+              <div>
+                <p className="text-[9px] font-black text-[#C5A059] uppercase tracking-[0.2em] leading-none mb-1">Senior Stylist</p>
+                <h4 className="text-lg font-bold text-stone-900 tracking-tight">Rahul Sharma</h4>
+                <p className="text-xs text-stone-500 mt-0.5">Specialist in Men’s Grooming</p>
+              </div>
+            </div>
+
           </div>
+
         </div>
       </section>
 
       {/* ══ STATS ══ */}
-      <section className="bg-[#3E362E] py-12">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {STATS.map(({ icon:Icon, val, label }) => (
-            <div key={label} className="text-center">
-              <div className="w-12 h-12 rounded-xl bg-[#C5A059]/20 flex items-center justify-center mx-auto mb-3">
-                <Icon className="w-6 h-6 text-[#C5A059]" />
-              </div>
-              <p className="text-2xl md:text-3xl font-black text-white mb-1">{val}</p>
-              <p className="text-[10px] uppercase tracking-widest text-[#8D7B68] font-bold">{label}</p>
+      {/* 📊 UPGRADED: 4-Column Luxury Metrics Banner */}
+      <section className="relative w-full bg-[#FAF7F2] pb-12 pt-4 px-6 z-20">
+        <div className="mx-auto max-w-7xl bg-white/60 backdrop-blur-md border border-stone-200/40 rounded-3xl p-6 md:p-8 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center">
+          
+          {/* Item 1: Expert Barbers */}
+          <div className="flex items-center gap-4 justify-center md:border-r border-stone-200/60 last:border-none">
+            <div className="text-[#A37B58]">
+              {/* Scissors Icon */}
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-4.242-4.242M14.121 14.121a3 3 0 10-4.243-4.242m4.243 4.242a3 3 0 11-4.243-4.243m0 0L4 4m5.172 5.172L4 14m5.172-5.172l4.242 4.242" />
+              </svg>
             </div>
-          ))}
+            <div className="text-left">
+              <h3 className="text-xl md:text-2xl font-black text-stone-900 tracking-tight leading-none">15+</h3>
+              <p className="text-[10px] uppercase font-bold tracking-wider text-stone-500 mt-1">Expert Barbers</p>
+            </div>
+          </div>
+
+          {/* Item 2: Happy Clients */}
+          <div className="flex items-center gap-4 justify-center md:border-r border-stone-200/60 last:border-none">
+            <div className="text-[#A37B58]">
+              {/* User Portrait Icon */}
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <h3 className="text-xl md:text-2xl font-black text-stone-900 tracking-tight leading-none">10K+</h3>
+              <p className="text-[10px] uppercase font-bold tracking-wider text-stone-500 mt-1">Happy Clients</p>
+            </div>
+          </div>
+
+          {/* Item 3: Open Every Week */}
+          <div className="flex items-center gap-4 justify-center md:border-r border-stone-200/60 last:border-none">
+            <div className="text-[#A37B58]">
+              {/* Clock Icon */}
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <h3 className="text-xl md:text-2xl font-black text-stone-900 tracking-tight leading-none">7 Days</h3>
+              <p className="text-[10px] uppercase font-bold tracking-wider text-stone-500 mt-1">Open Every Week</p>
+            </div>
+          </div>
+
+          {/* Item 4: Cities Served */}
+          <div className="flex items-center gap-4 justify-center last:border-none">
+            <div className="text-[#A37B58]">
+              {/* Location Pin Icon */}
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <h3 className="text-xl md:text-2xl font-black text-stone-900 tracking-tight leading-none">20+</h3>
+              <p className="text-[10px] uppercase font-bold tracking-wider text-stone-500 mt-1">Cities Served</p>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -289,12 +335,12 @@ export default function HomePage() {
           <div className="relative">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4">
-                <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&h=300&fit=crop" alt="Barber" className="w-full h-48 object-cover rounded-2xl shadow-lg"/>
-                <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=200&fit=crop" alt="Salon" className="w-full h-32 object-cover rounded-2xl shadow-lg"/>
+                <img src="https://i.pinimg.com/736x/89/90/e0/8990e0304c44794197af164ab0138011.jpg" alt="Barber" className="w-full h-48 object-cover rounded-2xl shadow-lg"/>
+                <img src="https://i.pinimg.com/736x/bd/10/db/bd10db8df4573f03415a898584459188.jpg" alt="Salon" className="w-full h-32 object-cover rounded-2xl shadow-lg"/>
               </div>
               <div className="space-y-4 mt-8">
-                <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=400&h=200&fit=crop" alt="Interior" className="w-full h-32 object-cover rounded-2xl shadow-lg"/>
-                <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=300&fit=crop" alt="Service" className="w-full h-48 object-cover rounded-2xl shadow-lg"/>
+                <img src="https://i.pinimg.com/1200x/35/e1/16/35e116f3d65f94e0525f4810f94b5fc7.jpg" alt="Interior" className="w-full h-32 object-cover rounded-2xl shadow-lg"/>
+                <img src="https://i.pinimg.com/1200x/c0/7c/78/c07c78a373ee1bfd8c122578be42e0c2.jpg" alt="Service" className="w-full h-48 object-cover rounded-2xl shadow-lg"/>
               </div>
             </div>
             <div className="absolute -bottom-4 -right-4 bg-[#C5A059] text-white rounded-2xl p-5 shadow-2xl text-center">
@@ -304,17 +350,17 @@ export default function HomePage() {
           </div>
 
           <div>
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">About Us</span>
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3 mb-6">
+            <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[#C5A059]">About Us</span>
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-stone-900 mt-3 mb-6">
               We Are The Art Of <span className="text-[#C5A059] italic font-serif">Grooming</span>
             </h2>
-            <p className="text-stone-600 leading-relaxed mb-4 font-serif italic">
+            <p className="leading-relaxed mb-4 font-serif italic text-stone-600">
               BarberPro is Pune's premier grooming destination, where tradition meets modern luxury. We combine precision barbering with cutting-edge technology to deliver an unmatched experience.
             </p>
-            <p className="text-stone-600 leading-relaxed mb-8">
+            <p className="leading-relaxed mb-8 text-stone-600">
               Our platform connects customers with the best barbers in the city, offering seamless booking, real-time queue management, and premium grooming services — all in one place.
             </p>
-            <div className="space-y-3 mb-8">
+            <div className="space-y-3 mb-8 ">
               {[
                 "Real-time queue tracking — know your exact wait time",
                 "Certified master barbers with 3-10 years experience",
@@ -322,19 +368,19 @@ export default function HomePage() {
                 "Hygienic tools — sterilized after every use",
                 "Easy online booking with token payment system",
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
+                <div key={i} className="flex items-center gap-3 ">
                   <CheckCircle className="w-5 h-5 text-[#C5A059] flex-shrink-0" />
-                  <span className="text-sm text-stone-600">{item}</span>
+                  <span className="text-sm text-stone-700">{item}</span>
                 </div>
               ))}
             </div>
             <div className="flex flex-wrap gap-4">
               <button onClick={() => navigate("/salon-detail")}
-                className="flex items-center gap-2 bg-[#3E362E] text-white px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] transition hover:scale-105">
+                className="flex items-center gap-2 bg-[#3E362E] text-white px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] transition hover:scale-105 cursor-pointer">
                 Read More <ArrowRight className="w-4 h-4" />
               </button>
               <button onClick={() => navigate("/customer/services")}
-                className="flex items-center gap-2 border-2 border-[#EADDCA] text-[#3E362E] px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition">
+                className="flex items-center gap-2 border-2 border-[#EADDCA] text-[#3E362E] px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition cursor-pointer">
                 Book Now <CalendarDays className="w-4 h-4" />
               </button>
             </div>
@@ -346,7 +392,7 @@ export default function HomePage() {
       <section id="services" className="bg-[#F9F5EF] py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-14">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What We Offer</span>
+            <span className="text-[14px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What We Offer</span>
             <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">Our Services</h2>
             <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
           </div>
@@ -355,8 +401,8 @@ export default function HomePage() {
               <div key={f.title} onClick={() => navigate(f.path)}
                 className="group relative h-80 md:h-96 rounded-3xl border border-[#EADDCA] bg-white overflow-hidden transition-all hover:-translate-y-2 hover:shadow-2xl cursor-pointer">
                 <div className="absolute inset-0 z-0">
-                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-50 group-hover:opacity-80 transition-all duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
+                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-150 group-hover:opacity-100 transition-all duration-700" /> 
+                  <div className="absolute inset-0 bg-gradient-to-t from-white via-white/5 to-transparent opacity-80" /> 
                 </div>
                 <div className="relative z-10 p-6 md:p-8 flex flex-col h-full justify-end">
                   <div className="mb-4 inline-flex w-fit rounded-xl bg-[#FDFBF7] p-3 text-[#C5A059] shadow-sm border border-[#EADDCA]/30 group-hover:bg-[#C5A059] group-hover:text-white transition-all">
@@ -373,18 +419,18 @@ export default function HomePage() {
           </div>
           <div className="text-center mt-10">
             <button onClick={() => navigate("/customer/services")}
-              className="inline-flex items-center gap-3 bg-[#3E362E] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] transition-all hover:scale-105">
+              className="inline-flex items-center gap-3 bg-[#3E362E] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] transition-all hover:scale-105 cursor-pointer">
               View All Services <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </section>
 
-      {/* ══ HOW IT WORKS — proper SVG icons ══ */}
+      {/* ══ HOW IT WORKS ══ */}
       <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
         <div className="text-center mb-14">
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Simple Process</span>
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">How It Works</h2>
+          <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Simple Process</span>
+          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-stone-900 mt-3">How It Works</h2>
           <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
         </div>
 
@@ -392,28 +438,25 @@ export default function HomePage() {
           {HOW_IT_WORKS.map((s, i) => (
             <div key={s.step} onClick={() => navigate(s.path)}
               className="group cursor-pointer relative">
-              {/* Connector line */}
               {i < HOW_IT_WORKS.length - 1 && (
                 <div className="hidden md:block absolute top-10 left-[calc(50%+3rem)] w-[calc(100%-3rem)] h-[2px] bg-gradient-to-r from-[#C5A059] to-[#EAD8C0]" />
               )}
 
               <div className="text-center relative z-10">
-                {/* Icon box */}
                 <div className="w-20 h-20 rounded-2xl mx-auto mb-5 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl border-2"
                   style={{ background:s.bg, borderColor:s.color, color:s.color }}>
                   {s.icon}
                 </div>
 
-                {/* Step number */}
                 <div className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border"
                   style={{ background:s.bg, color:s.color, borderColor:s.color }}>
                   Step {s.step}
                 </div>
 
-                <h3 className="font-black text-[#3E362E] text-sm mb-2 uppercase tracking-wide group-hover:text-[#C5A059] transition">
+                <h3 className="font-black text-stone-900 text-sm mb-2 uppercase tracking-wide group-hover:text-[#C5A059] transition">
                   {s.title}
                 </h3>
-                <p className="text-[11px] text-stone-500 leading-relaxed">{s.desc}</p>
+                <p className="text-[11px] text-stone-500 leading-relaxed ">{s.desc}</p>
               </div>
             </div>
           ))}
@@ -421,7 +464,7 @@ export default function HomePage() {
 
         <div className="text-center mt-12">
           <button onClick={() => navigate("/login")}
-            className="inline-flex items-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105">
+            className="inline-flex items-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105 cursor-pointer">
             Get Started Now <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -453,11 +496,11 @@ export default function HomePage() {
                   </div>
                   <div className="flex gap-2">
                     <button onClick={e => { e.stopPropagation(); navigate(`/salon/${s._id}`); }}
-                      className="flex-1 border border-[#EADDCA] text-[#3E362E] py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:border-[#C5A059] transition">
+                      className="flex-1 border border-[#EADDCA] text-[#3E362E] py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:border-[#C5A059] transition cursor-pointer">
                       View Details
                     </button>
                     <button onClick={e => { e.stopPropagation(); navigate("/customer/services"); }}
-                      className="flex-1 bg-[#3E362E] text-white py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#C5A059] transition">
+                      className="flex-1 bg-[#3E362E] text-white py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#C5A059] transition cursor-pointer">
                       Book Now
                     </button>
                   </div>
@@ -466,7 +509,7 @@ export default function HomePage() {
             </div>
             <div className="text-center mt-8">
               <button onClick={() => navigate("/nearby")}
-                className="inline-flex items-center gap-2 text-[#C5A059] font-black uppercase text-[11px] tracking-widest hover:gap-4 transition-all">
+                className="inline-flex items-center gap-2 text-[#C5A059] font-black uppercase text-[11px] tracking-widest hover:gap-4 transition-all cursor-pointer">
                 View All Salons <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -474,143 +517,164 @@ export default function HomePage() {
         </section>
       )}
 
+      <MembershipSection />
+
       {/* ══ TESTIMONIALS ══ */}
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+      <section className="mx-auto max-w-7xl px-6 py-20 md:py-28 bg-[#cfc6b9]">
         <div className="text-center mb-14">
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What They Say</span>
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">Customer Reviews</h2>
+          <span className="text-[14px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What They Say</span>
+          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#FFFFFF] mt-3">Customer Reviews</h2>
           <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
         </div>
+
         <div className="grid gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map(t => (
-            <div key={t.name} className="bg-white rounded-2xl p-8 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all">
-              <div className="flex gap-1 mb-4">
-                {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#C5A059] text-[#C5A059]" />)}
-              </div>
-              <p className="text-sm text-stone-600 italic font-serif leading-relaxed mb-6">"{t.text}"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8A840] flex items-center justify-center text-white font-black text-sm">{t.avatar}</div>
-                <div>
-                  <p className="font-black text-[#3E362E] text-sm">{t.name}</p>
-                  <p className="text-[10px] text-[#8D7B68] uppercase tracking-widest">{t.role}</p>
+          {(reviews.length > 0 ? reviews.slice(0, 3) : TESTIMONIALS).map((item) => {
+            const isReal = !!item._id;
+            const name   = isReal ? (item.customer_id?.name || "Anonymous") : item.name;
+            const text   = isReal ? (item.review_text || "(No written feedback)") : item.text;
+            const rating = isReal ? Math.max(item.salon_rating || 0, item.barber_rating || 0) : (item.rating || 5);
+            const role   = isReal
+              ? new Date(item.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" })
+              : item.role;
+            const avatar = isReal ? (name[0] || "?").toUpperCase() : item.avatar;
+
+            return (
+              <div key={item._id || item.name}
+                onClick={() => isReal && setSelectedReview(item)}
+                className={`bg-white rounded-2xl p-8 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all ${isReal ? "cursor-pointer" : ""}`}>
+                <div className="flex gap-1 mb-4">
+                  {[...Array(rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#C5A059] text-[#C5A059]" />)}
+                </div>
+                <p className="text-sm text-stone-600 italic font-serif leading-relaxed mb-6 line-clamp-3">"{text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8A840] flex items-center justify-center text-white font-black text-sm">{avatar}</div>
+                  <div>
+                    <p className="font-black text-[#3E362E] text-sm">{name}</p>
+                    <p className="text-[10px] text-[#8D7B68] uppercase tracking-widest">{role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-        <div className="text-center mt-8">
+
+        <div className="text-center mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+          <button onClick={() => navigate("/reviews")}
+            className="inline-flex items-center gap-2 bg-[#C5A059] text-white px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105 cursor-pointer">
+            See All Reviews{reviews.length > 0 && ` (${reviews.length})`} <ArrowRight className="w-4 h-4" />
+          </button>
           <button onClick={() => navigate("/write-review")}
-            className="inline-flex items-center gap-2 border-2 border-[#EADDCA] text-[#3E362E] px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition">
+            className="inline-flex items-center gap-2 border-2 border-[#EADDCA] text-[#FFFFFF] px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition cursor-pointer">
             <Heart className="w-4 h-4" /> Write a Review
           </button>
         </div>
       </section>
 
       {/* ══ CTA ══ */}
-      <section className="bg-[#3E362E] py-16 px-6">
+      <section className="bg-[#F9F5EF] py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-black uppercase text-white tracking-tight mb-4">
+          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4 text-stone-800">
             Ready for Your <span className="text-[#C5A059] italic font-serif">Transformation?</span>
           </h2>
-          <p className="text-stone-400 mb-8 font-serif italic">Book your appointment today and experience the BarberPro difference.</p>
+          <p className="text-stone-600 mb-8 font-serif italic text-lg">
+            Book your appointment today and experience the BarberPro difference.
+          </p>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onClick={() => navigate("/customer/services")}
-              className="flex items-center justify-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105">
+            <button 
+              onClick={() => navigate("/customer/services")}
+              className="flex items-center justify-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#b38f4d] transition-all hover:scale-105 shadow-lg cursor-pointer"
+            >
               <CalendarDays className="w-5 h-5" /> Book Now
             </button>
-            <button onClick={() => navigate("/nearby")}
-              className="flex items-center justify-center gap-3 border-2 border-white/20 text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition">
+
+            <button 
+              onClick={() => navigate("/nearby")}
+              className="flex items-center justify-center gap-3 border-2 border-stone-300 text-stone-700 px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition-all cursor-pointer"
+            >
               <MapPin className="w-5 h-5" /> Find Salon
             </button>
-            <button onClick={() => navigate("/login")}
-              className="flex items-center justify-center gap-3 border-2 border-white/20 text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition">
+
+            <button 
+              onClick={() => navigate("/login")}
+              className="flex items-center justify-center gap-3 border-2 border-stone-300 text-stone-700 px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition-all cursor-pointer"
+            >
               <User className="w-5 h-5" /> Login
             </button>
           </div>
         </div>
       </section>
 
-      {/* ══ FOOTER ══ */}
-      <footer id="contact" className="bg-[#2A241F] py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid gap-10 md:grid-cols-4 mb-12">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Scissors className="w-5 h-5 text-[#C5A059]" />
-                <span className="text-lg font-bold text-white tracking-widest uppercase italic">BARBER <span className="text-[#C5A059]">PRO</span></span>
+      <Footer />
+
+      {/* ══ REVIEW DETAIL MODAL ══ */}
+      {selectedReview && (
+        <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
+          style={{ animation: "fadeUp 0.3s ease forwards" }}
+          onClick={() => setSelectedReview(null)}>
+          <div className="bg-white rounded-3xl p-8 md:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA]"
+            onClick={e => e.stopPropagation()}>
+
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8A840] flex items-center justify-center text-white font-black text-lg">
+                  {(selectedReview.customer_id?.name?.[0] || "?").toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-black text-[#3E362E] text-base">{selectedReview.customer_id?.name || "Anonymous"}</p>
+                  <p className="text-[9px] tracking-[0.2em] uppercase text-[#8D7B68] font-bold mt-0.5">
+                    {new Date(selectedReview.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })}
+                  </p>
+                </div>
               </div>
-              <p className="text-stone-400 text-sm font-serif italic leading-relaxed mb-4">Mastering the art of grooming since 2026.</p>
-              <div className="flex gap-3">
-                {SocialSVG.map(s => (
-                  <button key={s.label} title={s.label}
-                    className="w-9 h-9 rounded-lg bg-white/5 hover:bg-[#C5A059] flex items-center justify-center transition text-white">
-                    {s.d}
-                  </button>
-                ))}
-              </div>
+              <button onClick={() => setSelectedReview(null)} className="text-[#8D7B68] hover:text-[#3E362E] transition cursor-pointer">
+                <X className="w-5 h-5"/>
+              </button>
             </div>
 
-            <div>
-              <h4 className="text-[11px] font-black uppercase tracking-widest text-white mb-4">Services</h4>
-              <ul className="space-y-2">
-                {SERVICE_LINKS.map(s => (
-                  <li key={s.path}>
-                    <button onClick={() => navigate(s.path)} className="text-stone-400 hover:text-[#C5A059] text-sm transition">{s.label}</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-[11px] font-black uppercase tracking-widest text-white mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                {[
-                  ["My Profile",      "/customerprofile"],
-                  ["Booking History", "/booking-history"],
-                  ["Salon Detail",    "/salon-detail"],
-                  ["Nearby Salons",   "/nearby"],
-                  ["Staff Login",     "/staff-login"],
-                  ["Barber Login",    "/barber/login"],
-                  ["Salon Register",  "/register-salon"],
-                  ["Admin Panel",     "/admin/login"],
-                  ["Owner Dashboard", "/owner/dashboard"],
-                ].map(([l,p]) => (
-                  <li key={p}><button onClick={() => navigate(p)} className="text-stone-400 hover:text-[#C5A059] text-sm transition">{l}</button></li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-[11px] font-black uppercase tracking-widest text-white mb-4">Contact</h4>
-              <div className="space-y-3 mb-6">
-                {[
-                  [Phone,  "+91 98765 43210"],
-                  [Mail,   "hello@barberpro.com"],
-                  [MapPin, "Pune, Maharashtra, India"],
-                  [Clock,  "Mon-Sun: 9AM - 9PM"],
-                ].map(([Icon,text],i) => (
-                  <div key={i} className="flex items-center gap-3 text-stone-400 text-sm">
-                    <Icon className="w-4 h-4 text-[#C5A059] flex-shrink-0" />{text}
+            {(selectedReview.salon_rating > 0 || selectedReview.barber_rating > 0) && (
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                {selectedReview.salon_rating > 0 && (
+                  <div className="bg-[#FEF3E2] rounded-xl p-3 text-center border border-[#EADDCA]">
+                    <p className="text-[9px] tracking-widest uppercase text-[#C5A059] font-black mb-1">Salon</p>
+                    <p className="text-2xl text-[#C5A059]">
+                      {"★".repeat(selectedReview.salon_rating)}
+                      <span className="text-[#EADDCA]">{"★".repeat(5-selectedReview.salon_rating)}</span>
+                    </p>
                   </div>
-                ))}
+                )}
+                {selectedReview.barber_rating > 0 && (
+                  <div className="bg-[#FEF3E2] rounded-xl p-3 text-center border border-[#EADDCA]">
+                    <p className="text-[9px] tracking-widest uppercase text-[#C5A059] font-black mb-1">Barber</p>
+                    <p className="text-2xl text-[#C5A059]">
+                      {"★".repeat(selectedReview.barber_rating)}
+                      <span className="text-[#EADDCA]">{"★".repeat(5-selectedReview.barber_rating)}</span>
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white mb-3">Newsletter</p>
-              <div className="flex gap-2">
-                <input type="email" placeholder="your@email.com"
-                  className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-xs outline-none focus:border-[#C5A059] placeholder:text-stone-500" />
-                <button className="bg-[#C5A059] text-white px-3 py-2 rounded-lg hover:bg-[#E8A840] transition">
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
+            )}
 
-          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-stone-500 text-[11px] uppercase tracking-widest">© 2026 BarberPro by Graphura India Pvt Ltd</p>
-            <p className="text-stone-500 text-[11px] uppercase tracking-widest">All Rights Reserved</p>
+            <div className="text-[#C5A059] text-5xl font-serif italic leading-none mb-2">"</div>
+            <p className="font-serif italic text-base leading-[1.7] text-[#3E362E] mb-6">
+              {selectedReview.review_text || "No written feedback"}
+            </p>
+
+            {selectedReview.barber_id?.name && (
+              <div className="bg-[#FDFBF7] rounded-xl p-3 mb-5 border border-[#EADDCA]/50">
+                <p className="text-[9px] tracking-[0.2em] uppercase text-[#8D7B68] font-bold mb-0.5">Stylist</p>
+                <p className="text-sm font-black text-[#C5A059]">{selectedReview.barber_id.name}</p>
+              </div>
+            )}
+
+            <button onClick={() => setSelectedReview(null)}
+              className="w-full bg-[#3E362E] text-white py-3.5 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-[#C5A059] transition cursor-pointer">
+              Close
+            </button>
           </div>
         </div>
-      </footer>
+        
+      )}
     </div>
   );
 }

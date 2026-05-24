@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Frame, Brand, Title, Sub, Field, Label, Input, PhoneRow, Btn, ErrBox } from "../../components"
+import { Frame, Brand, Title, Sub, Field, Label, Input, PhoneRow, Btn, ErrBox } from "../../components/common/FormAtoms"
 
 const REGISTERED = ['9550105897', '9735897907']
 

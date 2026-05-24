@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // 🔑 1. Bring in the navigation router hook
 import { Play, CheckCircle, Clock, History, Scissors, TrendingUp, IndianRupee, PlusCircle, Sparkles } from 'lucide-react';
 
 const ServiceConsole = () => {
+  const navigate = useNavigate(); // 🔑 2. Initialize the navigation control launcher
   const [status, setStatus] = useState('Available');
   const [seconds, setSeconds] = useState(0);
   const [currentCustomer, setCurrentCustomer] = useState("Rahul Sharma");
@@ -63,7 +65,12 @@ const ServiceConsole = () => {
 
       {/* --- HEADER --- */}
       <header className="p-6 fixed top-0 left-0 z-50 w-full flex justify-between items-start">
-        <div className="flex flex-col items-start group cursor-pointer">
+        
+        {/* 🔑 3. FIXED CLICK ACTION: Routes directly to your specific layout window */}
+        <div 
+          onClick={() => navigate("/barber/live-session")} 
+          className="flex flex-col items-start group cursor-pointer"
+        >
           <div className="flex items-center gap-2.5">
             <Scissors className="w-5 h-5 text-[#C5A059] group-hover:rotate-[-30deg] transition-transform duration-300" />
             <h1 className="text-xl font-bold text-[#3E362E] tracking-[0.2em] uppercase italic">
@@ -112,19 +119,19 @@ const ServiceConsole = () => {
 
         <div className="relative">
           <h1 className="text-6xl font-black tracking-[-0.04em] uppercase leading-none flex items-center justify-center gap-3">
-  <span className="relative inline-block bg-gradient-to-br from-[#3D3631] via-[#8D7B68] to-[#3D3631] bg-clip-text text-transparent">
-    Live
-    <svg className="absolute -bottom-2 -left-2 w-12 h-3 text-[#C5A059]/30 transform scale-x-[-1]" viewBox="0 0 100 20">
-      <path d="M0 10 Q25 0 50 10 T100 10" fill="none" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  </span>
-  <span className="relative inline-block text-[#C5A059] italic font-serif font-light lowercase tracking-normal">
-    Session
-    <svg className="absolute -bottom-2 -right-4 w-12 h-3 text-[#C5A059]/30" viewBox="0 0 100 20">
-      <path d="M0 10 Q25 0 50 10 T100 10" fill="none" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  </span>
-</h1>
+            <span className="relative inline-block bg-gradient-to-br from-[#3D3631] via-[#8D7B68] to-[#3D3631] bg-clip-text text-transparent">
+              Live
+              <svg className="absolute -bottom-2 -left-2 w-12 h-3 text-[#C5A059]/30 transform scale-x-[-1]" viewBox="0 0 100 20">
+                <path d="M0 10 Q25 0 50 10 T100 10" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </span>
+            <span className="relative inline-block text-[#C5A059] italic font-serif font-light lowercase tracking-normal">
+              Session
+              <svg className="absolute -bottom-2 -right-4 w-12 h-3 text-[#C5A059]/30" viewBox="0 0 100 20">
+                <path d="M0 10 Q25 0 50 10 T100 10" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </span>
+          </h1>
           <div className="flex items-center justify-center gap-3 mt-4">
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#C5A059]/40"></div>
             <div className="h-1 w-1 rounded-full bg-[#C5A059] animate-pulse"></div>
@@ -184,22 +191,25 @@ const ServiceConsole = () => {
           <div className="flex flex-col gap-4 relative">
             {status === 'Available' ? (
               <button
+                type="button"
                 onClick={handleStart}
-                className="w-full group relative flex items-center justify-center gap-4 bg-[#3D3631] text-white py-6 rounded-2xl font-black text-xs tracking-[0.2em] transition-all hover:scale-[1.01] hover:shadow-2xl active:scale-95"
+                className="w-full group relative flex items-center justify-center gap-4 bg-[#3D3631] text-white py-6 rounded-2xl font-black text-xs tracking-[0.2em] transition-all hover:scale-[1.01] hover:shadow-2xl active:scale-95 cursor-pointer"
               >
                 <Play size={18} fill="#C5A267" className="text-[#C5A267]" /> START SESSION
               </button>
             ) : (
               <div className="grid grid-cols-5 gap-3">
                 <button
+                  type="button"
                   onClick={handleComplete}
-                  className="col-span-4 flex items-center justify-center gap-4 bg-[#C5A267] text-white py-6 rounded-2xl font-black text-xs tracking-[0.2em] transition-all hover:bg-[#b08e56] active:scale-95 shadow-xl shadow-[#C5A267]/20"
+                  className="col-span-4 flex items-center justify-center gap-4 bg-[#C5A267] text-white py-6 rounded-2xl font-black text-xs tracking-[0.2em] transition-all hover:bg-[#b08e56] active:scale-95 shadow-xl shadow-[#C5A267]/20 cursor-pointer"
                 >
                   <CheckCircle size={20} /> COMPLETE & BILL
                 </button>
                 <button 
+                  type="button"
                   onClick={() => setShowServices(!showServices)}
-                  className={`flex items-center justify-center border rounded-2xl transition-all shadow-sm ${showServices ? 'bg-[#3D3631] text-white border-[#3D3631]' : 'bg-white border-gray-100 text-[#3D3631] hover:bg-gray-50'}`}
+                  className={`flex items-center justify-center border rounded-2xl transition-all shadow-sm cursor-pointer ${showServices ? 'bg-[#3D3631] text-white border-[#3D3631]' : 'bg-white border-gray-100 text-[#3D3631] hover:bg-gray-50'}`}
                 >
                   <PlusCircle size={24} strokeWidth={1.5} className={showServices ? 'rotate-45 transition-transform' : 'transition-transform'} />
                 </button>
@@ -211,11 +221,12 @@ const ServiceConsole = () => {
                       {extraServices.map((service, i) => (
                         <button 
                           key={i}
+                          type="button"
                           onClick={() => {
                             alert(`${service.name} added to bill!`);
                             setShowServices(false);
                           }}
-                          className="flex justify-between items-center text-[11px] font-bold text-[#3D3631] hover:bg-[#C5A267]/10 p-2 rounded-xl transition-colors"
+                          className="flex justify-between items-center text-[11px] font-bold text-[#3D3631] hover:bg-[#C5A267]/10 p-2 rounded-xl transition-colors cursor-pointer"
                         >
                           <span>{service.name}</span>
                           <span className="text-[#C5A267]">₹{service.price}</span>
