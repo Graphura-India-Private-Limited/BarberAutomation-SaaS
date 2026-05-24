@@ -742,12 +742,17 @@ export default function HomePage() {
               <h4 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#C5A059] mb-6">Explore</h4>
               <ul className="grid grid-cols-1 gap-3">
                 {[
-                  ["My Profile", "/customerprofile"],
+                   ["My Profile", "/customerprofile"],
                   ["Booking History", "/customer/history"],
                   ["Nearby Salons", "/nearby"],
+                  ["Barber Login", "/barber/login"],
+                  ["Owner Login", "/owner/login"],
+                  ["Staff Login", "/staff-login"],
                   ["Salon Register", "/register-salon"],
+                  ["Admin Panel", "/admin/login"],
                   ["Write Review", "/write-review"],
                   ["All Reviews", "/reviews"],
+
                 ].map(([label, path]) => (
                   <li key={path}>
                     <button 

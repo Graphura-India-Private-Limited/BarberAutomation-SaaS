@@ -174,12 +174,7 @@ function App() {
         <Route path="/admin/settings"  element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
         <Route path="/admin/customer-issues" element={<AdminLayout page="customer"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.CUSTOMER} /></AdminLayout>} />
         <Route path="/admin/salon-issues"    element={<AdminLayout page="salon"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.SALON} /></AdminLayout>} />
-    
-       
-       <Route
-  path="/admin/salon-management"
-  element={<SalonManagement />}
-/>    
+        <Route path="/admin/salon-management"element={<SalonManagement />}/>    
         <Route path="/admin/salon-view" element={<SalonViewPage />} />
 
         {/* --- UTILITY & FALLBACK SECURITY CORE --- */}

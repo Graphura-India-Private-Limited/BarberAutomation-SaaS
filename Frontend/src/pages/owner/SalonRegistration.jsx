@@ -104,17 +104,13 @@ export default function SalonRegistration() {
   const inputClass = "w-full rounded-2xl border border-[#EAD8C0] bg-[#FDF5E6]/60 p-4 text-sm font-semibold text-[#3E362E] outline-none transition focus:border-[#C5A059] focus:bg-white";
 
   return (
-    <div
-      className="relative min-h-screen bg-cover bg-center bg-fixed p-6 font-sans"
-      style={{ backgroundImage: `url(${shopImage})` }}
-    >
-      <div className="absolute inset-0 bg-[#FFFBF2]/92 backdrop-blur-sm" />
-      <div className="relative z-10 mx-auto max-w-5xl py-10">
+    <div className="min-h-screen bg-[#FAF7F2] p-6 font-sans">
+      <div className="mx-auto max-w-5xl py-10">
         <header className="mb-10 text-center">
           <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.5em] text-[#C5A059]">
             Graphura India Private Limited
           </span>
-          <h1 className="text-4xl font-black uppercase tracking-tight text-[#3E362E] md:text-5xl">
+          <h1 className="text-4xl font-serif tracking-normal text-[#3E362E] md:text-5xl">
             Register Your Salon
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm font-medium text-[#8D7B68]">
