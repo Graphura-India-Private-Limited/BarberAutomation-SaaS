@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Store, Users, UserSquare, UserPlus, Calendar,
   Scissors, CreditCard, Star, Radio, Settings, RefreshCw, Bell,
   CalendarDays, IndianRupee, FileText, ShieldCheck, BarChart, ChevronDown,
-  LogOut, Clock, MapPin, X, ArrowRight, Search, Menu
+  LogOut, Clock, MapPin, X, ArrowRight, Menu
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import { AdminGlobalStyles } from "../../Components/admin/AdminUIKit";
+import {
+  CustomersModule, SalonsModule, BarbersModule, AddBarberModule, AppointmentsModule,
+  ServicesModule, PaymentsModule, ReviewsModule, LiveMonitoringModule, SettingsModule,
+} from "./AdminModulePages";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
@@ -49,6 +54,12 @@ const Avatar = ({ name, size = 32, color = C.gold, bg = C.goldLight }) => (
   </div>
 );
 
+const formatDate = (value) => {
+  if (!value) return "—";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+};
+
 const NAV = [
   { k: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { k: "salons", label: "Salon Management", icon: Store },
@@ -67,12 +78,26 @@ const bStatus = s => s === "available" ? C.green : s === "busy" ? C.orange : s =
 const bkStatus = s => s === "completed" ? C.green : s === "pending" ? C.purple : s === "cancelled" ? C.red : C.blue;
 const pyStatus = s => s === "captured" ? C.green : s === "refunded" ? C.blue : s === "pending" ? C.orange : C.red;
 
-export function AdminRequests() {
+const ROUTE_TAB_MAP = {
+  "/admin/customers": "customers",
+  "/admin/salon-management": "salons",
+  "/admin/barbers": "barbers",
+  "/admin/add-barber": "addbarber",
+  "/admin/appointments": "appointments",
+  "/admin/services": "services",
+  "/admin/payments": "payments",
+  "/admin/reviews": "reviews",
+  "/admin/live": "live",
+  "/admin/platform-settings": "settings",
+};
+
+export function AdminRequests({ initialTab = "dashboard" }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const photoRef = useRef();
   const docRef = useRef();
 
-  const [tab, setTab] = useState("dashboard");
+  const [tab, setTab] = useState(initialTab);
   const [salons, setSalons] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -84,8 +109,7 @@ export function AdminRequests() {
   const [payments, setPayments] = useState([]);
   const [modal, setModal] = useState(null);
   const [toast, setToast] = useState(null);
-  const [search, setSearch] = useState("");
-  const [salonTab, setSalonTab] = useState("requests");
+  const [customerSearch, setCustomerSearch] = useState("");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [addedBarbers, setAddedBarbers] = useState([]);
@@ -97,6 +121,12 @@ export function AdminRequests() {
   const [newService, setNewService] = useState({ name: "", category: "men", price: "", duration: "30", salon_id: "" });
 
   useEffect(() => { fetchAll(); }, []);
+
+  useEffect(() => {
+    const routeTab = ROUTE_TAB_MAP[location.pathname];
+    if (routeTab) setTab(routeTab);
+    else if (location.pathname === "/admin/requests") setTab(initialTab || "dashboard");
+  }, [location.pathname, initialTab]);
 
   const h = () => ({ Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" });
 
@@ -284,13 +314,17 @@ export function AdminRequests() {
     setNewBarber(p => ({ ...p, document: file, documentName: file.name }));
   };
 
-  const SALONS_FILTERED = salons.filter(s =>
-    salonTab === "requests" ? s.status === "pending" :
-      salonTab === "approved" ? s.status === "approved" : s.status === "rejected"
-  );
-
   const pendingBookings = bookings.filter(b => b.status === "pending").length;
   const totalRevenue = payments.filter(p => p.status === "captured").reduce((a, b) => a + (b.amount || 0), 0);
+
+  const revenueDisplay = loading
+    ? "—"
+    : `₹${(((stats?.revenue || totalRevenue) / 100) || 0).toLocaleString("en-IN")}`;
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    navigate("/admin/login");
+  };
 
   /* Chart Data */
   const chartData = [
@@ -304,20 +338,11 @@ export function AdminRequests() {
   ];
 
   return (
-    <div className="flex min-h-screen font-sans" style={{ background: C.bg, color: C.ink }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-        .font-serif { font-family: 'Cormorant Garamond', serif; }
-        .font-sans { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #E7E5E4; border-radius: 10px; }
-        .card-shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02); }
-        .inp { width: 100%; border: 1px solid #E7E5E4; border-radius: 8px; padding: 10px 14px; font-size: 13px; outline: none; transition: all 0.2s; background: #fff; }
-        .inp:focus { border-color: #C5A059; box-shadow: 0 0 0 3px rgba(197,160,89,0.1); }
-      `}</style>
+    <div className="admin-root flex h-screen overflow-hidden font-sans" style={{ background: C.bg, color: C.ink }}>
+      <AdminGlobalStyles />
 
       {/* ════ SIDEBAR ════ */}
-      <aside className="w-64 flex-shrink-0 flex flex-col sticky top-0 h-screen overflow-y-auto border-r" style={{ background: C.sidebar, borderColor: C.border }}>
+      <aside className="w-64 flex-shrink-0 flex flex-col h-full overflow-y-auto border-r" style={{ background: C.sidebar, borderColor: C.border }}>
         <div className="p-6 flex items-center gap-3">
           <div className="w-8 h-8 rounded flex items-center justify-center shrink-0" style={{ background: C.goldLight }}>
             <Scissors size={18} color={C.gold} />
@@ -328,19 +353,20 @@ export function AdminRequests() {
           </div>
         </div>
 
-        <nav className="flex-1 px-4 py-2 flex flex-col gap-1">
+        <nav className="flex-1 px-4 py-2 flex flex-col gap-1 min-h-0">
           {NAV.map((n, i) => {
             const Icon = n.icon;
             const isActive = tab === n.k;
             return (
               <React.Fragment key={n.k}>
-                {(i === 5 || i === 8 || i === 10) && <div className="h-px my-3" style={{ background: C.border }} />}
+                {(i === 5 || i === 8 || i === 10) && <div className="h-px my-3" style={{ background: "#6B4C2A" }} />}
                 <button
                   onClick={() => setTab(n.k)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all relative"
                   style={{
                     background: isActive ? C.goldLight : "transparent",
                     color: isActive ? C.gold : C.muted,
+                    borderLeft: isActive ? `3px solid ${C.gold}` : "3px solid transparent",
                   }}
                 >
                   <Icon size={18} />
@@ -355,16 +381,38 @@ export function AdminRequests() {
             );
           })}
         </nav>
+
+        <div className="px-4 pb-6 mt-auto border-t pt-4" style={{ borderColor: C.border }}>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-[13px] font-medium transition-colors hover:bg-red-50"
+            style={{ color: C.red }}
+          >
+            <LogOut size={16} />
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       {/* ════ MAIN ════ */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
-        <div className="max-w-[1400px] w-full mx-auto px-10">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
+        <div className="w-full px-6 lg:px-8">
           {/* HEADER */}
           <header className="pt-12 pb-6 flex items-end justify-between shrink-0">
             <div>
               <h1 className="font-serif text-[42px] font-bold leading-none mb-2" style={{ color: C.ink }}>{NAV.find(n => n.k === tab)?.label || "Dashboard"}</h1>
-              <p className="text-[15px] font-medium" style={{ color: C.muted }}>Welcome back, Admin!</p>
+              {tab === "dashboard" && (
+                <p className="text-[15px] font-medium" style={{ color: C.muted }}>Welcome back, Admin!</p>
+              )}
+              {tab !== "dashboard" && (
+                <p className="text-[13px] font-medium mt-1" style={{ color: C.muted }}>
+                  <button type="button" onClick={() => setTab("dashboard")} className="hover:underline" style={{ color: C.gold }}>
+                    Dashboard
+                  </button>
+                  <span className="mx-2">&gt;</span>
+                  <span style={{ color: C.ink }}>{NAV.find(n => n.k === tab)?.label}</span>
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-5 pb-1">
               <span className="text-[13px] font-medium" style={{ color: C.muted }}>
@@ -377,7 +425,7 @@ export function AdminRequests() {
               </button>
               <div className="relative cursor-pointer w-10 h-10 rounded-full flex items-center justify-center bg-white border" style={{ borderColor: C.border }}>
                 <Bell size={18} color={C.muted} />
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-500 ring-2 ring-white"></span>
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#C5A059] text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white">3</span>
               </div>
               <div className="flex items-center gap-3 cursor-pointer pl-4 border-l" style={{ borderColor: C.border }}>
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#D1BFA5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#FFFFFF", flexShrink: 0 }}>AD</div>
@@ -391,51 +439,32 @@ export function AdminRequests() {
 
           <div className="w-full h-[2px]" style={{ background: '#A1804E', opacity: 0.9 }}></div>
 
-          <main className="pt-8 pb-12">
+          <main className="pt-8 pb-12" key={tab}>
             {tab === "dashboard" && (
               <div className="space-y-6 animate-fade-in">
-                {/* STAT CARDS */}
-                <div className="grid grid-cols-4 gap-6">
-                  <div className="bg-white rounded-2xl p-6 border card-shadow flex items-center gap-5" style={{ borderColor: C.border }}>
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style={{ background: C.goldLight }}>
-                      <Users size={24} color={C.gold} />
-                    </div>
-                    <div>
-                      <div className="text-[12px] font-semibold" style={{ color: C.muted }}>Total Customers</div>
-                      <div className="text-3xl font-bold font-serif mt-1">{loading ? "—" : stats?.customers ?? customers.length}</div>
-                      <div className="text-[11px] font-medium mt-1" style={{ color: C.blue }}>Registered users</div>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-2xl p-6 border card-shadow flex items-center gap-5" style={{ borderColor: C.border }}>
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style={{ background: C.greenLight }}>
-                      <Store size={24} color={C.green} />
-                    </div>
-                    <div>
-                      <div className="text-[12px] font-semibold" style={{ color: C.muted }}>Active Salons</div>
-                      <div className="text-3xl font-bold font-serif mt-1">{loading ? "—" : stats?.salons ?? salons.filter(s => s.status === "approved").length}</div>
-                      <div className="text-[11px] font-medium mt-1" style={{ color: C.green }}>Approved & live</div>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-2xl p-6 border card-shadow flex items-center gap-5" style={{ borderColor: C.border }}>
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style={{ background: C.purpleLight }}>
-                      <CalendarDays size={24} color={C.purple} />
-                    </div>
-                    <div>
-                      <div className="text-[12px] font-semibold" style={{ color: C.muted }}>Total Bookings</div>
-                      <div className="text-3xl font-bold font-serif mt-1">{loading ? "—" : stats?.bookings ?? bookings.length}</div>
-                      <div className="text-[11px] font-medium mt-1" style={{ color: C.purple }}>{pendingBookings} pending</div>
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-2xl p-6 border card-shadow flex items-center gap-5" style={{ borderColor: C.border }}>
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center shrink-0" style={{ background: C.goldLight }}>
-                      <IndianRupee size={24} color={C.gold} />
-                    </div>
-                    <div>
-                      <div className="text-[12px] font-semibold" style={{ color: C.muted }}>Revenue</div>
-                      <div className="text-3xl font-bold font-serif mt-1">{loading ? "—" : `₹${((stats?.revenue || totalRevenue) / 100).toLocaleString("en-IN")}`}</div>
-                      <div className="text-[11px] font-medium mt-1" style={{ color: C.orange }}>Total collected</div>
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                  {[
+                    { label: "Total Customers", value: loading ? "—" : stats?.customers ?? customers.length, sub: "Registered users", subColor: C.gold, icon: Users, iconBg: C.goldLight, iconColor: C.gold },
+                    { label: "Active Salons", value: loading ? "—" : stats?.salons ?? salons.filter(s => s.status === "approved").length, sub: "Approved & live", subColor: C.green, icon: Store, iconBg: C.greenLight, iconColor: C.green },
+                    { label: "Total Bookings", value: loading ? "—" : stats?.bookings ?? bookings.length, sub: `${pendingBookings} pending`, subColor: C.purple, icon: CalendarDays, iconBg: C.purpleLight, iconColor: C.purple },
+                    { label: "Revenue", value: loading ? "—" : revenueDisplay, sub: "Total collected", subColor: C.orange, icon: IndianRupee, iconBg: C.orangeLight, iconColor: C.orange },
+                  ].map((card) => {
+                    const Icon = card.icon;
+                    return (
+                      <div key={card.label} className="bg-white rounded-xl border card-shadow p-6" style={{ borderColor: C.border }}>
+                        <p className="text-[13px] font-medium" style={{ color: C.muted }}>{card.label}</p>
+                        <div className="flex items-center justify-between mt-3">
+                          <div>
+                            <div className="text-2xl font-bold font-serif" style={{ color: C.ink }}>{card.value}</div>
+                            <div className="text-[12px] font-medium mt-1" style={{ color: card.subColor }}>{card.sub}</div>
+                          </div>
+                          <div className="p-3 rounded-lg" style={{ background: card.iconBg }}>
+                            <Icon size={22} color={card.iconColor} />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* MAIN GRID LAYOUT */}
@@ -541,7 +570,7 @@ export function AdminRequests() {
                   <div className="col-span-1 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-serif text-[17px] font-bold" style={{ color: C.ink }}>Pending Salon Requests</h3>
-                      <button onClick={() => { setTab("salons"); setSalonTab("requests"); }} className="text-[11px] font-bold" style={{ color: C.orange }}>View All</button>
+                      <button onClick={() => setTab("salons")} className="text-[11px] font-bold" style={{ color: C.orange }}>View All</button>
                     </div>
                     {salons.filter(s => s.status === "pending").length === 0 ? (
                       <div className="flex-1 flex flex-col items-center justify-center text-center pt-2">
@@ -672,21 +701,77 @@ export function AdminRequests() {
               </div>
             )}
 
-            {/* FALLBACK FOR OTHER TABS */}
-            {tab !== "dashboard" && (
-              <div className="bg-white rounded-2xl border card-shadow p-8 min-h-[500px]" style={{ borderColor: C.border }}>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-serif text-2xl font-bold" style={{ color: C.ink }}>{NAV.find(n => n.k === tab)?.label}</h2>
-                </div>
-                <div className="text-center py-20 text-gray-500">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
-                    <LayoutDashboard size={24} className="text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Content Area</h3>
-                  <p className="text-sm max-w-sm mx-auto">The details for the <strong>{NAV.find(n => n.k === tab)?.label}</strong> module are available. Please select this section from the sidebar.</p>
-                  <p className="text-xs text-red-500 mt-4">(Functionality is preserved in state, UI for this tab is pending full redesign translation)</p>
-                </div>
-              </div>
+            {tab === "salons" && (
+              <SalonsModule
+                salons={salons}
+                customers={customers}
+                bookings={bookings}
+                stats={stats}
+                loading={loading}
+                pendingBookings={pendingBookings}
+                revenueDisplay={revenueDisplay}
+                updateSalonStatus={updateSalonStatus}
+              />
+            )}
+            {tab === "customers" && (
+              <CustomersModule
+                customers={customers}
+                loading={loading}
+                customerSearch={customerSearch}
+                setCustomerSearch={setCustomerSearch}
+                blockCustomer={blockCustomer}
+                stats={stats}
+              />
+            )}
+            {tab === "barbers" && (
+              <BarbersModule
+                barbers={barbers}
+                loading={loading}
+                onSetTab={setTab}
+                changeBarberStatus={changeBarberStatus}
+                removeBarber={removeBarber}
+              />
+            )}
+            {tab === "addbarber" && (
+              <AddBarberModule
+                salons={salons}
+                newBarber={newBarber}
+                setNewBarber={setNewBarber}
+                addBarber={addBarber}
+                busy={busy}
+                addedBarbers={addedBarbers}
+                photoRef={photoRef}
+                docRef={docRef}
+                handlePhotoChange={handlePhotoChange}
+                handleDocChange={handleDocChange}
+              />
+            )}
+            {tab === "appointments" && (
+              <AppointmentsModule bookings={bookings} loading={loading} changeBookingStatus={changeBookingStatus} />
+            )}
+            {tab === "services" && (
+              <ServicesModule
+                services={services}
+                salons={salons}
+                loading={loading}
+                newService={newService}
+                setNewService={setNewService}
+                addService={addService}
+                toggleService={toggleService}
+                deleteService={deleteService}
+              />
+            )}
+            {tab === "payments" && (
+              <PaymentsModule payments={payments} loading={loading} />
+            )}
+            {tab === "reviews" && (
+              <ReviewsModule reviews={reviews} loading={loading} deleteReview={deleteReview} />
+            )}
+            {tab === "live" && (
+              <LiveMonitoringModule barbers={barbers} loading={loading} changeBarberStatus={changeBarberStatus} />
+            )}
+            {tab === "settings" && (
+              <SettingsModule onSave={() => pop("Settings saved!")} />
             )}
 
           </main>
@@ -702,3 +787,5 @@ export function AdminRequests() {
     </div>
   );
 }
+
+export default AdminRequests;
