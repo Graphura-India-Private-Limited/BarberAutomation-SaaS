@@ -135,29 +135,62 @@ export default function BarberDashboard() {
   const sc = STATUS_CFG[status];
 
   if (loading) return (
-    <div style={{ background: "#0F1117" }} className="min-h-screen flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 flex items-center justify-center animate-pulse">
-          <Scissors className="w-6 h-6 text-amber-400" />
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        .font-sans-loading {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+      `}</style>
+      <div style={{ background: "#FAF6F0", fontFamily: "'Plus Jakarta Sans', sans-serif" }} className="min-h-screen flex items-center justify-center font-sans-loading">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
+            <Scissors className="w-6 h-6 text-amber-600" />
+          </div>
+          <p className="text-zinc-600 text-sm font-medium normal-case font-sans-loading">Loading Barber Console...</p>
         </div>
-        <p className="text-zinc-400 text-sm font-medium tracking-widest uppercase">Loading console...</p>
       </div>
-    </div>
+    </>
   );
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#0F1117", fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap');
-        :root { --gold: #F5C842; --gold2: #E8A020; --bg: #0F1117; --bg2: #161821; --bg3: #1E2030; --border: rgba(255,255,255,0.07); --text: #E8EAF0; --muted: #6B7280; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        :root { 
+          --gold: #D97706; 
+          --gold2: #B45309; 
+          --bg: #FAF6F0; 
+          --bg2: #FFFFFF; 
+          --bg3: #FDFBF7; 
+          --border: #EADBCE; 
+          --text: #1C1917; 
+          --muted: #78716C; 
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-        .syne { font-family: 'Syne', sans-serif; }
-        .bar-hover:hover { opacity: 1 !important; filter: brightness(1.2); }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 2px; }
+        body, .font-sans {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .font-serif {
+          font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
+        }
+        .bar-hover:hover { opacity: 1 !important; filter: brightness(1.1); }
         .nav-item { transition: all 0.2s ease; }
-        .nav-item:hover { background: rgba(255,255,255,0.05); }
-        .nav-item.active { background: rgba(245,200,66,0.12); }
-        .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; }
+        .nav-item:hover { background: rgba(0,0,0,0.03); }
+        .nav-item.active { background: rgba(217,119,6,0.08); }
+        .card { 
+          background: var(--bg2); 
+          border: 1px solid var(--border); 
+          border-radius: 16px; 
+          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
+          transition: all 0.2s ease;
+        }
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px -4px rgba(28, 25, 23, 0.06), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
+          border-color: #D6C4AE;
+        }
         .card-inner { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; }
         .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
         @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
@@ -165,34 +198,35 @@ export default function BarberDashboard() {
         @keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
       `}</style>
 
+
       {/* ═══ SIDEBAR ═══ */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ${sideOpen ? "w-64" : "w-0 md:w-64"}`}
-        style={{ background: "#0D0F14", borderRight: "1px solid rgba(255,255,255,0.06)" }}
+        style={{ background: "var(--bg2)", borderRight: "1px solid var(--border)" }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className="flex items-center gap-3 px-6 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
           <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
             <Scissors className="w-4.5 h-4.5 text-black" style={{ width: 18, height: 18 }} />
           </div>
           <div className="overflow-hidden">
-            <p className="syne text-white font-bold text-sm leading-none">{profile.salonName}</p>
-            <p className="text-[10px] mt-0.5 font-semibold uppercase tracking-widest" style={{ color: "#F5C842" }}>Barber Panel</p>
+            <p className="font-serif tracking-normal text-zinc-900 font-bold text-sm leading-none">{profile.salonName}</p>
+            <p className="text-[10px] mt-0.5 font-semibold uppercase tracking-widest" style={{ color: "var(--gold)" }}>Barber Panel</p>
           </div>
         </div>
 
         {/* Barber Profile Card */}
-        <div className="mx-4 my-4 rounded-xl p-4" style={{ background: "rgba(245,200,66,0.06)", border: "1px solid rgba(245,200,66,0.15)" }}>
+        <div className="mx-4 my-4 rounded-xl p-4" style={{ background: "rgba(217,119,6,0.04)", border: "1px solid rgba(217,119,6,0.15)" }}>
           <div className="flex items-center gap-3">
             <div className="relative flex-shrink-0">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm text-black syne" style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
+              <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm text-black font-serif tracking-normal" style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
                 {profile.initials}
               </div>
-              <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 pulse-dot ${sc.dot}`} style={{ borderColor: "#0D0F14" }} />
+              <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 pulse-dot ${sc.dot}`} style={{ borderColor: "var(--bg2)" }} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm truncate">{profile.name}</p>
-              <p className="text-[10px] truncate" style={{ color: "#9CA3AF" }}>{profile.specialization}</p>
+              <p className="text-zinc-900 font-bold text-sm truncate font-serif tracking-normal">{profile.name}</p>
+              <p className="text-[10px] truncate font-sans normal-case" style={{ color: "var(--muted)" }}>{profile.specialization}</p>
             </div>
           </div>
 
@@ -201,7 +235,7 @@ export default function BarberDashboard() {
             <button
               onClick={() => setStatusOpen(!statusOpen)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold ring-1 ${sc.ring}`}
-              style={{ background: "rgba(255,255,255,0.04)" }}
+              style={{ background: "var(--bg3)", border: "1px solid var(--border)" }}
             >
               <span className="flex items-center gap-2">
                 <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
@@ -210,15 +244,15 @@ export default function BarberDashboard() {
               <ChevronDown className={`w-3.5 h-3.5 text-zinc-500 transition-transform ${statusOpen ? "rotate-180" : ""}`} />
             </button>
             {statusOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-50 shadow-2xl" style={{ background: "#1A1C27", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-50 shadow-2xl" style={{ background: "var(--bg2)", border: "1px solid var(--border)" }}>
                 {Object.entries(STATUS_CFG).map(([key, cfg]) => (
                   <button
                     key={key}
                     onClick={() => { setStatus(key); setStatusOpen(false); showToast(`Status → ${cfg.label}`); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs hover:bg-white/5 transition"
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs hover:bg-zinc-50 transition"
                   >
                     <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                    <span className={`font-semibold ${status === key ? cfg.text : "text-zinc-300"}`}>{cfg.label}</span>
+                    <span className={`font-sans normal-case font-semibold ${status === key ? cfg.text : "text-zinc-600"}`}>{cfg.label}</span>
                     {status === key && <Check className="w-3 h-3 ml-auto text-zinc-500" />}
                   </button>
                 ))}
@@ -246,21 +280,21 @@ export default function BarberDashboard() {
               }}
               className={`nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left ${active === id ? "active" : ""}`}
             >
-              <Icon className={`w-4 h-4 flex-shrink-0 ${active === id ? "text-amber-400" : "text-zinc-500"}`} style={active === id ? { color: "#F5C842" } : {}} />
-              <span className={`text-sm font-medium flex-1 ${active === id ? "text-white font-semibold" : "text-zinc-400"}`}>{label}</span>
+              <Icon className={`w-4 h-4 flex-shrink-0 ${active === id ? "text-amber-600" : "text-zinc-500"}`} style={active === id ? { color: "var(--gold)" } : {}} />
+              <span className={`text-sm font-medium flex-1 font-sans normal-case ${active === id ? "text-zinc-900 font-semibold" : "text-zinc-600"}`}>{label}</span>
               {badge && (
-                <span className="w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center text-black" style={{ background: "#F5C842" }}>{badge}</span>
+                <span className="w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center text-white" style={{ background: "var(--gold)" }}>{badge}</span>
               )}
-              {active === id && <div className="w-1 h-4 rounded-full ml-auto" style={{ background: "#F5C842" }} />}
+              {active === id && <div className="w-1 h-4 rounded-full ml-auto" style={{ background: "var(--gold)" }} />}
             </button>
           ))}
         </nav>
 
         {/* Logout */}
-        <div className="px-3 pb-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 12 }}>
+        <div className="px-3 pb-4" style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
           <button
             onClick={() => { localStorage.clear(); navigate("/barber/login"); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:bg-red-500/10 transition text-sm font-medium"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-600 hover:bg-red-50 transition text-sm font-medium font-sans normal-case"
           >
             <LogOut className="w-4 h-4" /> Logout
           </button>
@@ -275,15 +309,15 @@ export default function BarberDashboard() {
 
         {/* Top Bar */}
         <header className="sticky top-0 z-30 flex items-center justify-between px-4 md:px-6 py-4"
-          style={{ background: "rgba(15,17,23,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+          style={{ background: "rgba(250,246,240,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--border)" }}>
 
           <div className="flex items-center gap-3">
-            <button className="md:hidden p-2 rounded-lg text-zinc-400 hover:text-white" onClick={() => setSideOpen(!sideOpen)}>
+            <button className="md:hidden p-2 rounded-lg text-zinc-600 hover:text-zinc-900" onClick={() => setSideOpen(!sideOpen)}>
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-white font-bold text-lg syne leading-none">Dashboard</h1>
-              <p className="text-[11px] mt-0.5" style={{ color: "#6B7280" }}>
+              <h1 className="text-zinc-900 font-bold text-lg font-serif tracking-normal leading-none">Dashboard</h1>
+              <p className="text-[11px] mt-0.5 font-sans normal-case" style={{ color: "var(--muted)" }}>
                 {profile.salonName} · {currentTime.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
               </p>
             </div>
@@ -293,15 +327,15 @@ export default function BarberDashboard() {
             {/* Salon open badge */}
             <button
               onClick={() => setSalonOpen(!salonOpen)}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition"
-              style={{ background: salonOpen ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.1)", border: `1px solid ${salonOpen ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, color: salonOpen ? "#34D399" : "#F87171" }}
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition font-sans normal-case"
+              style={{ background: salonOpen ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.06)", border: `1px solid ${salonOpen ? "rgba(16,185,129,0.25)" : "rgba(239,68,68,0.2)"}`, color: salonOpen ? "#047857" : "#B91C1C" }}
             >
-              <span className={`w-1.5 h-1.5 rounded-full pulse-dot ${salonOpen ? "bg-emerald-400" : "bg-red-400"}`} />
-              SALON {salonOpen ? "OPEN" : "CLOSED"}
+              <span className={`w-1.5 h-1.5 rounded-full pulse-dot ${salonOpen ? "bg-emerald-600" : "bg-red-600"}`} />
+              Salon {salonOpen ? "Open" : "Closed"}
             </button>
 
             {/* Notifications */}
-            <button className="relative p-2 rounded-xl text-zinc-400 hover:text-white transition" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <button className="relative p-2 rounded-xl text-zinc-600 hover:text-zinc-900 transition" style={{ background: "var(--bg3)", border: "1px solid var(--border)" }}>
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 pulse-dot" />
             </button>
@@ -309,13 +343,13 @@ export default function BarberDashboard() {
             {/* Profile */}
             <button onClick={() => navigate("/barber/profile")}
               className="flex items-center gap-2 px-2 py-1.5 rounded-xl transition"
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-black syne" style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
+              style={{ background: "var(--bg3)", border: "1px solid var(--border)" }}>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-black font-serif tracking-normal" style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
                 {profile.initials}
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-white text-xs font-semibold leading-none">{profile.name.split(" ")[0]}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: "#F5C842" }}>Barber</p>
+                <p className="text-zinc-900 text-xs font-semibold leading-none font-serif tracking-normal">{profile.name.split(" ")[0]}</p>
+                <p className="text-[10px] mt-0.5 font-sans normal-case" style={{ color: "var(--gold)" }}>Barber</p>
               </div>
             </button>
           </div>
@@ -332,20 +366,20 @@ export default function BarberDashboard() {
               { label: "Active Barbers",    value: stats.activeBarbers,                       sub: "1 on break",       icon: UserCheck,   up: null,  color: "#34D399" },
               { label: "Avg Wait Time",     value: `${stats.avgWait} min`,                    sub: "Peak: 28 min at 2PM", icon: Timer,    up: false, color: "#A78BFA" },
             ].map((s, i) => (
-              <div key={i} className="card p-4 md:p-5 hover:border-white/10 transition-all">
+              <div key={i} className="card p-4 md:p-5 transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${s.color}15` }}>
                     <s.icon className="w-4.5 h-4.5" style={{ width: 18, height: 18, color: s.color }} />
                   </div>
                   {s.up !== null && (
-                    <span className={`flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded-full ${s.up ? "text-emerald-400 bg-emerald-400/10" : "text-red-400 bg-red-400/10"}`}>
+                    <span className={`flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded-full border ${s.up ? "text-emerald-700 bg-emerald-50 border-emerald-200/50" : "text-red-700 bg-red-50 border-red-200/50"}`}>
                       {s.up ? <ArrowUp className="w-2.5 h-2.5" /> : <ArrowDown className="w-2.5 h-2.5" />} {s.sub.split(" ")[0]}
                     </span>
                   )}
                 </div>
-                <p className="syne font-bold text-2xl text-white leading-none">{s.value}</p>
-                <p className="text-[11px] mt-1.5 font-medium" style={{ color: "#6B7280" }}>{s.sub}</p>
-                <p className="text-[10px] mt-0.5 uppercase tracking-widest font-semibold" style={{ color: "#4B5563" }}>{s.label}</p>
+                <p className="font-serif tracking-normal font-bold text-2xl text-zinc-900 leading-none">{s.value}</p>
+                <p className="text-[11px] mt-1.5 font-medium font-sans normal-case" style={{ color: "var(--muted)" }}>{s.sub}</p>
+                <p className="text-[10px] mt-0.5 font-sans normal-case font-semibold" style={{ color: "var(--muted)" }}>{s.label}</p>
               </div>
             ))}
           </div>
@@ -353,33 +387,33 @@ export default function BarberDashboard() {
           {/* ── CURRENT SERVICE (active) ── */}
           {currentSvc && (
             <div className="rounded-2xl p-5 md:p-6 relative overflow-hidden slide-in"
-              style={{ background: "linear-gradient(135deg,#1A1400 0%,#2A1F00 40%,#1A1400 100%)", border: "1px solid rgba(245,200,66,0.25)" }}>
-              <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full opacity-10" style={{ background: "#F5C842", filter: "blur(30px)" }} />
+              style={{ background: "linear-gradient(135deg,#FFFDF9 0%,#FFF8E7 60%,#FFFDF9 100%)", border: "1px solid rgba(217,119,6,0.25)" }}>
+              <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full opacity-10" style={{ background: "var(--gold)", filter: "blur(30px)" }} />
               <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-4">
                 <div className="flex items-center gap-4 flex-1">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg text-black syne flex-shrink-0" style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg text-black font-serif tracking-normal flex-shrink-0" style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
                     {currentSvc.customer[0]}
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full text-black" style={{ background: "#F5C842" }}>● IN SERVICE</span>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full text-white font-sans normal-case" style={{ background: "var(--gold)" }}>● In Service</span>
                     </div>
-                    <p className="text-white font-bold text-lg syne">{currentSvc.customer}</p>
-                    <p className="text-[12px] mt-0.5" style={{ color: "#9CA3AF" }}>{currentSvc.service} · ₹{currentSvc.amount}</p>
+                    <p className="text-zinc-900 font-bold text-lg font-serif tracking-normal">{currentSvc.customer}</p>
+                    <p className="text-[12px] mt-0.5 font-sans normal-case" style={{ color: "var(--muted)" }}>{currentSvc.service} · ₹{currentSvc.amount}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 md:gap-6">
                   <div className="text-center">
-                    <p className="text-[9px] uppercase tracking-widest font-bold mb-1" style={{ color: "#6B7280" }}>Elapsed</p>
-                    <p className="syne font-bold text-2xl" style={{ color: "#F5C842", fontVariantNumeric: "tabular-nums" }}>{getElapsed()}</p>
+                    <p className="text-[10px] font-bold mb-1 font-sans normal-case" style={{ color: "var(--muted)" }}>Elapsed</p>
+                    <p className="font-serif tracking-normal font-bold text-2xl text-zinc-900" style={{ fontVariantNumeric: "tabular-nums" }}>{getElapsed()}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-[9px] uppercase tracking-widest font-bold mb-1" style={{ color: "#6B7280" }}>Amount</p>
-                    <p className="syne font-bold text-2xl text-white">₹{currentSvc.amount}</p>
+                    <p className="text-[10px] font-bold mb-1 font-sans normal-case" style={{ color: "var(--muted)" }}>Amount</p>
+                    <p className="font-serif tracking-normal font-bold text-2xl text-zinc-900">₹{currentSvc.amount}</p>
                   </div>
                   <button
                     onClick={() => { setCurrentSvc(null); showToast(`Completed — ${currentSvc.customer}`); }}
-                    className="px-5 py-3 rounded-xl text-black font-bold text-sm flex items-center gap-2 transition hover:opacity-90"
+                    className="px-5 py-3 rounded-xl text-black font-bold text-sm flex items-center gap-2 transition hover:opacity-90 font-sans normal-case"
                     style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}
                   >
                     <CheckCircle className="w-4 h-4" /> Complete
@@ -396,10 +430,10 @@ export default function BarberDashboard() {
             <div className="card p-5 md:p-6 lg:col-span-3">
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="syne font-bold text-white text-base">Weekly Revenue</h3>
-                  <p className="text-[11px] mt-0.5" style={{ color: "#6B7280" }}>Mon — Sun</p>
+                  <h3 className="font-serif tracking-normal font-bold text-zinc-900 text-base">Weekly Revenue</h3>
+                  <p className="text-[11px] mt-0.5 font-sans normal-case" style={{ color: "var(--muted)" }}>Mon — Sun</p>
                 </div>
-                <div className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: "rgba(245,200,66,0.12)", color: "#F5C842", border: "1px solid rgba(245,200,66,0.2)" }}>
+                <div className="px-3 py-1.5 rounded-full text-xs font-bold font-sans normal-case" style={{ background: "rgba(217,119,6,0.08)", color: "#B45309", border: "1px solid rgba(217,119,6,0.2)" }}>
                   This Week ₹{stats.weekRevenue.toLocaleString()}
                 </div>
               </div>
@@ -410,7 +444,7 @@ export default function BarberDashboard() {
                   const pct = (d.val / maxVal) * 100;
                   return (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                      <p className="text-[10px] font-bold" style={{ color: d.current ? "#F5C842" : "#4B5563" }}>
+                      <p className="text-[10px] font-bold font-sans normal-case" style={{ color: d.current ? "#B45309" : "var(--muted)" }}>
                         ₹{(d.val / 1000).toFixed(1)}k
                       </p>
                       <div
@@ -419,14 +453,14 @@ export default function BarberDashboard() {
                           height: `${pct * 0.65}px`,
                           background: d.current
                             ? "linear-gradient(180deg,#F5C842,#E8A020)"
-                            : "rgba(245,200,66,0.2)",
-                          opacity: d.current ? 1 : 0.6,
+                            : "rgba(217,119,6,0.15)",
+                          opacity: d.current ? 1 : 0.8,
                           minHeight: 8,
                           maxHeight: 72,
                         }}
                         title={`${d.day}: ₹${d.val.toLocaleString()}`}
                       />
-                      <p className="text-[10px] font-medium" style={{ color: d.current ? "#F5C842" : "#6B7280" }}>{d.day}</p>
+                      <p className="text-[10px] font-medium font-sans normal-case" style={{ color: d.current ? "#B45309" : "var(--muted)" }}>{d.day}</p>
                     </div>
                   );
                 })}
@@ -436,8 +470,8 @@ export default function BarberDashboard() {
             {/* Break Requests */}
             <div className="card p-5 lg:col-span-2">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="syne font-bold text-white text-sm">Break Requests</h3>
-                <span className="w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center text-black" style={{ background: "#F5C842" }}>
+                <h3 className="font-serif tracking-normal font-bold text-zinc-900 text-sm">Break Requests</h3>
+                <span className="w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center text-white font-sans normal-case" style={{ background: "var(--gold)" }}>
                   {breakRequests.filter(r => r.status === "pending").length}
                 </span>
               </div>
@@ -445,22 +479,22 @@ export default function BarberDashboard() {
                 {breakRequests.map(r => (
                   <div key={r.id} className="card-inner p-3">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="text-white font-bold text-sm">{r.name}</p>
-                      <span className={`text-[9px] font-bold px-2 py-1 rounded-full uppercase tracking-wide ${
+                      <p className="text-zinc-900 font-bold text-sm font-serif tracking-normal">{r.name}</p>
+                      <span className={`text-[9px] font-bold px-2 py-1 rounded-full font-sans normal-case border ${
                         r.status === "pending"
-                          ? "text-amber-400 bg-amber-400/10 border border-amber-400/20"
-                          : "text-emerald-400 bg-emerald-400/10 border border-emerald-400/20"
+                          ? "text-amber-800 bg-amber-50 border-amber-200/50"
+                          : "text-emerald-800 bg-emerald-50 border-emerald-200/50"
                       }`}>{r.status}</span>
                     </div>
-                    <p className="text-[11px] mb-0.5" style={{ color: "#6B7280" }}>
+                    <p className="text-[11px] mb-0.5 font-sans normal-case" style={{ color: "var(--muted)" }}>
                       <Coffee className="w-3 h-3 inline mr-1" />{r.type} · {r.time} ({r.duration})
                     </p>
                     {r.status === "pending" && (
                       <div className="flex gap-2 mt-2.5">
-                        <button className="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-black transition hover:opacity-90 flex items-center justify-center gap-1" style={{ background: "#34D399" }}>
+                        <button className="flex-1 py-1.5 rounded-lg text-[10px] font-bold text-white transition hover:opacity-90 flex items-center justify-center gap-1 font-sans normal-case" style={{ background: "#10B981" }}>
                           <Check className="w-3 h-3" /> Approve
                         </button>
-                        <button className="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition hover:opacity-80 flex items-center justify-center gap-1" style={{ background: "rgba(239,68,68,0.15)", color: "#F87171", border: "1px solid rgba(239,68,68,0.2)" }}>
+                        <button className="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition hover:opacity-80 flex items-center justify-center gap-1 font-sans normal-case" style={{ background: "rgba(239,68,68,0.06)", color: "#B91C1C", border: "1px solid rgba(239,68,68,0.2)" }}>
                           <X className="w-3 h-3" /> Reject
                         </button>
                       </div>
@@ -477,35 +511,35 @@ export default function BarberDashboard() {
             {/* My Queue */}
             <div className="card p-5 md:p-6 lg:col-span-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="syne font-bold text-white text-base flex items-center gap-2">
+                <h3 className="font-serif tracking-normal font-bold text-zinc-900 text-base flex items-center gap-2">
                   My Queue
-                  <span className="text-sm font-normal" style={{ color: "#F5C842" }}>({queue.length})</span>
+                  <span className="text-sm font-normal font-sans normal-case" style={{ color: "var(--gold2)" }}>({queue.length})</span>
                 </h3>
                 <button onClick={() => navigate("/barber/queue")}
-                  className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 hover:opacity-80 transition"
-                  style={{ color: "#F5C842" }}>
+                  className="text-xs font-bold font-sans normal-case flex items-center gap-1 hover:opacity-80 transition"
+                  style={{ color: "var(--gold2)" }}>
                   View All <ChevronRight className="w-3 h-3" />
                 </button>
               </div>
               <div className="space-y-2.5">
                 {queue.map((q, i) => (
-                  <div key={q.id} className="card-inner p-3.5 flex items-center gap-3 group hover:border-white/10 transition-all">
+                  <div key={q.id} className="card-inner p-3.5 flex items-center gap-3 group hover:border-amber-200 transition-all">
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0"
-                      style={{ background: i === 0 ? "rgba(245,200,66,0.15)" : "rgba(255,255,255,0.05)", color: i === 0 ? "#F5C842" : "#6B7280", border: i === 0 ? "1px solid rgba(245,200,66,0.3)" : "1px solid rgba(255,255,255,0.06)" }}>
+                      style={{ background: i === 0 ? "rgba(217,119,6,0.08)" : "var(--bg)", color: i === 0 ? "#B45309" : "var(--muted)", border: i === 0 ? "1px solid rgba(217,119,6,0.25)" : "1px solid var(--border)" }}>
                       #{q.position}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold text-sm truncate">{q.customer}</p>
-                      <p className="text-[11px] truncate" style={{ color: "#6B7280" }}>{q.service} · ₹{q.amount}</p>
+                      <p className="text-zinc-900 font-semibold text-sm truncate font-serif tracking-normal">{q.customer}</p>
+                      <p className="text-[11px] truncate font-sans normal-case" style={{ color: "var(--muted)" }}>{q.service} · ₹{q.amount}</p>
                     </div>
                     <div className="text-right flex-shrink-0 hidden sm:block">
-                      <p className="text-[10px] font-medium" style={{ color: "#4B5563" }}>{q.wait} wait</p>
-                      <p className="text-[10px]" style={{ color: "#374151" }}>{q.time}</p>
+                      <p className="text-[10px] font-medium font-sans normal-case" style={{ color: "var(--muted)" }}>{q.wait} wait</p>
+                      <p className="text-[10px] font-sans normal-case" style={{ color: "var(--muted)" }}>{q.time}</p>
                     </div>
                     {i === 0 && (
                       <button
                         onClick={() => showToast(`Started service for ${q.customer}`)}
-                        className="px-3 py-2 rounded-lg text-[10px] font-bold text-black flex items-center gap-1.5 flex-shrink-0 transition hover:opacity-90"
+                        className="px-3 py-2 rounded-lg text-[10px] font-bold text-black flex items-center gap-1.5 flex-shrink-0 transition hover:opacity-90 font-sans normal-case"
                         style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}
                       >
                         <PlayCircle className="w-3.5 h-3.5" /> Start
@@ -519,22 +553,22 @@ export default function BarberDashboard() {
             {/* Recent Reviews */}
             <div className="card p-5 lg:col-span-2">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="syne font-bold text-white text-sm flex items-center gap-2">
-                  <Star className="w-4 h-4" style={{ color: "#F5C842", fill: "#F5C842" }} /> Reviews
+                <h3 className="font-serif tracking-normal font-bold text-zinc-900 text-sm flex items-center gap-2">
+                  <Star className="w-4 h-4" style={{ color: "var(--gold)", fill: "var(--gold)" }} /> Reviews
                 </h3>
-                <span className="text-[11px] font-bold" style={{ color: "#F5C842" }}>★ {profile.rating}</span>
+                <span className="text-[11px] font-bold font-sans normal-case" style={{ color: "var(--gold)" }}>★ {profile.rating}</span>
               </div>
               <div className="space-y-3">
                 {reviews.map(r => (
                   <div key={r.id} className="card-inner p-3">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-black flex-shrink-0"
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-black flex-shrink-0 font-serif tracking-normal"
                         style={{ background: "linear-gradient(135deg,#F5C842,#E8A020)" }}>
                         {r.name[0]}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-white font-semibold text-xs truncate">{r.name}</p>
-                        <p className="text-[9px]" style={{ color: "#4B5563" }}>{r.time}</p>
+                        <p className="text-zinc-900 font-semibold text-xs truncate font-serif tracking-normal">{r.name}</p>
+                        <p className="text-[9px] font-sans normal-case" style={{ color: "var(--muted)" }}>{r.time}</p>
                       </div>
                       <div className="flex gap-0.5 flex-shrink-0">
                         {[...Array(r.rating)].map((_,i) => (
@@ -542,7 +576,7 @@ export default function BarberDashboard() {
                         ))}
                       </div>
                     </div>
-                    <p className="text-[11px] italic leading-relaxed" style={{ color: "#9CA3AF" }}>"{r.text}"</p>
+                    <p className="text-[11px] italic leading-relaxed font-sans normal-case" style={{ color: "var(--text)" }}>"{r.text}"</p>
                   </div>
                 ))}
               </div>
@@ -559,12 +593,12 @@ export default function BarberDashboard() {
             ].map((a, i) => (
               <button key={i}
                 onClick={() => { if (a.route) navigate(a.route); else showToast(`${a.label} — coming soon`); }}
-                className="card flex items-center gap-3 px-4 py-3.5 hover:border-white/10 transition-all group text-left">
+                className="card flex items-center gap-3 px-4 py-3.5 transition-all group text-left">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110" style={{ background: `${a.color}15` }}>
                   <a.icon className="w-4 h-4" style={{ color: a.color }} />
                 </div>
-                <span className="text-sm font-semibold text-zinc-300 group-hover:text-white transition">{a.label}</span>
-                <ChevronRight className="w-3.5 h-3.5 ml-auto text-zinc-600 group-hover:text-zinc-400 transition" />
+                <span className="text-sm font-semibold text-zinc-700 group-hover:text-zinc-900 transition font-sans normal-case">{a.label}</span>
+                <ChevronRight className="w-3.5 h-3.5 ml-auto text-zinc-400 group-hover:text-zinc-600 transition" />
               </button>
             ))}
           </div>

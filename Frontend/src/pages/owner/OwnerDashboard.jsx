@@ -170,6 +170,9 @@ export default function OwnerDashboard() {
             <button onClick={() => navigate("/owner/manage-services")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
               Barber & Service Management
             </button>
+            <button onClick={() => navigate("/owner/dashboard/analytics")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+              Analytics
+            </button>
             <button onClick={() => navigate("/owner/payments")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
               Payments
             </button>

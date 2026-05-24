@@ -158,7 +158,7 @@ function App() {
         <Route path="/owner/login" element={<OwnerLogin />} />
         <Route path="/register-salon" element={<SalonRegistration />} />
         <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-        <Route path="/owner/analytics" element={<AnalyticsDashboard />} />
+        <Route path="/owner/dashboard/analytics" element={<AnalyticsDashboard />} />
         <Route path="/owner/payments" element={<PaymentDashboard />} />
         <Route path="/owner/revenue" element={<RevenueDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
