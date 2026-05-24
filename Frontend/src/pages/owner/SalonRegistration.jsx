@@ -101,28 +101,53 @@ export default function SalonRegistration() {
     }
   };
 
-  const inputClass = "w-full rounded-2xl border border-[#EAD8C0] bg-[#FDF5E6]/60 p-4 text-sm font-semibold text-[#3E362E] outline-none transition focus:border-[#C5A059] focus:bg-white";
+  const inputClass = "w-full bg-zinc-50/60 border border-zinc-200 rounded-2xl p-4 outline-none text-zinc-800 focus:border-amber-600 focus:bg-white transition text-sm font-medium";
 
   return (
     <div
-      className="relative min-h-screen bg-cover bg-center bg-fixed p-6 font-sans"
+      className="relative min-h-screen bg-cover bg-center bg-fixed p-6 font-sans text-zinc-800"
       style={{ backgroundImage: `url(${shopImage})` }}
     >
-      <div className="absolute inset-0 bg-[#FFFBF2]/92 backdrop-blur-sm" />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        :root { 
+          --gold: #D97706; 
+          --gold2: #B45309; 
+          --bg: #FAF6F0; 
+          --bg2: #FFFFFF; 
+          --border: #EADBCE; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, .font-sans {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .font-serif {
+          font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
+        }
+        .card { 
+          background: rgba(255, 255, 255, 0.85); 
+          border: 1px solid var(--border); 
+          border-radius: 32px; 
+          box-shadow: 0 10px 30px -5px rgba(28, 25, 23, 0.08), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
+          transition: all 0.2s ease;
+        }
+      `}</style>
+
+      <div className="absolute inset-0 bg-[#FAF6F0]/90 backdrop-blur-sm" />
       <div className="relative z-10 mx-auto max-w-5xl py-10">
         <header className="mb-10 text-center">
-          <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.5em] text-[#C5A059]">
+          <span className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-amber-700">
             Graphura India Private Limited
           </span>
-          <h1 className="text-4xl font-black uppercase tracking-tight text-[#3E362E] md:text-5xl">
+          <h1 className="text-4xl font-bold font-serif tracking-normal text-zinc-900 md:text-5xl">
             Register Your Salon
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm font-medium text-[#8D7B68]">
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-zinc-500 font-sans">
             Submit your salon profile for admin approval. Customers can discover and book only after approval.
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="rounded-[2rem] border border-[#EAD8C0] bg-white/75 p-6 shadow-2xl backdrop-blur-xl md:p-10">
+        <form onSubmit={handleSubmit} className="card p-6 backdrop-blur-xl md:p-10">
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Salon Name *"><input required minLength={3} value={form.salon_name} onChange={e => setField("salon_name", e.target.value)} className={inputClass} /></Field>
             <Field label="Owner Name *"><input required value={form.owner_name} onChange={e => setField("owner_name", e.target.value)} className={inputClass} /></Field>
@@ -141,7 +166,7 @@ export default function SalonRegistration() {
           <div className="mt-5 grid gap-5 md:grid-cols-[1fr_auto]">
             <Field label="Address *"><textarea required minLength={10} value={form.address} onChange={e => setField("address", e.target.value)} className={`${inputClass} min-h-28 resize-none`} /></Field>
             <div className="flex items-end">
-              <button type="button" onClick={handleGeoTag} className={`h-14 rounded-2xl border px-6 text-[10px] font-black uppercase tracking-widest transition ${form.latitude ? "border-green-200 bg-green-50 text-green-700" : "border-[#C5A059] bg-white text-[#C5A059] hover:bg-[#C5A059] hover:text-white"}`}>
+              <button type="button" onClick={handleGeoTag} className={`h-14 rounded-2xl border px-6 text-xs font-bold uppercase tracking-wider transition-all duration-200 shadow-sm ${form.latitude ? "border-green-200 bg-green-50 text-green-700 shadow-none" : "border-amber-600 bg-white text-amber-700 hover:bg-amber-600 hover:text-white hover:shadow-md"}`}>
                 {form.latitude ? "Location Tagged" : "Geo Tag Location"}
               </button>
             </div>
@@ -154,15 +179,15 @@ export default function SalonRegistration() {
           {form.images.length > 0 && (
             <div className="mt-5 grid grid-cols-3 gap-3 md:grid-cols-5">
               {form.images.map((image, index) => (
-                <img key={index} src={image} alt={`Salon upload ${index + 1}`} className="aspect-square rounded-2xl border border-[#EAD8C0] object-cover" />
+                <img key={index} src={image} alt={`Salon upload ${index + 1}`} className="aspect-square rounded-2xl border border-zinc-200 object-cover" />
               ))}
             </div>
           )}
 
-          {error && <p className="mt-5 rounded-xl bg-red-50 p-3 text-center text-xs font-bold text-red-600">{error}</p>}
-          {message && <p className="mt-5 rounded-xl bg-green-50 p-3 text-center text-xs font-bold text-green-700">{message}</p>}
+          {error && <p className="mt-5 rounded-xl bg-red-50 border border-red-100 p-3 text-center text-xs font-bold text-red-700">{error}</p>}
+          {message && <p className="mt-5 rounded-xl bg-green-50 border border-green-100 p-3 text-center text-xs font-bold text-green-700">{message}</p>}
 
-          <button disabled={loading} className="mt-8 w-full rounded-2xl bg-[#3E362E] py-5 text-[11px] font-black uppercase tracking-[0.3em] text-[#FFFBF2] shadow-xl transition hover:bg-[#2A241F] disabled:opacity-60">
+          <button disabled={loading} className="mt-8 w-full rounded-2xl bg-amber-600 py-5 text-xs font-bold uppercase tracking-wider text-white shadow-lg transition-all duration-200 hover:bg-amber-700 hover:shadow-xl disabled:opacity-60">
             {loading ? "Submitting..." : "Submit for Approval"}
           </button>
         </form>
@@ -174,7 +199,7 @@ export default function SalonRegistration() {
 function Field({ label, children }) {
   return (
     <label className="block space-y-2">
-      <span className="ml-1 text-[10px] font-black uppercase tracking-widest text-[#8D7B68]">{label}</span>
+      <span className="ml-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500">{label}</span>
       {children}
     </label>
   );

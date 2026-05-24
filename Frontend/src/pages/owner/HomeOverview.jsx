@@ -14,66 +14,108 @@ export default function HomeOverview() {
     : queue;
 
   const stats = [
-    { label: "Your Queue", value: myQueue.length, color: "bg-orange-100 text-orange-800" },
-    { label: "Active Customers", value: activeCount, color: "bg-amber-100 text-amber-800" },
-    { label: "Completed Today", value: queue.filter(q => q.status === "done").length, color: "bg-green-100 text-green-800" },
+    { label: "Your Queue", value: myQueue.length },
+    { label: "Active Customers", value: activeCount },
+    { label: "Completed Today", value: queue.filter(q => q.status === "done").length },
     ...(canViewFinance()
-      ? [{ label: "Today's Revenue", value: `₹${financeData.todayRevenue.toLocaleString()}`, color: "bg-yellow-100 text-yellow-800" }]
+      ? [{ label: "Today's Revenue", value: `₹${financeData.todayRevenue.toLocaleString()}` }]
       : []),
   ];
 
+  const getStatusStyle = (status) => {
+    if (status === "in-progress") return "bg-green-50 border border-green-200 text-green-700 font-bold";
+    if (status === "waiting") return "bg-amber-50 border border-amber-200/60 text-amber-700 font-bold";
+    return "bg-zinc-100 border border-zinc-200 text-zinc-600 font-bold";
+  };
+
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen p-4 sm:p-8 font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        :root { 
+          --gold: #D97706; 
+          --gold2: #B45309; 
+          --bg: #FAF6F0; 
+          --bg2: #FFFFFF; 
+          --bg3: #FDFBF7; 
+          --border: #EADBCE; 
+          --text: #1C1917; 
+          --muted: #78716C; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, .font-sans {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .font-serif {
+          font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
+        }
+        .card { 
+          background: var(--bg2); 
+          border: 1px solid var(--border); 
+          border-radius: 24px; 
+          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
+          transition: all 0.2s ease;
+        }
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px -4px rgba(28, 25, 23, 0.06), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
+          border-color: #D6C4AE;
+        }
+      `}</style>
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-orange-900">Welcome, {currentUser?.name}</h2>
-          <p className="text-gray-600 text-sm mt-1">{salon.name} · {salon.address}</p>
+          <p className="text-amber-700 font-sans normal-case font-bold tracking-[2px] text-xs sm:text-sm uppercase mb-1">
+            Grooming Console
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 font-serif tracking-normal">Welcome, {currentUser?.name}</h2>
+          <p className="text-zinc-500 text-sm mt-1">{salon.name} · {salon.address}</p>
         </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {stats.map((s, i) => (
-            <div key={i} className={`rounded-xl p-5 ${s.color} border border-orange-200`}>
-              <div className="text-2xl font-bold">{s.value}</div>
-              <div className="text-sm font-semibold mt-1 opacity-80">{s.label}</div>
+            <div key={i} className="card p-6">
+              <h3 className="text-xs font-bold text-zinc-500 font-sans normal-case mb-1">{s.label}</h3>
+              <p className="text-2xl sm:text-3xl font-bold mt-1 font-serif tracking-normal text-zinc-900">{s.value}</p>
             </div>
           ))}
         </div>
+
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-orange-200 p-5 shadow-sm">
-            <h3 className="text-lg font-bold text-orange-900 mb-3">Your Next Customers</h3>
+          <div className="card p-6">
+            <h3 className="text-lg font-bold text-zinc-900 font-serif mb-4">Your Next Customers</h3>
             {myQueue.length === 0 ? (
-              <p className="text-gray-500 text-sm">No customers in queue.</p>
+              <p className="text-zinc-500 text-sm">No customers in queue.</p>
             ) : (
               <div className="space-y-2">
                 {myQueue.slice(0, 4).map(item => (
-                  <div key={item.id} className="flex items-center justify-between bg-orange-50 rounded-lg px-3 py-2">
+                  <div key={item.id} className="flex items-center justify-between bg-amber-50/50 rounded-xl px-4 py-3 border border-amber-200/50 transition-all duration-200 hover:bg-amber-50">
                     <div>
-                      <p className="font-semibold text-gray-800 text-sm">{item.customer}</p>
-                      <p className="text-xs text-gray-500">{item.service} · {item.time}</p>
+                      <p className="font-bold text-zinc-900 text-sm">{item.customer}</p>
+                      <p className="text-xs text-zinc-500 font-sans mt-0.5">{item.service} · {item.time}</p>
                     </div>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                      item.status === "in-progress" ? "bg-green-200 text-green-800"
-                      : item.status === "waiting" ? "bg-orange-200 text-orange-800"
-                      : "bg-gray-200 text-gray-600"
-                    }`}>{item.status}</span>
+                    <span className={`text-xs px-2.5 py-1 rounded-full border ${getStatusStyle(item.status)}`}>
+                      {item.status}
+                    </span>
                   </div>
                 ))}
               </div>
             )}
             <button onClick={() => navigate("/barber/queue")}
-              className="mt-3 text-sm text-orange-700 font-semibold hover:underline">
+              className="mt-4 text-sm text-amber-700 font-bold hover:text-amber-800 hover:underline transition">
               View Full Queue
             </button>
           </div>
-          <div className="bg-white rounded-2xl border border-orange-200 p-5 shadow-sm">
-            <h3 className="text-lg font-bold text-orange-900 mb-3">Salon Info</h3>
-            <div className="space-y-2 text-sm text-gray-700">
-              <p><span className="font-semibold text-gray-800">Salon:</span> {salon.name}</p>
-              <p><span className="font-semibold text-gray-800">Address:</span> {salon.address}</p>
-              <p><span className="font-semibold text-gray-800">Phone:</span> {salon.phone}</p>
-              <p><span className="font-semibold text-gray-800">Your Role:</span> {currentUser?.role}</p>
+
+          <div className="card p-6">
+            <h3 className="text-lg font-bold text-zinc-900 font-serif mb-4">Salon Info</h3>
+            <div className="space-y-3.5 text-sm text-zinc-600">
+              <p className="flex justify-between border-b border-zinc-100 pb-2"><span className="font-bold text-zinc-800">Salon:</span> <span>{salon.name}</span></p>
+              <p className="flex justify-between border-b border-zinc-100 pb-2"><span className="font-bold text-zinc-800">Address:</span> <span>{salon.address}</span></p>
+              <p className="flex justify-between border-b border-zinc-100 pb-2"><span className="font-bold text-zinc-800">Phone:</span> <span>{salon.phone}</span></p>
+              <p className="flex justify-between border-b border-zinc-100 pb-2"><span className="font-bold text-zinc-800">Your Role:</span> <span className="capitalize">{currentUser?.role}</span></p>
               {currentUser?.role === "barber" && (
-                <p><span className="font-semibold text-gray-800">Salary Model:</span> {currentUser.salaryModel}</p>
+                <p className="flex justify-between border-b border-zinc-100 pb-2"><span className="font-bold text-zinc-800">Salary Model:</span> <span>{currentUser.salaryModel}</span></p>
               )}
             </div>
           </div>
