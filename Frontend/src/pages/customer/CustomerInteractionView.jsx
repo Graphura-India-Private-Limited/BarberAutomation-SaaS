@@ -5,7 +5,7 @@ import DetailPanel from '../../components/customer/DetailPanel'
 
 export default function CustomerInteractionView() {
   const [customers, setCustomers] = useState(CUSTOMERS)
-  const [selectedId, setSelectedId] = useState(CUSTOMERS[0].id)
+  const [selectedId, setSelectedId] = useState(CUSTOMERS[0]?.id || null)
   const [search, setSearch] = useState('')
 
   const selected = customers.find(c => c.id === selectedId)
@@ -28,95 +28,124 @@ export default function CustomerInteractionView() {
   }
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col">
+    <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-stone-800 antialiased overflow-hidden">
 
-      {/* Header */}
-      <header className="gradient-header px-6 py-3.5 flex items-center justify-between animate-fade-up"
-        style={{ boxShadow: '0 4px 18px rgba(26,10,0,0.30)' }}>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
-            <span className="text-white text-[15px] font-bold leading-none">✂</span>
+      {/* ✂️ PREMIUM LUXURY NAVIGATION HEADER BAR */}
+      <header className="bg-[#3E362E] border-b border-[#2A241F] px-8 py-4 flex items-center justify-between z-30 shadow-md">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
+            {/* Elegant SVG Scissors Layer */}
+            <svg className="w-5 h-5 text-[#C5A059]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-4.242-4.242M14.121 14.121a3 3 0 10-4.243-4.242m4.243 4.242a3 3 0 11-4.243-4.243m0 0L4 4m5.172 5.172L4 14m5.172-5.172l4.242 4.242" />
+            </svg>
           </div>
           <div>
-            <h1 className="font-display text-[17px] font-bold text-white leading-none text-shadow">
-              BarberAutomation
+            <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
+              BARBER <span className="text-white">PRO</span>
             </h1>
-            <p className="text-[10px] text-white/55 font-body mt-0.5 tracking-[0.1em] uppercase">
+            <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
+              Console Management Desk
             </p>
           </div>
         </div>
+        
         <div className="text-right">
-          <div className="text-[10px] text-white/45 font-body uppercase tracking-widest">Today</div>
-          <div className="text-[13px] text-white font-body font-bold mt-0.5">
+          <div className="text-[10px] text-stone-400 uppercase font-black tracking-widest leading-none">Live Monitor</div>
+          <div className="text-sm text-white font-black mt-1 leading-none">
             {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
           </div>
         </div>
       </header>
 
-      {/* Stats strip */}
-      <div className="flex border-b border-border bg-white animate-fade-up delay-75"
-        style={{ boxShadow: '0 2px 8px rgba(26,10,0,0.07)' }}>
+      {/* 📊 ANALYTICS STATS STRIP OVERVIEW */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-stone-200/60 grid grid-cols-4 z-20 shadow-xs">
         {[
-          { label: 'Total Today', value: counts.total,   color: 'text-primary'     },
-          { label: 'Waiting',     value: counts.waiting, color: 'text-amber-700'   },
-          { label: 'In Chair',    value: counts.inChair, color: 'text-accent'      },
-          { label: 'Completed',   value: counts.done,    color: 'text-emerald-700' },
-        ].map((s, i) => (
-          <div key={s.label} className={`flex-1 px-4 py-4 text-center ${i < 3 ? 'border-r border-border' : ''}`}>
-            <div className={`font-display text-[26px] font-bold leading-none ${s.color}`}>{s.value}</div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted mt-1.5 font-body">{s.label}</div>
+          { label: 'Total Today', value: counts.total,   color: 'text-stone-900',  border: 'border-r border-stone-100' },
+          { label: 'Waiting Queue', value: counts.waiting, color: 'text-amber-600',  border: 'border-r border-stone-100' },
+          { label: 'In Service Chair', value: counts.inChair, color: 'text-[#A37B58]', border: 'border-r border-stone-100' },
+          { label: 'Completed Jobs', value: counts.done,    color: 'text-emerald-700', border: '' },
+        ].map((s) => (
+          <div key={s.label} className={`px-6 py-4 flex flex-col items-center justify-center text-center ${s.border}`}>
+            <div className={`text-2xl md:text-3xl font-black tracking-tight leading-none ${s.color}`}>
+              {s.value}
+            </div>
+            <div className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-1.5">
+              {s.label}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Layout */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* 🧱 LAYOUT WORKSPACE AREA CONTAINER */}
+      <div className="flex flex-1 overflow-hidden relative max-w-[1600px] mx-auto w-full w-full">
 
-        {/* Sidebar */}
-        <aside className="flex-shrink-0 border-r border-border bg-surface flex flex-col animate-slide-in"
-          style={{ width: '284px' }}>
-
-          <div className="px-3.5 pt-3.5 pb-3 border-b border-border/60">
+        {/* 📋 SIDEBAR QUEUE MANAGER */}
+        <aside className="w-[320px] flex-shrink-0 bg-white/50 border-r border-stone-200/50 flex flex-col h-full z-10">
+          
+          {/* Search Box Header Section */}
+          <div className="p-4 border-b border-stone-200/40 bg-white/30 backdrop-blur-xs">
             <div className="relative">
-              <input type="text" placeholder="Search customers..."
+              <input 
+                type="text" 
+                placeholder="Search active profiles..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full bg-input-bg border border-border rounded-xl pl-9 pr-3.5 py-2.5 text-[13px] text-primary font-body font-medium outline-none focus:border-accent transition-spring placeholder:text-muted/50 shadow-inner"
+                className="w-full bg-white/80 border border-stone-200/80 rounded-xl pl-10 pr-4 py-3 text-xs font-bold text-stone-900 placeholder-stone-400 outline-none transition-all focus:border-[#C5A059] focus:bg-white shadow-xs"
               />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[15px] leading-none">⌕</span>
+              {/* Clean Minimal Search Loupe SVG */}
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
-            <p className="text-[11px] text-muted font-body font-medium mt-2 pl-0.5">
-              {filtered.length} customer{filtered.length !== 1 ? 's' : ''} today
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-3 pl-0.5">
+              Queue: {filtered.length} client{filtered.length !== 1 ? 's' : ''} loaded
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto custom-scroll px-2.5 py-2.5 flex flex-col gap-2">
+          {/* Scrollable Customer Cards Sidebar Pipeline */}
+          <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 bg-stone-50/20">
             {filtered.length === 0 ? (
-              <div className="text-center py-10 flex flex-col items-center gap-2">
-                <div className="text-3xl"></div>
-                <div className="text-[12px] text-muted font-body font-medium">No customers found</div>
+              <div className="text-center py-16 flex flex-col items-center justify-center gap-2">
+                <svg className="w-8 h-8 text-stone-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="text-xs font-bold uppercase tracking-wider text-stone-400">No matching queues</div>
               </div>
             ) : (
-              filtered.map((c, i) => (
-                <div key={c.id} className="animate-fade-up" style={{ animationDelay: `${i * 55}ms` }}>
-                  <CustomerCard customer={c} isSelected={c.id === selectedId} onClick={() => setSelectedId(c.id)} />
-                </div>
+              filtered.map((c) => (
+                <CustomerCard 
+                  key={c.id} 
+                  customer={c} 
+                  isSelected={c.id === selectedId} 
+                  onClick={() => setSelectedId(c.id)} 
+                />
               ))
             )}
           </div>
         </aside>
 
-        {/* Detail */}
-        <main className="flex-1 overflow-y-auto custom-scroll p-5 bg-bg animate-fade-up delay-150">
+        {/* 🔍 ACCENTED DETAIL PROFILE GRID CANVAS */}
+        <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-[#FAF6F0]">
           {selected ? (
-            <DetailPanel key={selected.id} customer={selected} onUpdate={handleUpdate} />
+            <div className="bg-white/80 backdrop-blur-sm border border-stone-200/40 rounded-3xl p-6 shadow-sm min-h-full">
+              <DetailPanel 
+                key={selected.id} 
+                customer={selected} 
+                onUpdate={handleUpdate} 
+              />
+            </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-2 text-muted">
-              <div className="text-4xl"></div>
-              <p className="font-body text-[13px] font-medium">Select a customer to view details</p>
+            <div className="flex flex-col items-center justify-center h-full gap-3 text-stone-400 text-center">
+              <svg className="w-12 h-12 text-stone-300 animate-pulse" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5a2.25 2.25 0 002.25 2.25zm.75-10.5h6a.75.75 0 01.75.75v6a.75.75 0 01-.75.75h-6a.75.75 0 01-.75-.75v-6a.75.75 0 01.75-.75z" />
+              </svg>
+              <p className="text-xs font-black uppercase tracking-widest text-stone-400">
+                Select an active profile card to initialize
+              </p>
             </div>
           )}
         </main>
+
       </div>
     </div>
   )
