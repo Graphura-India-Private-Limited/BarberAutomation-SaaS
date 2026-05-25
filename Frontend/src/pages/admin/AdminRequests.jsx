@@ -548,9 +548,9 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                       <button onClick={() => setTab("appointments")} className="text-[11px] font-bold" style={{ color: C.orange }}>View All</button>
                     </div>
                     {bookings.length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3" style={{ background: C.goldLight }}>
-                          <Calendar size={20} color={C.muted} />
+                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.goldLight }}>
+                          <Calendar size={28} color={C.muted} />
                         </div>
                         <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No bookings yet</div>
                         <div className="text-[11px] mt-1" style={{ color: C.muted }}>New bookings will appear here</div>
@@ -583,9 +583,9 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                       <button onClick={() => setTab("live")} className="text-[11px] font-bold" style={{ color: C.orange }}>Live View</button>
                     </div>
                     {barbers.length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3" style={{ background: C.greenLight }}>
-                          <Users size={20} color={C.green} />
+                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.greenLight }}>
+                          <Users size={28} color={C.green} />
                         </div>
                         <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No barbers added yet</div>
                         <div className="text-[11px] mt-1" style={{ color: C.muted }}>Add barbers to get started</div>
@@ -617,9 +617,9 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                       <button onClick={() => setTab("salons")} className="text-[11px] font-bold" style={{ color: C.orange }}>View All</button>
                     </div>
                     {salons.filter(s => s.status === "pending").length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center pt-2">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3" style={{ background: C.goldLight }}>
-                          <FileText size={20} color={C.gold} />
+                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.goldLight }}>
+                          <FileText size={28} color={C.gold} />
                         </div>
                         <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No pending requests</div>
                         <div className="text-[11px] mt-1" style={{ color: C.muted }}>All caught up!</div>
@@ -648,9 +648,9 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                       <h3 className="font-serif text-[17px] font-bold" style={{ color: C.ink }}>Barber Credentials (This Session)</h3>
                     </div>
                     {addedBarbers.length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center pt-2">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center mb-3" style={{ background: C.purpleLight }}>
-                          <ShieldCheck size={20} color={C.purple} />
+                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.purpleLight }}>
+                          <ShieldCheck size={28} color={C.purple} />
                         </div>
                         <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No barbers added this session</div>
                         <div className="text-[11px] mt-1" style={{ color: C.muted }}>Credentials will appear here</div>
