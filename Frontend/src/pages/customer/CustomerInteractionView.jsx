@@ -77,7 +77,7 @@ export default function CustomerInteractionView() {
       </div>
 
       {/* 🧱 LAYOUT WORKSPACE AREA CONTAINER */}
-      <div className="flex flex-1 overflow-hidden relative max-w-[1600px] mx-auto w-full w-full">
+      <div className="flex flex-1 overflow-hidden relative max-w-[1600px] mx-auto w-full">
 
         {/* 📋 SIDEBAR QUEUE MANAGER */}
         <aside className="w-[320px] flex-shrink-0 bg-white/50 border-r border-stone-200/50 flex flex-col h-full z-10">
