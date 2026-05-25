@@ -41,51 +41,51 @@ export default function DuplicateAccount({ onBack }) {
   return (
     <div className="min-h-screen w-full bg-[#FAF6F0] font-sans text-stone-800 antialiased flex">
       
-   <div className="hidden lg:flex lg:w-5/12 bg-[#3E362E] p-12 flex-col justify-between relative overflow-hidden border-r border-[#2A241F] shadow-2xl">
+      {/* ✂️ LEFT PANEL: LUXURY BRAND INTRO */}
+      <div className="hidden lg:flex lg:w-5/12 bg-[#3E362E] p-12 flex-col justify-between relative overflow-hidden border-r border-[#2A241F] shadow-2xl">
         
         {/* 📸 IMAGE CONTAINER LAYER */}
-        <div className="absolute inset-0 z-0 select-none pointer-events-none opacity-[0.25]">
+        <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <img 
             src="/DuplicateAccountImg.png" 
             alt="Barber Shop Interior Accent" 
-            className="w-full h-full object-cover grayscale brightness-110 contrast-105"
+            className="w-full h-full object-cover animate-fade-in" 
           />
-          {/* 🖤 ADDED: Premium Dark Vignette Gradient Overlay to protect text readability */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#2A241F]/90 via-[#3E362E]/40 to-transparent mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/75 mix-blend-multiply" />
         </div>
 
         {/* Decorative background ambient flares */}
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-[#C5A059]/10 blur-3xl pointer-events-none z-10" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#A37B58]/10 blur-3xl pointer-events-none z-10" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-[#C5A059]/15 blur-3xl pointer-events-none z-10" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#A37B58]/15 blur-3xl pointer-events-none z-10" />
 
         {/* Brand identity */}
-        <div className="flex flex-col items-start relative z-20">
+        <div className="flex flex-col items-start relative z-20 select-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#3E362E]/90 border border-[#C5A059]/60 flex items-center justify-center shadow-md">
               <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
             </div>
             <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
               BARBER <span className="text-white">PRO</span>
             </h1>
           </div>
-          <div className="h-[1px] w-48 bg-[#C5A059] mt-2 opacity-40"/>
-          <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1">
+          <div className="h-[1px] w-48 bg-[#C5A059] mt-2 opacity-60"/>
+          <p className="text-[9px] text-stone-300 font-bold tracking-[0.3em] uppercase mt-1">
             Premium Grooming Systems
           </p>
         </div>
 
         {/* Bottom catchphrase */}
-        <div className="relative z-20 text-left max-w-sm">
-          <h2 className="text-3xl font-serif text-white leading-tight mb-3 italic">
+        <div className="relative z-20 text-left max-w-sm drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
+          <h2 className="text-3xl font-serif text-white font-medium leading-tight mb-3 italic">
             Account Integrity & Verification.
           </h2>
-          <p className="text-xs text-stone-400 leading-relaxed font-medium">
+          <p className="text-xs text-stone-200 leading-relaxed font-semibold">
             We securely cross-reference client records instantly to protect your personal dashboard security and prevent duplicate queue conflicts.
           </p>
         </div>
 
         {/* Footer info label */}
-        <p className="text-[9px] text-stone-500 uppercase tracking-widest relative z-20 font-bold text-left">
+        <p className="text-[9px] text-stone-300 uppercase tracking-widest relative z-20 font-black text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
           Graphura India Private Limited
         </p>
       </div>

@@ -22,6 +22,7 @@ import ServiceHandler      from "./pages/barber/ServiceHandler";
 import BreakManagement     from "./pages/barber/BreakManagement";
 import NoShowHandle        from "./pages/barber/NoShowHandle";
 import QueuePage           from "./pages/barber/QueuePage";
+import BarberSettings      from "./pages/barber/BarberSettings";
 import SmartQueue          from "./pages/customer/SmartQueue";
 import OwnerLogin          from "./pages/owner/OwnerLogin";
 import SalonRegistration   from "./pages/owner/SalonRegistration";
@@ -152,6 +153,7 @@ function App() {
         <Route path="/barber/service-handler" element={<ServiceHandler />} />
         <Route path="/barber/noshow-delay" element={<NoShowDelayPage />} />
         <Route path="/barber/noshow-handle" element={<NoShowHandle />} />
+        <Route path="/barber/settings" element={<BarberSettings />} />
 
         {/* --- OWNER HUB CONTROL --- */}
         <Route path="/owner/login" element={<OwnerLogin />} />
