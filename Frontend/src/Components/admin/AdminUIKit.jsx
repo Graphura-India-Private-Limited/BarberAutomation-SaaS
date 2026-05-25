@@ -238,10 +238,10 @@ export const AdminDataTable = ({
 
 export const TableEmptyRow = ({ colSpan, icon: Icon, title, subtitle }) => (
   <tr>
-    <td colSpan={colSpan} className="px-6 py-16">
+    <td colSpan={colSpan} className="px-6 py-24">
       <div className="flex flex-col items-center justify-center text-center">
-        <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full" style={{ background: "#F4E8D7" }}>
-          <Icon size={32} color="#A66527" />
+        <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-full" style={{ background: "#F4E8D7" }}>
+          <Icon size={36} color="#A66527" />
         </div>
         <div className="text-lg font-semibold" style={{ color: ADMIN_C.ink }}>{title}</div>
         <div className="mt-2 text-sm" style={{ color: ADMIN_C.muted }}>{subtitle}</div>
