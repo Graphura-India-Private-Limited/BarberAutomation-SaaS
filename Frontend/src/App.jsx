@@ -60,6 +60,9 @@ import SalonManagement from "./pages/admin/SalonManagement";
 import SalonViewPage from "./pages/admin/SalonViewPage";
 import CustomerManagement from "./pages/customer/CustomerManagement";
 import AllReviews from "./pages/customer/AllReviews";
+import FaqPage from "./pages/FaqPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 
 /* ── Components (Capital C) ── */
@@ -155,7 +158,7 @@ function App() {
         <Route path="/owner/login" element={<OwnerLogin />} />
         <Route path="/register-salon" element={<SalonRegistration />} />
         <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-        <Route path="/owner/analytics" element={<AnalyticsDashboard />} />
+        <Route path="/owner/dashboard/analytics" element={<AnalyticsDashboard />} />
         <Route path="/owner/payments" element={<PaymentDashboard />} />
         <Route path="/owner/revenue" element={<RevenueDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
@@ -185,6 +188,9 @@ function App() {
         <Route path="/owner/settings" element={<SettingsPage />} />
          <Route path="/owner/queue" element={<LiveQueue />} />
          <Route path="/reviews" element={<AllReviews />} /> 
+         <Route path="/faq" element={<FaqPage />} />
+         <Route path="/terms" element={<TermsPage />} />
+         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </BrowserRouter>
   );

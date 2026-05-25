@@ -89,8 +89,8 @@ const ReviewSystem = ({ bookingData }) => {
   /* ── SUCCESS SCREEN ── */
   if (submitted) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-4 font-sans relative bg-[#FDFBF0]">
-        <div className="bg-white rounded-[2rem] shadow-2xl p-12 text-center max-w-md border border-[#E5E0D0]">
+      <div className="min-h-screen w-full flex items-center justify-center p-4 font-sans relative bg-[#FAF7F2]">
+        <div className="bg-white rounded-[2rem] shadow-2xl p-12 text-center max-w-md border border-stone-200/40">
           <div className="w-20 h-20 rounded-full bg-green-100 mx-auto mb-6 flex items-center justify-center">
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
@@ -98,7 +98,7 @@ const ReviewSystem = ({ bookingData }) => {
           <p className="text-[#A68942] text-[10px] uppercase tracking-[0.25em] mb-4 font-bold">Review Submitted</p>
           <p className="text-[#8C8475] text-sm mb-6">Your feedback helps us improve. Redirecting you home...</p>
           <button onClick={() => navigate("/")}
-            className="bg-[#3C3530] text-white px-8 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#2D2926] transition">
+            className="bg-[#3C3530] text-white px-8 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#2D2926] transition cursor-pointer">
             Go Home Now
           </button>
         </div>
@@ -108,33 +108,22 @@ const ReviewSystem = ({ bookingData }) => {
 
   /* ── FORM ── */
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 md:p-10 font-sans relative">
+    <div className="min-h-screen w-full bg-[#FAF7F2] p-4 md:p-10 font-sans relative flex items-center justify-center overflow-x-hidden">
 
-      {/* Background */}
-      <div className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: "url('/src/assets/adminlogin.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80 backdrop-blur-[2px]"/>
-      </div>
-
-      {/* Logo */}
-      <div className="fixed top-6 left-6 md:top-10 md:left-10 z-50">
+      {/* Brand Identity Header (Positioned absolutely so it doesn't break alignment flow) */}
+      <div className="absolute top-6 left-6 md:top-10 md:left-10 z-30">
         <div className="flex flex-col items-start">
           <h1 className="text-xl md:text-2xl font-black text-[#C5A059] tracking-[0.2em] uppercase flex items-center gap-2">
             <ScissorIcon className="w-6 h-6 text-[#C5A059] stroke-[1.5px]" />
-            Barber <span className="text-white">Pro</span>
+            Barber <span className="text-stone-900">Pro</span>
           </h1>
           <div className="h-[1px] w-full bg-[#C5A059] mt-1 opacity-50"/>
-          <p className="text-[8px] text-[#FDFBF0] tracking-[0.4em] uppercase mt-1 opacity-70">Premium Grooming</p>
+          <p className="text-[8px] text-stone-500 tracking-[0.4em] uppercase mt-1 opacity-70">Premium Grooming</p>
         </div>
       </div>
 
-      {/* Card */}
-      <div className="relative z-10 w-full max-w-lg bg-[#FDFBF0] rounded-[2rem] shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 animate-fade-in">
+      {/* Review Modal Card Container */}
+      <div className="w-full max-w-lg bg-[#FDFBF0] rounded-[2rem] shadow-xl border border-stone-200/40 relative z-10 mt-20 md:mt-0 animate-fade-in text-left">
         <div className="p-8 md:p-12">
 
           {/* Badge */}
@@ -156,10 +145,11 @@ const ReviewSystem = ({ bookingData }) => {
               <div className="flex justify-center gap-4">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button key={star}
+                    type="button"
                     onMouseEnter={() => setSalonHover(star)}
                     onMouseLeave={() => setSalonHover(0)}
                     onClick={() => { setSalonRating(star); setError(""); }}
-                    className="transition-transform duration-200 hover:scale-125 focus:outline-none">
+                    className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
                     <span className={`text-4xl ${star <= (salonHover || salonRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
                   </button>
                 ))}
@@ -173,10 +163,11 @@ const ReviewSystem = ({ bookingData }) => {
               <div className="flex justify-center gap-4">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button key={star}
+                    type="button"
                     onMouseEnter={() => setBarberHover(star)}
                     onMouseLeave={() => setBarberHover(0)}
                     onClick={() => { setBarberRating(star); setError(""); }}
-                    className="transition-transform duration-200 hover:scale-125 focus:outline-none">
+                    className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
                     <span className={`text-4xl ${star <= (barberHover || barberRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
                   </button>
                 ))}
@@ -185,7 +176,7 @@ const ReviewSystem = ({ bookingData }) => {
             </div>
           </div>
 
-          {/* Textarea */}
+          {/* Textarea Input Container */}
           <div className="mt-10 mb-4">
             <textarea
               value={reviewText}
@@ -197,7 +188,7 @@ const ReviewSystem = ({ bookingData }) => {
             <p className="text-right text-[9px] text-[#BDB7AB] mt-1">{reviewText.length}/500</p>
           </div>
 
-          {/* Error message */}
+          {/* Error Message */}
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -205,11 +196,12 @@ const ReviewSystem = ({ bookingData }) => {
             </div>
           )}
 
-          {/* Submit */}
+          {/* Action Trigger Button */}
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={loading || !token}
-            className="w-full bg-[#3C3530] hover:bg-[#2D2926] text-white font-bold py-5 rounded-2xl transition-all shadow-xl uppercase tracking-widest text-[10px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+            className="w-full bg-[#3C3530] hover:bg-[#2D2926] text-white font-bold py-5 rounded-2xl transition-all shadow-xl uppercase tracking-widest text-[10px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
             {loading ? "Submitting..." : "Submit Review"}
           </button>
 
@@ -219,9 +211,10 @@ const ReviewSystem = ({ bookingData }) => {
         </div>
       </div>
 
+      {/* Embedded Fade-In Keyframe Logic */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.8s ease-out; }
+        .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
       `}} />
     </div>
   );

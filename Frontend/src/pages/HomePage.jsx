@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import MembershipSection from "../components/membership/MembershipSection";
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
 
 import {
   Scissors, CalendarDays, Sparkles, User, Palette,
@@ -79,6 +82,9 @@ const SocialSVG = [
   { label:"Youtube",   d:<svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M23.498 6.186a2.99 2.99 0 0 0-2.105-2.118C19.618 3.5 12 3.5 12 3.5s-7.618 0-9.393.568A2.99 2.99 0 0 0 .502 6.186 31.32 31.32 0 0 0 0 12a31.32 31.32 0 0 0 .502 5.814 2.99 2.99 0 0 0 2.105 2.118C4.382 20.5 12 20.5 12 20.5s7.618 0 9.393-.568a2.99 2.99 0 0 0 2.105-2.118A31.32 31.32 0 0 0 24 12a31.32 31.32 0 0 0-.502-5.814zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg> },
 ];
 
+
+
+
 export default function HomePage() {
   const navigate    = useNavigate();
   const [menuOpen,  setMenuOpen]  = useState(false);
@@ -88,6 +94,7 @@ export default function HomePage() {
   const [reviews,         setReviews]         = useState([]);
   const [selectedReview,  setSelectedReview]  = useState(null);
   const dropRef = useRef(null);
+
 
   useEffect(() => {
     fetch(`${API}/salon/nearby`)
@@ -130,103 +137,7 @@ export default function HomePage() {
         .nav-link:hover::after{width:100%}
         .line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
       `}} />
-
-      {/* ══ NAVBAR ══ */}
-      <nav className={`sticky top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-[#EADDCA]/80 bg-white/95 shadow-md backdrop-blur-xl" : "border-[#EADDCA]/30 bg-[#FAF6F0]/80 backdrop-blur-md"}`}>
-        <div className="flex w-full items-center justify-between pl-3 pr-6 md:pl-5 md:pr-10 py-4">
-          <div className="flex flex-col items-start cursor-pointer font-serif" onClick={() => navigate("/")}>
-            <div className="flex items-center gap-2.5">
-              <Scissors className="w-5 h-5 text-[#C5A059]" />
-              <h1 className="text-lg md:text-xl font-bold tracking-[0.2em] uppercase italic text-[#3E362E]">BARBER <span className="text-[#C5A059] not-italic">PRO</span></h1>
-            </div>
-            <div className="hidden md:flex items-center gap-2 w-full mt-1">
-              <div className="h-[1px] flex-grow bg-[#C5A059] opacity-30" />
-              <span className="text-[8px] text-[#8D7B68] tracking-[0.3em] uppercase font-bold">Est. 2026</span>
-              <div className="h-[1px] flex-grow bg-[#C5A059] opacity-30" />
-            </div>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-8">
-            {NAV_ITEMS.map(item => (
-              item.hasDropdown ? (
-                <div key={item.label} className="relative" ref={dropRef}>
-                  <button onClick={() => setDropOpen(p => !p)}
-                    className="nav-link flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-stone-700 hover:text-[#C5A059] transition">
-                    {item.label}
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${dropOpen ? "rotate-180 text-[#C5A059]" : ""}`} />
-                  </button>
-                  {dropOpen && (
-                    <div className="dd-enter absolute top-8 left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border border-[#EADDCA] overflow-hidden z-50">
-                      <div className="p-2">
-                        {SERVICE_LINKS.map(svc => (
-                          <button key={svc.path} onClick={() => handleNav(svc.path)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-[#FEF3E2] transition-all group text-left">
-                            <span className="text-[#C5A059]">{svc.icon}</span>
-                            <div>
-                              <p className="text-[12px] font-bold text-[#3E362E] group-hover:text-[#C5A059]">{svc.label}</p>
-                              <p className="text-[10px] text-[#8D7B68]">{svc.desc}</p>
-                            </div>
-                            <ArrowRight className="w-3.5 h-3.5 text-[#C5A059] ml-auto opacity-0 group-hover:opacity-100 transition" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button key={item.label} onClick={() => handleNav(item.path)}
-                  className="nav-link text-[11px] font-bold uppercase tracking-widest text-stone-700 hover:text-[#C5A059] transition">
-                  {item.label}
-                </button>
-              )
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/login")}
-              className="hidden sm:block text-[10px] font-bold uppercase tracking-widest text-[#3E362E] border border-[#EADDCA] px-4 py-2 rounded-lg hover:bg-[#FEF3E2] hover:border-[#C5A059] transition">
-              Login
-            </button>
-            <button onClick={() => navigate("/customer/services")}
-              className="relative hidden sm:block overflow-hidden rounded-lg bg-[#3E362E] px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:scale-105 hover:bg-[#C5A059]">
-              <div className="absolute top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-[#C5A059] to-transparent animate-border-beam opacity-50" />
-              Book Now
-            </button>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-[#3E362E]">
-              {menuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
-        </div>
-
-        {menuOpen && (
-          <div className="lg:hidden bg-white border-t border-[#EADDCA] p-6 space-y-3 shadow-2xl">
-            {NAV_ITEMS.map(item => (
-              <div key={item.label}>
-                <button onClick={() => item.hasDropdown ? setDropOpen(p => !p) : handleNav(item.path)}
-                  className="flex items-center justify-between w-full text-left text-sm font-bold uppercase tracking-widest text-stone-700 py-2 border-b border-[#EADDCA]/50">
-                  {item.label}
-                  {item.hasDropdown && <ChevronDown className={`w-4 h-4 transition-transform ${dropOpen ? "rotate-180" : ""}`} />}
-                </button>
-                {item.hasDropdown && dropOpen && (
-                  <div className="pl-4 space-y-2 mt-2">
-                    {SERVICE_LINKS.map(svc => (
-                      <button key={svc.path} onClick={() => handleNav(svc.path)}
-                        className="flex items-center gap-2 w-full text-left text-sm text-[#8D7B68] hover:text-[#C5A059] py-1.5">
-                        <span className="text-[#C5A059]">{svc.icon}</span>{svc.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            <div className="pt-3 space-y-2">
-              <button onClick={() => navigate("/login")} className="w-full border border-[#EADDCA] text-[#3E362E] py-3 rounded-lg font-bold uppercase text-[10px] tracking-widest">Login</button>
-              <button onClick={() => navigate("/customer/services")} className="w-full bg-[#3E362E] text-white py-4 rounded-lg font-black uppercase text-[10px] tracking-widest hover:bg-[#C5A059] transition">Book Now</button>
-            </div>
-          </div>
-        )}
-      </nav>
-
+  <Navbar />    
       
  {/* ══ FULL-PAGE IMMERSIVE BLENDED HERO SECTION ══ */}
       <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[550px] md:min-h-[650px] flex items-center">
@@ -694,120 +605,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ FOOTER ══ */}
-      <footer id="contact" className="relative bg-[#0D0D0D] py-20 px-6 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-[#C5A059]/50 to-transparent" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 mb-16">
-            
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="bg-[#C5A059] p-2 rounded-lg">
-                  <Scissors className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-black text-white tracking-[0.2em] uppercase italic">
-                  BARBER <span className="text-[#C5A059]">PRO</span>
-                </span>
-              </div>
-              <p className="text-stone-500 text-sm font-serif italic leading-relaxed">
-                Crafting confidence through precision. Mastering the art of grooming since 2026.
-              </p>
-              <div className="flex gap-4">
-                {SocialSVG.map(s => (
-                  <button key={s.label} title={s.label}
-                    className="w-10 h-10 rounded-full border border-white/10 hover:border-[#C5A059] hover:bg-[#C5A059] flex items-center justify-center transition-all duration-300 text-white group cursor-pointer">
-                    <span className="group-hover:scale-110 transition-transform">{s.d}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#C5A059] mb-6">Services</h4>
-              <ul className="space-y-3">
-                {SERVICE_LINKS.map(s => (
-                  <li key={s.path}>
-                    <button onClick={() => navigate(s.path)} 
-                      className="text-stone-400 hover:text-white text-sm transition-colors relative group cursor-pointer">
-                      {s.label}
-                      <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#C5A059] transition-all group-hover:w-full" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#C5A059] mb-6">Explore</h4>
-              <ul className="grid grid-cols-1 gap-3">
-                {[
-                   ["My Profile", "/customerprofile"],
-                  ["Booking History", "/customer/history"],
-                  ["Nearby Salons", "/nearby"],
-                  ["Barber Login", "/barber/login"],
-                  ["Owner Login", "/owner/login"],
-                  ["Staff Login", "/staff-login"],
-                  ["Salon Register", "/register-salon"],
-                  ["Admin Panel", "/admin/login"],
-                  ["Write Review", "/write-review"],
-                  ["All Reviews", "/reviews"],
-
-                ].map(([label, path]) => (
-                  <li key={path}>
-                    <button 
-                      onClick={() => navigate(path)}
-                      className="text-stone-400 hover:text-white text-sm transition-colors flex items-center gap-2 group cursor-pointer"
-                    >
-                      <span className="w-1 h-1 bg-[#C5A059] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                      {label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="space-y-6">
-              <h4 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#C5A059] mb-6">Contact Us</h4>
-              <div className="space-y-4">
-                {[
-                  [Phone, "+91 98765 43210"],
-                  [Mail, "hello@barberpro.com"],
-                  [MapPin, "Pune, Maharashtra, India"],
-                ].map(([Icon, text], i) => (
-                  <div key={i} className="flex items-start gap-3 text-stone-400 text-sm group">
-                    <Icon className="w-4 h-4 text-[#C5A059] mt-0.5" />
-                    <span className="group-hover:text-stone-200 transition-colors">{text}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="pt-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-white mb-3">Newsletter</p>
-                <div className="flex p-1 bg-white/5 border border-white/10 rounded-xl focus-within:border-[#C5A059]/50 transition-all">
-                  <input type="email" placeholder="your@email.com"
-                    className="flex-1 bg-transparent px-3 py-2 text-white text-xs outline-none placeholder:text-stone-600" />
-                  <button className="bg-[#C5A059] text-white p-2 rounded-lg hover:bg-[#E8A840] transition shadow-lg cursor-pointer">
-                    <Send className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-6">
-              <p className="text-stone-600 text-[10px] uppercase tracking-[0.2em]">© 2026 BarberPro</p>
-              <div className="h-4 w-[1px] bg-white/10 hidden md:block" />
-              <p className="text-stone-600 text-[10px] uppercase tracking-[0.2em]">Graphura India Pvt Ltd</p>
-            </div>
-            <div className="flex gap-8">
-              <button className="text-stone-600 hover:text-[#C5A059] text-[10px] uppercase tracking-[0.2em] transition cursor-pointer">Privacy Policy</button>
-              <button className="text-stone-600 hover:text-[#C5A059] text-[10px] uppercase tracking-[0.2em] transition cursor-pointer">Terms of Service</button>
-            </div>
-          </div>
-        </div>
-      </footer>
+     
+      <Footer />
 
       {/* ══ REVIEW DETAIL MODAL ══ */}
       {selectedReview && (
@@ -875,6 +674,7 @@ export default function HomePage() {
             </button>
           </div>
         </div>
+        
       )}
     </div>
   );
