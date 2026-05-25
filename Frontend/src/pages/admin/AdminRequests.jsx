@@ -20,7 +20,7 @@ const getToken = () => localStorage.getItem("token");
 
 /* ══ COLORS (From Image) ══ */
 const C = {
-  bg: "#FAFAFA",
+  bg: "#FAF6F0",
   sidebar: "#FFFFFF",
   card: "#FFFFFF",
   ink: "#1C1917", // dark gray/black
@@ -38,6 +38,39 @@ const C = {
   redLight: "#FEF2F2",
   orange: "#D97706",
   orangeLight: "#FFFBEB"
+};
+
+const USE_DEMO_DATA = import.meta.env.DEV;
+const DEMO_DATA = {
+  stats: { customers: 2, salons: 2, bookings: 2, revenue: 7500 },
+  customers: [
+    { _id: "demo-c1", name: "Rohit Patel", email: "rohit@example.com", phone: "9876543210", blocked: false, createdAt: "2026-05-20" },
+    { _id: "demo-c2", name: "Sneha Mehta", email: "sneha@example.com", phone: "9123456780", blocked: true, createdAt: "2026-05-18" },
+  ],
+  salons: [
+    { _id: "demo-s1", salon_name: "Royal Cuts", salon_city: "Ahmedabad", status: "approved", owner_name: "Karan Shah" },
+    { _id: "demo-s2", salon_name: "Style Hub", salon_city: "Vadodara", status: "pending", owner_name: "Priya Joshi" },
+  ],
+  barbers: [
+    { _id: "demo-b1", name: "Amit", mobile: "9812345678", status: "available", salon_name: "Royal Cuts", specialization: "Haircut & Styling" },
+    { _id: "demo-b2", name: "Deepak", mobile: "9823456789", status: "break", salon_name: "Style Hub", specialization: "Beard Trim" },
+  ],
+  bookings: [
+    { _id: "demo-book1", customer_id: { name: "Rohit Patel" }, barber_id: { name: "Amit" }, salon_id: { salon_name: "Royal Cuts" }, created_at: "2026-05-24", amount: 450, status: "completed" },
+    { _id: "demo-book2", customer_id: { name: "Sneha Mehta" }, barber_id: { name: "Deepak" }, salon_id: { salon_name: "Style Hub" }, created_at: "2026-05-25", amount: 300, status: "pending" },
+  ],
+  services: [
+    { _id: "demo-service1", name: "Classic Haircut", category: "men", price: 250, duration: "30", salon_id: { salon_name: "Royal Cuts" } },
+    { _id: "demo-service2", name: "Beard Trim", category: "men", price: 150, duration: "20", salon_id: { salon_name: "Style Hub" } },
+  ],
+  payments: [
+    { _id: "demo-pay1", customer_id: { name: "Rohit Patel" }, salon_id: { salon_name: "Royal Cuts" }, amount: 450, status: "captured", created_at: "2026-05-24" },
+    { _id: "demo-pay2", customer_id: { name: "Sneha Mehta" }, salon_id: { salon_name: "Style Hub" }, amount: 300, status: "pending", created_at: "2026-05-25" },
+  ],
+  reviews: [
+    { _id: "demo-rev1", customer_id: { name: "Rohit Patel" }, salon_id: { salon_name: "Royal Cuts" }, rating: 5, review_text: "Excellent haircut and fast service!" },
+    { _id: "demo-rev2", customer_id: { name: "Sneha Mehta" }, salon_id: { salon_name: "Style Hub" }, rating: 3, review_text: "Good styling but waiting time was high." },
+  ],
 };
 
 /* ══ HELPERS ══ */
@@ -155,7 +188,19 @@ export function AdminRequests({ initialTab = "dashboard" }) {
       if (payR?.success) setPayments(payR.payments || []);
       if (revR?.success) setReviews(revR.reviews || []);
     } catch (e) { pop("Failed to load data", "error"); }
-    finally { setLoading(false); }
+    finally {
+      if (USE_DEMO_DATA) {
+        setStats((prev) => prev || DEMO_DATA.stats);
+        setCustomers((prev) => (prev?.length ? prev : DEMO_DATA.customers));
+        setSalons((prev) => (prev?.length ? prev : DEMO_DATA.salons));
+        setBarbers((prev) => (prev?.length ? prev : DEMO_DATA.barbers));
+        setBookings((prev) => (prev?.length ? prev : DEMO_DATA.bookings));
+        setServices((prev) => (prev?.length ? prev : DEMO_DATA.services));
+        setPayments((prev) => (prev?.length ? prev : DEMO_DATA.payments));
+        setReviews((prev) => (prev?.length ? prev : DEMO_DATA.reviews));
+      }
+      setLoading(false);
+    }
   };
 
   const updateSalonStatus = async (id, status, rejection_reason = "") => {
@@ -451,12 +496,11 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                   ].map((card) => {
                     const Icon = card.icon;
                     return (
-                      <div key={card.label} className="bg-white rounded-xl border card-shadow p-6" style={{ borderColor: C.border }}>
+                      <div key={card.label} className="bg-white rounded-xl border card-shadow p-6 transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg" style={{ borderColor: C.border }}>
                         <p className="text-[13px] font-medium" style={{ color: C.muted }}>{card.label}</p>
                         <div className="flex items-center justify-between mt-3">
                           <div>
                             <div className="text-2xl font-bold font-serif" style={{ color: C.ink }}>{card.value}</div>
-                            <div className="text-[12px] font-medium mt-1" style={{ color: card.subColor }}>{card.sub}</div>
                           </div>
                           <div className="p-3 rounded-lg" style={{ background: card.iconBg }}>
                             <Icon size={22} color={card.iconColor} />

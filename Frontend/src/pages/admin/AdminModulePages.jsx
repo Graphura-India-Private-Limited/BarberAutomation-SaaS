@@ -327,7 +327,7 @@ export function AddBarberModule({ salons, newBarber, setNewBarber, addBarber, bu
   const approved = salons.filter((s) => s.status === "approved");
   return (
     <AdminPageShell>
-      <div className="max-w-3xl bg-white rounded-xl border card-shadow p-8" style={{ borderColor: C.border }}>
+      <div className="w-full bg-white rounded-xl border card-shadow p-8" style={{ borderColor: C.border }}>
         <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: C.ink }}>Add New Barber</h2>
         <p className="text-sm mb-6" style={{ color: C.muted }}>Credentials will be saved and the barber can log in at /barber/login</p>
         <div className="rounded-lg p-4 mb-6 text-sm" style={{ background: C.blueLight, border: `1px solid ${C.blue}30`, color: C.blue }}>

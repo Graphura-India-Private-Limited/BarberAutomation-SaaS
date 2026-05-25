@@ -12,6 +12,17 @@ export function AdminGlobalStyles() {
       .admin-root .card-shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02); }
       .admin-root .inp { width: 100%; border: 1px solid #E7E5E4; border-radius: 8px; padding: 10px 14px; font-size: 13px; outline: none; transition: all 0.2s; background: #fff; box-sizing: border-box; }
       .admin-root .inp:focus { border-color: #C5A059; box-shadow: 0 0 0 3px rgba(197,160,89,0.1); }
+      .admin-root button,
+      .admin-root .cursor-pointer,
+      .admin-root [role="button"] {
+        transition: transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+      }
+      .admin-root button:active,
+      .admin-root .cursor-pointer:active,
+      .admin-root [role="button"]:active {
+        transform: scale(0.98);
+        opacity: 0.92;
+      }
       .admin-root .admin-tab-btn { transition: background 0.15s, color 0.15s; }
     `}</style>
   );
@@ -93,12 +104,11 @@ export const StatCardsRow = ({ cards, loading }) => (
     {cards.map((card) => {
       const Icon = card.icon;
       return (
-        <div key={card.label} className="bg-white rounded-xl border card-shadow p-6" style={{ borderColor: ADMIN_C.border }}>
+        <div key={card.label} className="bg-white rounded-xl border card-shadow p-6 transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg" style={{ borderColor: ADMIN_C.border }}>
           <p className="text-[13px] font-medium" style={{ color: ADMIN_C.muted }}>{card.label}</p>
           <div className="flex items-center justify-between mt-3">
             <div>
               <div className="text-2xl font-bold font-serif" style={{ color: ADMIN_C.ink }}>{loading ? "—" : card.value}</div>
-              <div className="text-[12px] font-medium mt-1" style={{ color: card.subColor }}>{card.sub}</div>
             </div>
             <div className="p-3 rounded-lg" style={{ background: card.iconBg }}>
               <Icon size={22} color={card.iconColor} />
