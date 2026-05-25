@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Scissors } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -148,35 +149,87 @@ export default function OwnerDashboard() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-[#FFFBF2] p-10 text-center font-black text-[#3E362E]">Loading owner console...</div>;
+    return (
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+          .font-sans-loading {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+          }
+        `}</style>
+        <div style={{ background: "#FAF6F0" }} className="min-h-screen flex items-center justify-center font-sans-loading">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
+              <Scissors className="w-6 h-6 text-amber-600" />
+            </div>
+            <p className="text-zinc-600 text-sm font-medium font-sans-loading normal-case">Loading Owner Console...</p>
+          </div>
+        </div>
+      </>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFBF2] p-4 font-sans text-[#3E362E] md:p-10">
+    <div className="min-h-screen p-4 font-sans text-zinc-800 md:p-10" style={{ background: "var(--bg)" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        :root { 
+          --gold: #D97706; 
+          --gold2: #B45309; 
+          --bg: #FAF6F0; 
+          --bg2: #FFFFFF; 
+          --bg3: #FDFBF7; 
+          --border: #EADBCE; 
+          --text: #1C1917; 
+          --muted: #78716C; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, .font-sans {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .font-serif {
+          font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
+        }
+        .card { 
+          background: var(--bg2); 
+          border: 1px solid var(--border); 
+          border-radius: 24px; 
+          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
+          transition: all 0.2s ease;
+        }
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px -4px rgba(28, 25, 23, 0.06), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
+          border-color: #D6C4AE;
+        }
+      `}</style>
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-black uppercase tracking-tight md:text-5xl">
-              Owner <span className="text-[#C5A059]">Console</span>
+            <h1 className="text-3xl font-bold tracking-tight md:text-5xl font-serif tracking-normal text-zinc-900">
+              Owner <span className="text-amber-600">Console</span>
             </h1>
             <div className="mt-2 flex items-center gap-2">
               <span className={`h-2 w-2 rounded-full ${statusMeta.dot}`} />
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8D7B68]">
+              <p className="text-xs font-semibold font-sans normal-case" style={{ color: "var(--muted)" }}>
                 Salon Status: {statusMeta.label}
               </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button onClick={() => navigate("/owner/manage-services")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+            <button onClick={() => navigate("/owner/manage-services")} disabled={!approved} className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold font-sans normal-case transition hover:bg-zinc-50 hover:border-zinc-300 shadow-sm disabled:cursor-not-allowed disabled:opacity-50 text-zinc-700">
               Barber & Service Management
             </button>
-            <button onClick={() => navigate("/owner/payments")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+            <button onClick={() => navigate("/owner/dashboard/analytics")} disabled={!approved} className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold font-sans normal-case transition hover:bg-zinc-50 hover:border-zinc-300 shadow-sm disabled:cursor-not-allowed disabled:opacity-50 text-zinc-700">
+              Analytics
+            </button>
+            <button onClick={() => navigate("/owner/payments")} disabled={!approved} className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold font-sans normal-case transition hover:bg-zinc-50 hover:border-zinc-300 shadow-sm disabled:cursor-not-allowed disabled:opacity-50 text-zinc-700">
               Payments
             </button>
-            <button onClick={() => navigate("/owner/revenue")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
+            <button onClick={() => navigate("/owner/revenue")} disabled={!approved} className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold font-sans normal-case transition hover:bg-zinc-50 hover:border-zinc-300 shadow-sm disabled:cursor-not-allowed disabled:opacity-50 text-zinc-700">
               Revenue
             </button>
-            <button onClick={() => setEditing(prev => !prev)} className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition hover:opacity-90">
+            <button onClick={() => setEditing(prev => !prev)} className="rounded-xl bg-zinc-900 px-5 py-3 text-xs font-bold font-sans normal-case text-white hover:bg-zinc-800 transition shadow-sm">
               {editing ? "Close Editor" : "Edit Profile"}
             </button>
           </div>
@@ -200,8 +253,8 @@ export default function OwnerDashboard() {
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <section className="space-y-8 lg:col-span-5">
-            <div className="rounded-[2rem] border border-[#EAD8C0] bg-white p-7 shadow-sm">
-              <h2 className="mb-5 text-xl font-black uppercase">Salon Details</h2>
+            <div className="card p-7">
+              <h2 className="mb-5 text-xl font-bold font-serif tracking-normal text-zinc-900">Salon Details</h2>
               <Info label="Business Name" value={salon?.salon_name} />
               <Info label="Owner" value={salon?.owner_name} />
               <Info label="Hours" value={`${salon?.opening_time || "09:00"} - ${salon?.closing_time || "21:00"}`} />
@@ -209,14 +262,14 @@ export default function OwnerDashboard() {
               <Info label="Support" value={salon?.support_number || salon?.mobile || "Not added"} />
             </div>
 
-            <div className="rounded-[2rem] border border-[#EAD8C0] bg-[#FDF5E6] p-7">
-              <h2 className="mb-2 text-xl font-black uppercase">Shop Gallery</h2>
+            <div className="card p-7" style={{ background: "var(--bg3)" }}>
+              <h2 className="mb-2 text-xl font-bold font-serif tracking-normal text-zinc-900">Shop Gallery</h2>
               <div className="mt-5 grid grid-cols-3 gap-3">
                 {(form.images || []).map((url, index) => (
                   <img key={index} src={url} alt={`Salon ${index + 1}`} className="aspect-square rounded-2xl border border-white object-cover shadow-sm" />
                 ))}
                 {(!form.images || form.images.length === 0) && (
-                  <div className="col-span-3 rounded-2xl border border-dashed border-[#C5A059]/40 bg-white p-8 text-center text-xs font-bold text-[#8D7B68]">
+                  <div className="col-span-3 rounded-2xl border border-dashed border-amber-200 bg-white p-8 text-center text-xs font-semibold font-sans normal-case text-zinc-500">
                     No shop images added yet.
                   </div>
                 )}
@@ -236,16 +289,16 @@ export default function OwnerDashboard() {
                 canResubmit={salon?.status === "rejected"}
               />
             ) : (
-              <div className="rounded-[2rem] border border-[#EAD8C0] bg-white p-7 shadow-xl">
-                <h2 className="mb-6 text-2xl font-black uppercase">Activation Checklist</h2>
+              <div className="card p-7">
+                <h2 className="mb-6 text-2xl font-bold font-serif tracking-normal text-zinc-900">Activation Checklist</h2>
                 <ChecklistItem done={!!salon?.salon_name} label="Salon identity submitted" />
                 <ChecklistItem done={!!salon?.latitude && !!salon?.longitude} label="Geo location tagged" />
                 <ChecklistItem done={(salon?.services_offered || []).length > 0} label="Services offered added" />
                 <ChecklistItem done={!!salon?.basic_pricing} label="Basic pricing added" />
                 <ChecklistItem done={(salon?.images || []).length > 0} label="Shop images uploaded" />
                 <ChecklistItem done={approved} label="Admin approval completed" />
-                <div className="mt-8 rounded-2xl border border-dashed border-[#EAD8C0] bg-[#FDF5E6]/60 p-6">
-                  <p className="text-sm font-bold text-[#8D7B68]">
+                <div className="mt-8 rounded-2xl border border-dashed border-[#EADBCE] bg-[#FDFBF7] p-6">
+                  <p className="text-sm font-semibold text-zinc-600 font-sans normal-case">
                     Post-approval access includes barber management, service pricing, queue controls and full dashboard operations.
                   </p>
                 </div>
@@ -261,17 +314,17 @@ export default function OwnerDashboard() {
 function Info({ label, value }) {
   return (
     <div className="mb-4">
-      <label className="text-[9px] font-black uppercase tracking-widest text-[#C5A059]">{label}</label>
-      <p className="font-bold text-[#3E362E]">{value}</p>
+      <label className="text-xs font-bold font-sans normal-case" style={{ color: "var(--gold)" }}>{label}</label>
+      <p className="font-semibold text-zinc-950 mt-0.5">{value || "Not added"}</p>
     </div>
   );
 }
 
 function ChecklistItem({ done, label }) {
   return (
-    <div className="mb-3 flex items-center justify-between rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-4">
-      <span className="text-sm font-bold">{label}</span>
-      <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase ${done ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+    <div className="mb-3 flex items-center justify-between rounded-xl border border-zinc-200 bg-white p-4 hover:border-zinc-300 transition-all">
+      <span className="text-sm font-semibold text-zinc-700 font-sans normal-case">{label}</span>
+      <span className={`rounded-full px-3 py-1 text-xs font-bold font-sans normal-case ${done ? "bg-green-50 text-green-700 border border-green-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
         {done ? "Done" : "Pending"}
       </span>
     </div>
@@ -279,10 +332,10 @@ function ChecklistItem({ done, label }) {
 }
 
 function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, busy, canResubmit }) {
-  const inputClass = "w-full rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-3 text-sm font-semibold outline-none focus:border-[#C5A059]";
+  const inputClass = "w-full rounded-xl border border-zinc-200 bg-white p-3 text-sm font-medium outline-none focus:border-amber-600 transition-all text-zinc-800";
   return (
-    <div className="rounded-[2rem] border border-[#EAD8C0] bg-white p-7 shadow-xl">
-      <h2 className="mb-6 text-2xl font-black uppercase">Edit Salon Profile</h2>
+    <div className="card p-7">
+      <h2 className="mb-6 text-2xl font-bold font-serif tracking-normal text-zinc-900">Edit Salon Profile</h2>
       <div className="grid gap-4 md:grid-cols-2">
         <input className={inputClass} value={form.salon_name} onChange={e => setField("salon_name", e.target.value)} placeholder="Salon name" />
         <input className={inputClass} value={form.owner_name} onChange={e => setField("owner_name", e.target.value)} placeholder="Owner name" />
@@ -298,14 +351,14 @@ function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, bu
       <textarea className={`${inputClass} mt-4 min-h-24 resize-none`} value={form.address} onChange={e => setField("address", e.target.value)} placeholder="Address" />
       <textarea className={`${inputClass} mt-4 min-h-20 resize-none`} value={form.about} onChange={e => setField("about", e.target.value)} placeholder="About salon" />
       <div className="mt-5 flex flex-wrap gap-3">
-        <button onClick={tagLocation} className="rounded-xl border border-[#C5A059] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#C5A059] hover:bg-[#C5A059] hover:text-white">
+        <button onClick={tagLocation} className="rounded-xl border border-amber-600 px-5 py-3 text-xs font-bold font-sans normal-case text-amber-700 hover:bg-amber-600 hover:text-white transition shadow-sm">
           Update Location
         </button>
-        <button onClick={() => saveProfile(false)} disabled={busy} className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50">
+        <button onClick={() => saveProfile(false)} disabled={busy} className="rounded-xl bg-zinc-900 px-5 py-3 text-xs font-bold font-sans normal-case text-white hover:bg-zinc-800 transition disabled:opacity-50 shadow-sm">
           Save Profile
         </button>
         {canResubmit && (
-          <button onClick={() => saveProfile(true)} disabled={busy} className="rounded-xl bg-[#C5A059] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50">
+          <button onClick={() => saveProfile(true)} disabled={busy} className="rounded-xl bg-amber-600 px-5 py-3 text-xs font-bold font-sans normal-case text-white hover:bg-amber-700 transition disabled:opacity-50 shadow-sm">
             Resubmit Request
           </button>
         )}

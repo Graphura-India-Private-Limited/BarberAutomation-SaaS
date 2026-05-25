@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import SlotSelection from '../../components/booking/SlotSelection';
 import BookingForm from '../../components/booking/BookingForm';
 import ConfirmationPage from '../../components/booking/ConfirmationPage';
+import { useNavigate } from 'react-router-dom';
 
 export default function Wrapper() {
   const [bookingData, setBookingData] = useState({
@@ -11,6 +12,7 @@ export default function Wrapper() {
     date: null,
     time: null, // 📑 FIXED: Changed 'timeSlot' to 'time' to match your sub-components!
   });
+  const navigate = useNavigate();
 
   // Defaulting to Step 3 (Slot Selection view)
   const [currentStep, setCurrentStep] = useState(3); 
@@ -36,7 +38,8 @@ export default function Wrapper() {
       date: null,
       time: null,
     });
-    setCurrentStep(3);
+    setCurrentStep(1);
+    navigate("/");
   };
 
   return (

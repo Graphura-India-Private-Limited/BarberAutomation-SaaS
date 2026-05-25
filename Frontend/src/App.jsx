@@ -126,7 +126,6 @@ function App() {
         <Route path="/customer/services" element={<ServiceCategories />} />
         <Route path="/customer/services/men" element={<MenServices />} />
         <Route path="/customer/services/women" element={<WomenServices />} />
-        <Route path="/customer/services/addon" element={<AddonServices />} />
         <Route path="/customer/services/addons" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
@@ -158,7 +157,7 @@ function App() {
         <Route path="/owner/login" element={<OwnerLogin />} />
         <Route path="/register-salon" element={<SalonRegistration />} />
         <Route path="/owner/dashboard" element={<OwnerDashboard />} />
-        <Route path="/owner/analytics" element={<AnalyticsDashboard />} />
+        <Route path="/owner/dashboard/analytics" element={<AnalyticsDashboard />} />
         <Route path="/owner/payments" element={<PaymentDashboard />} />
         <Route path="/owner/revenue" element={<RevenueDashboard />} />
         <Route path="/owner/manage-services" element={<ManageServices />} />
@@ -177,12 +176,7 @@ function App() {
         <Route path="/admin/settings"  element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
         <Route path="/admin/customer-issues" element={<AdminLayout page="customer"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.CUSTOMER} /></AdminLayout>} />
         <Route path="/admin/salon-issues"    element={<AdminLayout page="salon"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.SALON} /></AdminLayout>} />
-    
-       
-       <Route
-  path="/admin/salon-management"
-  element={<SalonManagement />}
-/>    
+        <Route path="/admin/salon-management"element={<SalonManagement />}/>    
         <Route path="/admin/salon-view" element={<SalonViewPage />} />
 
         {/* --- UTILITY & FALLBACK SECURITY CORE --- */}
