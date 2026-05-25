@@ -319,7 +319,7 @@ export default function NoShowDelayPage() {
                   <button type="button" onClick={() => setModal({ type: "rejoin", customer: currentCustomer })} className="w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest text-[#C5A059] bg-[#3E362E] hover:bg-[#2A241F] transition-colors cursor-pointer shadow-3xs">
                     Rejoin Queue Pipeline
                   </button>
-                  <button type="button" onClick={() => setModal({ type: "remove", customer: currentCustomer })} className="w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest text-stone-400 hover:text-red-700 hover:bg-red-50/40 rounded-xl transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5">
+                  <button type="button" onClick={() => setModal({ type: "remove", customer: currentCustomer })} className="w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest text-stone-400 hover:text-red-700 hover:bg-red-50/40 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5">
                     <Trash2 size={12} /> Manually Purge Record
                   </button>
                 </div>
