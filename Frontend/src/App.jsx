@@ -44,6 +44,9 @@ import { ReportsPage }    from "./pages/admin/ReportsPage";
 import { AdminSettings }  from "./pages/admin/AdminSettings";
 import { useTickets } from "./utils/useTickets";
 import { TICKET_TYPE } from "./utils/tickets";
+import AdminRequests from "./pages/admin/AdminRequests";
+// import AdminSubscriptionDashboard from "./subscription/pages/AdminSubscriptionDashboard";
+// import OwnerBillingPage    from "./subscription/pages/OwnerBillingPage";
 import ServiceCategories   from "./pages/customer/ServiceCategories";
 import MenServices         from "./pages/customer/MenServices";
 import WomenServices       from "./pages/customer/WomenServices";
@@ -57,13 +60,13 @@ import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
 import AdminUserManagement from "./pages/admin/AdminUserManagement";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import BookingManagement from "./pages/owner/BookingManagement";
-import SalonManagement from "./pages/admin/SalonManagement";
 import SalonViewPage from "./pages/admin/SalonViewPage";
 import CustomerManagement from "./pages/customer/CustomerManagement";
 import AllReviews from "./pages/customer/AllReviews";
 import FaqPage from "./pages/FaqPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import SalonManagement from "./pages/admin/SalonManagement";
 
 
 /* ── Components (Capital C) ── */
@@ -168,10 +171,20 @@ function App() {
 
         {/* --- SUPER ADMIN CENTRAL PANEL --- */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminOnboarding />} />
+        <Route path="/admin/requests" element={<AdminRequests initialTab="dashboard" />} />
+        <Route path="/admin/customers" element={<AdminRequests initialTab="customers" />} />
+        <Route path="/admin/barbers" element={<AdminRequests initialTab="barbers" />} />
+        <Route path="/admin/add-barber" element={<AdminRequests initialTab="addbarber" />} />
+        <Route path="/admin/appointments" element={<AdminRequests initialTab="appointments" />} />
+        <Route path="/admin/services" element={<AdminRequests initialTab="services" />} />
+        <Route path="/admin/payments" element={<AdminRequests initialTab="payments" />} />
+        <Route path="/admin/reviews" element={<AdminRequests initialTab="reviews" />} />
+        <Route path="/admin/live" element={<AdminRequests initialTab="live" />} />
+        <Route path="/admin/platform-settings" element={<AdminRequests initialTab="settings" />} />
+        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
         <Route path="/admin/user-management" element={<AdminUserManagement />} />
         <Route path="/admin/analytics" element={<AdminAnalytics />} />
-        <Route path="/admin/salon-management" element={<SalonManagement />} />
+        <Route path="/admin/salon-management" element={<AdminRequests initialTab="salons" />} />
         <Route path="/admin/dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
         <Route path="/admin/tickets"   element={<AdminLayout page="tickets"><TicketsPage {...ticketState} /></AdminLayout>} />
         <Route path="/admin/reports"   element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />
