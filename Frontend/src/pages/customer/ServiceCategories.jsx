@@ -1,70 +1,111 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function ServiceCategories() {
   const navigate = useNavigate();
 
+  // विंडो स्क्रोल रिसेट
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const categories = [
     {
       title: "Men Services",
-      desc: "Timeless cuts that suit your style and face shape.",
+      desc: "Architectural cuts, razor-sharp beard styling, and premium treatments engineered for the modern gentleman.",
       img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80",
       path: "/customer/services/men"
     },
     {
       title: "Women Services",
-      desc: "Tailored cuts and blowouts for all hair types.",
+      desc: "Bespoke styling, rich couture coloring, and rejuvenating hair rituals crafted to illuminate your natural elegance.",
       img: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800&q=80",
       path: "/customer/services/women"
     },
     {
       title: "Add-On Services",
-      desc: "Extra grooming & treatments.",
+      desc: "Enhance your main ritual with therapeutic head massages, express treatments, and premium upgrades.",
       img: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80",
       path: "/customer/services/addon"
     }
   ];
 
   return (
-    <div style={{background:"#F9F7F4",minHeight:"100vh",fontFamily:"'DM Sans','Segoe UI',sans-serif",color:"#1C1410"}}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
-        .hcard { transition: all 0.3s ease; }
-        .hcard:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important; transform: translateY(-6px); }
-        .btn-gold { background: #C9882A; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(201,136,42,0.2); }
-        .btn-gold:hover { background: #b87a22; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,136,42,0.3); }
-      `}</style>
+    <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white">
       
-      {/* Hero Section */}
-      <div style={{position:"relative",height:300,display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",marginBottom:48}}>
-        <div style={{position:"absolute",inset:0,backgroundImage:"url(https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1600&q=80)",backgroundSize:"cover",backgroundPosition:"center",filter:"brightness(0.6)"}} />
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(to top, #F9F7F4, transparent)"}} />
-        <div style={{position:"relative",zIndex:1,textAlign:"center"}}>
-          <h2 style={{fontSize:56,fontWeight:900,color:"#1C1410",fontFamily:"'Cormorant Garamond',serif",letterSpacing:-1,marginBottom:12}}>
-            Our Services
-          </h2>
-          <p style={{fontSize:16,color:"#4a3f35",maxWidth:600,margin:"0 auto",lineHeight:1.6}}>
-            Experience premium grooming and styling with our curated selection of specialized services.
+      {/* Premium Hero Banner */}
+      <div className="relative h-[380px] sm:h-[420px] flex items-center justify-center overflow-hidden mb-12">
+        <div 
+          className="absolute inset-0 bg-cover bg-center filter brightness-[0.4] scale-105 transform transition-transform duration-1000"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1600&q=80')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6F0] via-transparent to-black/40" />
+        
+        {/* Subtle Ambient Glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
+        
+        {/* RETURN BUTTON (Top Left Corner) */}
+        <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+          <button
+            onClick={() => navigate("/")}
+            className="group flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-2xl text-white font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 shadow-sm hover:bg-white hover:text-[#3E362E] hover:border-white hover:scale-105 cursor-pointer"
+          >
+            <span className="text-sm font-light text-[#C5A059] transition-transform duration-300 transform group-hover:-translate-x-1 inline-block">
+              &lt;
+            </span>
+            <span className="relative">Return</span>
+          </button>
+        </div>
+
+        <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
+          <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-[#EADDCA] shadow-sm inline-block mb-4">
+            The Luxury Experience
+          </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white font-serif leading-none">
+            Our Service <span className="text-[#C5A059] italic normal-case">Categories</span>
+          </h1>
+          <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-6 mb-4" />
+          <p className="text-stone-300 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-light leading-relaxed">
+            Select a specialized category below to explore our meticulously curated treatments designed for your absolute rejuvenation.
           </p>
         </div>
       </div>
 
       {/* Grid Section */}
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"0 40px 80px"}}>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))",gap:32}}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center">
           {categories.map((cat, i) => (
-            <div key={i} className="hcard" style={{background:"#fff",borderRadius:16,overflow:"hidden",border:"1px solid #E8E0D6",boxShadow:"0 4px 16px rgba(0,0,0,0.04)",display:"flex",flexDirection:"column"}}>
-              <div style={{height:240,overflow:"hidden",position:"relative"}}>
-                <img src={cat.img} style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform 0.5s ease"}} 
-                     onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"}
-                     onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"} />
+            <div 
+              key={i} 
+              className="group bg-white rounded-[28px] overflow-hidden border border-[#EADDCA] shadow-sm hover:shadow-[0_22px_45px_rgba(62,54,46,0.08)] hover:border-[#C5A059]/40 transition-all duration-500 flex flex-col transform hover:-translate-y-2"
+            >
+              {/* Image Container with Smooth Zoom */}
+              <div className="h-64 overflow-hidden relative bg-stone-100">
+                <div className="absolute inset-0 bg-black/10 z-10 group-hover:bg-transparent transition-colors duration-500" />
+                <img 
+                  src={cat.img} 
+                  alt={cat.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
               </div>
-              <div style={{padding:"24px",display:"flex",flexDirection:"column",flexGrow:1,justifyContent:"space-between"}}>
-                <div>
-                  <h3 style={{fontSize:24,fontWeight:800,color:"#1C1410",fontFamily:"'Cormorant Garamond',serif",marginBottom:8}}>{cat.title}</h3>
-                  <p style={{fontSize:14,color:"#7C6E60",lineHeight:1.6,marginBottom:24}}>{cat.desc}</p>
+
+              {/* Category Details Card */}
+              <div className="p-8 flex flex-col flex-grow justify-between bg-gradient-to-b from-white to-[#FAF6F0]/10">
+                <div className="mb-6">
+                  <h3 className="font-serif font-bold text-2xl text-[#3E362E] tracking-wide mb-3 group-hover:text-[#C5A059] transition-colors duration-300">
+                    {cat.title}
+                  </h3>
+                  <p className="text-stone-500 text-sm font-light leading-relaxed">
+                    {cat.desc}
+                  </p>
                 </div>
-                <button className="btn-gold" onClick={() => navigate(cat.path)} style={{width:"100%"}}>
-                  EXPLORE SERVICES
+
+                <button
+                  onClick={() => navigate(cat.path)}
+                  className="w-full bg-[#3E362E] text-white py-4 px-4 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 group-hover:bg-[#C5A059] group-hover:text-[#2A241F] shadow-sm cursor-pointer select-none"
+                >
+                  Explore Services
                 </button>
               </div>
             </div>

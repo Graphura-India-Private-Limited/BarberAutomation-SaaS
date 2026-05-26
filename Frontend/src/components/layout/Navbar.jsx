@@ -104,13 +104,13 @@ const Navbar = () => {
     <>
       {/* ══ NAVBAR CONTAINER FIXED CONSOLE ══ */}
       <nav
-        className={`sticky top-0 z-50 border-b transition-all duration-300 ${
-          scrolled
-            ? "border-[#2A241F] bg-[#3E362E]/95 shadow-md backdrop-blur-xl"
-            : "border-[#2A241F]/60 bg-[#3E362E]"
-        }`}
-      >
-        <div className="flex w-full items-center justify-between pl-6 pr-8 py-4 max-w-[1600px] mx-auto">
+  className={`sticky top-0 z-50 transition-all duration-500 ${
+    scrolled
+      ? "bg-[#241F1B]/92 backdrop-blur-2xl border-b border-[#C5A059]/10 shadow-[0_10px_40px_rgba(0,0,0,0.45)]"
+      : "bg-gradient-to-r from-[#2A241F] via-[#3E362E] to-[#2A241F] border-b border-white/5"
+  }`}
+>
+        <div className="flex w-full items-center justify-between pl-5 pr-6 py-3 max-w-[1700px] mx-auto">
 
           {/* BRAND LOGO DESIGN PANEL */}
           <div
@@ -118,7 +118,7 @@ const Navbar = () => {
             onClick={() => handleNav("/")}
           >
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#C5A059]/10 border border-[#C5A059]/30 flex items-center justify-center">
+             <div className="relative flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.2em] text-stone-300 hover:text-[#FFE6A7] transition-all duration-300 cursor-pointer after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-0 after:bg-[#C5A059] after:transition-all hover:after:w-full">
                 <Scissors className="w-4 h-4 text-[#C5A059]" />
               </div>
 
@@ -157,7 +157,7 @@ const Navbar = () => {
 
                   {/* SUBMENU SERVICES OVERLAY POPUP */}
                   {dropOpen && (
-                    <div className="absolute top-9 left-1/2 -translate-x-1/2 w-64 bg-[#3E362E] rounded-2xl shadow-xl border border-[#2A241F] overflow-hidden z-50 animate-fade-in">
+                    <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 rounded-3xl bg-[#2A241F]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.45)] overflow-hidden z-50 animate-fade-in">
                       <div className="p-2 space-y-0.5">
                         {SERVICE_LINKS.map((svc) => (
                           <button
@@ -208,16 +208,14 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => handleNav("/login")}
-              className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-white border border-stone-600 px-5 py-2.5 rounded-xl hover:bg-white/5 hover:border-stone-400 transition-all cursor-pointer"
-            >
+              className="hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] text-white border border-white/10 bg-white/[0.03] backdrop-blur-xl px-5 py-2.5 rounded-xl hover:border-[#C5A059]/40 hover:bg-white/[0.06] transition-all duration-300 cursor-pointer">
               Login
             </button>
 
             <button
               type="button"
               onClick={() => handleNav("/customer/services")}
-              className="hidden sm:block rounded-xl bg-[#A37B58] hover:bg-[#8F6947] px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-xs transition-all cursor-pointer active:scale-[0.98]"
-            >
+             className="hidden sm:block rounded-xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] hover:scale-105 px-7 py-3 text-[10px] font-black uppercase tracking-[0.25em] text-[#2A241F] shadow-[0_0_25px_rgba(197,160,89,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98]">
               Book Now
             </button>
 
