@@ -637,7 +637,7 @@ const handleNext = () => {
 {/* ════════════════════════════════════════
       LUXURY TESTIMONIALS SECTION
 ════════════════════════════════════════ */}
-<section className="relative w-full overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] py-20 sm:py-24 px-4 flex flex-col items-center justify-center">
+<section className="relative w-full overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] ...">
 
   {/* GLOW BACKGROUND EFFECTS */}
   <div className="absolute top-[-100px] left-[-100px] w-[320px] h-[320px] bg-[#C5A059]/20 blur-[120px] rounded-full animate-pulse" />
@@ -677,7 +677,7 @@ const handleNext = () => {
     <div className="w-20 h-[3px] bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] mx-auto mt-5 rounded-full shadow-[0_0_20px_rgba(197,160,89,0.7)]" />
 
   </div>
-  </section>
+ 
 
   {/* SLIDER CONTAINER */}
   <div className="relative w-full max-w-[1450px] px-2 sm:px-8">
@@ -765,49 +765,9 @@ const handleNext = () => {
                 setSelectedReview(item)
               }
 
-              className="
-                relative
-
-                min-w-full
-                sm:min-w-[48%]
-                lg:min-w-[31%]
-                xl:min-w-[23.5%]
-
-                max-w-[350px]
-                min-h-[460px]
-
-                rounded-[32px]
-
-                bg-white/10
-                backdrop-blur-2xl
-
-                border border-white/10
-
-                shadow-[0_0_40px_rgba(0,0,0,0.25)]
-
-                overflow-hidden
-
-                p-6 sm:p-7
-
-                flex flex-col
-                items-center
-                justify-between
-                text-center
-
-                transition-all
-                duration-500
-
-                hover:-translate-y-3
-                hover:scale-[1.02]
-
-                hover:border-[#C5A059]/40
-
-                hover:shadow-[0_0_45px_rgba(197,160,89,0.35)]
-
-                group
-                shrink-0
-              "
-            >
+            className="relative min-w-full sm:min-w-[48%] lg:min-w-[31%] xl:min-w-[23.5%] max-w-[350px] min-h-[460px] rounded-[2.5rem] border border-[#C5A059]/15 shadow-2xl overflow-hidden p-6 sm:p-7 flex flex-col items-center justify-between text-center transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:border-[#C5A059]/40 hover:shadow-[0_0_45px_rgba(197,160,89,0.25)] group shrink-0"
+      style={{ backgroundColor: "#251F1B" }} // 👈 Force-overrides light-mode theme inheriting layouts globally
+    >
 
               {/* SHINY HOVER EFFECT */}
               <div className="
@@ -836,11 +796,11 @@ const handleNext = () => {
                   rounded-full
                   overflow-hidden
 
-                  border-2 border-[#C5A059]
+                  border-2 border-[#c8a461]
 
                   p-1
 
-                  bg-white/10
+                  bg-[#2f2924]
 
                   shadow-[0_0_25px_rgba(197,160,89,0.5)]
 
@@ -1105,7 +1065,7 @@ const handleNext = () => {
     </button>
 
   </div>
-
+</section>
 
 
 
