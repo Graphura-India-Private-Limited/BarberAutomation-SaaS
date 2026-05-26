@@ -637,436 +637,158 @@ const handleNext = () => {
 {/* ════════════════════════════════════════
       LUXURY TESTIMONIALS SECTION
 ════════════════════════════════════════ */}
-<section className="relative w-full overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] ...">
+<section className="relative w-full overflow-hidden bg-gradient-to-br from-[#3d342d] via-[#2A241F] to-[#3E362E] py-20 sm:py-24 px-4 flex flex-col items-center justify-center text-center">
 
   {/* GLOW BACKGROUND EFFECTS */}
-  <div className="absolute top-[-100px] left-[-100px] w-[320px] h-[320px] bg-[#C5A059]/20 blur-[120px] rounded-full animate-pulse" />
-
-  <div className="absolute bottom-[-100px] right-[-100px] w-[320px] h-[320px] bg-white/10 blur-[120px] rounded-full animate-pulse" />
+  <div className="absolute top-[-100px] left-[-100px] w-[320px] h-[320px] bg-[#C5A059]/20 blur-[120px] rounded-full animate-pulse pointer-events-none" />
+  <div className="absolute bottom-[-100px] right-[-100px] w-[320px] h-[320px] bg-white/10 blur-[120px] rounded-full animate-pulse pointer-events-none" />
 
   {/* NOISE OVERLAY */}
-  <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]" />
+  <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')] pointer-events-none" />
 
   {/* HEADING */}
   <div className="relative z-20 text-center mb-14 px-4">
-
     <span className="text-[12px] sm:text-[14px] font-black uppercase tracking-[0.35em] text-[#C5A059]">
       WHAT THEY SAY
     </span>
-    
-
-    <h2 className="
-      mt-4
-      text-3xl
-      sm:text-5xl
-      lg:text-6xl
-      font-black
-      uppercase
-      tracking-tight
-      bg-gradient-to-r
-      from-[#C5A059]
-      via-[#FFE6A7]
-      to-[#C5A059]
-      bg-clip-text
-      text-transparent
-      leading-tight
-    ">
+    <h2 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight bg-gradient-to-r from-[#C5A059] via-[#FFE6A7] to-[#C5A059] bg-clip-text text-transparent leading-tight">
       Customer Reviews
     </h2>
-
     <div className="w-20 h-[3px] bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] mx-auto mt-5 rounded-full shadow-[0_0_20px_rgba(197,160,89,0.7)]" />
-
   </div>
- 
 
   {/* SLIDER CONTAINER */}
-  <div className="relative w-full max-w-[1450px] px-2 sm:px-8">
+  <div className="relative w-full max-w-[1450px] px-2 sm:px-8 z-20">
 
     {/* LEFT BUTTON */}
     <button
       onClick={handlePrev}
-      className="
-        absolute
-        left-0
-        sm:left-2
-        top-1/2
-        -translate-y-1/2
-        z-40
-
-        w-11 h-11 sm:w-14 sm:h-14
-
-        rounded-full
-
-        bg-white/10
-        backdrop-blur-xl
-        border border-white/20
-
-        text-white
-
-        flex items-center justify-center
-
-        hover:bg-[#C5A059]
-        hover:scale-110
-
-        transition-all duration-300
-
-        shadow-[0_0_25px_rgba(255,255,255,0.08)]
-      "
+      className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.08)] cursor-pointer"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={2.5}
-        stroke="currentColor"
-        className="w-5 h-5"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M15.75 19.5L8.25 12l7.5-7.5"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
       </svg>
     </button>
 
-    {/* SLIDER */}
-    <div className="overflow-hidden py-6">
-
+    {/* SLIDER VIEWPORT */}
+    <div className="overflow-hidden py-6 w-full">
       <div
         className="flex gap-5 lg:gap-7 transition-transform duration-700 ease-out"
-        style={{
-          transform: `translateX(-${currentIdx * 100}%)`,
-        }}
+        style={{ transform: `translateX(-${currentIdx * 100}%)` }}
       >
-
         {displayReviews.map((item, idx) => {
-
+          console.log("This is a review object:", item);
           const isReal = !!item._id;
 
-          const name =
-            isReal
-              ? (item.customer_id?.name || "Anonymous")
-              : item.name;
+          // ✅ Fix 1: Fall back dynamically to "Anonymous" if names are omitted 
+          const name = isReal ? (item.customer_id?.name || "Anonymous") : (item.name || "Anonymous");
 
-          const text =
-            isReal
-              ? (item.review_text || "(No written feedback)")
-              : item.review_text || item.text;
+          // ✅ Fix 2: Safeguard against variations in local vs live database text keys
+          const text = isReal ? (item.review_text || "(No written feedback)") : (item.text || item.review_text);
 
-          const avatar = item.avatar;
+          // ✅ Fix 3: Map the real live population endpoint or the mock asset image reference safely
+          const avatarImg = item.customer?.profileImage;
 
           return (
             <div
-              key={item._id || `${name}-${idx}`}
+              key={item._id || `review-card-${idx}`}
+              onClick={() => isReal && setSelectedReview && setSelectedReview(item)}
+              className="relative min-w-full sm:min-w-[48%] lg:min-w-[31%] xl:min-w-[23.5%] max-w-[350px] min-h-[460px] rounded-[2.5rem] border border-[#C5A059]/15 shadow-2xl overflow-hidden p-6 sm:p-7 flex flex-col items-center justify-between text-center transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:border-[#C5A059]/40 hover:shadow-[0_0_45px_rgba(197,160,89,0.25)] group shrink-0"
+              style={{ backgroundColor: "#251F1B" }}
+            >
+              {/* SHINY HOVER GLINT EFFECT */}
+              <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-[120%] transition-all duration-1000 rotate-12 pointer-events-none" />
 
-              onClick={() =>
-                isReal &&
-                setSelectedReview &&
-                setSelectedReview(item)
-              }
-
-            className="relative min-w-full sm:min-w-[48%] lg:min-w-[31%] xl:min-w-[23.5%] max-w-[350px] min-h-[460px] rounded-[2.5rem] border border-[#C5A059]/15 shadow-2xl overflow-hidden p-6 sm:p-7 flex flex-col items-center justify-between text-center transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:border-[#C5A059]/40 hover:shadow-[0_0_45px_rgba(197,160,89,0.25)] group shrink-0"
-      style={{ backgroundColor: "#251F1B" }} // 👈 Force-overrides light-mode theme inheriting layouts globally
-    >
-
-              {/* SHINY HOVER EFFECT */}
-              <div className="
-                absolute
-                top-0
-                left-[-120%]
-                w-full
-                h-full
-                bg-gradient-to-r
-                from-transparent
-                via-white/10
-                to-transparent
-
-                group-hover:left-[120%]
-
-                transition-all
-                duration-1000
-                rotate-12
-              " />
-
-              {/* AVATAR */}
-              <div className="relative z-10 mt-2">
-
-                <div className="
-                  w-24 h-24
-                  rounded-full
-                  overflow-hidden
-
-                  border-2 border-[#c8a461]
-
-                  p-1
-
-                  bg-[#2f2924]
-
-                  shadow-[0_0_25px_rgba(197,160,89,0.5)]
-
-                  animate-[float_4s_ease-in-out_infinite]
-                ">
-
-                  {avatar ? (
+              {/* AVATAR FRAME CONTAINER */}
+              <div className="relative z-10 mt-2 flex-shrink-0">
+                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#c8a461] p-1 bg-[#2f2924] shadow-[0_0_25px_rgba(197,160,89,0.5)] flex items-center justify-center">
+                  {avatarImg ? (
                     <img
-                      src={avatar}
+                      src={avatarImg}
                       alt={name}
                       className="w-full h-full object-cover rounded-full"
+                      onError={(e) => {
+                        // Safe image fallback behavior if a hosted image link breaks
+                        e.currentTarget.style.display = 'none';
+                        const parent = e.currentTarget.parentElement;
+                        if (parent && !parent.querySelector('.fallback-avatar')) {
+                          const fallback = document.createElement('div');
+                          fallback.className = 'fallback-avatar w-full h-full rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8C878] flex items-center justify-center text-white text-2xl font-black';
+                          fallback.innerText = (name[0] || "?").toUpperCase();
+                          parent.appendChild(fallback);
+                        }
+                      }}
                     />
                   ) : (
-                    <div className="
-                      w-full h-full rounded-full
-
-                      bg-gradient-to-br
-                      from-[#C5A059]
-                      via-[#E8C878]
-                      to-[#C5A059]
-
-                      flex items-center justify-center
-
-                      text-white
-                      text-2xl
-                      font-black
-                    ">
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-[#C5A059] via-[#E8C878] to-[#C5A059] flex items-center justify-center text-white text-2xl font-black">
                       {(name[0] || "?").toUpperCase()}
                     </div>
                   )}
-
                 </div>
               </div>
 
-              {/* QUOTE */}
-              <div className="
-                relative z-10
-
-                text-[40px]
-                font-serif
-                text-[#FFE6A7]
-
-                mt-4
-
-                drop-shadow-[0_0_15px_rgba(255,230,167,0.8)]
-              ">
+              {/* QUOTE ICON */}
+              <div className="relative z-10 text-[40px] font-serif text-[#FFE6A7] mt-4 leading-none drop-shadow-[0_0_15px_rgba(255,230,167,0.8)]">
                 “
               </div>
 
-              {/* REVIEW */}
-              <p className="
-                relative z-10
-
-                text-stone-200
-
-                italic
-                font-serif
-
-                text-[14px]
-                leading-relaxed
-
-                flex-grow
-
-                flex items-center justify-center
-
-                mt-4
-
-                line-clamp-5
-              ">
+              {/* REVIEW DESCRIPTION CONTENT */}
+              <p className="relative z-10 text-stone-200 italic font-serif text-[14px] leading-relaxed flex-grow flex items-center justify-center mt-4 line-clamp-5 px-1">
                 {text}
               </p>
 
-              {/* NAME */}
-              <h3 className="
-                relative z-10
-
-                mt-5
-
-                text-[17px]
-                font-semibold
-                tracking-wide
-
-                text-[#FFE6A7]
-              ">
+              {/* TARGET REVIWER METADATA FOOTER */}
+              <h3 className="relative z-10 mt-5 text-[17px] font-semibold tracking-wide text-[#FFE6A7] uppercase">
                 — {name}
               </h3>
 
-              {/* BUTTON */}
+              {/* BOOKING TRIGGER ACTION */}
               <div className="relative z-10 w-full mt-6">
-
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-
-                    navigate &&
-                      navigate("/customer/services");
+                    if (navigate) navigate("/customer/services");
                   }}
-
-                  className="
-                    relative
-                    overflow-hidden
-
-                    w-full
-
-                    py-3.5
-                    px-4
-
-                    rounded-full
-
-                    bg-gradient-to-r
-                    from-[#C5A059]
-                    via-[#E8C878]
-                    to-[#C5A059]
-
-                    text-[#2A241F]
-
-                    font-black
-                    uppercase
-                    tracking-[0.2em]
-                    text-[10px]
-
-                    shadow-[0_0_25px_rgba(197,160,89,0.45)]
-
-                    hover:scale-105
-
-                    transition-all
-                    duration-300
-                  "
+                  className="relative overflow-hidden w-full py-3.5 px-4 rounded-full bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_0_25px_rgba(197,160,89,0.45)] hover:scale-105 transition-all duration-300 cursor-pointer"
                 >
-
-                  <span className="relative z-10">
-                    Book This Experience
-                  </span>
-
+                  <span className="relative z-10">Book This Experience</span>
                 </button>
-
               </div>
-
             </div>
           );
         })}
-
       </div>
     </div>
 
     {/* RIGHT BUTTON */}
     <button
       onClick={handleNext}
-      className="
-        absolute
-        right-0
-        sm:right-2
-        top-1/2
-        -translate-y-1/2
-        z-40
-
-        w-11 h-11 sm:w-14 sm:h-14
-
-        rounded-full
-
-        bg-white/10
-        backdrop-blur-xl
-        border border-white/20
-
-        text-white
-
-        flex items-center justify-center
-
-        hover:bg-[#C5A059]
-        hover:scale-110
-
-        transition-all duration-300
-
-        shadow-[0_0_25px_rgba(255,255,255,0.08)]
-      "
+      className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.08)] cursor-pointer"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={2.5}
-        stroke="currentColor"
-        className="w-5 h-5"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M8.25 4.5l7.5 7.5-7.5 7.5"
-        />
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>
     </button>
-
   </div>
 
-  {/* BOTTOM BUTTONS */}
+  {/* BOTTOM CALL TO ACTION BUTTONS */}
   <div className="relative z-20 mt-14 flex flex-col sm:flex-row gap-4">
-
     <button
-      onClick={() =>
-        navigate && navigate("/reviews")
-      }
-
-      className="
-        px-8 py-4
-
-        rounded-2xl
-
-        bg-gradient-to-r
-        from-[#C5A059]
-        via-[#E8C878]
-        to-[#C5A059]
-
-        text-[#2A241F]
-
-        font-black
-        uppercase
-        tracking-[0.2em]
-        text-[11px]
-
-        shadow-[0_0_30px_rgba(197,160,89,0.45)]
-
-        hover:scale-105
-
-        transition-all duration-300
-      "
+      onClick={() => navigate && navigate("/reviews")}
+      className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[11px] shadow-[0_0_30px_rgba(197,160,89,0.45)] hover:scale-105 transition-all duration-300 cursor-pointer"
     >
-      See All Reviews
-      {reviews &&
-        reviews.length > 0 &&
-        ` (${reviews.length})`}
+      See All Reviews {reviews && reviews.length > 0 && `(${reviews.length})`}
     </button>
 
     <button
-      onClick={() =>
-        navigate && navigate("/write-review")
-      }
-
-      className="
-        px-8 py-4
-
-        rounded-2xl
-
-        border border-[#C5A059]/40
-
-        bg-white/5
-        backdrop-blur-xl
-
-        text-[#FFE6A7]
-
-        font-black
-        uppercase
-        tracking-[0.2em]
-        text-[11px]
-
-        hover:bg-[#C5A059]/10
-        hover:border-[#FFE6A7]
-
-        transition-all duration-300
-      "
+      onClick={() => navigate && navigate("/write-review")}
+      className="px-8 py-4 rounded-2xl border border-[#C5A059]/40 bg-white/5 backdrop-blur-xl text-[#FFE6A7] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-[#C5A059]/10 hover:border-[#FFE6A7] transition-all duration-300 cursor-pointer"
     >
       Write a Review
     </button>
-
   </div>
 </section>
-
 
 
 {/* ══ CTA SECTION (Updated to Premium Light Theme matching your Screenshot) ══ */}

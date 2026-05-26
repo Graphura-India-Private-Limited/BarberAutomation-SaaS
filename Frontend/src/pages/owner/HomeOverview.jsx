@@ -28,44 +28,47 @@ export default function HomeOverview() {
     return "bg-zinc-100 border border-zinc-200 text-zinc-600 font-bold";
   };
 
-  return (
-    <div className="min-h-screen p-4 sm:p-8 font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        :root { 
-          --gold: #D97706; 
-          --gold2: #B45309; 
-          --bg: #FAF6F0; 
-          --bg2: #FFFFFF; 
-          --bg3: #FDFBF7; 
-          --border: #EADBCE; 
-          --text: #1C1917; 
-          --muted: #78716C; 
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, .font-sans {
-          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        .font-serif {
-          font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
-        }
-        .card { 
-          background: var(--bg2); 
-          border: 1px solid var(--border); 
-          border-radius: 24px; 
-          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
-          transition: all 0.2s ease;
-        }
-        .card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 25px -4px rgba(28, 25, 23, 0.06), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
-          border-color: #D6C4AE;
-        }
-      `}</style>
-      <Navbar />
+ return (
+  <div className="min-h-screen font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+      :root { 
+        --gold: #D97706; 
+        --gold2: #B45309; 
+        --bg: #FAF6F0; 
+        --bg2: #FFFFFF; 
+        --bg3: #FDFBF7; 
+        --border: #EADBCE; 
+        --text: #1C1917; 
+        --muted: #78716C; 
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body, .font-sans {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      }
+      .font-serif {
+        font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
+      }
+      .card { 
+        background: var(--bg2); 
+        border: 1px solid var(--border); 
+        border-radius: 24px; 
+        box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
+        transition: all 0.2s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -4px rgba(28, 25, 23, 0.06), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
+        border-color: #D6C4AE;
+      }
+    `}</style>
+
+    {/* ── 1. GLOBAL NAVBAR HEADER (Renders full width flush to screen edges) ── */}
+    <Navbar />
+      
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <p className="text-amber-700 font-sans normal-case font-bold tracking-[2px] text-xs sm:text-sm uppercase mb-1">
+          <p className="text-amber-700 font-sans font-bold tracking-[2px] text-xs sm:text-sm uppercase mb-1">
             Grooming Console
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 font-serif tracking-normal">Welcome, {currentUser?.name}</h2>

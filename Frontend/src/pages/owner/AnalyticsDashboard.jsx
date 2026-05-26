@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Header from "../../components/layout/Header";
 import { 
   Users, 
   Clock, 
@@ -66,7 +67,12 @@ const AnalyticsDashboard = () => {
   const displayData = getFilteredData();
 
   return (
-    <div className="min-h-screen p-6 font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
+    <div className="min-h-screen px-6 pb-6 font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
+      <Header
+      title ="Analytics and Owner dashboard"
+      subtitle="Making the revenue calculation easy"
+      ></Header>
+    
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         :root { 

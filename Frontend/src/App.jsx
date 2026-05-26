@@ -56,17 +56,18 @@ import CustomerDetails     from "./pages/customer/CustomerDetails";
 import Booking             from "./pages/customer/Booking";
 import BookingHistory      from "./pages/customer/BookingHistory";
 import CustomerBookingFlow from "./pages/customer/CustomerBookingFlow";
-import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
-import AdminUserManagement from "./pages/admin/AdminUserManagement";
-import AdminAnalytics from "./pages/admin/AdminAnalytics";
-import BookingManagement from "./pages/owner/BookingManagement";
-import SalonViewPage from "./pages/admin/SalonViewPage";
-import CustomerManagement from "./pages/customer/CustomerManagement";
-import AllReviews from "./pages/customer/AllReviews";
-import FaqPage from "./pages/FaqPage";
-import TermsPage from "./pages/TermsPage";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import SalonManagement from "./pages/admin/SalonManagement";
+import CustomerInteractionView                from "./pages/customer/CustomerInteractionView";
+import AdminUserManagement                from "./pages/admin/AdminUserManagement";
+import AdminAnalytics                from "./pages/admin/AdminAnalytics";
+import BookingManagement                from "./pages/owner/BookingManagement";
+import SalonViewPage                from "./pages/admin/SalonViewPage";
+import SalonManagement                from "./pages/admin/SalonManagement";
+import CustomerManagement                from "./pages/customer/CustomerManagement";
+import AllReviews                from "./pages/customer/AllReviews";
+import FaqPage                from "./pages/FaqPage";
+import TermsPage                from "./pages/TermsPage";
+import PrivacyPolicy                from "./pages/PrivacyPolicy";
+
 
 
 /* ── Components (Capital C) ── */

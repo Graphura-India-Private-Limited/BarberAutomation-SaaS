@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Check,
   X,
@@ -11,12 +11,20 @@ import {
   IndianRupee,
   Users,
   Plus,
+  Scissors,
+  LogOut,
+  SlidersHorizontal
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function BookingManagement() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState("ALL"); // ALL, Queue, Slot, Priority
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
+  const [time, setTime] = useState(new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }));
 
   // Form State for Add/Edit
   const [formData, setFormData] = useState({
@@ -26,79 +34,52 @@ export default function BookingManagement() {
   });
 
   const [bookings, setBookings] = useState([
-    {
-      id: 1,
-      name: "Rahul Sharma",
-      type: "Queue",
-      slot: "10:00 AM",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      name: "Amit Patil",
-      type: "Slot",
-      slot: "11:00 AM",
-      status: "Approved",
-    },
-    {
-      id: 3,
-      name: "Priya Deshmukh",
-      type: "Priority",
-      slot: "12:00 PM",
-      status: "Pending",
-    },
+    { id: 1, name: "wdwdw", type: "Queue", slot: "10:00 AM", status: "Approved" },
+    { id: 2, name: "Rahul Sharma", type: "Queue", slot: "10:00 AM", status: "Rejected" },
+    { id: 3, name: "Amit Patil", type: "Slot", slot: "11:00 AM", status: "Approved" },
+    { id: 4, name: "Priya Deshmukh", type: "Priority", slot: "12:00 PM", status: "Pending" },
   ]);
 
+  const [activities] = useState([
+    { id: 1, text: "Rahul booked haircut", time: "2 sec ago" },
+    { id: 2, text: "Priya upgraded to premium", time: "1 min ago" },
+    { id: 3, text: "Amit cancelled appointment", time: "3 min ago" },
+  ]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }));
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   const approveBooking = (id) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === id ? { ...b, status: "Approved" } : b
-      )
-    );
+    setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "Approved" } : b));
   };
 
   const rejectBooking = (id) => {
-    setBookings(
-      bookings.map((b) =>
-        b.id === id ? { ...b, status: "Rejected" } : b
-      )
-    );
+    setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "Rejected" } : b));
   };
 
-  // Open modal for creating new booking
   const handleNewBookingClick = () => {
     setEditingBooking(null);
     setFormData({ name: "", type: "Queue", slot: "10:00 AM" });
     setIsModalOpen(true);
   };
 
-  // Open modal for editing existing booking
   const handleEditClick = (booking) => {
     setEditingBooking(booking);
-    setFormData({
-      name: booking.name,
-      type: booking.type,
-      slot: booking.slot,
-    });
+    setFormData({ name: booking.name, type: booking.type, slot: booking.slot });
     setIsModalOpen(true);
   };
 
-  // Handle Form Submit (Both Add and Edit)
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
     if (editingBooking) {
-      // Edit Logic
-      setBookings(
-        bookings.map((b) =>
-          b.id === editingBooking.id
-            ? { ...b, name: formData.name, type: formData.type, slot: formData.slot }
-            : b
-        )
-      );
+      setBookings(prev => prev.map((b) => b.id === editingBooking.id ? { ...b, name: formData.name, type: formData.type, slot: formData.slot } : b));
     } else {
-      // Add New Logic
       const newBooking = {
         id: Date.now(),
         name: formData.name,
@@ -108,230 +89,314 @@ export default function BookingManagement() {
       };
       setBookings([newBooking, ...bookings]);
     }
-
     setIsModalOpen(false);
   };
 
-  const filteredBookings = bookings.filter((booking) =>
-    booking.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  // Dynamic Compound Filter Engine (Combines text searching and segment button states)
+  const filteredBookings = useMemo(() => {
+    return bookings.filter((b) => {
+      const matchesSearch = b.name.toLowerCase().includes(search.toLowerCase());
+      const matchesType = selectedTypeFilter === "ALL" || b.type.toLowerCase() === selectedTypeFilter.toLowerCase();
+      return matchesSearch && matchesType;
+    });
+  }, [bookings, search, selectedTypeFilter]);
+
+  // Compute live contextual counts for the metrics cards
+  const stats = useMemo(() => {
+    return {
+      today: bookings.length * 32, // Mock scalar scaling factor aligned with your original layout UI state
+      customers: new Set(bookings.map(b => b.name)).size,
+      pendingCount: bookings.filter(b => b.status === "Pending").length
+    };
+  }, [bookings]);
 
   const getStatusStyle = (status) => {
-    if (status === "Approved") return "bg-green-50 border border-green-200/60 text-green-700 font-bold";
-    if (status === "Rejected") return "bg-red-50 border border-red-200/60 text-red-700 font-bold";
+    if (status === "Approved") return "bg-emerald-50 border border-emerald-200/60 text-emerald-700 font-bold";
+    if (status === "Rejected") return "bg-rose-50 border border-rose-200/60 text-rose-700 font-bold";
     return "bg-amber-50 border border-amber-200/60 text-amber-700 font-bold";
   };
 
   return (
-    <div className="min-h-screen p-4 sm:p-8 font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
+    <div className="min-h-screen font-sans text-stone-800 selection:bg-amber-100" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        :root { 
-          --gold: #D97706; 
-          --gold2: #B45309; 
-          --bg: #FAF6F0; 
-          --bg2: #FFFFFF; 
-          --bg3: #FDFBF7; 
-          --border: #EADBCE; 
-          --text: #1C1917; 
-          --muted: #78716C; 
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, .font-sans {
-          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        .font-serif {
-          font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
-        }
+        body { background-color: #FAF6F0; }
+        .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .font-serif { font-family: 'Playfair Display', serif !important; }
+        
         .card { 
-          background: var(--bg2); 
-          border: 1px solid var(--border); 
+          background: #FFFFFF; 
+          border: 1px solid #EADBCE; 
           border-radius: 24px; 
           box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
-          transition: all 0.2s ease;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 25px -4px rgba(28, 25, 23, 0.06), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
-          border-color: #D6C4AE;
+        .card-active {
+          border-color: #D97706 !with-shadow !important;
+          box-shadow: 0 0 0 2px #D97706, 0 10px 25px -4px rgba(217, 119, 6, 0.15) !important;
         }
       `}</style>
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
-        <div>
-          <p className="text-amber-700 font-sans normal-case font-bold tracking-[2px] text-xs sm:text-sm">
-            Elite Grooming Management
-          </p>
-          <h1 className="text-3xl sm:text-5xl font-bold mt-2 font-serif tracking-normal text-zinc-900">Booking Dashboard</h1>
-        </div>
-
-        <div className="flex gap-3 w-full sm:w-auto">
-          <button
-            onClick={handleNewBookingClick}
-            className="flex-1 sm:flex-initial bg-amber-600 text-white hover:bg-amber-700 px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-md transition-all duration-200"
-          >
-            <Plus size={18} />
-            New Booking
-          </button>
-          <button className="bg-white p-3 rounded-xl border border-zinc-200 text-zinc-600 hover:bg-zinc-50 shadow-sm hover:text-zinc-800 transition">
-            <Bell size={20} />
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {[
-          { title: "Today's Bookings", value: "128", icon: Calendar },
-          { title: "Customers", value: "54", icon: Users },
-          { title: "Revenue", value: "₹12k", icon: IndianRupee },
-          { title: "Available Slots", value: "6", icon: Clock3 },
-        ].map((item) => (
-          <div key={item.title} className="card p-6">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200/55 flex items-center justify-center mb-4">
-              <item.icon className="text-amber-700 w-6 h-6" strokeWidth={2} />
-            </div>
-            <h3 className="text-xs font-bold text-zinc-500 font-sans normal-case mb-1">{item.title}</h3>
-            <p className="text-2xl sm:text-3xl font-bold mt-1 font-serif tracking-normal text-zinc-900">{item.value}</p>
+      {/* ── STICKY TOP PLATFORM HEADER ── */}
+      <header className="w-full border-b border-[#EADBCE] bg-white/90 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D97706] to-[#F59E0B] flex items-center justify-center shadow-md">
+            <Scissors size={20} className="text-white" strokeWidth={2.5} />
           </div>
-        ))}
-      </div>
-
-      {/* Search */}
-      <div className="card p-4 mb-8 flex items-center gap-3 bg-white">
-        <Search className="text-amber-600 shrink-0" size={20} />
-        <input
-          type="text"
-          placeholder="Search customer..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-transparent outline-none w-full text-zinc-800 placeholder-zinc-400 font-sans"
-        />
-      </div>
-
-      {/* Booking Types */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {[
-          { title: "Queue Booking", icon: Clock3 },
-          { title: "Slot Booking", icon: Calendar },
-          { title: "Priority Booking", icon: Crown },
-        ].map((item) => (
-          <div key={item.title} className="card p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200/55 flex items-center justify-center">
-              <item.icon className="text-amber-700 w-6 h-6" />
-            </div>
-            <h2 className="text-lg font-bold font-serif text-zinc-900">{item.title}</h2>
+          <div>
+            <h4 className="text-stone-900 font-extrabold tracking-[0.2em] text-xs uppercase">Barber Pro</h4>
+            <p className="text-[#B45309] text-[9px] font-black tracking-[0.3em] uppercase mt-0.5">Owner Console</p>
           </div>
-        ))}
-      </div>
-
-      {/* Table Section */}
-      <div className="card p-4 sm:p-6 mb-10">
-        <h2 className="text-xl sm:text-2xl mb-6 font-serif font-bold text-zinc-900">Live Bookings</h2>
+        </div>
         
-        {/* Table Wrapper for Horizontal Scrolling on Mobile */}
-        <div className="overflow-x-auto w-full">
-          <table className="w-full min-w-[600px] text-sm sm:text-base">
-            <thead>
-              <tr className="border-b border-zinc-200">
-                <th className="text-left text-zinc-500 font-bold text-xs uppercase tracking-wider py-4 pr-4">Customer</th>
-                <th className="text-left text-zinc-500 font-bold text-xs uppercase tracking-wider pr-4">Type</th>
-                <th className="text-left text-zinc-500 font-bold text-xs uppercase tracking-wider pr-4">Slot</th>
-                <th className="text-left text-zinc-500 font-bold text-xs uppercase tracking-wider pr-4">Status</th>
-                <th className="text-left text-zinc-500 font-bold text-xs uppercase tracking-wider">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredBookings.map((booking) => (
-                <tr key={booking.id} className="border-b border-zinc-100 hover:bg-zinc-50/80 transition-colors">
-                  <td className="py-5 pr-4 whitespace-nowrap font-medium text-zinc-900">{booking.name}</td>
-                  <td className="pr-4 whitespace-nowrap text-zinc-600">{booking.type}</td>
-                  <td className="pr-4 whitespace-nowrap text-zinc-600">{booking.slot}</td>
-                  <td className="pr-4 whitespace-nowrap">
-                    <span className={`px-4 py-1.5 rounded-full text-xs sm:text-sm ${getStatusStyle(booking.status)}`}>
-                      {booking.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex gap-2 sm:gap-3">
-                      <button
-                        onClick={() => approveBooking(booking.id)}
-                        className="bg-green-50 text-green-700 border border-green-200/60 hover:bg-green-100 p-2 rounded-lg transition shrink-0"
-                      >
-                        <Check size={16} />
-                      </button>
-                      <button
-                        onClick={() => rejectBooking(booking.id)}
-                        className="bg-red-50 text-red-700 border border-red-200/60 hover:bg-red-100 p-2 rounded-lg transition shrink-0"
-                      >
-                        <X size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleEditClick(booking)}
-                        className="bg-zinc-100 text-zinc-700 border border-zinc-200 hover:bg-zinc-200 p-2 rounded-lg transition shrink-0"
-                      >
-                        <Edit size={16} />
-                      </button>
+        <div className="flex items-center gap-6 relative">
+          <div className="hidden sm:flex flex-col text-right">
+            <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">System Clock</span>
+            <span className="text-xs font-extrabold text-stone-800 mt-0.5">{time} IST</span>
+          </div>
+
+          {/* Bell Icon Trigger Wrapper */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsNotifOpen(!isNotifOpen)}
+              className={`p-3 rounded-xl border text-stone-600 transition relative cursor-pointer shadow-sm ${isNotifOpen ? 'bg-amber-50 border-amber-500 text-[#D97706]' : 'bg-white border-stone-200 hover:bg-stone-50'}`}
+            >
+              <Bell size={18} />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+            </button>
+            
+            {/* Animated Micro Activity Dropdown Menu */}
+            {isNotifOpen && (
+              <div className="absolute right-0 mt-3 w-80 rounded-2xl border border-[#EADBCE] bg-white p-4 shadow-xl z-50 animate-fade-in">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-stone-500">Live Activity Feed</h4>
+                  <button onClick={() => setIsNotifOpen(false)} className="text-[10px] font-bold text-amber-700 hover:underline">Dismiss</button>
+                </div>
+                <div className="space-y-3">
+                  {activities.map((act) => (
+                    <div key={act.id} className="text-xs border-l-2 border-[#D97706] pl-2.5 py-0.5">
+                      <p className="text-stone-800 font-medium">{act.text}</p>
+                      <span className="text-[10px] text-stone-400 font-sans">{act.time}</span>
                     </div>
-                  </td>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button onClick={handleLogout} className="flex items-center gap-2 border border-stone-200 hover:border-stone-400 hover:bg-stone-50 px-4 py-2.5 rounded-xl text-stone-600 text-xs font-bold uppercase tracking-widest transition-all duration-200 cursor-pointer">
+            <LogOut size={14} /> Exit
+          </button>
+        </div>
+      </header>
+
+      {/* ── MAIN WORKSPACE CONTENT GRID ── */}
+      <main className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+        
+        {/* ── CONTEXT HEADER TITLE CARD ── */}
+        <div className="relative rounded-3xl p-8 mb-6 overflow-hidden card bg-white">
+          <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <p className="text-amber-700 font-bold tracking-[0.2em] text-xs uppercase mb-1">
+                Elite Grooming Management
+              </p>
+              <h1 className="text-3xl lg:text-4xl font-black font-serif tracking-tight text-stone-900 leading-none">Booking Dashboard</h1>
+              <p className="text-stone-500 mt-2 text-sm">Monitor floor allocation flow, approve queue intents, and confirm appointment configurations.</p>
+            </div>
+            <button
+              onClick={handleNewBookingClick}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer self-start sm:self-center"
+            >
+              <Plus size={16} /> New Booking
+            </button>
+          </div>
+        </div>
+
+        {/* ── SYSTEM MATRIX SUMMARY NUMBERS ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[
+            { title: "Today's Bookings", value: stats.today, icon: Calendar, color: "bg-orange-50 text-orange-700 border-orange-100" },
+            { title: "Customers", value: stats.customers, icon: Users, color: "bg-amber-50 text-amber-700 border-amber-100" },
+            { title: "Revenue Index", value: "12k", icon: IndianRupee, color: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+            { title: "Pending Reviews", value: stats.pendingCount, icon: Clock3, color: "bg-sky-50 text-sky-700 border-sky-100" },
+          ].map((item) => (
+            <div key={item.title} className="card p-5 bg-white flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl border flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                <item.icon size={22} />
+              </div>
+              <div>
+                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-1">{item.title}</h3>
+                <p className="text-2xl font-black font-serif tracking-normal text-stone-900 leading-none">{item.value}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── SEARCH INDEX CONSOLE ── */}
+        <div className="card p-4 mb-6 flex items-center gap-3 bg-white">
+          <Search className="text-amber-600 shrink-0" size={18} />
+          <input
+            type="text"
+            placeholder="Search active guest by name identifier..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-transparent outline-none w-full text-stone-800 placeholder-stone-400 text-sm font-medium"
+          />
+          {selectedTypeFilter !== "ALL" && (
+            <button 
+              onClick={() => setSelectedTypeFilter("ALL")}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black bg-stone-100 text-stone-500 uppercase tracking-wider hover:bg-stone-200 transition"
+            >
+              <SlidersHorizontal size={12} /> Clear Filter
+            </button>
+          )}
+        </div>
+
+        {/* ── INTERACTIVE FILTER SEGMENTS (Now updates the table state instantly) ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          {[
+            { filterKey: "Queue", title: "Queue Bookings", icon: Clock3, desc: "On-demand routing slot entries" },
+            { filterKey: "Slot", title: "Slot Bookings", icon: Calendar, desc: "Pre-arranged appointment times" },
+            { filterKey: "Priority", title: "Priority Bookings", icon: Crown, desc: "VIP fast-track checkout nodes" },
+          ].map((item) => {
+            const isTargetActive = selectedTypeFilter === item.filterKey;
+            return (
+              <div 
+                key={item.filterKey} 
+                onClick={() => setSelectedTypeFilter(isTargetActive ? "ALL" : item.filterKey)}
+                className={`card p-5 flex items-center gap-4 cursor-pointer select-none bg-white ${isTargetActive ? 'card-active ring-2 ring-[#D97706] border-[#D97706]' : 'hover:border-[#D6C4AE]'}`}
+              >
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all ${isTargetActive ? 'bg-amber-600 border-amber-700 text-white' : 'bg-amber-50/60 border-amber-100 text-amber-700'}`}>
+                  <item.icon size={22} />
+                </div>
+                <div>
+                  <h2 className="text-base font-black font-serif text-stone-900 leading-tight">{item.title}</h2>
+                  <p className="text-[11px] font-medium text-stone-400 mt-0.5">{item.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── LEDGER TABLE CONTENT CONTAINER ── */}
+        <div className="card p-6 bg-white overflow-hidden mb-8">
+          <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
+            <h2 className="text-xl font-black font-serif text-stone-900 tracking-tight">
+              Live Operations Queue {selectedTypeFilter !== "ALL" && <span className="text-sm font-sans font-bold text-[#D97706] lowercase">({selectedTypeFilter} only)</span>}
+            </h2>
+            <span className="text-[10px] font-black uppercase tracking-widest bg-stone-100 px-2.5 py-1 rounded-md text-stone-500">
+              {filteredBookings.length} Active Rows
+            </span>
+          </div>
+          
+          <div className="overflow-x-auto w-full custom-scrollbar">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr className="border-b border-stone-100 text-stone-400 text-[11px] font-black uppercase tracking-[0.15em]">
+                  <th className="text-left py-4 pr-4">Customer Entity</th>
+                  <th className="text-left pr-4">Pipeline Type</th>
+                  <th className="text-left pr-4">Target Window</th>
+                  <th className="text-left pr-4">State</th>
+                  <th className="text-right">Operations</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-stone-50">
+                {filteredBookings.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="text-center py-12 text-stone-400 italic font-medium">
+                      No matching transaction entries discovered in this viewport segment.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredBookings.map((booking) => (
+                    <tr key={booking.id} className="hover:bg-stone-50/60 transition-colors group">
+                      <td className="py-4.5 pr-4 whitespace-nowrap font-bold text-stone-900 text-sm">{booking.name}</td>
+                      <td className="pr-4 whitespace-nowrap">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${booking.type === 'Priority' ? 'bg-purple-50 text-purple-700' : booking.type === 'Slot' ? 'bg-blue-50 text-blue-700' : 'bg-stone-100 text-stone-700'}`}>
+                          {booking.type}
+                        </span>
+                      </td>
+                      <td className="pr-4 whitespace-nowrap text-stone-500 font-medium font-mono">{booking.slot}</td>
+                      <td className="pr-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${getStatusStyle(booking.status)}`}>
+                          {booking.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => approveBooking(booking.id)}
+                            disabled={booking.status === "Approved"}
+                            className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                            title="Approve Slot"
+                          >
+                            <Check size={14} strokeWidth={3} />
+                          </button>
+                          <button
+                            onClick={() => rejectBooking(booking.id)}
+                            disabled={booking.status === "Rejected"}
+                            className="bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                            title="Reject Slot"
+                          >
+                            <X size={14} strokeWidth={3} />
+                          </button>
+                          <button
+                            onClick={() => handleEditClick(booking)}
+                            className="bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100 p-2 rounded-xl transition shrink-0 cursor-pointer"
+                            title="Edit Allocation"
+                          >
+                            <Edit size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </main>
 
-      {/* Activity Feed */}
-      <div className="card p-6">
-        <h2 className="text-xl sm:text-2xl font-serif font-bold text-zinc-900 mb-5">Live Activity</h2>
-        <div className="space-y-4 text-sm sm:text-base text-zinc-600">
-          <p className="flex items-center gap-3 border-l-2 border-amber-500 pl-3 py-0.5">
-            <span>Rahul booked haircut • <span className="text-zinc-400 text-xs">2 sec ago</span></span>
-          </p>
-          <p className="flex items-center gap-3 border-l-2 border-amber-500 pl-3 py-0.5">
-            <span>Priya upgraded to premium • <span className="text-zinc-400 text-xs">1 min ago</span></span>
-          </p>
-          <p className="flex items-center gap-3 border-l-2 border-amber-500 pl-3 py-0.5">
-            <span>Amit cancelled appointment • <span className="text-zinc-400 text-xs">3 min ago</span></span>
-          </p>
-        </div>
-      </div>
-
-      {/* DYNAMIC FORM MODAL (Add / Edit Booking) */}
+      {/* ── MODAL ADD/EDIT APPOINTMENT FORM DIALOGUE ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white border border-zinc-200 rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
+        <div className="fixed inset-0 bg-stone-950/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white border border-[#EADBCE] rounded-[2rem] p-8 w-full max-w-md shadow-2xl relative">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 p-1.5 rounded-lg transition"
+              className="absolute top-5 right-5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 p-1.5 rounded-xl transition cursor-pointer"
             >
-              <X size={20} />
+              <X size={16} />
             </button>
 
-            <h2 className="text-xl sm:text-2xl font-bold mb-6 font-serif text-zinc-900">
-              {editingBooking ? "Edit Booking Details" : "Create New Booking"}
+            <h2 className="text-2xl font-black mb-6 font-serif text-stone-900 tracking-tight">
+              {editingBooking ? "Modify Booking Parameters" : "Generate Internal Slot"}
             </h2>
 
-            <form onSubmit={handleFormSubmit} className="space-y-5">
+            <form onSubmit={handleFormSubmit} className="space-y-4">
               <div>
-                <label className="block text-zinc-600 font-bold mb-2 text-xs sm:text-sm">Customer Name</label>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">Customer Identifier Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter full name"
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 outline-none text-zinc-800 focus:border-amber-600 focus:bg-white transition text-sm sm:text-base font-medium"
+                  placeholder="E.g., Nitin Kumar"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold placeholder-stone-400"
                 />
               </div>
 
               <div>
-                <label className="block text-zinc-600 font-bold mb-2 text-xs sm:text-sm">Booking Type</label>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">Target Workflow Pipeline</label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 outline-none text-zinc-800 focus:border-amber-600 focus:bg-white transition text-sm sm:text-base font-medium"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
                 >
                   <option value="Queue">Queue Booking</option>
                   <option value="Slot">Slot Booking</option>
@@ -340,11 +405,11 @@ export default function BookingManagement() {
               </div>
 
               <div>
-                <label className="block text-zinc-600 font-bold mb-2 text-xs sm:text-sm">Preferred Time Slot</label>
+                <label className="block text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">Preferred Allocation Time</label>
                 <select
                   value={formData.slot}
                   onChange={(e) => setFormData({ ...formData, slot: e.target.value })}
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 outline-none text-zinc-800 focus:border-amber-600 focus:bg-white transition text-sm sm:text-base font-medium"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
                 >
                   <option value="10:00 AM">10:00 AM</option>
                   <option value="11:00 AM">11:00 AM</option>
@@ -355,19 +420,19 @@ export default function BookingManagement() {
                 </select>
               </div>
 
-              <div className="flex gap-3 pt-2 text-sm sm:text-base">
+              <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition py-3 rounded-xl font-bold"
+                  className="w-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white transition py-3 rounded-xl font-bold shadow-md"
+                  className="w-full bg-gradient-to-r from-amber-600 to-amber-500 text-white transition py-3.5 rounded-xl font-extrabold text-xs uppercase tracking-widest shadow-md hover:from-amber-700 cursor-pointer"
                 >
-                  {editingBooking ? "Save Changes" : "Confirm Booking"}
+                  {editingBooking ? "Save Rules" : "Confirm Slot"}
                 </button>
               </div>
             </form>
