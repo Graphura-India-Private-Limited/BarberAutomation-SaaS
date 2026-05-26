@@ -43,6 +43,7 @@ const STATS = [
   { icon:Shield,  val:"100%",    label:"Satisfaction"    },
 ];
 
+
 const TESTIMONIALS = [
   { name:"Rahul Mehta",   role:"Regular Customer", rating:5, text:"Best grooming experience in the city! The fade is always perfect.",     avatar:"RM" },
   { name:"Priya Singh",   role:"Loyal Customer",   rating:5, text:"Love the women's styling section. Always leave feeling amazing!",       avatar:"PS" },
@@ -97,15 +98,30 @@ export default function HomePage() {
 
 
   useEffect(() => {
+    if (!API) {
+    console.error("API base URL configuration is missing.");
+    return;
+  }
     fetch(`${API}/salon/nearby`)
-      .then(r => r.json())
-      .then(d => { if (d.success) setSalons(d.salons?.slice(0, 3) || []); })
-      .catch(() => {});
+    .then((r) => {
+      if (!r.ok) throw new Error(`Network response error: ${r.status}`);
+      return r.json();
+    })
+    .then((d) => {
+      if (d.success) setSalons(d.salons?.slice(0, 3) || []);
+    })
+    .catch((err) => console.error("Failed fetching nearby salons:", err));
 
-    fetch(`${API}/review`)
-      .then(r => r.json())
-      .then(d => { if (d.success) setReviews(d.reviews || []); })
-      .catch(() => {});
+   // Fetch Reviews Pipeline
+  fetch(`${API}/review`)
+    .then((r) => {
+      if (!r.ok) throw new Error(`Network response error: ${r.status}`);
+      return r.json();
+    })
+    .then((d) => {
+      if (d.success) setReviews(d.reviews || []);
+    })
+    .catch((err) => console.error("Failed fetching reviews:", err));
 
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
@@ -124,6 +140,69 @@ export default function HomePage() {
       document.querySelector(path)?.scrollIntoView({ behavior:"smooth" });
     } else { navigate(path); }
   };
+   {/* ══ MOCK DATA WITH IMAGES (अगर बैकएंड से इमेज न आए तो ये दिखेगी) ══ */}
+  const BARBER_TESTIMONIALS = [
+    {
+      name: "Rahul Sharma",
+      review_text: "The premium fade and beard grooming here is exceptional. Best luxury barber experience in town!",
+      avatar: "https://i.pinimg.com/736x/da/ca/5f/daca5fccc87fc4eecf59867f40eb04ad.jpg"
+    },
+    {
+      name: "Vikram Malhotra",
+      review_text: "Amazing attention to detail. The hot towel treatment and head massage after the haircut felt incredibly premium.",
+      avatar: "https://i.pinimg.com/736x/d1/03/fd/d103fd5176a5c410a524a91bda718bbd.jpg"
+    },
+    {
+      name: "Sneha Patel",
+      review_text: "Took their premium hair spa and styling service. Absolutely loved the ambiance and professional staff!",
+      avatar: "https://i.pinimg.com/1200x/aa/a7/fd/aaa7fd00ad035bdb72a3de08df060edf.jpg"
+    },
+    {
+      name: "Arjun Mehta",
+      review_text: "Flawless hair texture enhancement and styling. The barbers really understand modern trends and face shapes.",
+      avatar: "https://i.pinimg.com/736x/50/fb/25/50fb25ac36eb75cfc883983fd77b1694.jpg"
+    },
+  {
+      name: "Karan Johar",
+      review_text: "Highly professional system. Booking an appointment was seamless, and the service console is amazing.",
+      avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=256&q=80"
+    },
+    {
+    name: "Ananya Deshmukh",
+    review_text: "Super clean, aesthetic interiors, and highly skilled professionals. The Service Console updates you instantly about your turn. Brilliant management!",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80",
+    barber_rating: 5,
+    salon_rating: 5
+  }
+  ];
+
+ const [currentIdx, setCurrentIdx] = useState(0);
+
+const displayReviews = reviews && reviews.length > 0 ? reviews : BARBER_TESTIMONIALS;
+
+const handlePrev = () => {
+  setCurrentIdx((prev) => {
+    if (prev === 0) {
+      const maxVisible = typeof window !== 'undefined' && window.innerWidth >= 1024 ? 4 : 1;
+      const maxIdx = Math.max(0, displayReviews.length - maxVisible);
+      return maxIdx;
+    }
+    return prev - 1;
+  });
+};
+
+const handleNext = () => {
+  setCurrentIdx((prev) => {
+    const maxVisible = typeof window !== 'undefined' && window.innerWidth >= 1024 ? 4 : 1;
+    const maxIdx = Math.max(0, displayReviews.length - maxVisible);
+
+    if (prev >= maxIdx) {
+      return 0;
+    }
+    return prev + 1;
+  });
+};
+
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans overflow-x-hidden">
@@ -329,64 +408,84 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ ABOUT ══ */}
-      <section id="about" className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <img src="https://i.pinimg.com/736x/89/90/e0/8990e0304c44794197af164ab0138011.jpg" alt="Barber" className="w-full h-48 object-cover rounded-2xl shadow-lg"/>
-                <img src="https://i.pinimg.com/736x/bd/10/db/bd10db8df4573f03415a898584459188.jpg" alt="Salon" className="w-full h-32 object-cover rounded-2xl shadow-lg"/>
-              </div>
-              <div className="space-y-4 mt-8">
-                <img src="https://i.pinimg.com/1200x/35/e1/16/35e116f3d65f94e0525f4810f94b5fc7.jpg" alt="Interior" className="w-full h-32 object-cover rounded-2xl shadow-lg"/>
-                <img src="https://i.pinimg.com/1200x/c0/7c/78/c07c78a373ee1bfd8c122578be42e0c2.jpg" alt="Service" className="w-full h-48 object-cover rounded-2xl shadow-lg"/>
-              </div>
-            </div>
-            <div className="absolute -bottom-4 -right-4 bg-[#C5A059] text-white rounded-2xl p-5 shadow-2xl text-center">
-              <p className="text-3xl font-black">10+</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest">Years of<br/>Excellence</p>
-            </div>
+      {/* ══ ABOUT SECTION (Updated to Match Reviews Dark Theme) ══ */}
+<section id="about" className="w-full bg-[#3E362E] py-20 md:py-28">
+  <div className="mx-auto max-w-7xl px-6">
+    <div className="grid lg:grid-cols-2 gap-16 items-center">
+      
+      {/* LEFT COLUMN: IMAGE GRID */}
+      <div className="relative">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
+            <img src="https://i.pinimg.com/736x/89/90/e0/8990e0304c44794197af164ab0138011.jpg" alt="Barber" className="w-full h-48 object-cover rounded-2xl shadow-xl"/>
+            <img src="https://i.pinimg.com/736x/bd/10/db/bd10db8df4573f03415a898584459188.jpg" alt="Salon" className="w-full h-32 object-cover rounded-2xl shadow-xl"/>
           </div>
-
-          <div>
-            <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[#C5A059]">About Us</span>
-            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-stone-900 mt-3 mb-6">
-              We Are The Art Of <span className="text-[#C5A059] italic font-serif">Grooming</span>
-            </h2>
-            <p className="leading-relaxed mb-4 font-serif italic text-stone-600">
-              BarberPro is Pune's premier grooming destination, where tradition meets modern luxury. We combine precision barbering with cutting-edge technology to deliver an unmatched experience.
-            </p>
-            <p className="leading-relaxed mb-8 text-stone-600">
-              Our platform connects customers with the best barbers in the city, offering seamless booking, real-time queue management, and premium grooming services — all in one place.
-            </p>
-            <div className="space-y-3 mb-8 ">
-              {[
-                "Real-time queue tracking — know your exact wait time",
-                "Certified master barbers with 3-10 years experience",
-                "Premium products — Wella, Schwarzkopf, L'Oreal",
-                "Hygienic tools — sterilized after every use",
-                "Easy online booking with token payment system",
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 ">
-                  <CheckCircle className="w-5 h-5 text-[#C5A059] flex-shrink-0" />
-                  <span className="text-sm text-stone-700">{item}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <button onClick={() => navigate("/salon-detail")}
-                className="flex items-center gap-2 bg-[#3E362E] text-white px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] transition hover:scale-105 cursor-pointer">
-                Read More <ArrowRight className="w-4 h-4" />
-              </button>
-              <button onClick={() => navigate("/customer/services")}
-                className="flex items-center gap-2 border-2 border-[#EADDCA] text-[#3E362E] px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition cursor-pointer">
-                Book Now <CalendarDays className="w-4 h-4" />
-              </button>
-            </div>
+          <div className="space-y-4 mt-8">
+            <img src="https://i.pinimg.com/1200x/35/e1/16/35e116f3d65f94e0525f4810f94b5fc7.jpg" alt="Interior" className="w-full h-32 object-cover rounded-2xl shadow-xl"/>
+            <img src="https://i.pinimg.com/1200x/c0/7c/78/c07c78a373ee1bfd8c122578be42e0c2.jpg" alt="Service" className="w-full h-48 object-cover rounded-2xl shadow-xl"/>
           </div>
         </div>
-      </section>
+        
+        {/* Badge */}
+        <div className="absolute -bottom-4 -right-4 bg-[#C5A059] text-white rounded-2xl p-5 shadow-2xl text-center z-10">
+          <p className="text-3xl font-black">10+</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest">Years of<br/>Excellence</p>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN: TEXT CONTENT */}
+      <div>
+        <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[#C5A059]">About Us</span>
+        
+        {/* Heading text-stone-900 वरून text-white केला */}
+        <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white mt-3 mb-6">
+          We Are The Art Of <span className="text-[#C5A059] italic font-serif">Grooming</span>
+        </h2>
+        
+        {/* Paragraphs चा कलर लाईट (text-stone-300 / text-stone-400) केला */}
+        <p className="leading-relaxed mb-4 font-serif italic text-stone-300 text-lg">
+          BarberPro is Pune's premier grooming destination, where tradition meets modern luxury. We combine precision barbering with cutting-edge technology to deliver an unmatched experience.
+        </p>
+        <p className="leading-relaxed mb-8 text-stone-400">
+          Our platform connects customers with the best barbers in the city, offering seamless booking, real-time queue management, and premium grooming services — all in one place.
+        </p>
+        
+        {/* Checklist */}
+        <div className="space-y-3 mb-8">
+          {[
+            "Real-time queue tracking — know your exact wait time",
+            "Certified master barbers with 3-10 years experience",
+            "Premium products — Wella, Schwarzkopf, L'Oreal",
+            "Hygienic tools — sterilized after every use",
+            "Easy online booking with token payment system",
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-[#C5A059] flex-shrink-0" />
+              {/* text-stone-700 वरून text-stone-300 केला */}
+              <span className="text-sm text-stone-300">{item}</span>
+            </div>
+          ))}
+        </div>
+        
+        {/* Buttons */}
+        <div className="flex flex-wrap gap-4">
+          {/* Primary Button: बॅकग्राउंड आता पांढरा (White) केला जेणेकरून डार्कवर उठून दिसेल */}
+          <button onClick={() => navigate("/salon-detail")}
+            className="flex items-center gap-2 bg-white text-[#3E362E] px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#C5A059] hover:text-white transition hover:scale-105 cursor-pointer shadow-md">
+            Read More <ArrowRight className="w-4 h-4" />
+          </button>
+          
+          {/* Outline Button: बॉर्डरचा कलर पांढरा/२०% ओपॅसिटी केला */}
+          <button onClick={() => navigate("/customer/services")}
+            className="flex items-center gap-2 border-2 border-white/20 text-white px-8 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition cursor-pointer">
+            Book Now <CalendarDays className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
 
       {/* ══ SERVICES ══ */}
       <section id="services" className="bg-[#F9F5EF] py-20 md:py-28">
@@ -426,49 +525,65 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ HOW IT WORKS ══ */}
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-        <div className="text-center mb-14">
-          <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Simple Process</span>
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-stone-900 mt-3">How It Works</h2>
-          <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
-        </div>
+      {/* ══ HOW IT WORKS SECTION (Updated to Match Reviews Dark Theme) ══ */}
+<section className="w-full bg-[#3E362E] py-20 md:py-28 select-none">
+  <div className="mx-auto max-w-7xl px-6">
+    
+    {/* --- HEADER SECTION --- */}
+    <div className="text-center mb-14">
+      <span className="text-[12px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Simple Process</span>
+      {/* text-stone-900 वरून text-white केला */}
+      <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white mt-3">How It Works</h2>
+      <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
+    </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {HOW_IT_WORKS.map((s, i) => (
-            <div key={s.step} onClick={() => navigate(s.path)}
-              className="group cursor-pointer relative">
-              {i < HOW_IT_WORKS.length - 1 && (
-                <div className="hidden md:block absolute top-10 left-[calc(50%+3rem)] w-[calc(100%-3rem)] h-[2px] bg-gradient-to-r from-[#C5A059] to-[#EAD8C0]" />
-              )}
+    {/* --- PROCESS STEPS GRID --- */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+      {HOW_IT_WORKS.map((s, i) => (
+        <div key={s.step} onClick={() => navigate(s.path)}
+          className="group cursor-pointer relative">
+          
+          {/* Connecting Line between steps - gradient बदलून डार्क थीमसाठी मॅच केला */}
+          {i < HOW_IT_WORKS.length - 1 && (
+            <div className="hidden md:block absolute top-10 left-[calc(50%+3rem)] w-[calc(100%-3rem)] h-[2px] bg-gradient-to-r from-[#C5A059] to-white/10" />
+          )}
 
-              <div className="text-center relative z-10">
-                <div className="w-20 h-20 rounded-2xl mx-auto mb-5 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-xl border-2"
-                  style={{ background:s.bg, borderColor:s.color, color:s.color }}>
-                  {s.icon}
-                </div>
-
-                <div className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border"
-                  style={{ background:s.bg, color:s.color, borderColor:s.color }}>
-                  Step {s.step}
-                </div>
-
-                <h3 className="font-black text-stone-900 text-sm mb-2 uppercase tracking-wide group-hover:text-[#C5A059] transition">
-                  {s.title}
-                </h3>
-                <p className="text-[11px] text-stone-500 leading-relaxed ">{s.desc}</p>
-              </div>
+          <div className="text-center relative z-10">
+            {/* Icon Container */}
+            <div className="w-20 h-20 rounded-2xl mx-auto mb-5 flex items-center justify-center transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] border-2"
+              style={{ background: s.bg, borderColor: s.color, color: s.color }}>
+              {s.icon}
             </div>
-          ))}
-        </div>
 
-        <div className="text-center mt-12">
-          <button onClick={() => navigate("/login")}
-            className="inline-flex items-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105 cursor-pointer">
-            Get Started Now <ArrowRight className="w-4 h-4" />
-          </button>
+            {/* Step Pill */}
+            <div className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border"
+              style={{ background: s.bg, color: s.color, borderColor: s.color }}>
+              Step {s.step}
+            </div>
+
+            {/* Title - text-stone-900 वरून text-white केला */}
+            <h3 className="font-black text-white text-sm mb-2 uppercase tracking-wide group-hover:text-[#C5A059] transition">
+              {s.title}
+            </h3>
+            
+            {/* Description - text-stone-500 वरून text-stone-300 केला */}
+            <p className="text-[11px] text-stone-300 leading-relaxed max-w-[90%] mx-auto">{s.desc}</p>
+          </div>
         </div>
-      </section>
+      ))}
+    </div>
+
+    {/* --- BOTTOM CTA BUTTON --- */}
+    <div className="text-center mt-12">
+      {/* Primary Gold Button */}
+      <button onClick={() => navigate("/login")}
+        className="inline-flex items-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105 cursor-pointer shadow-md">
+        Get Started Now <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
+
+  </div>
+</section>
 
       {/* ══ NEARBY SALONS ══ */}
       {salons.length > 0 && (
@@ -480,7 +595,7 @@ export default function HomePage() {
               <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
             </div>
             <div className="grid gap-6 md:grid-cols-3">
-              {salons.map(s => (
+              {salons.map((s) => (
                 <div key={s._id} onClick={() => navigate(`/salon/${s._id}`)}
                   className="bg-white rounded-2xl p-6 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
                   <div className="flex items-start justify-between mb-4">
@@ -519,92 +634,512 @@ export default function HomePage() {
 
       <MembershipSection />
 
-      {/* ══ TESTIMONIALS ══ */}
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-28 bg-[#cfc6b9]">
-        <div className="text-center mb-14">
-          <span className="text-[14px] font-black uppercase tracking-[0.3em] text-[#C5A059]">What They Say</span>
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#FFFFFF] mt-3">Customer Reviews</h2>
-          <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
-        </div>
+{/* ════════════════════════════════════════
+      LUXURY TESTIMONIALS SECTION
+════════════════════════════════════════ */}
+<section className="relative w-full overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] py-20 sm:py-24 px-4 flex flex-col items-center justify-center">
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {(reviews.length > 0 ? reviews.slice(0, 3) : TESTIMONIALS).map((item) => {
-            const isReal = !!item._id;
-            const name   = isReal ? (item.customer_id?.name || "Anonymous") : item.name;
-            const text   = isReal ? (item.review_text || "(No written feedback)") : item.text;
-            const rating = isReal ? Math.max(item.salon_rating || 0, item.barber_rating || 0) : (item.rating || 5);
-            const role   = isReal
-              ? new Date(item.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" })
-              : item.role;
-            const avatar = isReal ? (name[0] || "?").toUpperCase() : item.avatar;
+  {/* GLOW BACKGROUND EFFECTS */}
+  <div className="absolute top-[-100px] left-[-100px] w-[320px] h-[320px] bg-[#C5A059]/20 blur-[120px] rounded-full animate-pulse" />
 
-            return (
-              <div key={item._id || item.name}
-                onClick={() => isReal && setSelectedReview(item)}
-                className={`bg-white rounded-2xl p-8 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all ${isReal ? "cursor-pointer" : ""}`}>
-                <div className="flex gap-1 mb-4">
-                  {[...Array(rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#C5A059] text-[#C5A059]" />)}
-                </div>
-                <p className="text-sm text-stone-600 italic font-serif leading-relaxed mb-6 line-clamp-3">"{text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#E8A840] flex items-center justify-center text-white font-black text-sm">{avatar}</div>
-                  <div>
-                    <p className="font-black text-[#3E362E] text-sm">{name}</p>
-                    <p className="text-[10px] text-[#8D7B68] uppercase tracking-widest">{role}</p>
-                  </div>
+  <div className="absolute bottom-[-100px] right-[-100px] w-[320px] h-[320px] bg-white/10 blur-[120px] rounded-full animate-pulse" />
+
+  {/* NOISE OVERLAY */}
+  <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]" />
+
+  {/* HEADING */}
+  <div className="relative z-20 text-center mb-14 px-4">
+
+    <span className="text-[12px] sm:text-[14px] font-black uppercase tracking-[0.35em] text-[#C5A059]">
+      WHAT THEY SAY
+    </span>
+    
+
+    <h2 className="
+      mt-4
+      text-3xl
+      sm:text-5xl
+      lg:text-6xl
+      font-black
+      uppercase
+      tracking-tight
+      bg-gradient-to-r
+      from-[#C5A059]
+      via-[#FFE6A7]
+      to-[#C5A059]
+      bg-clip-text
+      text-transparent
+      leading-tight
+    ">
+      Customer Reviews
+    </h2>
+
+    <div className="w-20 h-[3px] bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] mx-auto mt-5 rounded-full shadow-[0_0_20px_rgba(197,160,89,0.7)]" />
+
+  </div>
+  </section>
+
+  {/* SLIDER CONTAINER */}
+  <div className="relative w-full max-w-[1450px] px-2 sm:px-8">
+
+    {/* LEFT BUTTON */}
+    <button
+      onClick={handlePrev}
+      className="
+        absolute
+        left-0
+        sm:left-2
+        top-1/2
+        -translate-y-1/2
+        z-40
+
+        w-11 h-11 sm:w-14 sm:h-14
+
+        rounded-full
+
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/20
+
+        text-white
+
+        flex items-center justify-center
+
+        hover:bg-[#C5A059]
+        hover:scale-110
+
+        transition-all duration-300
+
+        shadow-[0_0_25px_rgba(255,255,255,0.08)]
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2.5}
+        stroke="currentColor"
+        className="w-5 h-5"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15.75 19.5L8.25 12l7.5-7.5"
+        />
+      </svg>
+    </button>
+
+    {/* SLIDER */}
+    <div className="overflow-hidden py-6">
+
+      <div
+        className="flex gap-5 lg:gap-7 transition-transform duration-700 ease-out"
+        style={{
+          transform: `translateX(-${currentIdx * 100}%)`,
+        }}
+      >
+
+        {displayReviews.map((item, idx) => {
+
+          const isReal = !!item._id;
+
+          const name =
+            isReal
+              ? (item.customer_id?.name || "Anonymous")
+              : item.name;
+
+          const text =
+            isReal
+              ? (item.review_text || "(No written feedback)")
+              : item.review_text || item.text;
+
+          const avatar = item.avatar;
+
+          return (
+            <div
+              key={item._id || `${name}-${idx}`}
+
+              onClick={() =>
+                isReal &&
+                setSelectedReview &&
+                setSelectedReview(item)
+              }
+
+              className="
+                relative
+
+                min-w-full
+                sm:min-w-[48%]
+                lg:min-w-[31%]
+                xl:min-w-[23.5%]
+
+                max-w-[350px]
+                min-h-[460px]
+
+                rounded-[32px]
+
+                bg-white/10
+                backdrop-blur-2xl
+
+                border border-white/10
+
+                shadow-[0_0_40px_rgba(0,0,0,0.25)]
+
+                overflow-hidden
+
+                p-6 sm:p-7
+
+                flex flex-col
+                items-center
+                justify-between
+                text-center
+
+                transition-all
+                duration-500
+
+                hover:-translate-y-3
+                hover:scale-[1.02]
+
+                hover:border-[#C5A059]/40
+
+                hover:shadow-[0_0_45px_rgba(197,160,89,0.35)]
+
+                group
+                shrink-0
+              "
+            >
+
+              {/* SHINY HOVER EFFECT */}
+              <div className="
+                absolute
+                top-0
+                left-[-120%]
+                w-full
+                h-full
+                bg-gradient-to-r
+                from-transparent
+                via-white/10
+                to-transparent
+
+                group-hover:left-[120%]
+
+                transition-all
+                duration-1000
+                rotate-12
+              " />
+
+              {/* AVATAR */}
+              <div className="relative z-10 mt-2">
+
+                <div className="
+                  w-24 h-24
+                  rounded-full
+                  overflow-hidden
+
+                  border-2 border-[#C5A059]
+
+                  p-1
+
+                  bg-white/10
+
+                  shadow-[0_0_25px_rgba(197,160,89,0.5)]
+
+                  animate-[float_4s_ease-in-out_infinite]
+                ">
+
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt={name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="
+                      w-full h-full rounded-full
+
+                      bg-gradient-to-br
+                      from-[#C5A059]
+                      via-[#E8C878]
+                      to-[#C5A059]
+
+                      flex items-center justify-center
+
+                      text-white
+                      text-2xl
+                      font-black
+                    ">
+                      {(name[0] || "?").toUpperCase()}
+                    </div>
+                  )}
+
                 </div>
               </div>
-            );
-          })}
-        </div>
 
-        <div className="text-center mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-          <button onClick={() => navigate("/reviews")}
-            className="inline-flex items-center gap-2 bg-[#C5A059] text-white px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#E8A840] transition hover:scale-105 cursor-pointer">
-            See All Reviews{reviews.length > 0 && ` (${reviews.length})`} <ArrowRight className="w-4 h-4" />
-          </button>
-          <button onClick={() => navigate("/write-review")}
-            className="inline-flex items-center gap-2 border-2 border-[#EADDCA] text-[#FFFFFF] px-8 py-3 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition cursor-pointer">
-            <Heart className="w-4 h-4" /> Write a Review
-          </button>
-        </div>
-      </section>
+              {/* QUOTE */}
+              <div className="
+                relative z-10
 
-      {/* ══ CTA ══ */}
-      <section className="bg-[#F9F5EF] py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4 text-stone-800">
-            Ready for Your <span className="text-[#C5A059] italic font-serif">Transformation?</span>
-          </h2>
-          <p className="text-stone-600 mb-8 font-serif italic text-lg">
-            Book your appointment today and experience the BarberPro difference.
-          </p>
+                text-[40px]
+                font-serif
+                text-[#FFE6A7]
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={() => navigate("/customer/services")}
-              className="flex items-center justify-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#b38f4d] transition-all hover:scale-105 shadow-lg cursor-pointer"
-            >
-              <CalendarDays className="w-5 h-5" /> Book Now
-            </button>
+                mt-4
 
-            <button 
-              onClick={() => navigate("/nearby")}
-              className="flex items-center justify-center gap-3 border-2 border-stone-300 text-stone-700 px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition-all cursor-pointer"
-            >
-              <MapPin className="w-5 h-5" /> Find Salon
-            </button>
+                drop-shadow-[0_0_15px_rgba(255,230,167,0.8)]
+              ">
+                “
+              </div>
 
-            <button 
-              onClick={() => navigate("/login")}
-              className="flex items-center justify-center gap-3 border-2 border-stone-300 text-stone-700 px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition-all cursor-pointer"
-            >
-              <User className="w-5 h-5" /> Login
-            </button>
-          </div>
-        </div>
-      </section>
+              {/* REVIEW */}
+              <p className="
+                relative z-10
 
+                text-stone-200
+
+                italic
+                font-serif
+
+                text-[14px]
+                leading-relaxed
+
+                flex-grow
+
+                flex items-center justify-center
+
+                mt-4
+
+                line-clamp-5
+              ">
+                {text}
+              </p>
+
+              {/* NAME */}
+              <h3 className="
+                relative z-10
+
+                mt-5
+
+                text-[17px]
+                font-semibold
+                tracking-wide
+
+                text-[#FFE6A7]
+              ">
+                — {name}
+              </h3>
+
+              {/* BUTTON */}
+              <div className="relative z-10 w-full mt-6">
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+
+                    navigate &&
+                      navigate("/customer/services");
+                  }}
+
+                  className="
+                    relative
+                    overflow-hidden
+
+                    w-full
+
+                    py-3.5
+                    px-4
+
+                    rounded-full
+
+                    bg-gradient-to-r
+                    from-[#C5A059]
+                    via-[#E8C878]
+                    to-[#C5A059]
+
+                    text-[#2A241F]
+
+                    font-black
+                    uppercase
+                    tracking-[0.2em]
+                    text-[10px]
+
+                    shadow-[0_0_25px_rgba(197,160,89,0.45)]
+
+                    hover:scale-105
+
+                    transition-all
+                    duration-300
+                  "
+                >
+
+                  <span className="relative z-10">
+                    Book This Experience
+                  </span>
+
+                </button>
+
+              </div>
+
+            </div>
+          );
+        })}
+
+      </div>
+    </div>
+
+    {/* RIGHT BUTTON */}
+    <button
+      onClick={handleNext}
+      className="
+        absolute
+        right-0
+        sm:right-2
+        top-1/2
+        -translate-y-1/2
+        z-40
+
+        w-11 h-11 sm:w-14 sm:h-14
+
+        rounded-full
+
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/20
+
+        text-white
+
+        flex items-center justify-center
+
+        hover:bg-[#C5A059]
+        hover:scale-110
+
+        transition-all duration-300
+
+        shadow-[0_0_25px_rgba(255,255,255,0.08)]
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={2.5}
+        stroke="currentColor"
+        className="w-5 h-5"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M8.25 4.5l7.5 7.5-7.5 7.5"
+        />
+      </svg>
+    </button>
+
+  </div>
+
+  {/* BOTTOM BUTTONS */}
+  <div className="relative z-20 mt-14 flex flex-col sm:flex-row gap-4">
+
+    <button
+      onClick={() =>
+        navigate && navigate("/reviews")
+      }
+
+      className="
+        px-8 py-4
+
+        rounded-2xl
+
+        bg-gradient-to-r
+        from-[#C5A059]
+        via-[#E8C878]
+        to-[#C5A059]
+
+        text-[#2A241F]
+
+        font-black
+        uppercase
+        tracking-[0.2em]
+        text-[11px]
+
+        shadow-[0_0_30px_rgba(197,160,89,0.45)]
+
+        hover:scale-105
+
+        transition-all duration-300
+      "
+    >
+      See All Reviews
+      {reviews &&
+        reviews.length > 0 &&
+        ` (${reviews.length})`}
+    </button>
+
+    <button
+      onClick={() =>
+        navigate && navigate("/write-review")
+      }
+
+      className="
+        px-8 py-4
+
+        rounded-2xl
+
+        border border-[#C5A059]/40
+
+        bg-white/5
+        backdrop-blur-xl
+
+        text-[#FFE6A7]
+
+        font-black
+        uppercase
+        tracking-[0.2em]
+        text-[11px]
+
+        hover:bg-[#C5A059]/10
+        hover:border-[#FFE6A7]
+
+        transition-all duration-300
+      "
+    >
+      Write a Review
+    </button>
+
+  </div>
+
+
+
+
+{/* ══ CTA SECTION (Updated to Premium Light Theme matching your Screenshot) ══ */}
+<section className="relative w-full bg-[#FAF7F0] py-24 px-6 border-t border-[#3E362E]/10">
+  <div className="max-w-4xl mx-auto text-center">
+    <h2 className="text-3xl md:text-5xl font-black uppercase text-[#3E362E] tracking-tight mb-4">
+      Ready for Your <span className="text-[#C5A059] italic font-serif">Transformation?</span>
+    </h2>
+    <p className="text-stone-600 mb-10 font-serif italic text-lg">
+      Book your appointment today and experience the BarberPro difference.
+    </p>
+    
+    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      {/* Primary Gold Button */}
+      <button onClick={() => navigate("/customer/services")}
+        className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#C5A059] text-white px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:bg-[#3E362E] transition duration-300 hover:scale-105 shadow-md">
+        <CalendarDays className="w-5 h-5" /> Book Now
+      </button>
+      
+      {/* Outline Dark Button 1 */}
+      <button onClick={() => navigate("/nearby")}
+        className="w-full sm:w-auto flex items-center justify-center gap-3 border-2 border-[#3E362E]/20 text-[#3E362E] px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition duration-300">
+        <MapPin className="w-5 h-5" /> Find Salon
+      </button>
+      
+      {/* Outline Dark Button 2 */}
+      <button onClick={() => navigate("/login")}
+        className="w-full sm:w-auto flex items-center justify-center gap-3 border-2 border-[#3E362E]/20 text-[#3E362E] px-10 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest hover:border-[#C5A059] hover:text-[#C5A059] transition duration-300">
+        <User className="w-5 h-5" /> Login
+      </button>
+    </div>
+  </div>
+</section>
      
       <Footer />
 

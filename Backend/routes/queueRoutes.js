@@ -1,5 +1,23 @@
 const express=require("express");const router=express.Router();const Queue=require("../models/Queue");const{protect}=require("../middleware/authMiddleware");
-router.get("/:salon_id",protect,async(req,res)=>{try{const queue=await Queue.find({salon_id:req.params.salon_id,status:{$in:["waiting","in-progress","paused"]}}).populate("customer_id","name mobile").populate("barber_id","name status").populate("booking_id","booking_type services total_amount").sort({position:1});res.json({success:true,queue});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.get("/position/:booking_id",protect,async(req,res)=>{try{const entry=await Queue.findOne({booking_id:req.params.booking_id});if(!entry)return res.status(404).json({success:false,message:"Not in queue"});res.json({success:true,position:entry.position,estimated_wait:entry.estimated_wait,status:entry.status});}catch(err){res.status(500).json({success:false,message:err.message});}});
+router.get("/:salon_id", protect, async (req, res, next) => {
+  try {
+    const mongoose = require("mongoose");
+    const { salon_id } = req.params;
+
+    // ✅ Defensive check: If the passed ID isn't a valid ObjectId format, safely exit instead of crashing
+    if (!mongoose.Types.ObjectId.isValid(salon_id)) {
+      return res.status(200).json({ success: true, queue: [] });
+    }
+
+    const queue = await Queue.find({ 
+      salon_id: salon_id, 
+      status: { $in: ["waiting", "in-progress", "paused"] } 
+    }).populate("customer_id");
+
+    res.status(200).json({ success: true, queue });
+  } catch (error) {
+    next(error); // Passes execution down safely to server error boundary middleware
+  }
+});
 router.put("/:queue_id/status",protect,async(req,res)=>{try{const entry=await Queue.findByIdAndUpdate(req.params.queue_id,{status:req.body.status},{new:true});res.json({success:true,entry});}catch(err){res.status(500).json({success:false,message:err.message});}});
 module.exports=router;

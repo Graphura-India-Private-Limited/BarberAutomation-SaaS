@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Scissors } from "lucide-react";
 
+
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const emptyForm = {
@@ -151,12 +152,14 @@ export default function OwnerDashboard() {
   if (loading) {
     return (
       <>
+     
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
           .font-sans-loading {
             font-family: 'Plus Jakarta Sans', sans-serif !important;
           }
         `}</style>
+      
         <div style={{ background: "#FAF6F0" }} className="min-h-screen flex items-center justify-center font-sans-loading">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
@@ -170,6 +173,7 @@ export default function OwnerDashboard() {
   }
 
   return (
+    
     <div className="min-h-screen p-4 font-sans text-zinc-800 md:p-10" style={{ background: "var(--bg)" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
@@ -206,7 +210,7 @@ export default function OwnerDashboard() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight md:text-5xl font-serif tracking-normal text-zinc-900">
+            <h1 className="text-3xl font-bold md:text-5xl font-serif tracking-normal text-zinc-900">
               Owner <span className="text-amber-600">Console</span>
             </h1>
             <div className="mt-2 flex items-center gap-2">
