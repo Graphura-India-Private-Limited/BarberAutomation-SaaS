@@ -36,7 +36,7 @@ export default function OwnerLogin() {
     if (!password)             { setError("Enter password"); return; }
     setLoading(true); setError(""); setSuccess("");
     try {
-      const res  = await fetch(`${API}/auth/owner/login`, {
+     const res  = await fetch(`${API}/auth/owner/login`, { // 👈 Keep /auth here
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile, password }),
