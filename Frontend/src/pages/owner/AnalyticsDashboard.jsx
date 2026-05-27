@@ -254,28 +254,32 @@ const AnalyticsDashboard = () => {
                     <p className="text-[11px] text-stone-400 font-medium mt-1">Daily customer traffic and wait times</p>
                   </div>
                   
-                  <div className="relative h-60 w-full px-2 mb-4">
-                    <div className="absolute inset-0 flex flex-col justify-between">
+                  {/* FIXED CONTAINER LAYOUT: Placed accurate absolute left paddings to maintain design harmony */}
+                  <div className="relative h-60 w-full pl-8 pr-2 mb-6">
+                    <div className="absolute inset-0 pl-8 pr-2 flex flex-col justify-between">
                       {[0, 1, 2, 3, 4].map((i) => (
                         <div key={i} className="w-full h-px relative flex items-center border-dashed border-t border-stone-200/60">
-                          <span className="absolute -left-7 text-[9px] font-bold font-mono text-stone-400">{(4-i) * 25}</span>
+                          <span className="absolute -left-8 text-[9px] font-bold font-mono text-stone-400">{(4-i) * 25}</span>
                         </div>
                       ))}
                     </div>
                     
-                    <div className="absolute bottom-0 inset-x-0 translate-y-6 flex justify-between text-[10px] font-bold font-mono text-stone-400 px-1">
+                    {/* Adjusted position grid framework to avoid text overflow */}
+                    <div className="absolute bottom-0 left-8 right-2 translate-y-5 flex justify-between text-[10px] font-bold font-mono text-stone-400">
                       <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                     </div>
 
-                    <div className="absolute inset-0 pb-px pt-2">
+                    {/* Adjusted SVG view boundary points mapping layout scale safely */}
+                    <div className="absolute inset-0 left-8 pr-2 pb-px pt-2">
                       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+                        {/* Normalized Y coordinates from (70, 60, 75, 50, 20) into centralized viewport matrix */}
                         <path 
-                          d="M0,70 Q15,60 30,75 T60,50 T100,20 L100,100 L0,100 Z" 
+                          d="M0,75 Q16.6,60 33.3,70 T66.6,45 T100,25 L100,100 L0,100 Z" 
                           fill="url(#orange-gradient)" 
                           className="opacity-15"
                         />
                         <path 
-                          d="M0,70 Q15,60 30,75 T60,50 T100,20" 
+                          d="M0,75 Q16.6,60 33.3,70 T66.6,45 T100,25" 
                           fill="none" 
                           stroke={GOLD} 
                           strokeWidth="2.5"
