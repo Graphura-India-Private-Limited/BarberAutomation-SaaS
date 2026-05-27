@@ -1,6 +1,11 @@
-const express=require("express");const router=express.Router();const Reminder=require("../models/Reminder");const{protect}=require("../middleware/authMiddleware");
-router.get("/",protect,async(req,res)=>{try{const reminders=await Reminder.find({customer_id:req.user.id,is_active:true}).sort({created_at:-1});res.json({success:true,reminders});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.post("/",protect,async(req,res)=>{try{const{title,interval_days,last_haircut_date,notify_before_days}=req.body;const next=new Date(last_haircut_date);next.setDate(next.getDate()+Number(interval_days)-Number(notify_before_days||2));const reminder=await Reminder.create({customer_id:req.user.id,title,interval_days,last_haircut_date,notify_before_days:notify_before_days||2,next_reminder_date:next});res.status(201).json({success:true,reminder});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.put("/:id",protect,async(req,res)=>{try{const{title,interval_days,last_haircut_date,notify_before_days}=req.body;const next=new Date(last_haircut_date);next.setDate(next.getDate()+Number(interval_days)-Number(notify_before_days||2));const reminder=await Reminder.findByIdAndUpdate(req.params.id,{title,interval_days,last_haircut_date,notify_before_days,next_reminder_date:next},{new:true});res.json({success:true,reminder});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.delete("/:id",protect,async(req,res)=>{try{await Reminder.findByIdAndUpdate(req.params.id,{is_active:false});res.json({success:true,message:"Deleted"});}catch(err){res.status(500).json({success:false,message:err.message});}});
-module.exports=router;
+const express = require("express");
+const router = express.Router();
+const reminderController = require("../controllers/reminderController");
+const { protect } = require("../middleware/authMiddleware");
+
+router.get("/", protect, reminderController.getMyReminders);
+router.post("/", protect, reminderController.createReminder);
+router.put("/:id", protect, reminderController.updateReminder);
+router.delete("/:id", protect, reminderController.deleteReminder);
+
+module.exports = router;
