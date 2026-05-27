@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import heroImg from "../../assets/shop.jpg";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom' // ✅ Imported the Router navigate hook
+import heroImg from '../../assets/blog27.png'
 
 const REGISTERED = ['9550105897', '9735897907']
 
 export default function Register({ onBack }) {
+  const navigate = useNavigate() // Initialize the router navigator pipeline
   const [name, setName]   = useState('')
   const [phone, setPhone] = useState('')
   const [error, setError] = useState('')
@@ -28,6 +30,15 @@ export default function Register({ onBack }) {
     }
     setError('')
     setDone(true)
+  }
+
+  // ✅ Created a unified click handler fallback to resolve navigation errors
+  const handleBackToLogin = () => {
+    if (typeof onBack === 'function') {
+      onBack() // Fallback to prop toggle handler if parent conditional exists
+    } else {
+      navigate('/login') // Direct link route swap path fallback
+    }
   }
 
   return (
@@ -142,7 +153,7 @@ export default function Register({ onBack }) {
           {/* Error */}
           {error && (
             <div className="mb-4 text-xs rounded-lg px-3 py-2.5 flex items-start gap-2 bg-[#fdf5f0] border border-[#e8b49a] text-[#7a3018]">
-              <span className="flex-shrink-0">⚠️</span>
+              <span className="flex-shrink-0">⚠</span>
               <span>{error}</span>
             </div>
           )}
@@ -165,7 +176,8 @@ export default function Register({ onBack }) {
 
           {/* Back to Login */}
           <button
-            onClick={onBack}
+            type="button"
+            onClick={handleBackToLogin} // ✅ Triggers our dual-safe backup router function
             className="w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest bg-white hover:bg-[#f0ece3] text-[#2b2118] border border-[#e0d8cc] transition-colors"
           >
             Back to Login
