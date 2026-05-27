@@ -245,7 +245,7 @@ function PrivacyPolicy() {
                   return (
                     <div
                       key={item.id}
-                      className="animate-in fade-in zoom-in-95 duration-300 flex flex-col justify-between bg-white/90 backdrop-blur-xl border border-[#C5A059]/30 rounded-[32px] p-6 sm:p-8 shadow-[0_12px_30px_rgba(197,160,89,0.05)] hover:border-[#C5A059]/60 transition-all duration-300"
+                      className="animate-in fade-in zoom-in-95 flex flex-col justify-between bg-white/90 backdrop-blur-xl border border-[#C5A059]/30 rounded-[32px] p-6 sm:p-8 shadow-[0_12px_30px_rgba(197,160,89,0.05)] hover:border-[#C5A059]/60 transition-all duration-300"
                     >
                       <div>
                         {/* Header structure inside card */}
