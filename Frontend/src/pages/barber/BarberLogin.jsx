@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Scissors, Calendar, Clock, Star, Users,
-  ChevronDown, Eye, EyeOff, Lock, ArrowRight, Shield, UserCircle,
+  ChevronDown, Eye, EyeOff, Lock, ArrowRight, Shield,
 } from "lucide-react";
 import barberImage from "../../assets/login.jpg";
 
@@ -14,10 +14,10 @@ const BROWN       = "#8B6B3E";
 const BROWN_HOVER = "#735A32";
 
 const FEATURES = [
-  { icon: Calendar, title: "MY SCHEDULE",    sub: "Daily appointments" },
-  { icon: Users,    title: "MY CLIENTS",     sub: "Client history" },
-  { icon: Clock,    title: "QUEUE STATUS",   sub: "Live updates" },
-  { icon: Star,     title: "PERFORMANCE",    sub: "Track your stats" },
+  { icon: Calendar, title: "MY SCHEDULE",  sub: "Daily appointments" },
+  { icon: Users,    title: "MY CLIENTS",   sub: "Client history" },
+  { icon: Clock,    title: "QUEUE STATUS", sub: "Live updates" },
+  { icon: Star,     title: "PERFORMANCE",  sub: "Track your stats" },
 ];
 
 export default function BarberLogin() {
@@ -111,78 +111,6 @@ export default function BarberLogin() {
               </div>
             ))}
           </div>
-
-          {/* Demo Box */}
-          <div className="bg-[#FAF6F0] border border-stone-200/60 rounded-xl p-4 mb-6">
-            <p className="text-[10px] font-black text-[#A37B58] uppercase tracking-widest mb-2.5">Demo Credentials</p>
-            <div className="flex justify-between items-center gap-4">
-              <div className="space-y-0.5">
-                <p className="text-xs text-stone-600 font-semibold">Mobile: <span className="font-extrabold text-stone-900">{DEMO.mobile}</span></p>
-                <p className="text-xs text-stone-600 font-semibold">Password: <span className="font-extrabold text-stone-900">{DEMO.password}</span></p>
-              </div>
-              <button 
-                type="button"
-                onClick={fillDemo}
-                className="text-[10px] font-black text-white bg-[#A37B58] hover:bg-[#8F6947] px-4 py-2.5 rounded-lg uppercase tracking-wider transition shadow-3xs cursor-pointer"
-              >
-                Use Demo
-              </button>
-            </div>
-          </div>
-
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block mb-2 text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Mobile Number</label>
-              <div className="relative">
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[#A37B58] font-black text-sm">+91</span>
-                <input 
-                  type="tel" 
-                  maxLength="10" 
-                  required 
-                  placeholder="Registered mobile link"
-                  value={mobile} 
-                  onChange={e => { setMobile(e.target.value.replace(/\D/g,"")); setError(""); }}
-                  className={`${inp} pl-16`}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block mb-2 text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Password ID</label>
-              <input 
-                type="password" 
-                required 
-                placeholder="Enter secure staff key token"
-                value={password} 
-                onChange={e => { setPassword(e.target.value); setError(""); }}
-                className={inp}
-              />
-            </div>
-
-            {error   && <p className="text-red-600 text-xs font-semibold text-center bg-red-50 border border-red-100 py-2.5 rounded-xl">{error}</p>}
-            {success && <p className="text-emerald-700 text-xs font-semibold text-center bg-emerald-50 border border-emerald-100 py-2.5 rounded-xl">{success}</p>}
-
-            <button 
-              type="submit" 
-              disabled={loading || mobile.length !== 10 || !password} 
-              className={btn}
-            >
-              {loading ? "Verifying..." : "Login to Dashboard"}
-            </button>
-          </form>
-
-          {/* Sub-portal Navigation Links */}
-          <div className="mt-8 pt-4 border-t border-stone-200/40 text-center">
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[9px] font-black text-stone-400 uppercase tracking-widest">
-              <Link to="/login" className="hover:text-[#A37B58] transition-colors">Customer Login</Link>
-              <span className="text-stone-200">·</span>
-              <Link to="/owner/login" className="hover:text-[#A37B58] transition-colors">Owner Login</Link>
-              <span className="text-stone-200">·</span>
-              <Link to="/admin/login" className="hover:text-[#A37B58] transition-colors">Admin Login</Link>
-            </div>
-          </div>
-
         </div>
 
         {/* ── RIGHT: Form card ── */}
@@ -315,13 +243,12 @@ export default function BarberLogin() {
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
-            {/* Register */}
+            {/* Login with Google */}
             <Link
               to="/login"
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
               style={{ borderColor: "#E5E7EB" }}
             >
-              {/* Google icon */}
               <svg width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -351,7 +278,6 @@ export default function BarberLogin() {
         </div>
 
       </div>
-
     </div>
   );
 }

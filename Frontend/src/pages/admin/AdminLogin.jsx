@@ -1,193 +1,252 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import {
+  Shield, ShieldCheck, Users, Clock, ShieldAlert,
+  ChevronDown, Eye, EyeOff, Lock, ArrowRight,
+} from "lucide-react";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-const DEMO = { mobile:"9000000000", password:"Admin@123", mpin:"123456" };
+const API  = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const DEMO = { mobile: "9000000000", password: "Admin@123" };
 
-const ScissorIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
-    <line x1="20" y1="4" x2="8.12" y2="15.88"/>
-    <line x1="14.47" y1="14.48" x2="20" y2="20"/>
-    <line x1="8.12" y1="8.12" x2="12" y2="12"/>
-  </svg>
-);
+const GOLD        = "#C5A059";
+const BROWN       = "#8B6B3E";
+const BROWN_HOVER = "#735A32";
+
+const FEATURES = [
+  { icon: ShieldCheck, title: "SECURITY",  sub: "Protected access" },
+  { icon: Users,       title: "USERS",     sub: "Manage accounts" },
+  { icon: Clock,       title: "REQUESTS",  sub: "Review quickly" },
+  { icon: ShieldAlert, title: "AUDIT",     sub: "Track activity" },
+];
 
 export default function AdminLogin() {
-  const navigate   = useNavigate();
-  const [step,     setStep]    = useState("login");
+  const navigate = useNavigate();
   const [mobile,   setMobile]  = useState("");
   const [password, setPassword]= useState("");
-  const [mpin,     setMpin]    = useState(["","","","","",""]);
+  const [showPwd,  setShowPwd] = useState(false);
   const [loading,  setLoading] = useState(false);
   const [error,    setError]   = useState("");
   const [success,  setSuccess] = useState("");
-  const [token,    setToken]   = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (mobile.length !== 10) { setError("Enter valid 10-digit mobile"); return; }
-    if (!password) { setError("Enter password"); return; }
+    if (!password)             { setError("Enter password"); return; }
     setLoading(true); setError(""); setSuccess("");
     try {
       const res  = await fetch(`${API}/auth/admin/login/mobile`, {
-        method:"POST", headers:{"Content-Type":"application/json"},
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile, password }),
       });
       const data = await res.json();
       if (data.success) {
-        setToken(data.token);
         localStorage.setItem("token", data.token);
         localStorage.setItem("role",  "admin");
-        setSuccess("Password verified! Enter MPIN...");
-        setTimeout(() => { setStep("mpin"); setSuccess(""); }, 1000);
-      } else setError(data.message || "Login failed");
-    } catch { setError("Server error! Make sure backend is running."); }
-    finally { setLoading(false); }
-  };
-
-  const handleMpin = async () => {
-    const mpinStr = mpin.join("");
-    if (mpinStr.length !== 6) { setError("Enter complete 6-digit MPIN"); return; }
-    setLoading(true); setError(""); setSuccess("");
-    try {
-      const res  = await fetch(`${API}/auth/admin/verify-mpin`, {
-        method:"POST", headers:{"Content-Type":"application/json", Authorization:`Bearer ${token}`},
-        body: JSON.stringify({ mpin: mpinStr }),
-      });
-      const data = await res.json();
-      if (data.success) {
         setSuccess("Access granted! Redirecting...");
         setTimeout(() => navigate("/admin/requests"), 1000);
-      } else setError(data.message || "Wrong MPIN");
-    } catch { setError("Server error!"); }
-    finally { setLoading(false); }
-  };
-
-  const handleMpinChange = (el, idx) => {
-    if (isNaN(el.value)) return;
-    const n = [...mpin]; n[idx] = el.value; setMpin(n); setError("");
-    if (el.value && el.nextSibling) el.nextSibling.focus();
-  };
-
-  const handleMpinKey = (e, idx) => {
-    if (e.key==="Backspace" && !mpin[idx] && idx>0) e.target.previousSibling?.focus();
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch {
+      setError("Server error! Make sure backend is running.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fillDemo = () => { setMobile(DEMO.mobile); setPassword(DEMO.password); setError(""); };
 
-  const inp = "w-full px-5 py-4 bg-[#FDF5E6] border border-[#EAD8C0] rounded-2xl text-[#3E362E] outline-none focus:border-[#C5A059] focus:bg-white text-sm transition-all shadow-sm";
-  const btn = "w-full bg-[#3E362E] text-[#FFFBF2] py-4 rounded-2xl font-black tracking-[3px] hover:bg-[#2A241F] shadow-lg transition-all uppercase text-xs disabled:opacity-50 disabled:cursor-not-allowed";
-
   return (
-    <div className="min-h-screen bg-[#FFFBF2] flex items-center justify-center px-4 font-sans">
-      <div className="absolute top-0 right-0 w-80 h-80 bg-[#C5A059]/10 rounded-full blur-[120px] pointer-events-none"/>
+    <div className="min-h-screen bg-[#111] flex">
+      <div className="w-full h-screen bg-white flex">
 
-      <div className="w-full max-w-md relative z-10">
+        {/* ── LEFT: Admin Hero ── */}
+        <div className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 40%, #16213e 70%, #0f3460 100%)" }}
+        >
+          <div className="absolute inset-0 opacity-10"
+            style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #C5A059 0%, transparent 50%), radial-gradient(circle at 80% 20%, #8B6B3E 0%, transparent 40%)" }}
+          />
 
-        <button onClick={() => navigate("/")} className="flex items-center gap-2 text-[10px] font-bold text-[#8D7B68] hover:text-[#C5A059] mb-8 uppercase tracking-widest transition">
-          <ArrowLeft className="w-3.5 h-3.5"/> Back to Home
-        </button>
-
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#C5A059]/10 border border-[#C5A059]/20 mb-4">
-            <ScissorIcon className="w-8 h-8 text-[#C5A059]"/>
+          {/* Logo */}
+          <div className="relative z-10 p-10 pt-12">
+            <div className="flex items-center gap-3">
+              <Shield size={26} color={GOLD} strokeWidth={2} />
+              <div>
+                <div className="text-white font-bold tracking-[0.25em] text-sm uppercase">Admin Station</div>
+                <div className="text-white/60 text-[10px] tracking-[0.35em] uppercase mt-0.5">— Secure Access —</div>
+              </div>
+            </div>
           </div>
-          <h2 className="text-3xl font-serif font-bold text-[#3E362E]">
-            {step==="login" ? "Admin Login" : "Verify MPIN"}
-          </h2>
-          <p className="text-[#C5A059] mt-2 tracking-[0.3em] uppercase text-[10px] font-bold">
-            {step==="login" ? "Secure Admin Portal" : "Enter your 6-digit MPIN"}
-          </p>
+
+          {/* Headline */}
+          <div className="relative z-10 px-10 pb-8 flex-1 flex flex-col justify-center">
+            <h1 className="text-7xl font-serif font-bold leading-none">
+              <span style={{ color: GOLD }}>ADMIN</span>
+              <br />
+              <span className="text-white">PORTAL</span>
+            </h1>
+            <div className="w-16 h-1 mt-5" style={{ background: GOLD }} />
+            <p className="text-white/80 text-base mt-5 leading-relaxed max-w-xs italic">
+              Manage requests, users, and analytics through a secure control center.
+            </p>
+          </div>
+
+          {/* Feature icons */}
+          <div className="relative z-10 px-10 pb-10 grid grid-cols-4 gap-3">
+            {FEATURES.map(({ icon: Icon, title, sub }) => (
+              <div key={title} className="flex flex-col items-center text-center gap-2">
+                <div
+                  className="w-14 h-14 rounded-xl flex items-center justify-center border"
+                  style={{ borderColor: `${GOLD}80`, background: "rgba(0,0,0,0.35)" }}
+                >
+                  <Icon size={22} color={GOLD} strokeWidth={1.5} />
+                </div>
+                <span className="text-[9px] font-bold tracking-wider text-white uppercase leading-snug">{title}</span>
+                <span className="text-[9px] text-white/60 leading-snug">{sub}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Demo Box */}
-        {step==="login" && (
-          <div className="bg-[#FEF3DC] border border-[#C5A059]/30 rounded-2xl p-4 mb-6">
-            <p className="text-[10px] font-black text-[#C5A059] uppercase tracking-widest mb-2">Demo Credentials</p>
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-xs text-[#3E362E] font-semibold">Mobile: <span className="font-black">{DEMO.mobile}</span></p>
-                <p className="text-xs text-[#3E362E] font-semibold">Password: <span className="font-black">{DEMO.password}</span></p>
-                <p className="text-xs text-[#3E362E] font-semibold">MPIN: <span className="font-black">{DEMO.mpin}</span></p>
+        {/* ── RIGHT: Form card ── */}
+        <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8" style={{ background: "#f7f5f2" }}>
+          <div className="bg-white w-[460px] px-8 py-5 rounded-[28px] shadow-xl">
+
+            {/* Shield icon */}
+            <div className="flex justify-center mb-3">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "#FEF3DC", border: `1.5px solid ${GOLD}50` }}>
+                <Shield size={22} color={BROWN} />
               </div>
-              <button onClick={fillDemo}
-                className="text-[10px] font-black text-white bg-[#C5A059] px-3 py-1.5 rounded-lg uppercase tracking-wide hover:bg-[#b38f4d] transition">
-                Use Demo
+            </div>
+
+            {/* Title */}
+            <div className="text-center mb-4">
+              <h2 className="text-2xl font-serif font-semibold text-gray-900">
+                Admin Login 🔐
+              </h2>
+              <p className="text-gray-400 text-xs mt-1">Sign in to access the admin dashboard</p>
+            </div>
+
+            {/* Demo credentials */}
+            <div
+              className="rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between"
+              style={{ background: "#FEF9EE", border: `1px solid ${GOLD}40` }}
+            >
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: GOLD }}>
+                  Demo Credentials
+                </p>
+                <p className="text-sm font-semibold text-gray-700">
+                  {DEMO.mobile} &nbsp;|&nbsp; {DEMO.password}
+                </p>
+              </div>
+              <button
+                onClick={fillDemo}
+                className="text-[10px] font-bold uppercase tracking-wide px-3 py-1.5 rounded-lg text-white transition shrink-0"
+                style={{ background: BROWN }}
+                onMouseEnter={e => (e.currentTarget.style.background = BROWN_HOVER)}
+                onMouseLeave={e => (e.currentTarget.style.background = BROWN)}
+              >
+                Use
               </button>
             </div>
-          </div>
-        )}
 
-        {/* Step 1 — Login */}
-        {step==="login" && (
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block mb-2 text-[10px] font-black uppercase tracking-widest text-[#8D7B68] ml-1">Mobile Number</label>
-              <div className="relative">
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-[#C5A059] font-bold text-sm">+91</span>
-                <input type="tel" maxLength="10" required placeholder="Admin mobile"
-                  value={mobile} onChange={e => { setMobile(e.target.value.replace(/\D/g,"")); setError(""); }}
-                  className={`${inp} pl-16`}/>
+            <form onSubmit={handleLogin} className="space-y-3">
+              {/* Mobile */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-widest mb-2 text-gray-600">
+                  Mobile Number
+                </label>
+                <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
+                  <div className="flex items-center gap-1 px-4 py-3.5 border-r bg-gray-50 text-sm font-semibold text-gray-700 shrink-0" style={{ borderColor: "#E5E7EB" }}>
+                    <span>+91</span>
+                    <ChevronDown size={13} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    autoFocus
+                    placeholder="98765 43210"
+                    value={mobile}
+                    onChange={e => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
+                    className="flex-1 px-4 py-3.5 text-sm outline-none bg-white text-gray-800"
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <label className="block mb-2 text-[10px] font-black uppercase tracking-widest text-[#8D7B68] ml-1">Password</label>
-              <input type="password" required placeholder="Enter admin password"
-                value={password} onChange={e => { setPassword(e.target.value); setError(""); }}
-                className={inp}/>
-            </div>
-            {error   && <p className="text-red-500 text-xs font-semibold text-center bg-red-50 py-2 rounded-xl">{error}</p>}
-            {success && <p className="text-green-600 text-xs font-semibold text-center bg-green-50 py-2 rounded-xl">{success}</p>}
-            <button type="submit" disabled={loading || mobile.length!==10 || !password} className={btn}>
-              {loading ? "Verifying..." : "Continue"}
-            </button>
-          </form>
-        )}
 
-        {/* Step 2 — MPIN */}
-        {step==="mpin" && (
-          <div>
-            <button onClick={() => { setStep("login"); setMpin(["","","","","",""]); setError(""); }}
-              className="flex items-center gap-1 text-[10px] font-bold text-[#8D7B68] hover:text-[#C5A059] mb-6 transition uppercase tracking-widest">
-              <ArrowLeft className="w-3.5 h-3.5"/> Back
-            </button>
+              {/* Password */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-gray-600">Password</label>
+                  <button type="button" className="text-xs font-semibold hover:underline" style={{ color: GOLD }}>
+                    Forgot password?
+                  </button>
+                </div>
+                <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
+                  <div className="flex items-center px-4 border-r bg-gray-50" style={{ borderColor: "#E5E7EB" }}>
+                    <Lock size={15} className="text-gray-400" />
+                  </div>
+                  <input
+                    type={showPwd ? "text" : "password"}
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={e => { setPassword(e.target.value); setError(""); }}
+                    className="flex-1 px-4 py-3.5 text-sm outline-none bg-white text-gray-800"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPwd(p => !p)}
+                    className="px-4 bg-white text-gray-400 hover:text-gray-600"
+                  >
+                    {showPwd ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
 
-            {/* Demo MPIN hint */}
-            <div className="bg-[#FEF3DC] border border-[#C5A059]/30 rounded-2xl p-3 mb-6 text-center">
-              <p className="text-[10px] font-black text-[#C5A059] uppercase tracking-widest">Demo MPIN: <span className="text-[#3E362E]">{DEMO.mpin}</span></p>
+              {error   && <p className="text-red-500 text-xs font-medium text-center">{error}</p>}
+              {success && <p className="text-green-600 text-xs font-medium text-center">{success}</p>}
+
+              {/* Access Dashboard button */}
+              <button
+                type="submit"
+                disabled={loading || mobile.length !== 10 || !password}
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: BROWN }}
+                onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = BROWN_HOVER; }}
+                onMouseLeave={e => { e.currentTarget.style.background = BROWN; }}
+              >
+                {loading ? "Signing in…" : <><span>Access Dashboard</span><ArrowRight size={16} /></>}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-3">
+              <div className="flex-1 h-px bg-gray-200" />
+              <span className="text-xs text-gray-400 uppercase tracking-widest">Need help?</span>
+              <div className="flex-1 h-px bg-gray-200" />
             </div>
 
-            <div className="flex justify-between gap-2 mb-6">
-              {mpin.map((d,i) => (
-                <input key={i} type="tel" inputMode="numeric" maxLength="1" value={d}
-                  onChange={e => handleMpinChange(e.target, i)}
-                  onKeyDown={e => handleMpinKey(e, i)}
-                  onFocus={e => e.target.select()}
-                  autoFocus={i===0}
-                  className="w-full h-14 bg-[#FDF5E6] border-2 rounded-2xl text-center text-2xl font-black text-[#C5A059] outline-none focus:bg-white transition-all"
-                  style={{ borderColor: d?"#C5A059":"#EAD8C0" }}/>
-              ))}
-            </div>
-            {error   && <p className="text-red-500 text-xs font-semibold text-center mb-4 bg-red-50 py-2 rounded-xl">{error}</p>}
-            {success && <p className="text-green-600 text-xs font-semibold text-center mb-4 bg-green-50 py-2 rounded-xl">{success}</p>}
-            <button onClick={handleMpin} disabled={loading || mpin.join("").length!==6} className={btn}>
-              {loading ? "Verifying MPIN..." : "Access Admin Panel"}
-            </button>
-          </div>
-        )}
+            {/* Contact Support */}
+            <p className="text-center text-sm text-gray-400">
+              Need support?{" "}
+              <a href="mailto:support@barberpro.in" className="font-semibold hover:underline" style={{ color: GOLD }}>
+                Contact Support
+              </a>
+            </p>
 
-        <div className="mt-6 text-center">
-          <div className="flex justify-center gap-4 text-[9px] text-[#A09080] uppercase tracking-widest">
-            <Link to="/login" className="hover:text-[#C5A059] transition">Customer</Link>
-            <span>·</span>
-            <Link to="/barber/login" className="hover:text-[#C5A059] transition">Barber</Link>
-            <span>·</span>
-            <Link to="/owner/login" className="hover:text-[#C5A059] transition">Owner</Link>
+            {/* Security note */}
+            <div className="flex items-center justify-center gap-1.5 mt-3">
+              <Shield size={12} className="text-gray-300" />
+              <p className="text-[10px] text-gray-300 text-center">
+                Secured with super-level authentication • Admins only
+              </p>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   );
