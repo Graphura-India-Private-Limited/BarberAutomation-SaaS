@@ -131,6 +131,7 @@ function App() {
         <Route path="/customer/services" element={<ServiceCategories />} />
         <Route path="/customer/services/men" element={<MenServices />} />
         <Route path="/customer/services/women" element={<WomenServices />} />
+        <Route path="/customer/services/addon" element={<AddonServices />} />
         <Route path="/customer/services/addons" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
@@ -143,6 +144,7 @@ function App() {
 
         {/* --- DISCOVERY & REVIEWS --- */}
         <Route path="/nearby" element={<NearbyBarbers />} />
+        <Route path="/barbers" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
         <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />

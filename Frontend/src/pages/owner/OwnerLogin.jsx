@@ -35,10 +35,11 @@ export default function OwnerLogin() {
     if (mobile.length !== 10) { setError("Enter valid 10-digit mobile"); return; }
     if (!password)             { setError("Enter password"); return; }
     setLoading(true); setError(""); setSuccess("");
-    try {
-      const res  = await fetch(`${API}/auth/owner/login`, {
+  try {
+      const res = await fetch(`${API}/auth/owner/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // ✅ CHANGED BACK: Use 'mobile' to match your real authRoutes.js extraction key!
         body: JSON.stringify({ mobile, password }),
       });
       const data = await res.json();
@@ -118,7 +119,7 @@ export default function OwnerLogin() {
 
             {/* Store icon */}
             <div className="flex justify-center mb-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "#FEF3DC", border: `1.5px solid ${GOLD}50` }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "#FEF3DC", border: `1.5px solid ${GOLD}50 `}}>
                 <Store size={22} color={BROWN} />
               </div>
             </div>

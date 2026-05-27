@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import SearchFilterHeader from "../../components/booking/SearchFilterHeader";
 
 export default function AddonServices() {
@@ -13,7 +13,7 @@ export default function AddonServices() {
     rating: ""
   });
 
-  // विंडो स्क्रोल रिसेट
+  // Reset window scroll position cleanly on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -82,7 +82,7 @@ export default function AddonServices() {
         {/* Subtle Ambient Glow */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
         
-        {/* RETURN BUTTON (Top Left Corner) */}
+        {/* RETURN BUTTON (Points cleanly back to main route layout view context) */}
         <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
           <button
             onClick={() => navigate("/")}
@@ -148,7 +148,7 @@ export default function AddonServices() {
                 </span>
               )}
 
-              {/* Image Container with Shimmer Fade */}
+              {/* Image Container */}
               <div className="h-56 overflow-hidden relative bg-stone-100">
                 <div className="absolute inset-0 bg-black/5 z-10 group-hover:bg-transparent transition-colors duration-500" />
                 <img 
@@ -172,6 +172,7 @@ export default function AddonServices() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() =>
                     navigate("/customer/barber", {
                       state: { service: s }
