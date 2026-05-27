@@ -1,43 +1,45 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+  Bell, 
+  Scissors, 
+  Clock, 
+  Check, 
+  Trash2, 
+  Edit3, 
+  ArrowLeft, 
+  Plus, 
+  Calendar, 
+  Sparkles, 
+  Info 
+} from "lucide-react";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
 
-/* ── ICONS ── */
-const Ic = {
-  bell:    (c="#C5A059",s=22)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
-  scissors:(c="#C5A059",s=22)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>,
-  clock:   (c="#C5A059",s=22)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-  check:   (c="#fff",s=16)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-  trash:   (c="#EF4444",s=16)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
-  edit:    (c="#6366F1",s=16)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
-  back:    (c="#3E362E",s=20)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
-  plus:    (c="#fff",s=18)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
-  calendar:(c="#C5A059",s=20)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
-};
-
 const PRESET_DAYS = [15, 20, 30];
 
-/* ── Days left badge ── */
+/* ── Days left badge component ── */
 const DaysLeft = ({ lastDate, intervalDays }) => {
   const last = new Date(lastDate);
   const next = new Date(last.getTime() + intervalDays * 24 * 60 * 60 * 1000);
   const today = new Date();
-  const diff  = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
+  const diff = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
 
   if (diff <= 0) return (
-    <span style={{ background:"#FEE2E2", color:"#991B1B", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:800 }}>
+    <span className="bg-red-50 text-red-700 border border-red-200/60 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm animate-pulse">
       Overdue {Math.abs(diff)}d
     </span>
   );
   if (diff <= 3) return (
-    <span style={{ background:"#FEF9C3", color:"#854D0E", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:800 }}>
+    <span className="bg-amber-50 text-amber-800 border border-amber-200/60 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm">
       Due in {diff}d
     </span>
   );
   return (
-    <span style={{ background:"#DCFCE7", color:"#166534", padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:800 }}>
+    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider shadow-sm">
       {diff}d left
     </span>
   );
@@ -45,12 +47,11 @@ const DaysLeft = ({ lastDate, intervalDays }) => {
 
 export default function ReminderSystem() {
   const navigate = useNavigate();
-  const [reminders,   setReminders]   = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [showForm,    setShowForm]    = useState(false);
-  const [editId,      setEditId]      = useState(null);
-  const [toast,       setToast]       = useState(null);
-  const [customDays,  setCustomDays]  = useState("");
+  const [reminders, setReminders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [toast, setToast] = useState(null);
   const [form, setForm] = useState({
     title: "Haircut Reminder",
     interval_days: 20,
@@ -58,7 +59,7 @@ export default function ReminderSystem() {
     notify_before_days: 2,
   });
 
-  const toast_ = (msg, type="success") => {
+  const toast_ = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
   };
@@ -67,13 +68,12 @@ export default function ReminderSystem() {
   const load = async () => {
     setLoading(true);
     try {
-      const res  = await fetch(`${API}/reminder`, {
+      const res = await fetch(`${API}/reminder`, {
         headers: { Authorization: `Bearer ${getToken()}` }
       });
       const data = await res.json();
       if (data.success) setReminders(data.reminders);
     } catch {
-      // use local storage fallback
       const local = JSON.parse(localStorage.getItem("reminders") || "[]");
       setReminders(local);
     } finally {
@@ -81,7 +81,10 @@ export default function ReminderSystem() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    window.scrollTo(0, 0);
+    load(); 
+  }, []);
 
   /* save reminder */
   const handleSave = async () => {
@@ -96,11 +99,11 @@ export default function ReminderSystem() {
     };
 
     try {
-      const url    = editId ? `${API}/reminder/${editId}` : `${API}/reminder`;
+      const url = editId ? `${API}/reminder/${editId}` : `${API}/reminder`;
       const method = editId ? "PUT" : "POST";
-      const res    = await fetch(url, {
+      const res = await fetch(url, {
         method,
-        headers: { "Content-Type":"application/json", Authorization:`Bearer ${getToken()}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -155,276 +158,345 @@ export default function ReminderSystem() {
     setShowForm(true);
   };
 
-  /* next haircut date */
+  /* next haircut date calculation */
   const getNextDate = (lastDate, days) => {
     const d = new Date(lastDate);
     d.setDate(d.getDate() + Number(days));
-    return d.toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
+    return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#FFFBF2", fontFamily:"'DM Sans','Segoe UI',sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-        .nb{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
-        .card{background:#fff;border-radius:18px;border:1px solid #EAD8C0;box-shadow:0 4px 20px rgba(62,54,46,.07)}
-        .inp{width:100%;padding:11px 14px;border-radius:11px;border:1.5px solid #EAD8C0;font-size:14px;font-family:'DM Sans',sans-serif;color:#3E362E;background:#FFFBF2;outline:none;transition:border .2s}
-        .inp:focus{border-color:#C5A059}
-        .btn-gold{background:linear-gradient(135deg,#C5A059,#E8A840);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-weight:800;font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-        .btn-gold:hover{filter:brightness(1.08);transform:translateY(-1px)}
-        .preset{padding:8px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
-        .reminder-card{animation:fadeUp .4s ease}
-        .reminder-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(62,54,46,.12)!important}
-      `}</style>
+    <>
+      <Navbar />
+      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white relative overflow-hidden flex flex-col">
+        
+        {/* Ambient Premium Glow Layers */}
+        <div className="absolute top-40 -left-40 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-40 -right-40 w-[500px] h-[500px] bg-[#EADDCA]/40 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* HEADER */}
-      <div style={{ background:"linear-gradient(135deg,#3E362E,#5C4A3A)", padding:"24px 20px 0" }}>
-        <div style={{ maxWidth:640, margin:"0 auto" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:24 }}>
-            <button className="nb" onClick={() => navigate("/customerprofile")}
-              style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,255,255,.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-              {Ic.back("#fff")}
-            </button>
-            <div>
-              <h1 style={{ fontSize:22, fontWeight:800, color:"#fff", letterSpacing:-.5 }}>Haircut Reminders</h1>
-              <p style={{ fontSize:12, color:"rgba(255,255,255,.6)", marginTop:2 }}>Never miss your next haircut</p>
-            </div>
-          </div>
-
-          {/* Stats row */}
-          <div style={{ display:"flex", gap:12, paddingBottom:20 }}>
-            {[
-              { label:"Active Reminders", val: reminders.length },
-              { label:"Due Soon",         val: reminders.filter(r => {
-                  const d = Math.ceil((new Date(r.last_haircut_date).getTime() + r.interval_days*86400000 - Date.now()) / 86400000);
-                  return d <= 3;
-                }).length },
-              { label:"Overdue",          val: reminders.filter(r => {
-                  const d = Math.ceil((new Date(r.last_haircut_date).getTime() + r.interval_days*86400000 - Date.now()) / 86400000);
-                  return d <= 0;
-                }).length },
-            ].map(({ label, val }) => (
-              <div key={label} style={{ flex:1, background:"rgba(255,255,255,.1)", borderRadius:14, padding:"12px 14px", textAlign:"center" }}>
-                <div style={{ fontSize:22, fontWeight:800, color:"#E8A840" }}>{val}</div>
-                <div style={{ fontSize:10, color:"rgba(255,255,255,.7)", fontWeight:600, marginTop:2 }}>{label}</div>
+        {/* HERO HEADER */}
+        <div className="relative bg-gradient-to-br from-[#3E362E] to-[#2A241F] pt-12 pb-16 px-4 overflow-hidden shadow-md">
+          <div className="absolute inset-0 bg-[radial-gradient(#C5A059_0.5px,transparent_0.5px)] [background-size:16px_16px] opacity-10" />
+          
+          <div className="max-w-2xl mx-auto relative z-10">
+            <div className="flex items-center gap-4 mb-8">
+              <button 
+                onClick={() => navigate("/customerprofile")}
+                className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all hover:bg-white hover:text-[#3E362E] hover:scale-105 cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-wide">Haircut Reminders</h1>
+                <p className="text-xs text-stone-400 mt-0.5 font-light tracking-wider uppercase">Never miss your next grooming standard</p>
               </div>
-            ))}
+            </div>
+
+            {/* Metrics Layout Grid */}
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { label: "Active Stays", val: reminders.length },
+                { 
+                  label: "Due Soon", 
+                  val: reminders.filter(r => {
+                    const d = Math.ceil((new Date(r.last_haircut_date).getTime() + r.interval_days * 86400000 - Date.now()) / 86400000);
+                    return d > 0 && d <= 3;
+                  }).length 
+                },
+                { 
+                  label: "Overdue", 
+                  val: reminders.filter(r => {
+                    const d = Math.ceil((new Date(r.last_haircut_date).getTime() + r.interval_days * 86400000 - Date.now()) / 86400000);
+                    return d <= 0;
+                  }).length 
+                },
+              ].map(({ label, val }) => (
+                <div key={label} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-3 text-center shadow-sm">
+                  <div className="text-2xl font-serif font-black text-[#C5A059]">{val}</div>
+                  <div className="text-[9px] text-stone-400 font-black uppercase tracking-widest mt-1">{label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div style={{ maxWidth:640, margin:"0 auto", padding:"24px 16px 80px" }}>
+        {/* MAIN BODY LAYOUT */}
+        <div className="max-w-2xl mx-auto px-4 py-8 pb-24 relative z-10 w-full flex-grow">
+          
+          {/* TRIGGER CONTROL BUTTON */}
+          {!showForm && (
+            <button 
+              onClick={() => { 
+                setShowForm(true); 
+                setEditId(null); 
+                setForm({ title: "Haircut Reminder", interval_days: 20, last_haircut_date: new Date().toISOString().split("T")[0], notify_before_days: 2 }); 
+              }}
+              className="w-full bg-[#3E362E] hover:bg-[#4E443A] text-white rounded-2xl py-4 font-black text-xs uppercase tracking-[0.2em] transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2 mb-6 cursor-pointer transform hover:-translate-y-0.5 select-none"
+            >
+              <Plus className="w-4 h-4 text-[#C5A059]" /> Add New Reminder
+            </button>
+          )}
 
-        {/* ADD BUTTON */}
-        {!showForm && (
-          <button className="btn-gold" onClick={() => { setShowForm(true); setEditId(null); setForm({ title:"Haircut Reminder", interval_days:20, last_haircut_date: new Date().toISOString().split("T")[0], notify_before_days:2 }); }}
-            style={{ width:"100%", marginBottom:20, display:"flex", alignItems:"center", justifyContent:"center", gap:8, fontSize:15 }}>
-            {Ic.plus()} Add New Reminder
-          </button>
-        )}
-
-        {/* FORM */}
-        {showForm && (
-          <div className="card" style={{ padding:22, marginBottom:20, animation:"fadeUp .3s ease" }}>
-            <h3 style={{ fontSize:16, fontWeight:800, color:"#3E362E", marginBottom:18 }}>
-              {editId ? "Edit Reminder" : "Set New Reminder"}
-            </h3>
-
-            {/* Title */}
-            <div style={{ marginBottom:14 }}>
-              <label style={{ fontSize:12, fontWeight:700, color:"#8D7B68", display:"block", marginBottom:6 }}>REMINDER NAME</label>
-              <input className="inp" placeholder="e.g. Haircut Reminder"
-                value={form.title}
-                onChange={e => setForm(p => ({ ...p, title:e.target.value }))} />
-            </div>
-
-            {/* Interval */}
-            <div style={{ marginBottom:14 }}>
-              <label style={{ fontSize:12, fontWeight:700, color:"#8D7B68", display:"block", marginBottom:8 }}>REMIND EVERY</label>
-              <div style={{ display:"flex", gap:8, marginBottom:10, flexWrap:"wrap" }}>
-                {PRESET_DAYS.map(d => (
-                  <button key={d} className="nb preset" onClick={() => setForm(p => ({ ...p, interval_days:d }))}
-                    style={{ background:form.interval_days===d?"linear-gradient(135deg,#C5A059,#E8A840)":"#F9F5EF", color:form.interval_days===d?"#fff":"#8D7B68", border:`1.5px solid ${form.interval_days===d?"#C5A059":"#EAD8C0"}` }}>
-                    {d} Days
-                  </button>
-                ))}
-                <button className="nb preset" onClick={() => {}} style={{ background:![15,20,30].includes(form.interval_days)?"linear-gradient(135deg,#C5A059,#E8A840)":"#F9F5EF", color:![15,20,30].includes(form.interval_days)?"#fff":"#8D7B68", border:`1.5px solid ${![15,20,30].includes(form.interval_days)?"#C5A059":"#EAD8C0"}` }}>
-                  Custom
-                </button>
+          {/* DYNAMIC FORM CONTAINER */}
+          {showForm && (
+            <div className="bg-white rounded-[28px] border border-[#EADDCA] p-6 mb-6 shadow-sm animate-[slideUp_0.3s_ease]">
+              <div className="flex items-center gap-2 mb-6">
+                <Sparkles className="w-4 h-4 text-[#C5A059]" />
+                <h3 className="font-serif font-bold text-lg text-[#3E362E]">
+                  {editId ? "Modify Ritual Target" : "Configure Custom Tracking"}
+                </h3>
               </div>
-              {/* Custom input */}
-              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                <input className="inp" type="number" placeholder="Custom days (e.g. 25)"
-                  style={{ maxWidth:180 }}
-                  value={![15,20,30].includes(form.interval_days) ? form.interval_days : ""}
-                  onChange={e => { setForm(p => ({ ...p, interval_days: Number(e.target.value) })); setCustomDays(e.target.value); }} />
-                <span style={{ fontSize:12, color:"#8D7B68" }}>days</span>
-              </div>
-            </div>
 
-            {/* Last haircut date */}
-            <div style={{ marginBottom:14 }}>
-              <label style={{ fontSize:12, fontWeight:700, color:"#8D7B68", display:"block", marginBottom:6 }}>LAST HAIRCUT DATE</label>
-              <input className="inp" type="date"
-                value={form.last_haircut_date}
-                onChange={e => setForm(p => ({ ...p, last_haircut_date: e.target.value }))} />
-            </div>
+              {/* Input Control Set */}
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-2">Reminder Label</label>
+                  <input 
+                    type="text"
+                    className="w-full bg-[#FAF6F0] border border-[#EADDCA] rounded-xl px-4 py-3 text-sm font-medium text-[#3E362E] outline-none focus:border-[#C5A059] transition-colors placeholder:text-stone-400"
+                    placeholder="e.g. Sharp Fade Renewal"
+                    value={form.title}
+                    onChange={e => setForm(p => ({ ...p, title: e.target.value }))} 
+                  />
+                </div>
 
-            {/* Notify before */}
-            <div style={{ marginBottom:18 }}>
-              <label style={{ fontSize:12, fontWeight:700, color:"#8D7B68", display:"block", marginBottom:6 }}>NOTIFY ME BEFORE (DAYS)</label>
-              <div style={{ display:"flex", gap:8 }}>
-                {[1,2,3].map(d => (
-                  <button key={d} className="nb preset" onClick={() => setForm(p => ({ ...p, notify_before_days:d }))}
-                    style={{ background:form.notify_before_days===d?"linear-gradient(135deg,#C5A059,#E8A840)":"#F9F5EF", color:form.notify_before_days===d?"#fff":"#8D7B68", border:`1.5px solid ${form.notify_before_days===d?"#C5A059":"#EAD8C0"}` }}>
-                    {d} Day{d>1?"s":""}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Preview */}
-            {form.last_haircut_date && form.interval_days && (
-              <div style={{ background:"#FDF5E6", borderRadius:12, padding:"12px 16px", marginBottom:18, border:"1px solid #EAD8C0" }}>
-                <p style={{ fontSize:12, fontWeight:700, color:"#8D7B68", marginBottom:4 }}>NEXT HAIRCUT DATE</p>
-                <p style={{ fontSize:18, fontWeight:800, color:"#C5A059" }}>
-                  {getNextDate(form.last_haircut_date, form.interval_days)}
-                </p>
-                <p style={{ fontSize:11, color:"#8D7B68", marginTop:4 }}>
-                  You'll be notified {form.notify_before_days} day{form.notify_before_days>1?"s":""} before
-                </p>
-              </div>
-            )}
-
-            <div style={{ display:"flex", gap:10 }}>
-              <button className="nb" onClick={() => { setShowForm(false); setEditId(null); }}
-                style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #EAD8C0", fontWeight:700, fontSize:14, color:"#8D7B68", cursor:"pointer" }}>
-                Cancel
-              </button>
-              <button className="btn-gold" onClick={handleSave} style={{ flex:2 }}>
-                {editId ? "Update Reminder" : "Set Reminder"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* REMINDER CARDS */}
-        {loading ? (
-          <div style={{ textAlign:"center", padding:"40px 0" }}>
-            <div style={{ width:40, height:40, border:"3px solid #EAD8C0", borderTopColor:"#C5A059", borderRadius:"50%", margin:"0 auto 12px", animation:"pulse 1s infinite" }}/>
-            <p style={{ color:"#8D7B68", fontSize:13 }}>Loading reminders...</p>
-          </div>
-        ) : reminders.length === 0 ? (
-          <div className="card" style={{ padding:"40px 20px", textAlign:"center", animation:"fadeUp .4s ease" }}>
-            {Ic.scissors("#EAD8C0", 48)}
-            <h3 style={{ fontSize:18, fontWeight:800, color:"#3E362E", margin:"16px 0 8px" }}>No Reminders Yet</h3>
-            <p style={{ fontSize:13, color:"#8D7B68", lineHeight:1.6 }}>
-              Set your first haircut reminder and we'll tell you when it's time to visit your barber!
-            </p>
-          </div>
-        ) : (
-          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            {reminders.map(r => {
-              const nextDate = getNextDate(r.last_haircut_date, r.interval_days);
-              return (
-                <div key={r.id} className="card reminder-card" style={{ padding:18, transition:"all .2s" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                      <div style={{ width:44, height:44, borderRadius:13, background:"linear-gradient(135deg,#FEF3E2,#FDE8C0)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        {Ic.scissors()}
-                      </div>
-                      <div>
-                        <h3 style={{ fontSize:15, fontWeight:800, color:"#3E362E" }}>{r.title}</h3>
-                        <p style={{ fontSize:11, color:"#8D7B68", marginTop:2 }}>Every {r.interval_days} days</p>
-                      </div>
-                    </div>
-                    <DaysLeft lastDate={r.last_haircut_date} intervalDays={r.interval_days} />
-                  </div>
-
-                  {/* Info rows */}
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
-                    {[
-                      { icon: Ic.calendar, label:"Last Haircut", val: new Date(r.last_haircut_date).toLocaleDateString("en-IN",{ day:"2-digit", month:"short", year:"numeric" }) },
-                      { icon: Ic.clock,    label:"Next Haircut", val: nextDate },
-                      { icon: Ic.bell,     label:"Notify Before", val: `${r.notify_before_days} day${r.notify_before_days>1?"s":""}` },
-                      { icon: Ic.scissors, label:"Interval",      val: `${r.interval_days} days` },
-                    ].map(({ icon, label, val }) => (
-                      <div key={label} style={{ background:"#FFFBF2", borderRadius:10, padding:"10px 12px", border:"1px solid #EAD8C0" }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:5, marginBottom:4 }}>
-                          {icon("#C5A059", 13)}
-                          <span style={{ fontSize:10, fontWeight:700, color:"#8D7B68", textTransform:"uppercase", letterSpacing:.5 }}>{label}</span>
-                        </div>
-                        <span style={{ fontSize:13, fontWeight:700, color:"#3E362E" }}>{val}</span>
-                      </div>
+                <div>
+                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-2">Interval Frequency</label>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {PRESET_DAYS.map(d => (
+                      <button 
+                        key={d}
+                        type="button"
+                        onClick={() => setForm(p => ({ ...p, interval_days: d }))}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all select-none cursor-pointer ${
+                          form.interval_days === d
+                            ? "bg-[#3E362E] text-white shadow-sm"
+                            : "bg-[#FAF6F0] text-stone-600 border border-[#EADDCA] hover:bg-[#C5A059]/10"
+                        }`}
+                      >
+                        {d} Days
+                      </button>
                     ))}
+                    <button 
+                      type="button"
+                      className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all select-none ${
+                        !PRESET_DAYS.includes(form.interval_days)
+                          ? "bg-[#3E362E] text-white shadow-sm"
+                          : "bg-[#FAF6F0] text-stone-600 border border-[#EADDCA]"
+                      }`}
+                    >
+                      Custom
+                    </button>
                   </div>
-
-                  {/* Actions */}
-                  <div style={{ display:"flex", gap:8 }}>
-                    <button className="nb" onClick={() => handleEdit(r)}
-                      style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px", borderRadius:10, background:"#EEF2FF", border:"none", cursor:"pointer", fontSize:12, fontWeight:700, color:"#6366F1" }}>
-                      {Ic.edit()} Edit
-                    </button>
-                    <button className="nb"
-                      onClick={() => {
-                        // Mark as done — update last haircut date to today
-                        const updated = reminders.map(rem =>
-                          rem.id === r.id ? { ...rem, last_haircut_date: new Date().toISOString().split("T")[0] } : rem
-                        );
-                        setReminders(updated);
-                        localStorage.setItem("reminders", JSON.stringify(updated));
-                        toast_("Haircut done! Reminder reset to today.");
-                      }}
-                      style={{ flex:2, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding:"9px", borderRadius:10, background:"linear-gradient(135deg,#C5A059,#E8A840)", border:"none", cursor:"pointer", fontSize:12, fontWeight:800, color:"#fff" }}>
-                      {Ic.check()} Got Haircut Today!
-                    </button>
-                    <button className="nb" onClick={() => handleDelete(r.id)}
-                      style={{ width:40, display:"flex", alignItems:"center", justifyContent:"center", padding:"9px", borderRadius:10, background:"#FEF2F2", border:"none", cursor:"pointer" }}>
-                      {Ic.trash()}
-                    </button>
+                  
+                  <div className="flex items-center gap-3 max-w-[200px]">
+                    <input 
+                      type="number" 
+                      className="w-full bg-[#FAF6F0] border border-[#EADDCA] rounded-xl px-4 py-2.5 text-sm font-medium text-[#3E362E] outline-none focus:border-[#C5A059] transition-colors"
+                      placeholder="Custom standard"
+                      value={!PRESET_DAYS.includes(form.interval_days) ? form.interval_days : ""}
+                      onChange={e => setForm(p => ({ ...p, interval_days: Number(e.target.value) }))} 
+                    />
+                    <span className="text-xs font-medium text-stone-400 uppercase tracking-wider">Days</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
 
-        {/* INFO CARD */}
-        <div style={{ marginTop:20, background:"linear-gradient(135deg,#3E362E,#5C4A3A)", borderRadius:18, padding:20, color:"#fff" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-            {Ic.bell("#E8A840", 18)}
-            <h4 style={{ fontSize:14, fontWeight:800 }}>How it works</h4>
-          </div>
-          {[
-            "Set your preferred haircut interval (15, 20, or 30 days)",
-            "We track your last haircut date",
-            "Get reminded before your next appointment is due",
-            "Click 'Got Haircut Today!' to reset the timer",
-          ].map((tip, i) => (
-            <div key={i} style={{ display:"flex", gap:10, marginBottom:8, fontSize:12, color:"rgba(255,255,255,.8)", alignItems:"flex-start" }}>
-              <span style={{ width:18, height:18, borderRadius:"50%", background:"#C5A059", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:9, fontWeight:800, flexShrink:0, marginTop:1 }}>{i+1}</span>
-              {tip}
+                <div>
+                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-2">Last Incident Log</label>
+                  <input 
+                    type="date"
+                    className="w-full bg-[#FAF6F0] border border-[#EADDCA] rounded-xl px-4 py-3 text-sm font-medium text-[#3E362E] outline-none focus:border-[#C5A059] transition-colors"
+                    value={form.last_haircut_date}
+                    onChange={e => setForm(p => ({ ...p, last_haircut_date: e.target.value }))} 
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-2">Notification Lead Time</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3].map(d => (
+                      <button 
+                        key={d}
+                        type="button"
+                        onClick={() => setForm(p => ({ ...p, notify_before_days: d }))}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all select-none cursor-pointer ${
+                          form.notify_before_days === d
+                            ? "bg-[#3E362E] text-white shadow-sm"
+                            : "bg-[#FAF6F0] text-stone-600 border border-[#EADDCA] hover:bg-[#C5A059]/10"
+                        }`}
+                      >
+                        {d} Day{d > 1 ? "s" : ""} Before
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Dynamic Live Preview Box */}
+              {form.last_haircut_date && form.interval_days > 0 && (
+                <div className="mt-6 p-4 rounded-2xl bg-[#FAF6F0] border border-[#EADDCA] text-left">
+                  <div className="flex items-center gap-2 text-stone-400 mb-1">
+                    <Calendar className="w-3.5 h-3.5 text-[#C5A059]" />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Calculated Target Milestone</span>
+                  </div>
+                  <div className="text-xl font-serif font-black text-[#3E362E]">
+                    {getNextDate(form.last_haircut_date, form.interval_days)}
+                  </div>
+                  <p className="text-[10px] text-stone-400 mt-1 font-light">
+                    Early alert triggers exactly {form.notify_before_days} day{form.notify_before_days > 1 ? "s" : ""} prior.
+                  </p>
+                </div>
+              )}
+
+              {/* Form Actions */}
+              <div className="flex gap-3 mt-6">
+                <button 
+                  onClick={() => { setShowForm(false); setEditId(null); }}
+                  className="flex-1 bg-white border border-[#EADDCA] text-stone-600 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all hover:bg-stone-50 cursor-pointer select-none"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSave}
+                  className="flex-[2] bg-[#C5A059] hover:bg-[#B48F4B] text-white py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm cursor-pointer select-none"
+                >
+                  {editId ? "Update Standard" : "Establish Tracker"}
+                </button>
+              </div>
             </div>
-          ))}
+          )}
+
+          {/* ACTIVE TRACKERS GRID CONTAINER */}
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="w-8 h-8 border-2 border-[#EADDCA] border-t-[#C5A059] rounded-full mx-auto animate-spin mb-3" />
+              <p className="text-xs text-stone-400 tracking-wider font-light uppercase">Synchronizing profiles...</p>
+            </div>
+          ) : reminders.length === 0 ? (
+            <div className="bg-white rounded-[28px] border border-[#EADDCA] p-10 text-center shadow-sm">
+              <div className="w-14 h-14 bg-[#FAF6F0] border border-[#EADDCA] rounded-full flex items-center justify-center mx-auto mb-4 text-stone-300">
+                <Scissors className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif font-bold text-lg text-[#3E362E] mb-2">No Tracking Cycles Discovered</h3>
+              <p className="text-xs text-stone-400 font-light max-w-sm mx-auto leading-relaxed">
+                Establish your typical hair length cycle metrics above. We'll automatically signal your device interface when scheduling parameters peak.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reminders.map(r => {
+                const nextDate = getNextDate(r.last_haircut_date, r.interval_days);
+                return (
+                  <div key={r.id} className="bg-white rounded-[24px] border border-[#EADDCA] p-5 shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_16px_35px_rgba(62,54,46,0.04)] hover:border-[#C5A059]/30 transition-all duration-300 flex flex-col text-left">
+                    
+                    {/* Header Core Panel */}
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-[#FAF6F0] border border-[#EADDCA] flex items-center justify-center text-[#C5A059]">
+                          <Scissors className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h3 className="font-serif font-bold text-base text-[#3E362E]">{r.title}</h3>
+                          <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider mt-0.5">Recurring Frequency: {r.interval_days}d</p>
+                        </div>
+                      </div>
+                      <DaysLeft lastDate={r.last_haircut_date} intervalDays={r.interval_days} />
+                    </div>
+
+                    {/* Meta Diagnostics Blocks */}
+                    <div className="grid grid-cols-2 gap-2.5 mb-4">
+                      {[
+                        { icon: Calendar, label: "Last Cut", val: new Date(r.last_haircut_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+                        { icon: Clock, label: "Target Window", val: nextDate },
+                        { icon: Bell, label: "Notification Signal", val: `${r.notify_before_days} day${r.notify_before_days > 1 ? "s" : ""} prior` },
+                        { icon: Sparkles, label: "Cadence Mode", val: "Automated" },
+                      ].map((item, idx) => (
+                        <div key={idx} className="bg-[#FAF6F0]/60 border border-[#EADDCA]/50 rounded-xl p-3">
+                          <div className="flex items-center gap-1.5 text-stone-400 mb-1">
+                            <item.icon className="w-3 h-3 text-[#C5A059]" />
+                            <span className="text-[8px] font-black uppercase tracking-wider">{item.label}</span>
+                          </div>
+                          <div className="text-xs font-bold text-[#3E362E]">{item.val}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Grid Core Operations */}
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => handleEdit(r)}
+                        className="flex-1 bg-[#FAF6F0] hover:bg-stone-100 border border-[#EADDCA] text-stone-600 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none"
+                      >
+                        <Edit3 className="w-3 h-3" /> Edit
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const updated = reminders.map(rem =>
+                            rem.id === r.id ? { ...rem, last_haircut_date: new Date().toISOString().split("T")[0] } : rem
+                          );
+                          setReminders(updated);
+                          localStorage.setItem("reminders", JSON.stringify(updated));
+                          toast_("Cycle Reset! Date synced to today.");
+                        }}
+                        className="flex-[2] bg-[#3E362E] hover:bg-[#4E443A] text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm select-none"
+                      >
+                        <Check className="w-3 h-3 text-[#C5A059]" /> Got Haircut Today
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(r.id)}
+                        className="w-11 bg-red-50 hover:bg-red-100 border border-red-200/60 rounded-xl flex items-center justify-center text-red-600 transition-all cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* DOCUMENTATION PANEL */}
+          <div className="mt-8 bg-gradient-to-br from-[#3E362E] to-[#4E443A] rounded-[24px] p-5 text-white shadow-sm text-left relative overflow-hidden">
+            <div className="absolute right-0 bottom-0 translate-x-4 translate-y-4 opacity-5 text-white pointer-events-none">
+              <Bell className="w-32 h-32" />
+            </div>
+            <div className="flex items-center gap-2 mb-4">
+              <Info className="w-4 h-4 text-[#C5A059]" />
+              <h4 className="font-serif font-bold text-sm tracking-wide">Tracking Operations Walkthrough</h4>
+            </div>
+            <div className="space-y-3">
+              {[
+                "Input your tailored length milestones (standard cycles usually range from 15 to 30 days).",
+                "The engine cross-references real-time timestamps with your last check-in log.",
+                "Automated alerts process ahead of time based on your set notification lead window.",
+                "Dispatching the 'Got Haircut Today' action instantly sets your target milestone forward to the next cycle."
+              ].map((tip, i) => (
+                <div key={i} className="flex gap-3 text-xs text-stone-300 font-light items-start leading-relaxed">
+                  <span className="w-5 h-5 rounded-full bg-[#C5A059] text-[#3E362E] font-black text-[9px] flex items-center justify-center flex-shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <p>{tip}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+      <Footer />
 
-      {/* TOAST */}
+      {/* TOAST NOTIFICATION STACK */}
       {toast && (
-        <div style={{ position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)", zIndex:600,
-          background: toast.type==="error"?"#991B1B":"#3E362E",
-          color:"#fff", padding:"12px 24px", borderRadius:14, fontWeight:700, fontSize:13,
-          boxShadow:"0 8px 24px rgba(0,0,0,.25)", display:"flex", alignItems:"center", gap:10,
-          animation:"fadeUp .3s ease", whiteSpace:"nowrap" }}>
-          <span style={{ width:20, height:20, borderRadius:"50%", background: toast.type==="error"?"#EF4444":"#22C55E", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            {Ic.check()}
-          </span>
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider text-white shadow-xl flex items-center gap-2.5 animate-[slideUp_0.2s_ease] ${
+          toast.type === "error" ? "bg-red-900 border border-red-700" : "bg-[#3E362E] border border-[#C5A059]/30"
+        }`}>
+          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-white ${
+            toast.type === "error" ? "bg-red-500" : "bg-emerald-500"
+          }`}>
+            <Check className="w-3 h-3" strokeWidth={3} />
+          </div>
           {toast.msg}
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -1,6 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { ArrowLeft, Sparkles, Users, Clock } from "lucide-react";
 import SearchFilterHeader from "../../components/booking/SearchFilterHeader";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 
 export default function BarberSelection() {
   const location = useLocation();
@@ -59,6 +62,11 @@ export default function BarberSelection() {
     );
   });
 
+  // 🔥 SELECT BARBER HANDLER
+  const handleBarberSelect = (barber) => {
+    setSelectedBarber(barber);
+  };
+
   // 🔥 AUTO ASSIGN
   const handleAutoAssign = () => {
     const availableBarber = filteredBarbers.find(
@@ -73,131 +81,187 @@ export default function BarberSelection() {
   };
 
   return (
-    <div style={{background:"#F9F7F4",minHeight:"100vh",fontFamily:"'DM Sans','Segoe UI',sans-serif",color:"#1C1410",padding:"40px 20px"}}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
-        .hcard { transition: all 0.3s ease; }
-        .hcard:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.1) !important; transform: translateY(-6px); }
-        .btn-gold { background: #C9882A; color: #fff; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(201,136,42,0.2); }
-        .btn-gold:hover { background: #b87a22; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,136,42,0.3); }
-        .badge-avail { background: #ECFDF5; color: #065F46; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid #A7F3D0; }
-        .badge-busy { background: #FFF7ED; color: #92400E; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid #FCD34D; }
-      `}</style>
-
-      <div style={{maxWidth:1200,margin:"0 auto"}}>
-        <SearchFilterHeader onFiltersChange={setFilters} />
+    <>
+      <Navbar />
+      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white relative overflow-hidden flex flex-col">
         
-        <div style={{marginTop:40,marginBottom:32}}>
-          <h1 style={{fontSize:42,fontWeight:900,color:"#1C1410",fontFamily:"'Cormorant Garamond',serif",letterSpacing:-0.5,marginBottom:16}}>
-            Select Barber
-          </h1>
+        {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
+        <div className="absolute top-20 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
+        <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
-          {!selectedService && (
-            <p style={{ color: "red" }}>
-              No service selected. Please go back.
-            </p>
-          )}
-
-          {selectedService && (
-            <div style={{background:"#fff",padding:"20px 24px",borderRadius:12,border:"1px solid #E8E0D6",display:"inline-block",boxShadow:"0 4px 12px rgba(0,0,0,0.03)",marginBottom:24}}>
-              <div style={{fontSize:13,color:"#7C6E60",marginBottom:4,fontWeight:600}}>Selected Service</div>
-              <div style={{fontSize:18,fontWeight:800,color:"#1C1410"}}>{selectedService.name} <span style={{color:"#C9882A",marginLeft:8}}>₹{selectedService.price}</span></div>
-            </div>
-          )}
+        {/* Premium Hero Banner Aura */}
+        <div className="relative h-[280px] sm:h-[320px] flex items-center justify-center overflow-hidden mb-6">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
           
-          <div style={{display:"block",marginBottom:32}}>
-            <button className="btn-gold" style={{background:"#1C1410",boxShadow:"none"}} onClick={handleAutoAssign}>
-              AUTO ASSIGN BARBER
+          {/* RETURN BACK BUTTON (Top Left) */}
+          <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+            <button
+              onClick={() => navigate(-1)}
+              className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-medium text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-0.5" />
+              <span>Back</span>
             </button>
+          </div>
+
+          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-6">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-4">
+              Step 02 — Appointment Allocation
+            </span>
+            <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#3E362E] font-serif leading-none">
+              Select Your <span className="text-[#C5A059] italic normal-case">Stylist</span>
+            </h1>
+            <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-5" />
           </div>
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))",gap:28}}>
-          {filteredBarbers.map((b) => {
-            const isSelected = selectedBarber?.id === b.id;
-            return (
-              <div key={b.id} className="hcard" style={{background:"#fff",borderRadius:16,overflow:"hidden",border: isSelected ? '2px solid #C9882A' : '2px solid #E8E0D6',boxShadow:isSelected?"0 8px 24px rgba(201,136,42,0.15)":"0 4px 16px rgba(0,0,0,0.04)",display:"flex",flexDirection:"column",cursor:"pointer"}} onClick={() => b.status === "Available" && setSelectedBarber(b)}>
-                <div style={{height:220,overflow:"hidden",position:"relative"}}>
-                  <img src={b.img} style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform 0.5s ease",filter:b.status==="Busy"?"grayscale(0.6)":"none"}} 
-                       onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"}
-                       onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"} alt={b.name} loading="lazy" />
-                  <div style={{position:"absolute",top:12,right:12}}>
-                    <span className={b.status === "Available" ? "badge-avail" : "badge-busy"}>
-                      {b.status}
-                    </span>
-                  </div>
+        {/* Main Content Layout */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
+          
+          {/* Selected Service Card Box */}
+          <div className="mb-8 flex justify-center">
+            {selectedService ? (
+              <div className="bg-white/90 backdrop-blur-md rounded-2xl p-3 border border-[#EADDCA] shadow-[0_8px_25px_rgba(0,0,0,0.02)] flex items-center gap-4 max-w-md w-full">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0">
+                  <img src={selectedService.img || "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=150"} alt={selectedService.name} className="w-full h-full object-cover" />
                 </div>
-                <div style={{padding:"24px",display:"flex",flexDirection:"column",flexGrow:1,justifyContent:"space-between",textAlign:"center"}}>
-                  <div style={{marginBottom: 20}}>
-                    <h3 style={{fontSize:24,fontWeight:800,color:"#1C1410",fontFamily:"'Cormorant Garamond',serif",marginBottom:8}}>{b.name}</h3>
-                    <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:4,marginBottom:8}}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <span style={{fontSize:14,fontWeight:700,color:"#1C1410"}}>{b.rating}</span>
-                    </div>
-                    <div style={{fontSize:13,color:"#7C6E60",marginBottom:4}}>{b.experience} experience</div>
-                    <div style={{fontSize:13,color:"#7C6E60",marginBottom:16}}>{b.distance} km away</div>
-
-                    {/* AI WAIT TIME PREDICTION VIEW */}
-                    <div className="bg-orange-50" style={{padding:"12px",borderRadius:"8px",border:"1px solid #FED7AA",textAlign:"left"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"8px"}}>
-                        <span style={{fontSize:"14px"}}>✨</span>
-                        <span style={{fontSize:"11px",fontWeight:800,color:"#9A3412",letterSpacing:"0.5px"}}>AI WAIT TIME PREDICTION</span>
-                      </div>
-                      <div style={{display:"flex",flexDirection:"column",gap:"4px",fontSize:"12px",color:"#7C2D12"}}>
-                        <div style={{display:"flex",justifyContent:"space-between"}}>
-                          <span>Queue Length:</span>
-                          <span style={{fontWeight:600}}>{b.aiWaitTime.queueLength} persons</span>
-                        </div>
-                        <div style={{display:"flex",justifyContent:"space-between"}}>
-                          <span>7-Day Avg Speed:</span>
-                          <span style={{fontWeight:600}}>{b.aiWaitTime.past7DaysAvg}</span>
-                        </div>
-                        <div style={{display:"flex",justifyContent:"space-between",marginTop:"4px",paddingTop:"4px",borderTop:"1px solid #FDBA74",fontWeight:700}}>
-                          <span>Est. Wait Time:</span>
-                          <span>{b.aiWaitTime.estimatedWait}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {b.status === "Available" ? (
-                    <button
-                      className="btn-gold"
-                      style={{width:"100%",background:isSelected?"#C9882A":"transparent",color:isSelected?"#fff":"#C9882A",border:isSelected?"none":"1.5px solid #C9882A",boxShadow:isSelected?"0 4px 14px rgba(201,136,42,0.2)":"none"}}
-                      onClick={(e) => { e.stopPropagation(); setSelectedBarber(b); }}
-                    >
-                      {isSelected ? "SELECTED" : "SELECT"}
-                    </button>
-                  ) : (
-                    <button className="btn-gold" style={{width:"100%",background:"#F3F0EB",color:"#A89F91",cursor:"not-allowed",boxShadow:"none"}}>
-                      UNAVAILABLE
-                    </button>
-                  )}
+                <div className="flex-1 min-w-0">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-0.5">Selected Ritual</span>
+                  <h4 className="font-serif font-bold text-sm text-[#3E362E] truncate">{selectedService.name}</h4>
+                  <p className="text-[#C5A059] font-serif font-bold text-xs mt-0.5">₹{selectedService.price}</p>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ) : (
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-4 max-w-md w-full text-center">
+                <p className="text-xs text-red-600 font-bold">No ritual selected. Please go back to services.</p>
+              </div>
+            )}
+          </div>
 
-        {/* CONTINUE */}
-        {selectedBarber && (
-          <div style={{ marginTop: 48, textAlign: "center" }}>
-            <button
-              className="btn-gold"
-              style={{padding:"16px 40px",fontSize:15}}
-              onClick={() =>
-                navigate("/customer/details", {
-                  state: {
-                    service: selectedService,
-                    barber: selectedBarber
-                  }
-                })
-              }
-            >
-              CONTINUE TO DETAILS →
+          {/* Search & Filter Component Wrapper */}
+          <div className="mb-8 bg-white/80 backdrop-blur-xl p-4 rounded-3xl border border-white/60 shadow-sm">
+            <SearchFilterHeader onFiltersChange={setFilters} />
+          </div>
+
+          {/* Quick Actions Bar */}
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <p className="text-xs text-stone-400 font-light">Showing {filteredBarbers.length} bespoke professionals.</p>
+            <button onClick={handleAutoAssign} className="bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black text-[10px] tracking-[0.2em] uppercase px-6 py-3.5 rounded-xl transition-all duration-300 shadow-sm cursor-pointer select-none">
+              Auto Assign Best Stylist
             </button>
           </div>
-        )}
+
+          {/* Stylists Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {filteredBarbers.map((b) => {
+              const isSelected = selectedBarber?.id === b.id;
+              const isBusy = b.status === "Busy";
+
+              return (
+                <div 
+                  key={b.id} 
+                  onClick={() => !isBusy && handleBarberSelect(b)}
+                  className={`group bg-white/90 backdrop-blur-md rounded-[28px] overflow-hidden border transition-all duration-500 flex flex-col justify-between ${
+                    isSelected ? 'border-[#C5A059] shadow-[0_22px_45px_rgba(197,160,89,0.12)] ring-1 ring-[#C5A059]' : 'border-[#EADDCA] shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-[0_25px_50px_rgba(62,54,46,0.08)] hover:-translate-y-1.5'
+                  } ${isBusy ? 'cursor-not-allowed opacity-85' : 'cursor-pointer'}`}
+                >
+                  <div className="h-60 overflow-hidden relative bg-stone-100">
+                    <img src={b.img} alt={b.name} loading="lazy" className={`w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700 ${isBusy ? 'grayscale-[0.5]' : ''}`} />
+                    <div className="absolute top-4 right-4 z-10">
+                      <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm ${isBusy ? 'bg-[#FAF6F0] text-amber-700 border-[#EADDCA]' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
+                        {b.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 flex-grow flex flex-col justify-between bg-gradient-to-b from-white to-[#FAF6F0]/20">
+                    <div className="text-center mb-6">
+                      <h3 className="font-serif font-bold text-2xl text-[#3E362E] mb-1 group-hover:text-[#C5A059] transition-colors">{b.name}</h3>
+                      <div className="flex items-center justify-center gap-1 mb-3">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#C5A059" stroke="#C5A059"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        <span className="text-xs font-bold text-[#3E362E]">{b.rating} Verified Rating</span>
+                      </div>
+                      <div className="flex justify-center gap-4 text-xs font-light text-stone-400">
+                        <span>{b.experience}</span>
+                        <span>•</span>
+                        <span>{b.distance} km away</span>
+                      </div>
+
+                      {/* AI WAIT TIME ENGINE */}
+                      <div className="mt-5 bg-[#FAF6F0] border border-[#EADDCA] rounded-2xl p-4 text-left">
+                        <div className="flex items-center gap-2 mb-3 border-b border-[#EADDCA]/60 pb-2">
+                          <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <span className="text-[9px] font-black tracking-[0.15em] uppercase text-[#3E362E]">AI Wait Time Engine</span>
+                        </div>
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between text-stone-500">
+                            <span className="flex items-center gap-1.5"><Users className="w-3 h-3" /> Queue Length:</span>
+                            <span className="font-bold text-[#3E362E]">{b.aiWaitTime.queueLength} Guests</span>
+                          </div>
+                          <div className="flex justify-between text-stone-500">
+                            <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> Pace Metric:</span>
+                            <span className="font-medium text-[#3E362E]">{b.aiWaitTime.past7DaysAvg}</span>
+                          </div>
+                          <div className="flex justify-between items-center pt-2 border-t border-dashed border-[#EADDCA] mt-1">
+                            <span className="font-bold text-[#3E362E]">Est. Intermission:</span>
+                            <span className={`font-serif font-bold px-2 py-0.5 rounded text-sm ${isBusy ? 'text-amber-700 bg-amber-50' : 'text-emerald-700 bg-emerald-50'}`}>
+                              {b.aiWaitTime.estimatedWait}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {!isBusy ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleBarberSelect(b); }}
+                        className={`w-full py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer select-none ${
+                          isSelected ? 'bg-[#C5A059] text-white border border-[#C5A059]' : 'bg-white text-[#3E362E] border border-[#3E362E] hover:bg-[#3E362E] hover:text-white'
+                        }`}
+                      >
+                        {isSelected ? "Artist Selected" : "Request Artist"}
+                      </button>
+                    ) : (
+                      <button disabled className="w-full bg-stone-100 text-stone-400 py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase cursor-not-allowed select-none">
+                        Fully Booked Today
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Empty Fallback State */}
+          {filteredBarbers.length === 0 && (
+            <div className="text-center py-20 bg-white/40 backdrop-blur-md rounded-[32px] border border-dashed border-[#EADDCA] px-4">
+              <h4 className="text-sm font-bold uppercase tracking-wider text-[#3E362E] mb-1">No stylists found</h4>
+              <p className="text-xs text-stone-400 font-light max-w-xs mx-auto">Try lowering your rating filter or expanding your distance range.</p>
+            </div>
+          )}
+
+          {/* CONTINUE BUTTON */}
+          {selectedBarber && (
+            <div className="mt-12 text-center">
+              <button
+                className="bg-[#C5A059] hover:bg-[#3E362E] text-white font-black text-xs tracking-[0.2em] uppercase px-10 py-5 rounded-xl transition-all duration-300 shadow-md cursor-pointer"
+                onClick={() =>
+                  navigate("/customer/details", {
+                    state: {
+                      service: selectedService,
+                      barber: selectedBarber
+                    }
+                  })
+                }
+              >
+                Continue to Details →
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }

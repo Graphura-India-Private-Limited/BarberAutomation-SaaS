@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import Header from "../../components/layout/Header";
-import { Settings, Lock, Bell, Moon, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import Navbar from "../../components/layout/Navbar"; 
+import Footer from "../../components/layout/Footer"; 
+import { Settings, Lock, Bell, ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 export default function BarberSettings() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); 
   const [notifications, setNotifications] = useState(true);
   const [soundAlerts, setSoundAlerts] = useState(true);
   
@@ -23,19 +24,46 @@ export default function BarberSettings() {
     setPasswords({ current: "", new: "", confirm: "" });
   };
 
-  return (
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
-      {/* ✂️ GLOBAL BRAND HEADER */}
-      <Header title="Control Panel" subtitle="Configure workspace preferences & security" />
+  const formInputStyle = "w-full pl-4 pr-11 py-3 bg-white border border-[#EADDCA] rounded-xl text-stone-900 font-semibold outline-none focus:border-[#C5A059] focus:shadow-[0_0_0_4px_rgba(197,160,89,0.08)] text-sm transition-all duration-300 h-11";
 
-      <main className="max-w-4xl mx-auto w-full px-6 py-10 flex-1 text-left">
+  return (
+    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col selection:bg-[#C5A059] selection:text-white relative overflow-hidden">
+      <Navbar />
+
+      {/* Luxury Background Ambient Glows */}
+      <div className="absolute top-24 left-0 w-80 h-80 bg-[#C5A059]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-40 right-0 w-96 h-96 bg-[#EADDCA]/30 rounded-full blur-3xl pointer-events-none" />
+
+      <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 flex-1 text-left relative z-10">
+        
+        {/* 🔙 BACK TO HOME PAGE NAVIGATION BUTTON (नवीन जोडला आहे) */}
+        <div className="mb-6">
+          <button 
+            onClick={() => window.location.href = '/'} 
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-[#C5A059] transition-colors duration-300 group cursor-pointer"
+          >
+            <ArrowLeft size={14} className="transform transition-transform duration-300 group-hover:-translate-x-1 stroke-[2.5px]" />
+            Back to Home Page
+          </button>
+        </div>
+
+        {/* PAGE DESCRIPTIVE HERO LAYER */}
+        <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
+          <h1 className="text-3xl font-black tracking-tight text-[#3E362E] uppercase">
+            Control Panel
+          </h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#C5A059] mt-1">
+            Configure workspace preferences & security
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* 📑 LEFT COL: MENU TABS DESCRIPTION */}
           <div className="md:col-span-1 space-y-4">
-            <div className="bg-white border border-stone-200/60 rounded-2xl p-5 shadow-3xs">
+            <div className="bg-white/70 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-5 shadow-3xs">
               <h3 className="text-sm font-black uppercase tracking-wider text-stone-900 mb-3 flex items-center gap-2">
-                <Settings size={16} className="text-[#A37B58]" /> System Config
+                <Settings size={16} className="text-[#C5A059]" /> System Config
               </h3>
               <p className="text-xs text-stone-500 leading-relaxed font-medium">
                 Manage your profile discoverability, workspace alerts, and password tokens safely from this control board.
@@ -47,65 +75,74 @@ export default function BarberSettings() {
           <div className="md:col-span-2 space-y-6">
             
             {/* PANEL 1: SECURITY & PASSWORD TRANSFORMS */}
-            <div className="bg-white border border-stone-200/60 rounded-[2.5rem] p-6 md:p-8 shadow-sm">
-              <div className="flex items-center gap-2.5 mb-6 border-b border-stone-50 pb-4">
-                <Lock className="text-[#A37B58]" size={18} />
-                <h2 className="text-lg font-black uppercase tracking-tight text-stone-900">Update Password</h2>
+            <div className="bg-white/70 backdrop-blur-md border border-[#EADDCA] rounded-[22px] p-6 md:p-8 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
+                <Lock className="text-[#C5A059]" size={18} />
+                <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Update Password</h2>
               </div>
 
               <form onSubmit={handlePasswordUpdate} className="space-y-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Current Password</label>
+                {/* Current Password */}
+                <div className="flex flex-col gap-1.5 relative">
+                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Current Password</label>
                   <input 
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={passwords.current}
                     onChange={e => setPasswords({...passwords, current: e.target.value})}
-                    className="w-full px-4 py-3 bg-[#FAF6F0]/40 border border-stone-200 rounded-xl text-stone-900 font-semibold outline-none focus:border-stone-900 text-sm"
+                    className={formInputStyle}
                   />
+                  <button 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-[29px] text-stone-400 hover:text-[#C5A059] transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
 
+                {/* New & Confirm Password Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">New Secure Token</label>
+                  <div className="flex flex-col gap-1.5 relative">
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">New Secure Token</label>
                     <input 
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       required
                       value={passwords.new}
                       onChange={e => setPasswords({...passwords, new: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#FAF6F0]/40 border border-stone-200 rounded-xl text-stone-900 font-semibold outline-none focus:border-stone-900 text-sm"
+                      className={formInputStyle}
                     />
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Confirm New Token</label>
+                  <div className="flex flex-col gap-1.5 relative">
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Confirm New Token</label>
                     <input 
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       required
                       value={passwords.confirm}
                       onChange={e => setPasswords({...passwords, confirm: e.target.value})}
-                      className="w-full px-4 py-3 bg-[#FAF6F0]/40 border border-stone-200 rounded-xl text-stone-900 font-semibold outline-none focus:border-stone-900 text-sm"
+                      className={formInputStyle}
                     />
                   </div>
                 </div>
 
-                <button type="submit" className="mt-4 bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl transition shadow-xs cursor-pointer">
+                <button type="submit" className="w-full sm:w-auto bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-[10px] uppercase tracking-[0.2em] px-6 py-4 rounded-xl transition duration-300 shadow-xs cursor-pointer mt-2">
                   Save New Security Token
                 </button>
               </form>
             </div>
 
             {/* PANEL 2: RADAR & AUDIO NOTIFICATIONS SYSTEM */}
-            <div className="bg-white border border-stone-200/60 rounded-[2.5rem] p-6 md:p-8 shadow-sm">
-              <div className="flex items-center gap-2.5 mb-6 border-b border-stone-50 pb-4">
-                <Bell className="text-[#A37B58]" size={18} />
-                <h2 className="text-lg font-black uppercase tracking-tight text-stone-900">Workspace Alerts</h2>
+            <div className="bg-white/70 backdrop-blur-md border border-[#EADDCA] rounded-[22px] p-6 md:p-8 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
+                <Bell className="text-[#C5A059]" size={18} />
+                <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Workspace Alerts</h2>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50/60 transition-colors">
+                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-white transition-colors">
                   <div>
-                    <p className="text-sm font-extrabold text-stone-900">Live Queue Push Notifications</p>
-                    <p className="text-xs text-stone-400 mt-0.5 font-medium">Alert me instantly when a new customer arrives in the pipeline.</p>
+                    <p className="text-sm font-extrabold text-[#3E362E]">Live Queue Push Notifications</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5 font-medium leading-none">Alert me instantly when a new customer arrives in the pipeline.</p>
                   </div>
                   <input 
                     type="checkbox" 
@@ -115,10 +152,10 @@ export default function BarberSettings() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50/60 transition-colors">
+                <div className="flex items-center justify-between p-3 rounded-xl hover:bg-white transition-colors">
                   <div>
-                    <p className="text-sm font-extrabold text-stone-900">Auditory Radar Alerts</p>
-                    <p className="text-xs text-stone-400 mt-0.5 font-medium">Play a sound chime when a customer turn is approaching limit caps.</p>
+                    <p className="text-sm font-extrabold text-[#3E362E]">Auditory Radar Alerts</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5 font-medium leading-none">Play a sound chime when a customer turn is approaching limit caps.</p>
                   </div>
                   <input 
                     type="checkbox" 
@@ -129,9 +166,9 @@ export default function BarberSettings() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 rounded-xl bg-[#FAF7F2] border border-stone-200/40 p-4 text-xs text-stone-600 mt-6">
-                <ShieldCheck size={16} className="shrink-0 text-[#C5A059] mt-0.5" />
-                <span className="font-medium leading-normal">
+              <div className="flex items-start gap-3 rounded-xl bg-[#FAF6F0] border border-[#EADDCA]/60 p-4 text-xs text-stone-500 mt-6 leading-relaxed">
+                <ShieldCheck size={15} className="shrink-0 text-[#C5A059] mt-0.5" />
+                <span className="font-medium">
                   All preferences configured here are saved locally to your current workspace interface profile safely.
                 </span>
               </div>
@@ -140,6 +177,8 @@ export default function BarberSettings() {
           </div>
         </div>
       </main>
+      
+      <Footer />
     </div>
   );
 }

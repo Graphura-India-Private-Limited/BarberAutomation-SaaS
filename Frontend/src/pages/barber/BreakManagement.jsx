@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from "../../components/layout/Navbar";
-import { Coffee, Clock, CalendarCheck, ShieldAlert, CheckCircle2, AlertCircle } from "lucide-react";
+import Footer from "../../components/layout/Footer"; // 👈 तुमच्या प्रोजेक्टमधील फुटर इथे इम्पोर्ट केला आहे
+import { Coffee, Clock, CalendarCheck, ShieldAlert, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
 
 export default function BreakManagement() {
   // --- STATE FOR LUNCH TIMING ---
@@ -22,10 +23,17 @@ export default function BreakManagement() {
     e.preventDefault();
     if (!lunchStart || !lunchEnd) return;
 
+    const formatTime = (timeStr) => {
+      const [hour, minute] = timeStr.split(':');
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const formattedHour = hour % 12 || 12;
+      return `${formattedHour}:${minute} ${ampm}`;
+    };
+
     const newRequest = {
       id: Date.now(),
       type: 'Lunch Update',
-      details: `${lunchStart} to ${lunchEnd}`,
+      details: `${formatTime(lunchStart)} - ${formatTime(lunchEnd)}`,
       status: 'Pending'
     };
     setRequests([newRequest, ...requests]);
@@ -37,10 +45,17 @@ export default function BreakManagement() {
     e.preventDefault();
     if (!breakStart || !breakDuration) return;
 
+    const formatTime = (timeStr) => {
+      const [hour, minute] = timeStr.split(':');
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const formattedHour = hour % 12 || 12;
+      return `${formattedHour}:${minute} ${ampm}`;
+    };
+
     const newRequest = {
       id: Date.now(),
       type: 'Long Break',
-      details: `${breakDuration} Mins at ${breakStart}`,
+      details: `${breakDuration} Mins at ${formatTime(breakStart)}`,
       status: 'Pending'
     };
     setRequests([newRequest, ...requests]);
@@ -53,32 +68,50 @@ export default function BreakManagement() {
   const getStatusBadge = (status) => {
     if (status === 'Approved') {
       return (
-        <span className="inline-flex items-center gap-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg shadow-3xs">
-          <CheckCircle2 size={12} className="stroke-[2.5px]" />
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-lg">
+          <CheckCircle2 size={11} className="stroke-[2.5px]" />
           Approved
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 border border-amber-200 rounded-lg shadow-3xs">
-        <AlertCircle size={12} className="stroke-[2.5px]" />
+      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-amber-50 text-amber-700 border border-amber-200/60 rounded-lg">
+        <AlertCircle size={11} className="stroke-[2.5px]" />
         Pending
       </span>
     );
   };
 
+  const formInputStyle = "w-full p-3.5 border border-[#EADDCA] rounded-xl focus:outline-none focus:border-[#C5A059] focus:shadow-[0_0_0_4px_rgba(197,160,89,0.08)] bg-white font-medium text-xs text-[#3E362E] placeholder-stone-400 transition-all duration-300 h-11";
+
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
+    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col selection:bg-[#C5A059] selection:text-white relative overflow-hidden">
       <Navbar />
 
-      <main className="max-w-5xl mx-auto w-full px-6 py-10 flex-1 text-left">
+      {/* Luxury Background Ambient Glows */}
+      <div className="absolute top-24 left-0 w-80 h-80 bg-[#C5A059]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-40 right-0 w-96 h-96 bg-[#EADDCA]/30 rounded-full blur-3xl pointer-events-none" />
+
+      {/* MAIN CONTENT AREA */}
+      <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 flex-1 text-left relative z-10">
         
+        {/* 🔙 BACK TO HOME PAGE NAVIGATION BUTTON */}
+        <div className="mb-6">
+          <button 
+            onClick={() => window.location.href = '/'} 
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-[#C5A059] transition-colors duration-300 group cursor-pointer"
+          >
+            <ArrowLeft size={14} className="transform transition-transform duration-300 group-hover:-translate-x-1 stroke-[2.5px]" />
+            Back to Home Page
+          </button>
+        </div>
+
         {/* PAGE DESCRIPTIVE HERO LAYER */}
-        <div className="mb-10 border-b border-stone-200/60 pb-6">
-          <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 uppercase">
+        <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
+          <h1 className="text-3xl font-black tracking-tight text-[#3E362E] uppercase">
             Break Management
           </h1>
-          <p className="text-xs font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#C5A059] mt-1">
             Submit Schedule Intervals & Absences to Salon Owner
           </p>
         </div>
@@ -87,38 +120,38 @@ export default function BreakManagement() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           {/* 🥪 LUNCH SETUP CONTAINER */}
-          <div className="bg-white p-6 rounded-2xl border border-stone-200/50 shadow-3xs flex flex-col justify-between">
+          <div className="bg-white/70 backdrop-blur-md p-6 rounded-[22px] border border-[#EADDCA] shadow-[0_15px_40px_rgba(0,0,0,0.01)] flex flex-col justify-between hover:bg-white transition-all duration-500">
             <div>
-              <div className="flex items-center gap-2.5 mb-5 border-b border-stone-50 pb-3">
-                <Coffee className="text-[#A37B58]" size={20} />
-                <h2 className="text-lg font-black uppercase tracking-tight text-stone-900">Daily Lunch Schedule</h2>
+              <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
+                <Coffee className="text-[#C5A059]" size={18} />
+                <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Daily Lunch Schedule</h2>
               </div>
               
               <form onSubmit={handleLunchSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Start Time</label>
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Start Time</label>
                     <input 
                       type="time" 
                       required
                       value={lunchStart}
                       onChange={(e) => setLunchStart(e.target.value)}
-                      className="w-full p-3.5 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-900 bg-[#FAF6F0]/30 font-semibold h-11"
+                      className={formInputStyle}
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">End Time</label>
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">End Time</label>
                     <input 
                       type="time" 
                       required
                       value={lunchEnd}
                       onChange={(e) => setLunchEnd(e.target.value)}
-                      className="w-full p-3.5 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-900 bg-[#FAF6F0]/30 font-semibold h-11"
+                      className={formInputStyle}
                     />
                   </div>
                 </div>
                 
-                <button type="submit" className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-xs uppercase tracking-widest py-4 rounded-xl transition shadow-xs cursor-pointer mt-2">
+                <button type="submit" className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-[10px] uppercase tracking-[0.2em] py-4 rounded-xl transition duration-300 shadow-xs cursor-pointer mt-2">
                   Request Schedule Change
                 </button>
               </form>
@@ -126,51 +159,51 @@ export default function BreakManagement() {
           </div>
 
           {/* ⏱️ LONG BREAK FORM PANEL CONTAINER */}
-          <div className="bg-white p-6 rounded-2xl border border-stone-200/50 shadow-3xs flex flex-col justify-between">
+          <div className="bg-white/70 backdrop-blur-md p-6 rounded-[22px] border border-[#EADDCA] shadow-[0_15px_40px_rgba(0,0,0,0.01)] flex flex-col justify-between hover:bg-white transition-all duration-500">
             <div>
-              <div className="flex items-center gap-2.5 mb-5 border-b border-stone-50 pb-3">
-                <Clock className="text-[#A37B58]" size={20} />
-                <h2 className="text-lg font-black uppercase tracking-tight text-stone-900">Request Long Break (&gt;30m)</h2>
+              <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
+                <Clock className="text-[#C5A059]" size={18} />
+                <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Request Long Break</h2>
               </div>
 
               <form onSubmit={handleBreakSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Start Time</label>
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Start Time</label>
                     <input 
                       type="time" 
                       required
                       value={breakStart}
                       onChange={(e) => setBreakStart(e.target.value)}
-                      className="w-full p-3.5 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-900 bg-[#FAF6F0]/30 font-semibold h-11"
+                      className={formInputStyle}
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Duration (Mins)</label>
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Duration (Mins)</label>
                     <input 
                       type="number" 
                       min="30"
                       required
                       value={breakDuration}
                       onChange={(e) => setBreakDuration(e.target.value)}
-                      className="w-full p-3.5 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-900 bg-[#FAF6F0]/30 font-semibold h-11"
+                      className={formInputStyle}
                       placeholder="e.g. 45"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5">Reason (Optional)</label>
+                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Reason (Optional)</label>
                   <input 
                     type="text" 
                     value={breakReason}
                     onChange={(e) => setBreakReason(e.target.value)}
-                    className="w-full p-3.5 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-900 bg-[#FAF6F0]/30 font-semibold h-11"
+                    className={formInputStyle}
                     placeholder="Doctor appointment, personal errand..."
                   />
                 </div>
 
-                <button type="submit" className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-xs uppercase tracking-widest py-4 rounded-xl transition shadow-xs cursor-pointer">
+                <button type="submit" className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-[10px] uppercase tracking-[0.2em] py-4 rounded-xl transition duration-300 shadow-xs cursor-pointer">
                   Submit For Approval
                 </button>
               </form>
@@ -180,18 +213,18 @@ export default function BreakManagement() {
         </div>
 
         {/* 📜 HISTORICAL MONITOR STATUS QUEUE FLOW PANEL */}
-        <div className="bg-white p-6 rounded-2xl border border-stone-200/50 shadow-3xs mt-10">
-          <div className="flex items-center gap-2.5 mb-5 border-b border-stone-50 pb-3">
-            <CalendarCheck className="text-[#A37B58]" size={20} />
-            <h2 className="text-xl font-black uppercase tracking-tight text-stone-900">Request Status</h2>
+        <div className="bg-white/60 backdrop-blur-md p-6 rounded-[22px] border border-[#EADDCA] shadow-[0_15px_40px_rgba(0,0,0,0.01)] mt-10">
+          <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
+            <CalendarCheck className="text-[#C5A059]" size={18} />
+            <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Request Status History</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {requests.map((req) => (
-              <div key={req.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-stone-200/40 rounded-xl bg-[#FAF6F0]/30 hover:bg-stone-50/60 transition-colors gap-3">
+              <div key={req.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-[#EADDCA]/40 rounded-xl bg-white/40 hover:bg-white transition-all duration-300 gap-3">
                 <div className="text-left">
-                  <p className="font-extrabold text-stone-900 text-base">{req.type}</p>
-                  <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mt-0.5">{req.details}</p>
+                  <p className="font-black text-[#3E362E] text-base leading-none mb-2">{req.type}</p>
+                  <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{req.details}</p>
                 </div>
                 <div className="flex sm:justify-end">
                   {getStatusBadge(req.status)}
@@ -201,15 +234,16 @@ export default function BreakManagement() {
           </div>
 
           {/* Quick Informational Notice Seam Guard */}
-          <div className="flex items-start gap-3 rounded-xl bg-[#FAF7F2] border border-stone-200/40 p-4 text-xs text-stone-600 mt-6">
-            <ShieldAlert size={16} className="shrink-0 text-[#C5A059] mt-0.5" />
-            <span className="font-medium leading-normal">
+          <div className="flex items-start gap-3 rounded-xl bg-[#FAF6F0] border border-[#EADDCA]/60 p-4 text-xs text-stone-500 mt-6 leading-relaxed">
+            <ShieldAlert size={15} className="shrink-0 text-[#C5A059] mt-0.5" />
+            <span className="font-medium">
               Approved breaks sync live with the client booking portal. Active client reservation slots will dynamically close to safeguard your schedule layout.
             </span>
           </div>
         </div>
 
       </main>
+      <Footer />
     </div>
   );
 }

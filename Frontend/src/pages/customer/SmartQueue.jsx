@@ -1,6 +1,7 @@
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 
 import {
   SERVICES,
@@ -185,7 +186,7 @@ function StatsPanel({ queue, bookings, servedCount, liveActive }) {
       <div className="bg-white border border-stone-200/50 rounded-2xl p-5 shadow-2xs">
         <p className="font-extrabold text-stone-900 text-base tracking-tight mb-3">Session Summary</p>
         {[
-          ['Customers served',  servedCount],
+          ['Customers served',   servedCount],
           ['Currently waiting', queue.length],
           ['Pending bookings',  bookings.filter(b => b.status === 'confirmed').length],
           ['Total queue wait',  `${totalWait} mins`],
@@ -314,166 +315,171 @@ export default function SmartQueue() {
   const tabs = [['queue', 'Active Queue'], ['bookings', 'Live Bookings'], ['stats', 'Analytics Stats']];
 
   return (
-    <div className="min-h-screen pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col">
-      <Toast notif={notif} />
+    <>
+      <Navbar />
 
-      {/* ✂️ BARBER PRO CORPORATE NAVIGATION HEADER */}
-      <header className="bg-[#3E362E] border-b border-[#2A241F] px-8 py-4 flex items-center justify-between z-30 shadow-md">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
-            <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
-          </div>
-          <div className="text-left">
-            <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
-              BARBER <span className="text-white">PRO</span>
-            </h1>
-            <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
-              Smart Pipeline System
-            </p>
-          </div>
-        </div>
-        
-        {/* Top Control Automation Elements */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => { setLiveActive(v => !v); toast(liveActive ? 'Live updates paused' : 'Live updates resumed', 'info'); }}
-            className="flex items-center gap-2 rounded-xl px-4 py-2.5 font-bold text-[11px] uppercase tracking-wider cursor-pointer transition-all border border-stone-700/50 text-white"
-            style={{ background: liveActive ? '#2E4F39' : '#5C2E2E' }}
-          >
-            <LiveDot active={liveActive} />
-            {liveActive ? 'ONLINE' : 'PAUSED'}
-          </button>
-          
-          <button 
-            onClick={() => setShowAdd(true)}
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xl font-medium cursor-pointer bg-[#A37B58] hover:bg-[#8F6947] transition-all border-none shadow-xs"
-          >
-            +
-          </button>
-        </div>
-      </header>
+      <div className="min-h-screen pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col">
+        <Toast notif={notif} />
 
-      {/* 📊 CORE GRID SUMMARY COUNTERS ROW */}
-      <div className="bg-white border-b border-stone-200/40 shadow-2xs py-4 px-4">
-        <div className="max-w-lg mx-auto grid grid-cols-4 gap-3">
-          {[
-            { v: queue.length,                                             l: 'In Queue',   c: 'text-[#3E362E]' },
-            { v: bookings.filter(b => b.status === 'confirmed').length,    l: 'Bookings',   c: 'text-blue-600' },
-            { v: servedCount,                                              l: 'Served',     c: 'text-emerald-700' },
-            { v: `${totalWaitMins}m`,                                      l: 'Total Wait', c: 'text-[#A37B58]' },
-          ].map(({ v, l, c }) => (
-            <div key={l} className="text-center rounded-xl py-3 px-1 bg-[#FAF7F2] border border-stone-200/50 shadow-2xs">
-              <p className={`font-black text-xl leading-none m-0 ${c}`}>{v}</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-1.5 leading-none">{l}</p>
+        <header className="bg-[#3E362E] border-b border-[#2A241F] px-8 py-4 flex items-center justify-between z-30 shadow-md">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
+              <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 📑 SWITCHER SEGMENTED TABS ROW */}
-      <div className="bg-white/40 backdrop-blur-md border-b border-stone-200/30 px-4 py-2.5 sticky top-0 z-20 shadow-3xs">
-        <div className="max-w-lg mx-auto flex gap-2 bg-stone-100/80 p-1 rounded-xl border border-stone-200/30">
-          {tabs.map(([k, label]) => (
-            <button 
-              key={k} 
-              onClick={() => setTab(k)}
-              className={`flex-1 py-2.5 rounded-lg border-none font-bold text-xs uppercase tracking-wider cursor-pointer transition-all ${
-                tab === k 
-                  ? 'bg-[#3E362E] text-white shadow-xs' 
-                  : 'text-stone-500 hover:text-stone-800 hover:bg-stone-200/50'
-              }`}
+            <div className="text-left">
+              <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
+                BARBER <span className="text-white">PRO</span>
+              </h1>
+              <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
+                Smart Pipeline System
+              </p>
+            </div>
+          </div>
+          
+          {/* Top Control Automation Elements */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => { setLiveActive(v => !v); toast(liveActive ? 'Live updates paused' : 'Live updates resumed', 'info'); }}
+              className="flex items-center gap-2 rounded-xl px-4 py-2.5 font-bold text-[11px] uppercase tracking-wider cursor-pointer transition-all border border-stone-700/50 text-white"
+              style={{ background: liveActive ? '#2E4F39' : '#5C2E2E' }}
             >
-              {label}
+              <LiveDot active={liveActive} />
+              {liveActive ? 'ONLINE' : 'PAUSED'}
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── CENTRAL PIPELINE VIEWPORT CONTENT ── */}
-      <div className="max-w-lg mx-auto w-full px-4 pt-6 flex-1">
-
-        {/* QUEUE PIPELINE ACTION CONTENT */}
-        {tab === 'queue' && (
-          <div className="flex flex-col gap-3">
-            {queue.length === 0 ? (
-              <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
-                <p className="font-extrabold text-stone-900 text-xl tracking-tight mb-1">Queue container empty</p>
-                <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-6">No walk-in lines active</p>
-                <button 
-                  className="bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl cursor-pointer transition-colors"
-                  onClick={() => setShowAdd(true)}
-                >
-                  + Inject Customer
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {queue.map((entry, i) => (
-                  <QueueRow 
-                    key={entry.id} 
-                    entry={entry} 
-                    idx={i}
-                    onClick={() => setDetail({ entry, type: 'queue' })}
-                    onServe={handleServe} 
-                  />
-                ))}
-              </div>
-            )}
+            
             <button 
-              className="bg-[#A37B58] hover:bg-[#8F6947] text-white font-black text-xs uppercase tracking-widest w-full mt-4 py-4 rounded-xl shadow-xs transition-colors cursor-pointer"
               onClick={() => setShowAdd(true)}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xl font-medium cursor-pointer bg-[#A37B58] hover:bg-[#8F6947] transition-all border-none shadow-xs"
             >
-              + Add Customer to Queue
+              +
             </button>
           </div>
-        )}
+        </header>
 
-        {/* BOOKINGS REGISTER PIPELINE ACTION CONTENT */}
-        {tab === 'bookings' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex justify-between items-center mb-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58]">Upcoming Registry</p>
+        {/* 📊 CORE GRID SUMMARY COUNTERS ROW */}
+        <div className="bg-white border-b border-stone-200/40 shadow-2xs py-4 px-4">
+          <div className="max-w-lg mx-auto grid grid-cols-4 gap-3">
+            {[
+              { v: queue.length,                                             l: 'In Queue',   c: 'text-[#3E362E]' },
+              { v: bookings.filter(b => b.status === 'confirmed').length,    l: 'Bookings',   c: 'text-blue-600' },
+              { v: servedCount,                                              l: 'Served',     c: 'text-emerald-700' },
+              { v: `${totalWaitMins}m`,                                      l: 'Total Wait', c: 'text-[#A37B58]' },
+            ].map(({ v, l, c }) => (
+              <div key={l} className="text-center rounded-xl py-3 px-1 bg-[#FAF7F2] border border-stone-200/50 shadow-2xs">
+                <p className={`font-black text-xl leading-none m-0 ${c}`}>{v}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-1.5 leading-none">{l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 📑 SWITCHER SEGMENTED TABS ROW */}
+        <div className="bg-white/40 backdrop-blur-md border-b border-stone-200/30 px-4 py-2.5 sticky top-0 z-20 shadow-3xs">
+          <div className="max-w-lg mx-auto flex gap-2 bg-stone-100/80 p-1 rounded-xl border border-stone-200/30">
+            {tabs.map(([k, label]) => (
               <button 
-                onClick={() => setShowAdd(true)}
-                className="bg-white border border-stone-200 hover:border-stone-400 text-stone-700 font-bold text-xs px-3.5 py-2 rounded-xl transition-colors cursor-pointer"
+                key={k} 
+                onClick={() => setTab(k)}
+                className={`flex-1 py-2.5 rounded-lg border-none font-bold text-xs uppercase tracking-wider cursor-pointer transition-all ${
+                  tab === k 
+                    ? 'bg-[#3E362E] text-white shadow-xs' 
+                    : 'text-stone-500 hover:text-stone-800 hover:bg-stone-200/50'
+                }`}
               >
-                + Create Slot
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── CENTRAL PIPELINE VIEWPORT CONTENT ── */}
+        <div className="max-w-lg mx-auto w-full px-4 pt-6 flex-1">
+
+          {/* QUEUE PIPELINE ACTION CONTENT */}
+          {tab === 'queue' && (
+            <div className="flex flex-col gap-3">
+              {queue.length === 0 ? (
+                <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
+                  <p className="font-extrabold text-stone-900 text-xl tracking-tight mb-1">Queue container empty</p>
+                  <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-6">No walk-in lines active</p>
+                  <button 
+                    className="bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl cursor-pointer transition-colors"
+                    onClick={() => setShowAdd(true)}
+                  >
+                    + Inject Customer
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {queue.map((entry, i) => (
+                    <QueueRow 
+                      key={entry.id} 
+                      entry={entry} 
+                      idx={i}
+                      onClick={() => setDetail({ entry, type: 'queue' })}
+                      onServe={handleServe} 
+                    />
+                  ))}
+                </div>
+              )}
+              <button 
+                className="bg-[#A37B58] hover:bg-[#8F6947] text-white font-black text-xs uppercase tracking-widest w-full mt-4 py-4 rounded-xl shadow-xs transition-colors cursor-pointer"
+                onClick={() => setShowAdd(true)}
+              >
+                + Add Customer to Queue
               </button>
             </div>
-            {bookings.length === 0 ? (
-              <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
-                <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider">No appointment logs active</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {bookings.map((entry, i) => (
-                  <BookingRow 
-                    key={entry.id} 
-                    entry={entry} 
-                    idx={i}
-                    onClick={() => setDetail({ entry, type: 'booking' })}
-                    onMoveToQueue={handleMoveToQueue} 
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
-        {/* ANALYTICS WORKLOAD TAB */}
-        {tab === 'stats' && (
-          <StatsPanel queue={queue} bookings={bookings} servedCount={servedCount} liveActive={liveActive} />
+          {/* BOOKINGS REGISTER PIPELINE ACTION CONTENT */}
+          {tab === 'bookings' && (
+            <div className="flex flex-col gap-3">
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58]">Upcoming Registry</p>
+                <button 
+                  onClick={() => setShowAdd(true)}
+                  className="bg-white border border-stone-200 hover:border-stone-400 text-stone-700 font-bold text-xs px-3.5 py-2 rounded-xl transition-colors cursor-pointer"
+                >
+                  + Create Slot
+                </button>
+              </div>
+              {bookings.length === 0 ? (
+                <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
+                  <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider">No appointment logs active</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {bookings.map((entry, i) => (
+                    <BookingRow 
+                      key={entry.id} 
+                      entry={entry} 
+                      idx={i}
+                      onClick={() => setDetail({ entry, type: 'booking' })}
+                      onMoveToQueue={handleMoveToQueue} 
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ANALYTICS WORKLOAD TAB */}
+          {tab === 'stats' && (
+            <StatsPanel queue={queue} bookings={bookings} servedCount={servedCount} liveActive={liveActive} />
+          )}
+        </div>
+
+        {/* ── PORTAL MODAL DRIVERS ── */}
+        {showAdd && <AddCustomerModal onClose={() => setShowAdd(false)} onAdd={handleAdd} />}
+        {detail?.type === 'queue' && (
+          <DetailModal entry={detail.entry} isQueue onClose={() => setDetail(null)} onServe={handleServe} onRemove={handleRemoveQueue} />
+        )}
+        {detail?.type === 'booking' && (
+          <DetailModal entry={detail.entry} isQueue={false} onClose={() => setDetail(null)} onServe={() => {}} onRemove={handleRemoveBooking} />
         )}
       </div>
 
-      {/* ── PORTAL MODAL DRIVERS ── */}
-      {showAdd && <AddCustomerModal onClose={() => setShowAdd(false)} onAdd={handleAdd} />}
-      {detail?.type === 'queue' && (
-        <DetailModal entry={detail.entry} isQueue onClose={() => setDetail(null)} onServe={handleServe} onRemove={handleRemoveQueue} />
-      )}
-      {detail?.type === 'booking' && (
-        <DetailModal entry={detail.entry} isQueue={false} onClose={() => setDetail(null)} onServe={() => {}} onRemove={handleRemoveBooking} />
-      )}
-    </div>
+      <Footer />
+    </>
   );
 }
