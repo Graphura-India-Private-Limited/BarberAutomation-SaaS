@@ -1,6 +1,11 @@
-const express=require("express");const router=express.Router();const Queue=require("../models/Queue");const Booking=require("../models/Booking");const Barber=require("../models/Barber");const{protect}=require("../middleware/authMiddleware");
-router.put("/:queue_id/noshow",protect,async(req,res)=>{try{const q=await Queue.findByIdAndUpdate(req.params.queue_id,{status:"noshow"},{new:true});await Booking.findByIdAndUpdate(q.booking_id,{status:"noshow"});await Barber.findByIdAndUpdate(q.barber_id,{status:"available"});await Queue.updateMany({barber_id:q.barber_id,status:"waiting",position:{$gt:q.position}},{$inc:{position:-1}});res.json({success:true,message:"No-show marked!"});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.put("/:queue_id/delay",protect,async(req,res)=>{try{const{delay_mins}=req.body;const q=await Queue.findByIdAndUpdate(req.params.queue_id,{status:"delayed",estimated_wait:delay_mins||15},{new:true});res.json({success:true,message:`Delayed by ${delay_mins} mins`,queue:q});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.put("/:queue_id/rejoin",protect,async(req,res)=>{try{const q=await Queue.findById(req.params.queue_id);const newPos=await Queue.countDocuments({salon_id:q.salon_id,status:"waiting"})+1;await Queue.findByIdAndUpdate(req.params.queue_id,{status:"waiting",position:newPos,estimated_wait:newPos*20});res.json({success:true,message:`Rejoined at position ${newPos}`,position:newPos});}catch(err){res.status(500).json({success:false,message:err.message});}});
-router.get("/stats/:salon_id",protect,async(req,res)=>{try{const today=new Date();today.setHours(0,0,0,0);const[waiting,completed,noshows,delayed]=await Promise.all([Queue.countDocuments({salon_id:req.params.salon_id,status:"waiting"}),Queue.countDocuments({salon_id:req.params.salon_id,status:"completed",joined_at:{$gte:today}}),Queue.countDocuments({salon_id:req.params.salon_id,status:"noshow",joined_at:{$gte:today}}),Queue.countDocuments({salon_id:req.params.salon_id,status:"delayed"})]);res.json({success:true,stats:{waiting,completed,noshows,delayed}});}catch(err){res.status(500).json({success:false,message:err.message});}});
-module.exports=router;
+const express = require("express");
+const router = express.Router();
+const noshowController = require("../controllers/noshowController");
+const { protect } = require("../middleware/authMiddleware");
+
+router.put("/:queue_id/noshow", protect, noshowController.markQueueEntryNoShow);
+router.put("/:queue_id/delay", protect, noshowController.delayQueueEntry);
+router.put("/:queue_id/rejoin", protect, noshowController.rejoinQueueEntry);
+router.get("/stats/:salon_id", protect, noshowController.getQueueStatsBySalon);
+
+module.exports = router;

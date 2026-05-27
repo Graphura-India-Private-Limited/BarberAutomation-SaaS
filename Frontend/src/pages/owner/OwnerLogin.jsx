@@ -35,8 +35,8 @@ export default function OwnerLogin() {
     if (mobile.length !== 10) { setError("Enter valid 10-digit mobile"); return; }
     if (!password)             { setError("Enter password"); return; }
     setLoading(true); setError(""); setSuccess("");
-  try {
-      const res = await fetch(`${API}/auth/owner/login`, {
+    try {
+     const res  = await fetch(`${API}/auth/owner/login`, { // 👈 Keep /auth here
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // ✅ CHANGED BACK: Use 'mobile' to match your real authRoutes.js extraction key!

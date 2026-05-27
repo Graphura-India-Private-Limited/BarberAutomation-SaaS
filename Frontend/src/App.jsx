@@ -70,7 +70,7 @@ import PrivacyPolicy                from "./pages/PrivacyPolicy";
 
 
 
-/* ── Components (Capital C) ── */
+/* ── Components (Small c) ── */
 
 import ReviewSystem    from "./components/reviews/ReviewSystem";
 import SalonDetailPage from "./components/salon/SalonDetailPage";
@@ -146,6 +146,7 @@ function App() {
         <Route path="/nearby" element={<NearbyBarbers />} />
         <Route path="/barbers" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
+        <Route path="/barbers" element={<NearbyBarbers />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
         <Route path="/write-review" element={<ReviewSystem bookingData={demoBooking} />} />
         <Route path="/membership" element={<MembershipSection />} />
