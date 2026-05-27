@@ -86,33 +86,6 @@ export default function MenServices() {
         <div className="absolute top-80 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
         <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
 
-<<<<<<< HEAD
-        <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-[#EADDCA] shadow-sm inline-block mb-4">
-            Grooming Excellence
-          </span>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white font-serif leading-none">
-            Men's <span className="text-[#C5A059] italic normal-case">Services</span>
-          </h1>
-          <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-6 mb-4" />
-          <p className="text-stone-300 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-light leading-relaxed">
-            Architectural haircuts, razor-sharp beard styling, and premium treatments engineered for the modern gentleman.
-          </p>
-        </div>
-      </div>
-
-      {/* Main Content Layout */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        
-        {/* Search & Filter Component Wrapper */}
-        <div className="mb-8 bg-white/70 backdrop-blur-md p-4 rounded-3xl border border-[#EADDCA] shadow-sm">
-          <SearchFilterHeader onFiltersChange={setFilters} />
-        </div>
-
-        {/* QUICK CATEGORY PILLS */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-          {categories.map((cat) => (
-=======
         {/* Premium Hero Banner */}
         <div className="relative h-[380px] sm:h-[420px] flex items-center justify-center overflow-hidden mb-10">
           <div 
@@ -123,7 +96,6 @@ export default function MenServices() {
           
           {/* RETURN BUTTON */}
           <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
->>>>>>> eaad78b (Change UI)
             <button
               onClick={() => navigate("/")}
               className="group flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-2xl text-white font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 shadow-sm hover:bg-white hover:text-[#3E362E] hover:border-white hover:scale-105 cursor-pointer"
@@ -147,21 +119,6 @@ export default function MenServices() {
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredServices.map((s, i) => (
-            <div 
-              key={i} 
-              className="group bg-white rounded-[28px] overflow-hidden border border-[#EADDCA] shadow-sm hover:shadow-[0_22px_45px_rgba(62,54,46,0.08)] hover:border-[#C5A059]/40 transition-all duration-500 flex flex-col transform hover:-translate-y-1.5 relative"
-            >
-              {/* Dynamic Luxury Badge */}
-              {s.badge && (
-                <span className="absolute top-4 left-4 z-20 bg-[#3E362E] text-[#C5A059] border border-[#C5A059]/30 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg shadow-md backdrop-blur-sm">
-                  {s.badge}
-                </span>
-              )}
-=======
         {/* Main Content Layout */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
           
@@ -190,7 +147,6 @@ export default function MenServices() {
             </div>
             <SearchFilterHeader onFiltersChange={setFilters} />
           </div>
->>>>>>> eaad78b (Change UI)
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

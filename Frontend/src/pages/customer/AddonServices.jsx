@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-=======
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
->>>>>>> eaad78b (Change UI)
 import SearchFilterHeader from "../../components/booking/SearchFilterHeader";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
@@ -80,28 +75,10 @@ export default function AddonServices() {
       <Navbar />
       <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white relative overflow-hidden flex flex-col">
         
-<<<<<<< HEAD
-        {/* Subtle Ambient Glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
-        
-        {/* RETURN BUTTON (Points cleanly back to main route layout view context) */}
-        <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
-          <button
-            onClick={() => navigate("/")}
-            className="group flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-2xl text-white font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 shadow-sm hover:bg-white hover:text-[#3E362E] hover:border-white hover:scale-105 cursor-pointer"
-          >
-            <span className="text-sm font-light text-[#C5A059] transition-transform duration-300 transform group-hover:-translate-x-1 inline-block">
-              &lt;
-            </span>
-            <span className="relative">Return</span>
-          </button>
-        </div>
-=======
         {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
         <div className="absolute top-20 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
         <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
->>>>>>> eaad78b (Change UI)
 
         {/* Premium Hero Banner */}
         <div className="relative h-[380px] sm:h-[420px] flex items-center justify-center overflow-hidden mb-6">
@@ -146,18 +123,6 @@ export default function AddonServices() {
             <SearchFilterHeader onFiltersChange={setFilters} />
           </div>
 
-<<<<<<< HEAD
-              {/* Image Container */}
-              <div className="h-56 overflow-hidden relative bg-stone-100">
-                <div className="absolute inset-0 bg-black/5 z-10 group-hover:bg-transparent transition-colors duration-500" />
-                <img 
-                  src={s.img} 
-                  alt={s.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700 ease-out"
-                />
-              </div>
-=======
           {/* QUICK CATEGORY PILLS */}
           <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
             {categories.map((cat) => (
@@ -174,7 +139,6 @@ export default function AddonServices() {
               </button>
             ))}
           </div>
->>>>>>> eaad78b (Change UI)
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
@@ -201,22 +165,6 @@ export default function AddonServices() {
                   />
                 </div>
 
-<<<<<<< HEAD
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate("/customer/barber", {
-                      state: { service: s }
-                    })
-                  }
-                  className="w-full bg-[#3E362E] text-white py-3.5 px-4 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 group-hover:bg-[#C5A059] group-hover:text-[#2A241F] shadow-sm cursor-pointer select-none"
-                >
-                  Select Service
-                </button>
-              </div>
-            </div>
-          ))}
-=======
                 {/* Service Details Card */}
                 <div className="p-6 flex flex-col flex-grow justify-between bg-gradient-to-b from-white to-[#FAF6F0]/20">
                   <div className="mb-6">
@@ -228,7 +176,6 @@ export default function AddonServices() {
                       <span className="text-xl font-black text-[#3E362E]">₹{s.price}</span>
                     </div>
                   </div>
->>>>>>> eaad78b (Change UI)
 
                   <button
                     onClick={() =>
