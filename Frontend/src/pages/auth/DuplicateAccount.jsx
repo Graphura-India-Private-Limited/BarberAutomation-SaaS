@@ -1,8 +1,11 @@
-import { useState } from 'react'
-import { AlertCircle, CheckCircle2 } from 'lucide-react'
+import { useState } from 'react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
-// Registered mock numbers database check array
-const REGISTERED = ['9550105897', '9735897907']
+// Registered numbers mockup check ledger
+const REGISTERED = ['9550105897', '9735897907'];
+
+// ✅ EMBEDDED HIGH-RES PRODUCTION ASSET IMAGE: Replaces the broken local file string path
+const BARBER_HERO_IMAGE = 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&auto=format&fit=crop&q=80';
 
 const ScissorIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -15,9 +18,9 @@ const ScissorIcon = ({ className }) => (
 );
 
 export default function DuplicateAccount({ onBack }) {
-  const [name, setName]         = useState('')
-  const [phone, setPhone]       = useState('')
-  const [status, setStatus]     = useState('idle') // 'idle' | 'duplicate' | 'available'
+  const [name, setName]         = useState('');
+  const [phone, setPhone]       = useState('');
+  const [status, setStatus]     = useState('idle'); // 'idle' | 'duplicate' | 'available'
 
   function handleVerifyCheck() {
     const sanitizedPhone = phone.replace(/\D/g, '');
@@ -31,7 +34,6 @@ export default function DuplicateAccount({ onBack }) {
       setStatus('duplicate');
     } else {
       setStatus('available');
-      // Success action placeholder logic (e.g., dispatching registration details or trigger OTP workflow)
       setTimeout(() => {
         alert(`Verification Success! No duplicate found. Proceeding with OTP initialization for +91 ${sanitizedPhone}`);
       }, 100);
@@ -39,19 +41,24 @@ export default function DuplicateAccount({ onBack }) {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF6F0] font-sans text-stone-800 antialiased flex">
+    <div className="min-h-screen w-full bg-[#FAF6F0] font-sans text-stone-800 antialiased flex text-left">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .font-serif { font-family: 'Playfair Display', serif !important; }
+      `}</style>
       
-      {/* ✂️ LEFT PANEL: LUXURY BRAND INTRO */}
-      <div className="hidden lg:flex lg:w-5/12 bg-[#3E362E] p-12 flex-col justify-between relative overflow-hidden border-r border-[#2A241F] shadow-2xl">
+      {/* ✂️ LEFT PANEL: LUXURY BRAND INTRO (MATCHES MAIN AUTH PAGES) */}
+      <div className="hidden lg:flex lg:w-5/12 bg-[#3E362E] p-12 flex-col justify-between relative overflow-hidden border-r border-[#2A241F] shadow-2xl min-h-screen">
         
         {/* 📸 IMAGE CONTAINER LAYER */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <img 
-            src="/DuplicateAccountImg.png" 
+            src={BARBER_HERO_IMAGE} 
             alt="Barber Shop Interior Accent" 
-            className="w-full h-full object-cover animate-fade-in" 
+            className="w-full h-full object-cover" 
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/75 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/60 via-stone-900/30 to-stone-950/85 mix-blend-multiply" />
         </div>
 
         {/* Decorative background ambient flares */}
@@ -74,7 +81,7 @@ export default function DuplicateAccount({ onBack }) {
           </p>
         </div>
 
-        {/* Bottom catchphrase */}
+        {/* Bottom catchphrase text block */}
         <div className="relative z-20 text-left max-w-sm drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
           <h2 className="text-3xl font-serif text-white font-medium leading-tight mb-3 italic">
             Account Integrity & Verification.
@@ -90,12 +97,11 @@ export default function DuplicateAccount({ onBack }) {
         </p>
       </div>
             
-{/* 📄 RIGHT PANEL: CENTERING INTERACTIVE VERIFICATION CARD */}
-      {/* 🔄 CHANGE 1: Main background changed to pure white (bg-white) */}
+      {/* 📄 RIGHT PANEL: CENTERING INTERACTIVE VERIFICATION CARD */}
       <div className="w-full lg:w-7/12 flex items-center justify-center p-6 md:p-12 bg-white">
         
-        {/* 🔄 CHANGE 2: Card container changed to the light cream color (bg-[#FAF6F0]) */}
-        <div className="w-full max-w-md bg-[#FAF6F0] rounded-[2rem] border border-stone-200/60 shadow-md p-8 md:p-10 text-left animate-fade-in">
+        {/* Card envelope wrapper */}
+        <div className="w-full max-w-md bg-[#FAF6F0] rounded-[2rem] border border-stone-200/60 shadow-md p-8 md:p-10 text-left animate-in fade-in duration-300">
           
           {/* Form Header */}
           <div className="mb-8">
@@ -104,7 +110,7 @@ export default function DuplicateAccount({ onBack }) {
               <span className="text-xs font-black uppercase tracking-widest text-[#3E362E]">Barber Pro</span>
             </div>
             
-            <h2 className="text-3xl font-black text-stone-900 tracking-tight uppercase leading-none">
+            <h2 className="text-3xl font-black font-serif text-stone-900 tracking-tight uppercase leading-none">
               Verify Profile
             </h2>
             <p className="text-xs font-bold tracking-wide text-[#A37B58] uppercase mt-1.5">
@@ -120,7 +126,6 @@ export default function DuplicateAccount({ onBack }) {
               <label className="text-[10px] text-stone-400 uppercase font-black tracking-wider ml-0.5">
                 Full Name
               </label>
-              {/* 🔄 CHANGE 3: Swapped input background to pure white so it pops against the cream container */}
               <input 
                 type="text" 
                 placeholder="e.g. Mayur K." 
@@ -136,11 +141,9 @@ export default function DuplicateAccount({ onBack }) {
                 Mobile Number
               </label>
               <div className="flex gap-2">
-                {/* 🔄 CHANGE 4: Prefix badge to pure white */}
                 <div className="bg-white border border-stone-200/80 text-stone-500 font-bold text-sm rounded-xl px-4 flex items-center justify-center shadow-2xs">
                   +91
                 </div>
-                {/* 🔄 CHANGE 5: Input field background to pure white */}
                 <input 
                   type="tel" 
                   placeholder="98765 43210" 
@@ -155,7 +158,7 @@ export default function DuplicateAccount({ onBack }) {
 
           </div>
 
-          {/* 🚨 STATE 1: DUPLICATE ACCOUNT DETECTED */}
+          {/* STATE 1: DUPLICATE ACCOUNT DETECTED */}
           {status === 'duplicate' && (
             <div className="mt-5 p-3.5 bg-red-50 border border-red-200/60 rounded-xl flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
@@ -208,5 +211,5 @@ export default function DuplicateAccount({ onBack }) {
       </div>
 
     </div>
-  )
+  );
 }

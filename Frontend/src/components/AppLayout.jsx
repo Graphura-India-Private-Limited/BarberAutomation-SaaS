@@ -213,7 +213,7 @@ export function Sidebar({ activePage, setActivePage }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-[#3D3126] truncate">Admin User</p>
-            <p className="text-xs text-[#8A7A6A] truncate">admin@platform.in</p>
+            <p className="text-xs text-[#8A7A6A] truncate">Admin Use Only</p>
           </div>
         </div>
       </div>

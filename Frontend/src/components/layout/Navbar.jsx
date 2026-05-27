@@ -67,7 +67,7 @@ const Navbar = () => {
   const NAV_ITEMS = [
     { label: "Home", path: "/", icon: Home },
     { label: "Services", hasDropdown: true, icon: Sparkles },
-    { label: "Barbers", path: "/barbers", icon: Users },
+    { label: "Location", path: "/barbers", icon: Users },
     { label: "About", section: "about", icon: Info },
     { label: "Contact", section: "contact", icon: Phone },
   ];
