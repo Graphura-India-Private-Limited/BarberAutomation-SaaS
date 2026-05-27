@@ -127,7 +127,7 @@ export default function BarberLogin() {
             {/* Title */}
             <div className="text-center mb-4">
               <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                Barber Login ✂️
+                Barber Login 
               </h2>
               <p className="text-gray-400 text-xs mt-1">Sign in to access your station</p>
             </div>

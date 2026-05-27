@@ -147,7 +147,7 @@ export default function Login() {
             {/* Title */}
             <div className="text-center mb-4">
               <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                {step === "mobile" ? "Customer Login ✂️" : "Verify OTP 🔑"}
+                {step === "mobile" ? "Customer Login " : "Verify OTP 🔑"}
               </h2>
               <p className="text-gray-400 text-xs mt-1">
                 {step === "mobile"
