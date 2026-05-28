@@ -422,7 +422,7 @@ export default function BarberDashboard() {
         </div>
         <p className="font-serif tracking-normal font-black text-2xl text-[#4A3E3D] leading-none">{s.value}</p>
         <p className="text-[11px] mt-1.5 font-medium font-sans normal-case text-stone-400">{s.sub}</p>
-        <p className="text-[10px] mt-0.5 font-sans normal-case font-bold uppercase tracking-wider text-[#8B5A2B]">{s.label}</p>
+        <p className="text-[10px] mt-0.5 font-sans font-bold uppercase tracking-wider text-[#8B5A2B]">{s.label}</p>
       </div>
     ))}
   </div>
