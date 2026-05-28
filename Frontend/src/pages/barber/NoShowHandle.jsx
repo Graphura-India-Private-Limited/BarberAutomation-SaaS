@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Header from "../../components/layout/Header";
 import { Scissors, AlertTriangle, CheckCircle, Clock, Trash2, HelpCircle } from "lucide-react";
 
 const INITIAL_QUEUE = [
@@ -278,11 +277,6 @@ export default function NoShowHandler() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
-      <Header 
-      title="Absence Tracking" 
-      subtitle="Live Studio Client Monitor Framework" 
-    />
-
       <main className="max-w-2xl mx-auto w-full px-6 py-10 flex-1 text-center">
         
         {/* TOP COMPONENT CAPTION CONTROLS HEADER */}

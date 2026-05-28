@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, CheckCircle, Clock, RotateCcw, XCircle, DollarSign, Sparkles, TrendingUp } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, RotateCcw, XCircle, DollarSign, Sparkles, TrendingUp, ArrowLeft } from 'lucide-react'; 
+import { useNavigate } from 'react-router-dom'; 
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
+const GOLD = "#C5A059";
+
 export default function BookingHistory() {
   const [activeTab, setActiveTab] = useState('upcoming');
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -54,11 +58,22 @@ export default function BookingHistory() {
         <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
+        {/* ── 📑 UPDATED: ROUTE CHANGED TO BOOKING FLOW PAGE ── */}
+        <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 relative z-50 flex justify-start">
+          <button 
+            onClick={() => navigate('/customer/booking')} // 👈 Tumcha actual booking page cha path ithe taka (e.g., '/booking' or '/book')
+            className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white"
+          >
+            <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" style={{ color: GOLD }} />
+            <span>Back to Booking</span>
+          </button>
+        </div>
+
         {/* Premium Hero Banner Aura */}
-        <div className="relative h-[220px] sm:h-[260px] flex items-center justify-center overflow-hidden mb-2">
+        <div className="relative h-[180px] sm:h-[220px] flex items-center justify-center overflow-hidden mb-2">
           <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
           
-          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-6">
+          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-2">
             <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-4">
               Dashboard Overview
             </span>
