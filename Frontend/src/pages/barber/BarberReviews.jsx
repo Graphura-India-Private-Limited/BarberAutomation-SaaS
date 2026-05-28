@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Star, MessageSquare, Award, ThumbsUp, Filter, Calendar, Heart, ShieldCheck } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
@@ -194,9 +194,6 @@ export default function BarberReviews() {
 
         </main>
       </div>
-
-      {/* ── ✅ SYSTEM BASE BRAND FOOTER: Radial flashes snap exactly into place at baseline edge ── */}
-      <Footer />
 
     </div>
   );

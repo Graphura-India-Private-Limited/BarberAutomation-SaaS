@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Scissors, AlertTriangle, CheckCircle, Clock, Trash2, HelpCircle } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 const INITIAL_QUEUE = [
   { id: 1, name: "Arjun Mehta", service: "Haircut + Beard", bookingType: "Priority", waitMins: 0, noShowCount: 2, avatar: "AM", avatarColor: "bg-amber-100 text-amber-900 border-amber-300/40" },
@@ -283,8 +283,8 @@ export default function NoShowHandler() {
         {/* TOP COMPONENT CAPTION CONTROLS HEADER */}
         <div className="mb-8 border-b border-stone-200/60 pb-5 text-left flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 uppercase">
-              No-Show Customers
+            <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+              No-Show <span className="text-[#C5A059]">Customers</span>
             </h1>
             <p className="text-xs font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
               Live Studio Client Monitor Framework
@@ -329,7 +329,7 @@ export default function NoShowHandler() {
       <AnimatePresence>
         {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       </AnimatePresence>
-      <Footer />
+      
     </div>
   );
 }

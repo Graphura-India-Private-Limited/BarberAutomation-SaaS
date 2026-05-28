@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { User, ShieldCheck, Briefcase, Phone, Award, Save } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 const ProfileField = ({ label, value, icon: Icon }) => (
   <div className="flex items-center gap-4 p-5 rounded-2xl bg-[#3E362E]/5 border border-stone-200/60 shadow-3xs text-left">
@@ -162,7 +162,7 @@ function BarberProfile() {
 
         </div>
       </main>
-      <Footer />
+      
     </div>
   );
 }

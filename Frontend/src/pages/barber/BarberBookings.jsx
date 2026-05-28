@@ -3,7 +3,7 @@ import {
   Calendar, Clock, CheckCircle2, AlertCircle, XCircle, 
   Search, SlidersHorizontal, User, Sparkles, Scissors, Landmark 
 } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 // Mock operational dataset built to align with your dashboard models
 const INITIAL_BOOKINGS = [
@@ -208,8 +208,6 @@ export default function BarberBookings() {
         </main>
       </div>
 
-      {/* ── ✅ THE PIECE INJECTION: Your premium custom footer safely mounted here at the base ── */}
-      <Footer />
 
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Coffee, Clock, CalendarCheck, ShieldAlert, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 export default function BreakManagement() {
   // --- STATE FOR LUNCH TIMING ---
@@ -96,8 +96,8 @@ export default function BreakManagement() {
 
         {/* PAGE DESCRIPTIVE HERO LAYER */}
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
-          <h1 className="text-3xl font-black tracking-tight text-[#3E362E] uppercase">
-            Break Management
+          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+            Break <span className="text-[#C5A059]">Management</span>
           </h1>
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#C5A059] mt-1">
             Submit Schedule Intervals & Absences to Salon Owner
@@ -231,7 +231,7 @@ export default function BreakManagement() {
         </div>
 
       </main>
-      <Footer />
+     
 
     </div>
   );

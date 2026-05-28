@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Settings, Lock, Bell, ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 export default function BarberSettings() {
   const [showPassword, setShowPassword] = useState(false); 
@@ -36,8 +36,8 @@ export default function BarberSettings() {
   
         {/* PAGE DESCRIPTIVE HERO LAYER */}
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
-          <h1 className="text-3xl font-black tracking-tight text-[#3E362E] uppercase">
-            Control Panel
+          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+            Control <span className="text-[#C5A059]">Panel</span>
           </h1>
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#C5A059] mt-1">
             Configure workspace preferences & security
@@ -164,7 +164,7 @@ export default function BarberSettings() {
           </div>
         </div>
       </main>
-      <Footer />
+      
     </div>
   );
 }

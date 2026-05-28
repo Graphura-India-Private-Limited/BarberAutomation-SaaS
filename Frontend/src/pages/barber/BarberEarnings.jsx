@@ -3,7 +3,7 @@ import {
   DollarSign, TrendingUp, Award, Calendar, ArrowUpRight, 
   Wallet, Sparkles, CheckCircle2, ArrowRight, Download 
 } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 // Mock financial datasets configured specifically for the barber's workspace session profile
 const MOCK_EARNINGS_SUMMARY = {
@@ -188,7 +188,7 @@ export default function BarberEarnings() {
       </div>
 
       {/* ── ✅ BRAND FOOTER: Custom dark-wood theme module attaches at viewport bottom edge ── */}
-      <Footer />
+      
 
     </div>
   );

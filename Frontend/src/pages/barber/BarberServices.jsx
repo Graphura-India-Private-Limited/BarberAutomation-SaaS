@@ -3,7 +3,7 @@ import {
   Scissors, Plus, ToggleLeft, ToggleRight, Sparkles, 
   Clock, DollarSign, Layers, PlusCircle, Search, Edit2 
 } from "lucide-react";
-import Footer from "../../components/layout/Footer";
+
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
@@ -181,8 +181,6 @@ export default function BarberServices() {
         </main>
       </div>
 
-      {/* ── ✅ SYSTEM BASE BRAND FOOTER: Radial flashes snap exactly into place at baseline edge ── */}
-      <Footer />
 
     </div>
   );
