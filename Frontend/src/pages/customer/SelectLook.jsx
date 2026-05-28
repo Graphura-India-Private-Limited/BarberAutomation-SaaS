@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ArrowLeft, CheckCircle2, Image } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Image, Sparkles } from "lucide-react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
@@ -139,8 +139,8 @@ export default function SelectLook() {
   const currentCategory = getServiceCategory();
   const availableLooks = BARBER_LOOKS_DATABASE[currentCategory] || BARBER_LOOKS_DATABASE.default;
 
-  // 🛠️ पुढील स्टेपवर जाण्यासाठी डेटा पास करणारे हँडलर फंक्शन
   const handleContinue = () => {
+    if (!selectedLook) return;
     navigate("/customer/details", {
       state: {
         service: selectedService,
@@ -152,15 +152,14 @@ export default function SelectLook() {
 
   return (
     <>
-      {/* 🧭 १. टॉप मुख्य नेव्हबार */}
       <Navbar />
 
-      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white pb-32">
+      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white pb-36">
         
         {/* Header / Sub-navigation */}
         <div className="bg-white/80 backdrop-blur-md border-b border-[#EADDCA] sticky top-0 z-40 px-4 py-4 shadow-sm">
           <div className="max-w-7xl mx-auto flex items-center gap-4">
-            <button onClick={() => navigate(-1)} className="p-2 hover:bg-[#FAF6F0] rounded-full transition-colors group">
+            <button onClick={() => navigate(-1)} className="p-2 hover:bg-[#FAF6F0] rounded-full transition-colors group cursor-pointer">
               <ArrowLeft className="w-5 h-5 text-[#3E362E] group-hover:text-[#C5A059] transition-colors" />
             </button>
             <span className="font-serif font-bold text-lg">Back to Stylists</span>
@@ -174,14 +173,14 @@ export default function SelectLook() {
             
             <div className="mb-8 flex flex-col gap-3">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C5A059] block mb-1">
-                  Portfolio Catalogue — {selectedBarber?.name}
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C5A059] flex items-center gap-1 mb-1">
+                  <Sparkles className="w-3 h-3 fill-[#C5A059]" /> Portfolio Catalogue — {selectedBarber?.name}
                 </span>
                 <h2 className="font-serif font-black text-3xl md:text-4xl text-[#3E362E] uppercase tracking-tight">
                   Select Your Custom <span className="text-[#C5A059] italic normal-case">Desired Look</span>
                 </h2>
                 <p className="text-xs text-stone-400 font-light mt-1">
-                  Click on an image template you want {selectedBarber?.name} to follow for your {selectedService?.name}.
+                 Click on your favorite look below. Our expert stylist {selectedBarber?.name} will craft this exact look perfectly for you.
                 </p>
               </div>
               
@@ -200,26 +199,29 @@ export default function SelectLook() {
                     key={look.id}
                     onClick={() => setSelectedLook(look)}
                     className={`group/look relative rounded-2xl overflow-hidden cursor-pointer border-2 transition-all duration-300 ${
-                      isLookSelected ? "border-[#C5A059] shadow-md scale-[0.99]" : "border-transparent hover:shadow-md"
+                      isLookSelected 
+                        ? "border-[#C5A059] shadow-lg ring-4 ring-[#C5A059]/10 scale-[0.98]" 
+                        : "border-transparent hover:border-[#EADDCA] hover:shadow-md"
                     }`}
                   >
-                    <div className="h-72 bg-stone-100 overflow-hidden relative">
+                    <div className="h-80 bg-stone-100 overflow-hidden relative">
                       <img 
                         src={look.img} 
                         alt={look.name} 
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover/look:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/look:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      {/* Gradient overlay gets slightly darker on select */}
+                      <div className={`absolute inset-0 transition-colors duration-300 ${isLookSelected ? 'bg-black/40' : 'bg-gradient-to-t from-black/90 via-black/30 to-transparent'}`} />
                       
                       {isLookSelected && (
-                        <div className="absolute top-3 right-3 bg-[#C5A059] text-white p-1 rounded-full shadow-md">
+                        <div className="absolute top-4 right-4 bg-[#C5A059] text-white p-1 rounded-full shadow-md animate-in zoom-in duration-200">
                           <CheckCircle2 className="w-5 h-5 fill-[#3E362E] text-white" />
                         </div>
                       )}
 
-                      <div className="absolute bottom-4 left-4 right-4 text-white">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[#EADDCA] mb-0.5">Style Template</p>
-                        <h4 className="font-serif font-bold text-base leading-tight">{look.name}</h4>
+                      <div className="absolute bottom-5 left-5 right-5 text-white z-10">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-[#EADDCA] mb-0.5">Style Template</p>
+                        <h4 className="font-serif font-bold text-lg leading-tight transition-colors duration-300 group-hover/look:text-[#EADDCA]">{look.name}</h4>
                       </div>
                     </div>
                   </div>
@@ -227,21 +229,42 @@ export default function SelectLook() {
               })}
             </div>
           </div>
-
-          {/* 🔘 Floating Action Button: जेव्हा युझर लुक सिलेक्ट करेल तेव्हाच दिसेल */}
-          {selectedLook && (
-            <div className="mt-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <button
-                onClick={handleContinue}
-                className="bg-[#3E362E] text-white hover:bg-[#C5A059] hover:text-[#2A241F] font-black text-[11px] tracking-[0.25em] uppercase px-12 py-5 rounded-xl transition-all duration-300 shadow-xl hover:scale-105"
-              >
-                Continue to Details & Booking →
-              </button>
-            </div>
-          )}
         </div>
+
+        {/* 🔘 Premium Sticky Bottom Action Bar */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-[#EADDCA] py-5 px-6 z-50 shadow-[0_-10px_30px_rgba(62,54,46,0.06)] transition-all duration-300">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+              {selectedLook ? (
+                <>
+                  <p className="text-[10px] text-stone-400 uppercase tracking-widest font-black">Selected Style</p>
+                  <p className="font-serif font-bold text-lg text-[#3E362E]">
+                    {selectedLook.name}
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-stone-500 font-light italic">
+                 Please select a look from the catalog above to proceed...
+                </p>
+              )}
+            </div>
+            
+            <button
+              onClick={handleContinue}
+              disabled={!selectedLook}
+              className={`w-full sm:w-auto font-black text-[11px] tracking-[0.25em] uppercase px-10 py-4 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 ${
+                selectedLook 
+                  ? "bg-[#3E362E] text-white hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer hover:scale-[1.03]" 
+                  : "bg-stone-200 text-stone-400 cursor-not-allowed opacity-60"
+              }`}
+            >
+              Continue to Details & Booking →
+            </button>
+          </div>
+        </div>
+
       </div>
       <Footer />
-    </>
+    </> 
   );
 }

@@ -52,6 +52,7 @@ import MenServices         from "./pages/customer/MenServices";
 import WomenServices       from "./pages/customer/WomenServices";
 import AddonServices       from "./pages/customer/AddonServices";
 import BarberSelection     from "./pages/customer/BarberSelection";
+import SelectLook           from "./pages/customer/SelectLook";
 import CustomerDetails     from "./pages/customer/CustomerDetails";
 import Booking             from "./pages/customer/Booking";
 import BookingHistory      from "./pages/customer/BookingHistory";
@@ -134,6 +135,7 @@ function App() {
         <Route path="/customer/services/addon" element={<AddonServices />} />
         <Route path="/customer/services/addons" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
+        <Route path="/customer/Select-look" element={<SelectLook />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
         <Route path="/customer/booking" element={<CustomerBookingFlow />} />
         <Route path="/customer/history" element={<BookingHistory />} />
