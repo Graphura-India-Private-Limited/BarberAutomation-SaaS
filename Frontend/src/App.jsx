@@ -96,7 +96,7 @@ const demoBooking = { status: "completed", barberName: "Rahul" };
 function App() {
   const ticketState = useTickets();
 
-  /* ── BARBER STATE CONSTANTS (एरर टाळण्यासाठी इथे डीफॉल्ट स्टेट्स जोडल्या आहेत) ── */
+
   const [status, setStatus] = useState("available");
   const [profile, setProfile] = useState({
     name: "Rahul Kumar",
@@ -105,7 +105,6 @@ function App() {
     specialization: "Hair Stylist & Grooming Expert"
   });
 
-  // डॅशबोर्डला लागणारा रिकामी किंवा डमी डेटा (जेणेकरून undefined एरर येणार नाही)
   const [queue, setQueue] = useState([]);
   const [currentSvc, setCurrentSvc] = useState(null);
   const [breakRequests, setBreakRequests] = useState([]);
