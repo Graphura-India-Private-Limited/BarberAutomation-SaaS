@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   SERVICES,
@@ -15,11 +16,22 @@ import {
   SourceTag,
   AddCustomerModal,
   DetailModal,
-}  from "../../components/common/Modals";
+} from "../../components/common/Modals";
 
 import "../../styles/smart-queue.css";
 
-// ─── QUEUE ROW ────────────────────────────────────────────────────────────────
+// Scissor Brand SVG Icon Component
+const ScissorIcon = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="6" cy="6" r="3" stroke="currentColor"/>
+    <circle cx="6" cy="18" r="3" stroke="currentColor"/>
+    <line x1="20" y1="4" x2="8.12" y2="15.88" stroke="currentColor"/>
+    <line x1="14.47" y1="14.48" x2="20" y2="20" stroke="currentColor"/>
+    <line x1="8.12" y1="8.12" x2="12" y2="12" stroke="currentColor"/>
+  </svg>
+);
+
+// ─── QUEUE ROW COMPONENT ──────────────────────────────────────────────────────
 function QueueRow({ entry, idx, onClick, onServe }) {
   const barber  = BARBERS.find(b => b.id === entry.barber);
   const svc     = SERVICES.find(s => s.id === entry.service);
@@ -28,45 +40,49 @@ function QueueRow({ entry, idx, onClick, onServe }) {
   return (
     <div
       onClick={onClick}
-      className={`animate-slide-up flex items-center gap-3 px-4 py-3.5 cursor-pointer ${isFirst ? 'card-active' : 'card'}`}
+      className={`animate-slide-up flex items-center gap-4 px-5 py-4 cursor-pointer bg-white border border-stone-200/50 rounded-2xl transition-all hover:shadow-sm ${
+        isFirst ? 'ring-2 ring-[#C5A059] bg-[#FFFBF4]/40' : ''
+      }`}
       style={{ animationDelay: `${idx * 0.07}s` }}
     >
       {/* Position Badge */}
-      <div className="w-11 h-11 rounded-xl flex-shrink-0 flex items-center justify-center font-mono-q font-black text-base"
+      <div 
+        className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-black text-sm transition-colors"
         style={{
-          background: isFirst ? '#ea580c' : '#fff7ed',
-          border: `2px solid ${isFirst ? '#c2410c' : '#fed7aa'}`,
-          color: isFirst ? '#fff' : '#c2410c',
-        }}>
-        {entry.position}
+          background: isFirst ? '#3E362E' : '#F5EFE6',
+          border: `1.5px solid ${isFirst ? '#2A241F' : '#EAD8C0'}`,
+          color: isFirst ? '#FFF' : '#3E362E',
+        }}
+      >
+        #{entry.position}
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="font-bold text-orange-950 text-[15px] leading-tight">{entry.name}</span>
+      {/* Info context */}
+      <div className="flex-1 min-w-0 text-left">
+        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+          <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
           <SourceTag src={entry.source} />
-          {isFirst && <Chip color="#16a34a">● NEXT UP</Chip>}
+          {isFirst && <Chip color="#A37B58">● NEXT UP</Chip>}
         </div>
-        <p className="text-[13px] text-orange-600 font-medium">
-          {barber?.emoji} {barber?.name} &nbsp;·&nbsp; {svc?.label}
+        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
+          {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
       </div>
 
-      {/* Wait time */}
-      <div className="text-right flex-shrink-0 mr-1">
-        <p className="font-mono-q font-black text-[15px]" style={{ color: isFirst ? '#ea580c' : '#9a3412' }}>
+      {/* Wait time text metric */}
+      <div className="text-right flex-shrink-0">
+        <p className="font-black text-sm text-stone-900 leading-none mb-1">
           {fmtWait(entry.position, entry.service)}
         </p>
-        <p className="text-[11px] text-orange-400 font-medium">{timeAgo(entry.joinedAt)}</p>
+        <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">{timeAgo(entry.joinedAt)}</p>
       </div>
 
-      {/* Serve button (first only) */}
+      {/* Action Trigger */}
       {isFirst && (
         <button
           onClick={e => { e.stopPropagation(); onServe(entry.id); }}
-          className="btn-primary px-3 py-2 text-[13px] flex-shrink-0"
-          style={{ borderRadius:10 }}>
+          className="bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-xl transition-colors shadow-xs cursor-pointer"
+        >
           SERVE
         </button>
       )}
@@ -74,139 +90,129 @@ function QueueRow({ entry, idx, onClick, onServe }) {
   );
 }
 
-// ─── BOOKING ROW ──────────────────────────────────────────────────────────────
+// ─── BOOKING ROW COMPONENT ──────────────────────────────────────────────────
 function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
   const barber  = BARBERS.find(b => b.id === entry.barber);
   const svc     = SERVICES.find(s => s.id === entry.service);
   const inQueue = entry.status === 'in-queue';
+  
   const statusStyles = {
-    confirmed: { bg:'#eff6ff', border:'#93c5fd', color:'#1d4ed8' },
-    'in-queue':{ bg:'#fff7ed', border:'#fdba74', color:'#c2410c' },
-    cancelled: { bg:'#fef2f2', border:'#fca5a5', color:'#dc2626' },
+    confirmed: { bg: 'bg-blue-50', border: 'border-blue-200/60', text: 'text-blue-700' },
+    'in-queue': { bg: 'bg-stone-100', border: 'border-stone-200', text: 'text-stone-600' },
+    cancelled: { bg: 'bg-red-50', border: 'border-red-200/60', text: 'text-red-700' },
   };
   const ss = statusStyles[entry.status] ?? statusStyles.confirmed;
 
   return (
     <div
       onClick={onClick}
-      className="animate-slide-up card flex items-center gap-3 px-4 py-3.5 cursor-pointer"
+      className="animate-slide-up flex items-center gap-4 px-5 py-4 cursor-pointer bg-white border border-stone-200/50 rounded-2xl transition-all hover:shadow-sm"
       style={{ animationDelay: `${idx * 0.07}s` }}
     >
-      {/* Slot bubble */}
-      <div className="w-14 flex-shrink-0 text-center rounded-xl py-2"
-        style={{ background:'#fff7ed', border:'2px solid #fed7aa' }}>
-        <p className="font-mono-q font-black text-[12px] text-orange-600 leading-tight">{entry.slot.split(' ')[0]}</p>
-        <p className="font-mono-q text-[10px] text-orange-400">{entry.slot.split(' ')[1]}</p>
+      {/* Slot layout bubble */}
+      <div className="w-14 flex-shrink-0 text-center rounded-xl py-1.5 bg-[#FAF7F2] border border-[#EAD8C0]">
+        <p className="font-black text-xs text-stone-900 leading-tight">{entry.slot.split(' ')[0]}</p>
+        <p className="text-[9px] uppercase font-black tracking-wider text-[#A37B58] mt-0.5">{entry.slot.split(' ')[1]}</p>
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="font-bold text-orange-950 text-[15px]">{entry.name}</span>
-          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full capitalize"
-            style={{ background:ss.bg, border:`1.5px solid ${ss.border}`, color:ss.color }}>
+      {/* Core Profile Metadata */}
+      <div className="flex-1 min-w-0 text-left">
+        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+          <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
+          <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${ss.bg} ${ss.border} ${ss.text}`}>
             {entry.status}
           </span>
         </div>
-        <p className="text-[13px] text-orange-600 font-medium">
-          {barber?.emoji} {barber?.name} &nbsp;·&nbsp; {svc?.label}
+        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
+          {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
       </div>
 
-      {/* Action */}
-      {!inQueue
-        ? <button onClick={e => { e.stopPropagation(); onMoveToQueue(entry.id); }}
-            className="btn-primary px-3 py-2 text-[13px] flex-shrink-0 whitespace-nowrap"
-            style={{ borderRadius:10 }}>
-            → Queue
-          </button>
-        : <span className="text-[12px] font-bold text-orange-500 flex-shrink-0"> In Queue</span>
-      }
+      {/* Trigger Handler */}
+      {!inQueue ? (
+        <button 
+          onClick={e => { e.stopPropagation(); onMoveToQueue(entry.id); }}
+          className="border border-[#C5A059] text-[#C5A059] bg-white hover:bg-[#C5A059] hover:text-white font-black text-[10px] uppercase tracking-widest px-3 py-2.5 rounded-xl transition-all cursor-pointer shadow-2xs"
+        >
+          → Queue
+        </button>
+      ) : (
+        <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 bg-stone-50 px-2.5 py-1.5 rounded-lg border border-stone-200/40">
+          In Queue
+        </span>
+      )}
     </div>
   );
 }
 
-// ─── STATS TAB ────────────────────────────────────────────────────────────────
+// ─── STATS TAB COMPONENT ──────────────────────────────────────────────────────
 function StatsPanel({ queue, bookings, servedCount, liveActive }) {
-  const totalWait = queue.reduce((acc,e) => acc + (SERVICES.find(s=>s.id===e.service)?.mins ?? AVG_CUT), 0);
+  const totalWait = queue.reduce((acc, e) => acc + (SERVICES.find(s => s.id === e.service)?.mins ?? AVG_CUT), 0);
 
   return (
-    <div className="flex flex-col gap-4 animate-slide-up">
-      {/* Barber Cards */}
-      <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mt-1">Barber Workload</p>
+    <div className="flex flex-col gap-4 animate-slide-up text-left">
+      <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1">Barber Workload</p>
+      
       <div className="flex flex-col gap-3">
         {BARBERS.map(b => {
           const assigned = queue.filter(e => e.barber === b.id).length;
-          const pct = Math.min(100, queue.length > 0 ? (assigned/queue.length)*100 : 0);
+          const pct = Math.min(100, queue.length > 0 ? (assigned / queue.length) * 100 : 0);
           return (
-            <div key={b.id} className="card p-4">
+            <div key={b.id} className="bg-white border border-stone-200/50 rounded-2xl p-5 shadow-2xs">
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{b.emoji}</span>
-                  <span className="font-bold text-orange-950 text-[15px]">{b.name}</span>
+                  <span className="font-extrabold text-stone-900 text-base tracking-tight">{b.name}</span>
                 </div>
-                <Chip color={b.color}>{assigned} clients</Chip>
+                <span className="text-[10px] font-black bg-stone-50 text-stone-700 border border-stone-200/60 px-2.5 py-1 rounded-md uppercase tracking-wider">
+                  {assigned} clients
+                </span>
               </div>
-              <div className="rounded-full h-2.5 overflow-hidden" style={{ background:'#ffedd5', border:'1.5px solid #fed7aa' }}>
+              <div className="rounded-full h-2 bg-stone-100 overflow-hidden">
                 <div className="h-full rounded-full transition-all duration-700"
-                  style={{ background: b.color, width:`${pct}%` }} />
+                  style={{ background: '#3E362E', width: `${pct}%` }} />
               </div>
-              <div className="flex justify-between mt-1.5">
-                <span className="text-[12px] text-orange-400 font-medium">Queue load</span>
-                <span className="font-mono-q text-[12px] text-orange-600 font-bold">{Math.round(pct)}%</span>
+              <div className="flex justify-between mt-2">
+                <span className="text-xs text-stone-400 font-bold uppercase tracking-wider">Queue distribution</span>
+                <span className="text-xs text-stone-900 font-black">{Math.round(pct)}%</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Summary */}
-      <div className="card p-4">
-        <p className="font-bold text-orange-950 text-[15px] mb-3">Session Summary</p>
+      {/* Summary Data Context Grid */}
+      <div className="bg-white border border-stone-200/50 rounded-2xl p-5 shadow-2xs">
+        <p className="font-extrabold text-stone-900 text-base tracking-tight mb-3">Session Summary</p>
         {[
           ['Customers served',  servedCount],
           ['Currently waiting', queue.length],
-          ['Pending bookings',  bookings.filter(b=>b.status==='confirmed').length],
+          ['Pending bookings',  bookings.filter(b => b.status === 'confirmed').length],
           ['Total queue wait',  `${totalWait} mins`],
           ['Avg service time',  `${AVG_CUT} mins`],
-          ['Live updates',      liveActive ? '● Active' : '⏸ Paused'],
-        ].map(([k,v]) => (
-          <div key={k} className="flex justify-between py-2.5 border-b last:border-0" style={{ borderColor:'#ffedd5' }}>
-            <span className="text-[14px] text-orange-600 font-medium">{k}</span>
-            <span className="font-mono-q text-[14px] text-orange-950 font-bold">{v}</span>
+          ['Live updates',      liveActive ? '● Operational' : '⏸ Paused'],
+        ].map(([k, v]) => (
+          <div key={k} className="flex justify-between py-3 border-b border-stone-100 last:border-0">
+            <span className="text-sm text-stone-600 font-medium">{k}</span>
+            <span className="text-sm text-stone-900 font-black">{v}</span>
           </div>
         ))}
       </div>
 
-      {/* Services */}
-      <div className="card p-4">
-        <p className="font-bold text-orange-950 text-[15px] mb-3"> Services Breakdown</p>
-        {SERVICES.map(s => {
-          const count = queue.filter(e=>e.service===s.id).length;
-          return (
-            <div key={s.id} className="flex justify-between items-center py-2.5 border-b last:border-0" style={{ borderColor:'#ffedd5' }}>
-              <span className="text-[14px] text-orange-800 font-semibold">{s.label}</span>
-              <div className="flex items-center gap-2">
-                <span className="font-mono-q text-[12px] text-orange-400">{s.mins}m</span>
-                <Chip color="#ea580c">{count}</Chip>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="rounded-2xl p-4 flex items-center gap-3" style={{ background:'#fff7ed', border:'2px solid #fed7aa' }}>
-        <span className="text-orange-400 text-lg">⏱</span>
-        <p className="text-[13px] text-orange-700 font-medium leading-snug">
-          Queue auto-advances every <strong>18s</strong> · Bookings auto-queue every <strong>30s</strong> when live.
+      {/* Auto Ticker Message Container */}
+      <div className="rounded-2xl p-4 flex items-center gap-3 bg-white/60 border border-stone-200/40 shadow-2xs">
+        <span className="text-[#C5A059] text-base">⏱</span>
+        <p className="text-xs text-stone-600 font-medium leading-normal">
+          Queue auto-advances every <strong className="text-stone-900 font-bold">18s</strong> · Bookings auto-queue every <strong className="text-stone-900 font-bold">30s</strong> when system status is live.
         </p>
       </div>
     </div>
   );
 }
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+// ─── MAIN APP VIEW PANEL ──────────────────────────────────────────────────────
 export default function SmartQueue() {
+  const navigate = useNavigate();
   const [queue,       setQueue]       = useState(initQueue);
   const [bookings,    setBookings]    = useState(() => initBookings());
   const [tab,         setTab]         = useState('queue');
@@ -230,8 +236,8 @@ export default function SmartQueue() {
         if (!prev.length) return prev;
         const [done, ...rest] = prev;
         toast(`${done.name} has been served `, 'success');
-        setServedCount(n => n+1);
-        return rest.map((e,i) => ({ ...e, position:i+1 }));
+        setServedCount(n => n + 1);
+        return rest.map((e, i) => ({ ...e, position: i + 1 }));
       });
     }, 18000);
     return () => clearInterval(t);
@@ -243,12 +249,12 @@ export default function SmartQueue() {
       setBookings(prev => {
         const toMove = prev.find(b => b.status === 'confirmed');
         if (!toMove) return prev;
-        const updated = prev.map(b => b.id===toMove.id ? { ...b, status:'in-queue' } : b);
+        const updated = prev.map(b => b.id === toMove.id ? { ...b, status: 'in-queue' } : b);
         setQueue(q => {
-          if (q.some(e => e.id===toMove.id)) return q;
+          if (q.some(e => e.id === toMove.id)) return q;
           const newPos = q.length + 1;
           toast(`${toMove.name}'s booking moved to queue at #${newPos}`, 'info');
-          return [...q, { id:toMove.id, name:toMove.name, phone:toMove.phone, service:toMove.service, barber:toMove.barber, position:newPos, joinedAt:Date.now(), source:'booked', status:'waiting' }];
+          return [...q, { id: toMove.id, name: toMove.name, phone: toMove.phone, service: toMove.service, barber: toMove.barber, position: newPos, joinedAt: Date.now(), source: 'booked', status: 'waiting' }];
         });
         return updated;
       });
@@ -258,7 +264,7 @@ export default function SmartQueue() {
 
   const handleAdd = ({ type, entry }) => {
     if (type === 'queue') {
-      setQueue(prev => [...prev, { ...entry, position:prev.length+1 }]);
+      setQueue(prev => [...prev, { ...entry, position: prev.length + 1 }]);
       toast(`${entry.name} added to queue `, 'success');
     } else {
       setBookings(prev => [...prev, entry]);
@@ -268,174 +274,199 @@ export default function SmartQueue() {
 
   const handleServe = id => {
     setQueue(prev => {
-      const done = prev.find(e => e.id===id);
-      if (done) { toast(`${done.name} served! `, 'success'); setServedCount(n=>n+1); }
-      return prev.filter(e=>e.id!==id).map((e,i) => ({ ...e, position:i+1 }));
+      const done = prev.find(e => e.id === id);
+      if (done) { toast(`${done.name} served! `, 'success'); setServedCount(n => n + 1); }
+      return prev.filter(e => e.id !== id).map((e, i) => ({ ...e, position: i + 1 }));
     });
     setDetail(null);
   };
 
   const handleRemoveQueue = id => {
     setQueue(prev => {
-      const gone = prev.find(e => e.id===id);
+      const gone = prev.find(e => e.id === id);
       if (gone) toast(`${gone.name} removed from queue`, 'warn');
-      return prev.filter(e=>e.id!==id).map((e,i) => ({ ...e, position:i+1 }));
+      return prev.filter(e => e.id !== id).map((e, i) => ({ ...e, position: i + 1 }));
     });
   };
 
   const handleRemoveBooking = id => {
     setBookings(prev => {
-      const gone = prev.find(e => e.id===id);
+      const gone = prev.find(e => e.id === id);
       if (gone) toast(`${gone.name}'s booking cancelled`, 'warn');
-      return prev.filter(e=>e.id!==id);
+      return prev.filter(e => e.id !== id);
     });
   };
 
   const handleMoveToQueue = id => {
     setBookings(prev => {
-      const b = prev.find(e=>e.id===id);
+      const b = prev.find(e => e.id === id);
       if (!b) return prev;
       setQueue(q => {
-        const newPos = q.length+1;
+        const newPos = q.length + 1;
         toast(`${b.name} moved booking → queue at #${newPos}`, 'info');
-        return [...q, { id:b.id, name:b.name, phone:b.phone, service:b.service, barber:b.barber, position:newPos, joinedAt:Date.now(), source:'booked', status:'waiting' }];
+        return [...q, { id: b.id, name: b.name, phone: b.phone, service: b.service, barber: b.barber, position: newPos, joinedAt: Date.now(), source: 'booked', status: 'waiting' }];
       });
-      return prev.map(e => e.id===id ? { ...e, status:'in-queue' } : e);
+      return prev.map(e => e.id === id ? { ...e, status: 'in-queue' } : e);
     });
   };
 
-  const totalWaitMins = queue.reduce((acc,e) => acc + (SERVICES.find(s=>s.id===e.service)?.mins ?? AVG_CUT), 0);
-  const tabs = [['queue','Queue'],['bookings','Bookings'],['stats','Stats']];
+  const totalWaitMins = queue.reduce((acc, e) => acc + (SERVICES.find(s => s.id === e.service)?.mins ?? AVG_CUT), 0);
+  const tabs = [['queue', 'Active Queue'], ['bookings', 'Live Bookings'], ['stats', 'Analytics Stats']];
 
   return (
-    <div className="min-h-screen pb-24" style={{ background:'#fff7ed' }}>
+    <div className="min-h-screen pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col">
       <Toast notif={notif} />
 
-      {/* ── STICKY HEADER ── */}
-      <div className="sticky top-0 z-50 px-4 pt-5 pb-0"
-        style={{ background:'linear-gradient(to bottom, #ffffff 60%, #fff7ed)', borderBottom:'2px solid #fed7aa', boxShadow:'0 2px 12px rgba(194,65,12,0.1)' }}>
-        <div className="max-w-lg mx-auto">
+      {/* ✂️ BARBER PRO CORPORATE NAVIGATION HEADER */}
+      <header className="bg-[#3E362E] border-b border-[#2A241F] px-8 py-4 flex items-center justify-between z-30 shadow-md">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
+            <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
+          </div>
+          <div className="text-left">
+            <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
+              BARBER <span className="text-white">PRO</span>
+            </h1>
+            <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
+              Smart Pipeline System
+            </p>
+          </div>
+        </div>
+        
+        {/* Top Control Automation Elements */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => { setLiveActive(v => !v); toast(liveActive ? 'Live updates paused' : 'Live updates resumed', 'info'); }}
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 font-bold text-[11px] uppercase tracking-wider cursor-pointer transition-all border border-stone-700/50 text-white"
+            style={{ background: liveActive ? '#2E4F39' : '#5C2E2E' }}
+          >
+            <LiveDot active={liveActive} />
+            {liveActive ? 'ONLINE' : 'PAUSED'}
+          </button>
+          
+          <button 
+            onClick={() => setShowAdd(true)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xl font-medium cursor-pointer bg-[#A37B58] hover:bg-[#8F6947] transition-all border-none shadow-xs"
+          >
+            +
+          </button>
+        </div>
+      </header>
 
-          {/* Title Row */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-orange-400 mb-0.5">Smart Queue System</p>
-              <h1 className="font-display font-black text-orange-950 leading-tight" style={{ fontSize:22 }}>
-                 Barber Shop
-              </h1>
+      {/* 📊 CORE GRID SUMMARY COUNTERS ROW */}
+      <div className="bg-white border-b border-stone-200/40 shadow-2xs py-4 px-4">
+        <div className="max-w-lg mx-auto grid grid-cols-4 gap-3">
+          {[
+            { v: queue.length,                                             l: 'In Queue',   c: 'text-[#3E362E]' },
+            { v: bookings.filter(b => b.status === 'confirmed').length,    l: 'Bookings',   c: 'text-blue-600' },
+            { v: servedCount,                                              l: 'Served',     c: 'text-emerald-700' },
+            { v: `${totalWaitMins}m`,                                      l: 'Total Wait', c: 'text-[#A37B58]' },
+          ].map(({ v, l, c }) => (
+            <div key={l} className="text-center rounded-xl py-3 px-1 bg-[#FAF7F2] border border-stone-200/50 shadow-2xs">
+              <p className={`font-black text-xl leading-none m-0 ${c}`}>{v}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-1.5 leading-none">{l}</p>
             </div>
-            <div className="flex items-center gap-2.5">
-              {/* Live Toggle */}
-              <button
-                onClick={() => { setLiveActive(v=>!v); toast(liveActive ? 'Live updates paused' : 'Live updates resumed', 'info'); }}
-                className="flex items-center gap-2 rounded-full px-3.5 py-2 font-bold text-[12px] cursor-pointer transition-all border-2"
-                style={liveActive
-                  ? { background:'#f0fdf4', borderColor:'#16a34a', color:'#15803d' }
-                  : { background:'#fef2f2', borderColor:'#dc2626', color:'#dc2626' }
-                }>
-                <LiveDot active={liveActive} />
-                {liveActive ? 'LIVE' : 'PAUSED'}
-              </button>
-              {/* Add Button */}
-              <button onClick={() => setShowAdd(true)}
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-2xl font-light cursor-pointer transition-all hover:scale-105"
-                style={{ background:'linear-gradient(135deg,#ea580c,#f97316)', border:'none', boxShadow:'0 4px 14px rgba(234,88,12,0.4)' }}>
-                +
-              </button>
-            </div>
-          </div>
-
-          {/* Stats Strip */}
-          <div className="grid grid-cols-4 gap-2 mb-4">
-            {[
-              { v: queue.length,                                             l:'In Queue',   c:'#d97706' },
-              { v: bookings.filter(b=>b.status==='confirmed').length,        l:'Bookings',   c:'#0284c7' },
-              { v: servedCount,                                              l:'Served',     c:'#16a34a' },
-              { v: `${totalWaitMins}m`,                                      l:'Total Wait', c:'#ea580c' },
-            ].map(({ v,l,c }) => (
-              <div key={l} className="text-center rounded-2xl py-2.5 px-1"
-                style={{ background:'#fff', border:'2px solid #fed7aa', boxShadow:'0 1px 6px rgba(194,65,12,0.07)' }}>
-                <p className="font-mono-q font-black text-[17px] leading-tight m-0" style={{ color:c }}>{v}</p>
-                <p className="text-[10px] font-semibold text-orange-500 mt-0.5 leading-tight">{l}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-1">
-            {tabs.map(([k,label]) => (
-              <button key={k} onClick={() => setTab(k)}
-                className={`flex-1 py-2.5 border-none font-bold text-[14px] cursor-pointer transition-all duration-200 ${tab===k ? 'tab-active' : 'tab-inactive'}`}>
-                {label}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
 
-      {/* ── CONTENT ── */}
-      <div className="max-w-lg mx-auto px-4 pt-5">
+      {/* 📑 SWITCHER SEGMENTED TABS ROW */}
+      <div className="bg-white/40 backdrop-blur-md border-b border-stone-200/30 px-4 py-2.5 sticky top-0 z-20 shadow-3xs">
+        <div className="max-w-lg mx-auto flex gap-2 bg-stone-100/80 p-1 rounded-xl border border-stone-200/30">
+          {tabs.map(([k, label]) => (
+            <button 
+              key={k} 
+              onClick={() => setTab(k)}
+              className={`flex-1 py-2.5 rounded-lg border-none font-bold text-xs uppercase tracking-wider cursor-pointer transition-all ${
+                tab === k 
+                  ? 'bg-[#3E362E] text-white shadow-xs' 
+                  : 'text-stone-500 hover:text-stone-800 hover:bg-stone-200/50'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* QUEUE TAB */}
+      {/* ── CENTRAL PIPELINE VIEWPORT CONTENT ── */}
+      <div className="max-w-lg mx-auto w-full px-4 pt-6 flex-1">
+
+        {/* QUEUE PIPELINE ACTION CONTENT */}
         {tab === 'queue' && (
-          <>
+          <div className="flex flex-col gap-3">
             {queue.length === 0 ? (
-              <div className="card p-12 text-center">
-                <div className="text-5xl mb-3"></div>
-                <p className="font-display font-bold text-orange-950 text-xl mb-1.5">Queue is empty!</p>
-                <p className="text-orange-500 text-[14px] font-medium mb-6">Add a customer or wait for walk-ins</p>
-                <button className="btn-primary px-8 py-3.5" onClick={() => setShowAdd(true)}>+ Add Customer</button>
+              <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
+                <p className="font-extrabold text-stone-900 text-xl tracking-tight mb-1">Queue container empty</p>
+                <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-6">No walk-in lines active</p>
+                <button 
+                  className="bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl cursor-pointer transition-colors"
+                  onClick={() => setShowAdd(true)}
+                >
+                  + Inject Customer
+                </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
-                {queue.map((entry,i) => (
-                  <QueueRow key={entry.id} entry={entry} idx={i}
-                    onClick={() => setDetail({ entry, type:'queue' })}
-                    onServe={handleServe} />
+              <div className="flex flex-col gap-3">
+                {queue.map((entry, i) => (
+                  <QueueRow 
+                    key={entry.id} 
+                    entry={entry} 
+                    idx={i}
+                    onClick={() => setDetail({ entry, type: 'queue' })}
+                    onServe={handleServe} 
+                  />
                 ))}
               </div>
             )}
-            <button className="btn-primary w-full mt-4 py-4" onClick={() => setShowAdd(true)}>
+            <button 
+              className="bg-[#A37B58] hover:bg-[#8F6947] text-white font-black text-xs uppercase tracking-widest w-full mt-4 py-4 rounded-xl shadow-xs transition-colors cursor-pointer"
+              onClick={() => setShowAdd(true)}
+            >
               + Add Customer to Queue
             </button>
-          </>
+          </div>
         )}
 
-        {/* BOOKINGS TAB */}
+        {/* BOOKINGS REGISTER PIPELINE ACTION CONTENT */}
         {tab === 'bookings' && (
-          <>
-            <div className="flex justify-between items-center mb-3">
-              <p className="text-[12px] font-bold uppercase tracking-widest text-orange-500">Upcoming Appointments</p>
-              <button onClick={() => setShowAdd(true)}
-                className="px-3.5 py-1.5 rounded-xl font-bold text-[13px] cursor-pointer transition-colors"
-                style={{ background:'#eff6ff', border:'2px solid #93c5fd', color:'#1d4ed8' }}>
-                + Book
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-between items-center mb-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58]">Upcoming Registry</p>
+              <button 
+                onClick={() => setShowAdd(true)}
+                className="bg-white border border-stone-200 hover:border-stone-400 text-stone-700 font-bold text-xs px-3.5 py-2 rounded-xl transition-colors cursor-pointer"
+              >
+                + Create Slot
               </button>
             </div>
             {bookings.length === 0 ? (
-              <div className="card p-10 text-center">
-                <div className="text-4xl mb-2.5"></div>
-                <p className="text-orange-500 font-medium text-[14px]">No upcoming bookings</p>
+              <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
+                <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider">No appointment logs active</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
-                {bookings.map((entry,i) => (
-                  <BookingRow key={entry.id} entry={entry} idx={i}
-                    onClick={() => setDetail({ entry, type:'booking' })}
-                    onMoveToQueue={handleMoveToQueue} />
+              <div className="flex flex-col gap-3">
+                {bookings.map((entry, i) => (
+                  <BookingRow 
+                    key={entry.id} 
+                    entry={entry} 
+                    idx={i}
+                    onClick={() => setDetail({ entry, type: 'booking' })}
+                    onMoveToQueue={handleMoveToQueue} 
+                  />
                 ))}
               </div>
             )}
-          </>
+          </div>
         )}
 
-        {/* STATS TAB */}
+        {/* ANALYTICS WORKLOAD TAB */}
         {tab === 'stats' && (
           <StatsPanel queue={queue} bookings={bookings} servedCount={servedCount} liveActive={liveActive} />
         )}
       </div>
 
-      {/* ── MODALS ── */}
+      {/* ── PORTAL MODAL DRIVERS ── */}
       {showAdd && <AddCustomerModal onClose={() => setShowAdd(false)} onAdd={handleAdd} />}
       {detail?.type === 'queue' && (
         <DetailModal entry={detail.entry} isQueue onClose={() => setDetail(null)} onServe={handleServe} onRemove={handleRemoveQueue} />

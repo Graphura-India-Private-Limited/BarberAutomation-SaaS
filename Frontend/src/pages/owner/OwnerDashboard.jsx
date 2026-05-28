@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Scissors } from "lucide-react";
+
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -22,7 +24,6 @@ const emptyForm = {
 
 export default function OwnerDashboard() {
   const navigate = useNavigate();
-
 
   const [salon, setSalon] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -218,82 +219,110 @@ export default function OwnerDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFBF2] p-10 text-center font-black text-[#3E362E]">
-        Loading owner console...
-      </div>
+      <>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+          .font-sans-loading {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+          }
+        `}</style>
+
+        <div
+          style={{ background: "#FAF6F0" }}
+          className="min-h-screen flex items-center justify-center font-sans-loading"
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
+              <Scissors className="w-6 h-6 text-amber-600" />
+            </div>
+
+            <p className="text-zinc-600 text-sm font-medium">
+              Loading Owner Console...
+            </p>
+          </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFBF2] p-4 font-sans text-[#3E362E] md:p-10">
+    <div
+      className="min-h-screen p-4 font-sans text-zinc-800 md:p-10"
+      style={{ background: "#FAF6F0" }}
+    >
       <div className="mx-auto max-w-7xl">
+
         {/* Header */}
         <header className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-black uppercase tracking-tight md:text-5xl">
-              Owner <span className="text-[#C5A059]">Console</span>
+            <h1 className="text-3xl font-bold md:text-5xl text-zinc-900">
+              Owner <span className="text-amber-600">Console</span>
             </h1>
 
             <div className="mt-2 flex items-center gap-2">
-              <span
-                className={`h-2 w-2 rounded-full ${statusMeta.dot}`}
-              ></span>
+              <span className={`h-2 w-2 rounded-full ${statusMeta.dot}`} />
 
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8D7B68]">
+              <p className="text-xs font-semibold text-zinc-500">
                 Salon Status: {statusMeta.label}
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-3">
+
             <button
               onClick={() => navigate("/owner/manage-services")}
               disabled={!approved}
-              className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold transition hover:bg-zinc-50 shadow-sm disabled:opacity-50"
             >
               Barber & Service Management
             </button>
 
+            <button
+              onClick={() => navigate("/owner/dashboard/analytics")}
+              disabled={!approved}
+              className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold transition hover:bg-zinc-50 shadow-sm disabled:opacity-50"
+            >
+              Analytics
+            </button>
+
+            <button
+              onClick={() => navigate("/owner/payments")}
+              disabled={!approved}
+              className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold transition hover:bg-zinc-50 shadow-sm disabled:opacity-50"
+            >
+              Payments
+            </button>
+
+            <button
+              onClick={() => navigate("/owner/revenue")}
+              disabled={!approved}
+              className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-xs font-bold transition hover:bg-zinc-50 shadow-sm disabled:opacity-50"
+            >
+              Revenue
+            </button>
 
             <button
               onClick={() => setEditing((prev) => !prev)}
-              className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition hover:opacity-90"
-            > </button>
-
-            <button onClick={() => navigate("/owner/dashboard/analytics")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
-              Analytics
-            </button>
-            <button onClick={() => navigate("/owner/payments")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
-              Payments
-            </button>
-            <button onClick={() => navigate("/owner/revenue")} disabled={!approved} className="rounded-xl border border-[#EAD8C0] bg-white px-5 py-3 text-[10px] font-black uppercase tracking-widest transition hover:bg-[#FDF5E6] disabled:cursor-not-allowed disabled:opacity-50">
-              Revenue
-            </button>
-            <button onClick={() => setEditing(prev => !prev)} className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition hover:opacity-90">
-
+              className="rounded-xl bg-zinc-900 px-5 py-3 text-xs font-bold text-white hover:bg-zinc-800 transition shadow-sm"
+            >
               {editing ? "Close Editor" : "Edit Profile"}
             </button>
+
           </div>
         </header>
 
-        {/* Status Panel */}
+        {/* Status */}
         <div className={`mb-8 rounded-2xl border p-5 ${statusMeta.panel}`}>
           <p className="text-sm font-bold">
             {approved
-              ? "Your salon is live. Customers can discover and book your services."
+              ? "Your salon is live."
               : salon?.status === "rejected"
-              ? "Your submission was rejected. Edit your details and resubmit for approval."
-              : "Your salon profile is under admin review. Customer discovery and booking unlock after approval."}
+              ? "Your submission was rejected."
+              : "Your salon profile is under review."}
           </p>
-
-          {salon?.status === "rejected" &&
-            salon?.rejection_reason && (
-              <p className="mt-2 text-sm">
-                Reason: <strong>{salon.rejection_reason}</strong>
-              </p>
-            )}
         </div>
-
 
         {/* Alerts */}
         {error && (
@@ -308,28 +337,19 @@ export default function OwnerDashboard() {
           </p>
         )}
 
-        {error && <p className="mb-5 rounded-xl bg-red-50 p-3 text-center text-xs font-bold text-red-600">{error}</p>}
-        {message && <p className="mb-5 rounded-xl bg-green-50 p-3 text-center text-xs font-bold text-green-700">{message}</p>}
-
         {/* Main Grid */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-          {/* Left Side */}
+
+          {/* Left */}
           <section className="space-y-8 lg:col-span-5">
-            {/* Salon Details */}
-            <div className="rounded-[2rem] border border-[#EAD8C0] bg-white p-7 shadow-sm">
-              <h2 className="mb-5 text-xl font-black uppercase">
+
+            <div className="rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm">
+              <h2 className="mb-5 text-xl font-bold">
                 Salon Details
               </h2>
 
-              <Info
-                label="Business Name"
-                value={salon?.salon_name}
-              />
-
-              <Info
-                label="Owner"
-                value={salon?.owner_name}
-              />
+              <Info label="Business Name" value={salon?.salon_name} />
+              <Info label="Owner" value={salon?.owner_name} />
 
               <Info
                 label="Hours"
@@ -345,152 +365,10 @@ export default function OwnerDashboard() {
 
               <Info
                 label="Support"
-                value={
-                  salon?.support_number ||
-                  salon?.mobile ||
-                  "Not added"
-                }
+                value={salon?.support_number || "Not added"}
               />
             </div>
 
-            {/* Gallery */}
-            <div className="rounded-[2rem] border border-[#EAD8C0] bg-[#FDF5E6] p-7">
-              <h2 className="mb-2 text-xl font-black uppercase">
-                Shop Gallery
-              </h2>
-
-              <div className="mt-5 grid grid-cols-3 gap-3">
-                {(form.images || []).map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Salon ${index + 1}`}
-                    className="aspect-square rounded-2xl border border-white object-cover shadow-sm"
-                  />
-                ))}
-
-                {(!form.images || form.images.length === 0) && (
-                  <div className="col-span-3 rounded-2xl border border-dashed border-[#C5A059]/40 bg-white p-8 text-center text-xs font-bold text-[#8D7B68]">
-                    No shop images added yet.
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Services */}
-            <div className="rounded-[2rem] border border-[#EAD8C0] bg-white p-7 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-black uppercase">
-                  Services & Pricing
-                </h2>
-
-                <button
-                  onClick={() =>
-                    navigate("/owner/manage-services")
-                  }
-                  className="text-[10px] font-black text-[#C5A059] hover:underline"
-                >
-                  MANAGE
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {services.map((service) => (
-                  <div
-                    key={service.id}
-                    className="flex items-center justify-between rounded-2xl border border-[#EAD8C0]/50 bg-[#FFFBF2] p-5"
-                  >
-                    <div>
-                      <h3 className="font-bold">
-                        {service.name}
-                      </h3>
-
-                      <p className="mt-1 text-[10px] uppercase tracking-widest text-[#8D7B68]">
-                        Standard Service
-                      </p>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="text-xl font-black">
-                        ₹{service.price}
-                      </p>
-
-                      <button
-                        onClick={() =>
-                          navigate("/owner/manage-services")
-                        }
-                        className="mt-1 text-[8px] font-black uppercase text-[#C5A059] hover:underline"
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* Right Side */}
-          <section className="lg:col-span-7">
-            {editing ? (
-              <ProfileEditor
-                form={form}
-                setField={setField}
-                addImages={addImages}
-                tagLocation={tagLocation}
-                saveProfile={saveProfile}
-                busy={busy}
-                canResubmit={salon?.status === "rejected"}
-              />
-            ) : (
-              <div className="rounded-[2rem] border border-[#EAD8C0] bg-white p-7 shadow-xl">
-                <h2 className="mb-6 text-2xl font-black uppercase">
-                  Activation Checklist
-                </h2>
-
-                <ChecklistItem
-                  done={!!salon?.salon_name}
-                  label="Salon identity submitted"
-                />
-
-                <ChecklistItem
-                  done={
-                    !!salon?.latitude && !!salon?.longitude
-                  }
-                  label="Geo location tagged"
-                />
-
-                <ChecklistItem
-                  done={
-                    (salon?.services_offered || []).length > 0
-                  }
-                  label="Services offered added"
-                />
-
-                <ChecklistItem
-                  done={!!salon?.basic_pricing}
-                  label="Basic pricing added"
-                />
-
-                <ChecklistItem
-                  done={(salon?.images || []).length > 0}
-                  label="Shop images uploaded"
-                />
-
-                <ChecklistItem
-                  done={approved}
-                  label="Admin approval completed"
-                />
-
-                <div className="mt-8 rounded-2xl border border-dashed border-[#EAD8C0] bg-[#FDF5E6]/60 p-6">
-                  <p className="text-sm font-bold text-[#8D7B68]">
-                    Post-approval access includes barber
-                    management, service pricing, queue controls
-                    and full dashboard operations.
-                  </p>
-                </div>
-              </div>
-            )}
           </section>
         </div>
       </div>
@@ -501,199 +379,13 @@ export default function OwnerDashboard() {
 function Info({ label, value }) {
   return (
     <div className="mb-4">
-      <label className="text-[9px] font-black uppercase tracking-widest text-[#C5A059]">
+      <label className="text-xs font-bold text-amber-600">
         {label}
       </label>
 
-      <p className="font-bold text-[#3E362E]">{value}</p>
-    </div>
-  );
-}
-
-function ChecklistItem({ done, label }) {
-  return (
-    <div className="mb-3 flex items-center justify-between rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-4">
-      <span className="text-sm font-bold">{label}</span>
-
-      <span
-        className={`rounded-full px-3 py-1 text-[10px] font-black uppercase ${
-          done
-            ? "bg-green-100 text-green-700"
-            : "bg-yellow-100 text-yellow-700"
-        }`}
-      >
-        {done ? "Done" : "Pending"}
-      </span>
-    </div>
-  );
-}
-
-function ProfileEditor({
-  form,
-  setField,
-  addImages,
-  tagLocation,
-  saveProfile,
-  busy,
-  canResubmit,
-}) {
-  const inputClass =
-    "w-full rounded-xl border border-[#EAD8C0] bg-[#FFFBF2] p-3 text-sm font-semibold outline-none focus:border-[#C5A059]";
-
-  return (
-    <div className="rounded-[2rem] border border-[#EAD8C0] bg-white p-7 shadow-xl">
-      <h2 className="mb-6 text-2xl font-black uppercase">
-        Edit Salon Profile
-      </h2>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <input
-          className={inputClass}
-          value={form.salon_name}
-          onChange={(e) =>
-            setField("salon_name", e.target.value)
-          }
-          placeholder="Salon name"
-        />
-
-        <input
-          className={inputClass}
-          value={form.owner_name}
-          onChange={(e) =>
-            setField("owner_name", e.target.value)
-          }
-          placeholder="Owner name"
-        />
-
-        <input
-          className={inputClass}
-          value={form.email}
-          onChange={(e) =>
-            setField("email", e.target.value)
-          }
-          placeholder="Email"
-        />
-
-        <input
-          className={inputClass}
-          value={form.support_number}
-          onChange={(e) =>
-            setField(
-              "support_number",
-              e.target.value
-                .replace(/\D/g, "")
-                .slice(0, 10)
-            )
-          }
-          placeholder="Support number"
-        />
-
-        <input
-          type="time"
-          className={inputClass}
-          value={form.opening_time}
-          onChange={(e) =>
-            setField("opening_time", e.target.value)
-          }
-        />
-
-        <input
-          type="time"
-          className={inputClass}
-          value={form.closing_time}
-          onChange={(e) =>
-            setField("closing_time", e.target.value)
-          }
-        />
-
-        <input
-          className={inputClass}
-          value={form.services_offered}
-          onChange={(e) =>
-            setField(
-              "services_offered",
-              e.target.value
-            )
-          }
-          placeholder="Services, comma separated"
-        />
-
-        <input
-          type="number"
-          className={inputClass}
-          value={form.basic_pricing}
-          onChange={(e) =>
-            setField("basic_pricing", e.target.value)
-          }
-          placeholder="Basic pricing"
-        />
-
-        <input
-          type="number"
-          className={inputClass}
-          value={form.number_of_barbers}
-          onChange={(e) =>
-            setField(
-              "number_of_barbers",
-              e.target.value
-            )
-          }
-          placeholder="Number of barbers"
-        />
-
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          className={inputClass}
-          onChange={addImages}
-        />
-      </div>
-
-      <textarea
-        className={`${inputClass} mt-4 min-h-24 resize-none`}
-        value={form.address}
-        onChange={(e) =>
-          setField("address", e.target.value)
-        }
-        placeholder="Address"
-      />
-
-      <textarea
-        className={`${inputClass} mt-4 min-h-20 resize-none`}
-        value={form.about}
-        onChange={(e) =>
-          setField("about", e.target.value)
-        }
-        placeholder="About salon"
-      />
-
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button
-          onClick={tagLocation}
-          className="rounded-xl border border-[#C5A059] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-[#C5A059] hover:bg-[#C5A059] hover:text-white"
-        >
-          Update Location
-        </button>
-
-        <button
-          onClick={() => saveProfile(false)}
-          disabled={busy}
-          className="rounded-xl bg-[#3E362E] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50"
-        >
-          Save Profile
-        </button>
-
-        {canResubmit && (
-          <button
-            onClick={() => saveProfile(true)}
-            disabled={busy}
-            className="rounded-xl bg-[#C5A059] px-5 py-3 text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-50"
-          >
-            Resubmit Request
-          </button>
-        )}
-      </div>
+      <p className="font-semibold text-zinc-900 mt-1">
+        {value || "Not added"}
+      </p>
     </div>
   );
 }

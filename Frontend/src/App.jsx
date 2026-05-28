@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 
-/* ── Pages ── */
+/* ───────────── AUTH ───────────── */
 
 import HomePage from "./pages/HomePage";
 
@@ -16,6 +16,8 @@ import RateLimit from "./pages/auth/RateLimit";
 import Payment from "./pages/auth/Payment";
 import StaffLogin from "./pages/auth/StaffLogin";
 
+/* ───────────── BARBER ───────────── */
+
 import BarberLogin from "./pages/barber/BarberLogin";
 import BarberProfile from "./pages/barber/BarberProfile";
 import BarberDashboard from "./pages/barber/BarberDashboard";
@@ -25,6 +27,9 @@ import BreakManagement from "./pages/barber/BreakManagement";
 import NoShowHandle from "./pages/barber/NoShowHandle";
 import QueuePage from "./pages/barber/QueuePage";
 import MultiBarberSystem from "./pages/barber/MultiBarberSystem";
+import BarberSettings from "./pages/barber/BarberSettings";
+
+/* ───────────── OWNER ───────────── */
 
 import OwnerLogin from "./pages/owner/OwnerLogin";
 import SalonRegistration from "./pages/owner/SalonRegistration";
@@ -40,6 +45,8 @@ import AnalyticsDashboard from "./pages/owner/AnalyticsDashboard";
 import BookingManagement from "./pages/owner/BookingManagement";
 import LiveQueue from "./pages/owner/LiveQueue";
 
+/* ───────────── ADMIN ───────────── */
+
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import AdminExperienceMonitor from "./pages/admin/AdminExperienceMonitor";
@@ -52,6 +59,8 @@ import { DashboardPage } from "./pages/admin/DashboardPage";
 import { TicketsPage } from "./pages/admin/TicketsPage";
 import { ReportsPage } from "./pages/admin/ReportsPage";
 import { AdminSettings } from "./pages/admin/AdminSettings";
+
+/* ───────────── CUSTOMER ───────────── */
 
 import ServiceCategories from "./pages/customer/ServiceCategories";
 import MenServices from "./pages/customer/MenServices";
@@ -67,11 +76,13 @@ import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
 import CustomerManagement from "./pages/customer/CustomerManagement";
 import AllReviews from "./pages/customer/AllReviews";
 
+/* ───────────── STATIC PAGES ───────────── */
+
 import FaqPage from "./pages/FaqPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
-/* ── Components ── */
+/* ───────────── COMPONENTS ───────────── */
 
 import { Sidebar, Header } from "./Components/AppLayout";
 
@@ -81,10 +92,12 @@ import NearbyBarbers from "./components/queue/NearbyBarbers";
 import NoShowDelayPage from "./components/queue/NoShowDelayPage";
 import MembershipSection from "./components/membership/MembershipSection";
 
-/* ── Utils ── */
+/* ───────────── UTILS ───────────── */
 
 import { useTickets } from "./utils/useTickets";
 import { TICKET_TYPE } from "./utils/tickets";
+
+/* ───────────── ADMIN LAYOUT ───────────── */
 
 function AdminLayout({ page, children }) {
   const navigate = useNavigate();
@@ -125,6 +138,8 @@ const demoBooking = {
   barberName: "Rahul",
 };
 
+/* ───────────── APP ───────────── */
+
 function App() {
   const ticketState = useTickets();
 
@@ -135,9 +150,8 @@ function App() {
         {/* HOME */}
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/HomePage" element={<HomePage />} />
 
-        {/* CUSTOMER AUTH */}
+        {/* AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customerprofile" element={<CustomerProfile />} />
@@ -147,6 +161,7 @@ function App() {
         <Route path="/duplicate-account" element={<DuplicateAccount />} />
         <Route path="/rate-limit" element={<RateLimit />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/staff-login" element={<StaffLogin />} />
 
         {/* CUSTOMER */}
         <Route path="/customer/services" element={<ServiceCategories />} />
@@ -162,7 +177,10 @@ function App() {
           path="/customer/interactions"
           element={<CustomerInteractionView />}
         />
-        <Route path="/customer/customers" element={<CustomerManagement />} />
+        <Route
+          path="/customer/customers"
+          element={<CustomerManagement />}
+        />
 
         <Route path="/booking" element={<CustomerBookingFlow />} />
         <Route path="/booking-history" element={<BookingHistory />} />
@@ -188,10 +206,7 @@ function App() {
         <Route path="/barber/profile" element={<BarberProfile />} />
         <Route path="/barber/dashboard" element={<BarberDashboard />} />
         <Route path="/barber/breaks" element={<BreakManagement />} />
-
-        <Route path="/live-session" element={<ServiceConsole />} />
-        <Route path="/service-handler" element={<ServiceHandler />} />
-        <Route path="/noshow-delay" element={<NoShowDelayPage />} />
+        <Route path="/barber/queue" element={<QueuePage />} />
 
         <Route
           path="/barber/live-session"
@@ -218,7 +233,10 @@ function App() {
           element={<MultiBarberSystem />}
         />
 
-        <Route path="/barber/queue" element={<QueuePage />} />
+        <Route
+          path="/barber/settings"
+          element={<BarberSettings />}
+        />
 
         {/* OWNER */}
         <Route path="/owner/login" element={<OwnerLogin />} />
@@ -362,8 +380,7 @@ function App() {
           }
         />
 
-        {/* OTHER */}
-        <Route path="/staff-login" element={<StaffLogin />} />
+        {/* STATIC */}
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route

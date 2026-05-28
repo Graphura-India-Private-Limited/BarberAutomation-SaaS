@@ -605,6 +605,7 @@ export default function HomePage() {
         </div>
       </section>
 
+     
       <Footer />
 
       {/* ══ REVIEW DETAIL MODAL ══ */}

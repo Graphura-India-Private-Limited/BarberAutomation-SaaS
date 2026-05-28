@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Clock, Check, ChevronRight, Sparkles, Star, ArrowLeft, Lightbulb } from 'lucide-react';
+import Header from "../../components/layout/Header";
 
 const ServiceHandler = () => {
   const [step, setStep] = useState(1);
@@ -27,75 +28,119 @@ const ServiceHandler = () => {
     const finishTime = new Date(now.getTime() + minutes * 60000);
     return finishTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+  const handleConfirmSelection = () => {
+  if (!selectedService) return;
+  
+  // 🚀 Connect this to your database, local context pipeline, or router navigate:
+  alert(`Successfully confirmed ${selectedService.name} with ${selectedService.bestBarber}!`);
+  
+  // Example: Navigate to the final checkout or checkout log page
+  // navigate('/checkout', { state: { service: selectedService } });
+};
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#fcf8f1] p-4 lg:p-12">
-      <div className="bg-[#fdf5e6] text-[#4a3728] p-6 md:p-10 rounded-[3.5rem] border border-[#e8dcc4] w-full max-w-5xl shadow-[0_40px_120px_-20px_rgba(74,55,40,0.18)] font-sans relative overflow-hidden transition-all duration-500">
+ return (
+    <div className="min-h-screen w-full bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden">
+      
+      {/* ✂️ GLOBAL EXECUTIVE SYSTEM NAVIGATION HEADER */}
+      <Header 
+        title={step === 1 ? "Choose Expert" : "Select Treatment"} 
+        subtitle={step === 1 ? "Top-rated professionals for every style" : `Specialists available for ${selectedGender}`} 
+      />
+
+      <main className="max-w-6xl mx-auto w-full px-6 py-12 flex-grow relative flex flex-col justify-start">
         
+        {/* 🧭 Back Button Control */}
         {step === 2 && (
-          <button onClick={() => {setStep(1); setSelectedService(null);}} className="absolute top-8 right-8 p-3 bg-white/50 hover:bg-white rounded-full transition-all border border-[#e8dcc4] z-20">
-            <ArrowLeft size={18} />
-          </button>
+          <div className="w-full text-left mb-6">
+            <button 
+              type="button"
+              onClick={() => { setStep(1); setSelectedService(null); }} 
+              className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer"
+            >
+              <ArrowLeft size={14} className="stroke-[2.5px]" /> Return to Experts
+            </button>
+          </div>
         )}
 
-        <div className="mb-10 flex flex-col gap-3">
-          <h2 className="text-3xl md:text-5xl font-black text-[#3d2b1f] tracking-tight leading-none">
-            {step === 1 ? "Choose Your " : "Select "}
-            <span className="text-[#c5a385]">{step === 1 ? "Expert." : "Service."}</span>
-          </h2>
-          <p className="text-[#8b7355] text-xs md:text-sm font-medium flex items-center gap-2">
-            <Star size={16} fill="#c5a385" className="text-[#c5a385]" /> 
-            {step === 1 ? "Top-rated professionals for every style" : `Specialists available for ${selectedGender}`}
-          </p>
-        </div>
-
-        {/* STEP 1: 4 EXPERT CATEGORIES */}
+        {/* 🏷️ NEW: ADDED AN INTENTIONAL HEADING ZONE TO REMOVE BLANDNESS */}
         {step === 1 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in zoom-in-95 duration-500">
+          <div className="text-left mb-10 space-y-2 border-b border-stone-200/40 pb-6">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#A37B58]">
+              Personalized Grooming
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-stone-900 uppercase">
+              Choose Your <span className="italic font-serif font-medium lowercase text-[#A37B58]">Stylist</span>
+            </h2>
+            <p className="text-xs text-stone-400 font-medium max-w-md leading-relaxed">
+              Select a specialized master artisan to view their real-time treatment catalogs, session capacities, and current queue intervals.
+            </p>
+          </div>
+        )}
+
+        {/* STEP 1: 4 EXPERT CATEGORIES CONTAINER */}
+        {step === 1 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
             {expertCategories.map((cat) => (
               <div 
                 key={cat.id}
                 onClick={() => { setSelectedGender(cat.title); setStep(2); }}
-                className="group cursor-pointer relative overflow-hidden rounded-[2.5rem] border-2 border-[#ede0c8] bg-white hover:border-[#4a3728] transition-all duration-500 hover:shadow-xl"
+                className="group cursor-pointer relative overflow-hidden rounded-[2rem] bg-white border border-stone-200/60 shadow-3xs hover:shadow-xl hover:border-stone-400 transition-all duration-500 flex flex-col"
               >
-                <div className="h-48 md:h-60 overflow-hidden">
-                  <img src={cat.img} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                <div className="h-64 overflow-hidden relative bg-stone-100 flex-shrink-0">
+                  <img 
+                    src={cat.img} 
+                    alt={cat.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent mix-blend-multiply opacity-60" />
                 </div>
-                <div className="p-5 text-center">
-                  <h3 className="text-xl font-black uppercase tracking-tighter italic">{cat.title}</h3>
-                  <p className="text-[9px] font-bold text-[#c5a385] uppercase tracking-widest mt-1">{cat.sub}</p>
+                <div className="p-5 text-left flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-xl font-extrabold text-stone-900 tracking-tight uppercase">{cat.title}</h3>
+                    <p className="text-[10px] font-black text-[#A37B58] uppercase tracking-widest mt-1.5 leading-normal">{cat.sub}</p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* STEP 2: SERVICES GRID */}
+        {/* STEP 2: SERVICES SELECTION FLOW DISPLAY */}
         {step === 2 && (
-          <div className="animate-in fade-in slide-in-from-right-10 duration-500">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div className="w-full space-y-8 text-left">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {serviceCatalog.map((service) => (
                 <div
                   key={service.id}
                   onClick={() => setSelectedService(service)}
-                  className={`relative cursor-pointer p-3 rounded-[2rem] border-2 transition-all duration-500 group ${
-                    selectedService?.id === service.id ? 'border-[#4a3728] bg-white shadow-xl scale-[1.02] z-10' : 'border-[#ede0c8] bg-white/50 hover:border-[#4a3728]'
+                  className={`relative cursor-pointer p-4 rounded-[2rem] border-2 transition-all duration-300 group flex flex-col bg-white ${
+                    selectedService?.id === service.id 
+                      ? 'border-[#3E362E] shadow-md scale-[1.01]' 
+                      : 'border-stone-200/60 shadow-3xs hover:border-stone-400'
                   }`}
                 >
-                  <div className="flex flex-col gap-3">
-                    <div className="w-full aspect-square rounded-[1.2rem] overflow-hidden shadow-inner border border-[#ede0c8]">
-                      <img src={service.img} alt={service.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                  <div className="flex flex-col gap-4 flex-1">
+                    <div className="w-full aspect-video rounded-xl overflow-hidden relative bg-stone-100 border border-stone-100 flex-shrink-0">
+                      <img 
+                        src={service.img} 
+                        alt={service.name} 
+                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700" 
+                      />
                     </div>
-                    <div className="px-1 pb-1">
-                      <div className="flex justify-between items-start mb-2">
-                        <p className="font-black text-sm md:text-base leading-tight tracking-tight">{service.name}</p>
-                        <p className="font-bold text-sm text-[#c5a385]">{service.price}</p>
+                    <div className="flex flex-col flex-grow justify-between">
+                      <div className="flex justify-between items-start gap-4">
+                        <p className="font-extrabold text-stone-900 text-base tracking-tight leading-snug">{service.name}</p>
+                        <p className="font-mono font-black text-stone-900 text-sm whitespace-nowrap">{service.price}</p>
                       </div>
-                      <div className="flex justify-between items-center mt-3">
-                        <p className="text-[9px] font-bold uppercase text-[#8b7355] tracking-widest flex items-center gap-1">
-                          <Clock size={10} /> {service.time} MIN
+                      <div className="flex justify-between items-center mt-4 border-t border-stone-50 pt-3">
+                        <p className="text-[10px] font-black uppercase text-stone-400 tracking-widest inline-flex items-center gap-1.5">
+                          <Clock size={12} className="text-[#A37B58]" /> {service.time} MIN
                         </p>
-                        {selectedService?.id === service.id && <Check size={14} className="text-[#4a3728]" strokeWidth={4} />}
+                        {selectedService?.id === service.id && (
+                          <div className="w-5 h-5 rounded-full bg-[#3E362E] flex items-center justify-center text-white">
+                            <Check size={12} strokeWidth={4} />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -103,35 +148,41 @@ const ServiceHandler = () => {
               ))}
             </div>
 
-            <div className="min-h-[140px] flex items-center">
+            {/* LOWER BOTTOM ACTION FOOTER PANEL */}
+            <div className="min-h-[120px] pt-4 w-full">
               {selectedService ? (
-                <div className="w-full bg-[#4a3728] text-[#fdf5e6] p-6 rounded-[2.5rem] shadow-2xl">
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/5">
-                      <Lightbulb size={14} className="text-yellow-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Barber: {selectedService.bestBarber}</span>
+                <div className="w-full bg-white border border-stone-200/80 p-6 rounded-[2rem] shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 animate-fade-in">
+                  <div className="space-y-3 text-left">
+                    <div className="inline-flex items-center gap-1.5 bg-[#FAF6F0] border border-stone-200/60 px-3 py-1.5 rounded-lg text-stone-600">
+                      <Lightbulb size={12} className="text-[#C5A059]" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Recommended: {selectedService.bestBarber}</span>
                     </div>
-                  </div>
-                  <div className="flex justify-between items-end">
                     <div>
-                      <p className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-1">Estimated Completion</p>
-                      <p className="text-4xl font-black tabular-nums">{getEstimatedFinishTime(selectedService.time)}</p>
+                      <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">Estimated Completion Slot</p>
+                      <p className="text-4xl font-extrabold text-stone-900 tracking-tight font-mono mt-1">{getEstimatedFinishTime(selectedService.time)}</p>
                     </div>
-                    <button className="bg-[#c5a385] hover:bg-white hover:text-[#4a3728] p-4 rounded-2xl transition-all shadow-xl active:scale-95 group">
-                      <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} />
-                    </button>
                   </div>
+
+                  
+                  <button 
+                    type="button"
+                    onClick={handleConfirmSelection}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer group active:scale-[0.99]"
+                     >
+  <span>Confirm Selection</span>
+  <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform stroke-[2.5px]" />
+</button>
                 </div>
               ) : (
-                <div className="w-full text-center py-8 border-2 border-dashed border-[#ede0c8] rounded-[2.5rem] bg-white/10">
-                  <Sparkles size={24} className="mx-auto text-[#c5a385] mb-2 animate-pulse" />
-                  <p className="text-[#8b7355] text-[10px] font-black uppercase tracking-[0.15em] italic">Pick a service to check availability</p>
+                <div className="w-full text-center py-10 border border-dashed border-stone-300 rounded-[2rem] bg-white/40">
+                  <Sparkles size={20} className="mx-auto text-[#A37B58] mb-2 animate-pulse" />
+                  <p className="text-stone-400 text-[10px] font-black uppercase tracking-widest">Select a specialized service up top to verify execution logs</p>
                 </div>
               )}
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useAuth, users as initialUsers, SALARY_MODELS } from "../../contexts/AppContext";
 import Navbar from "../../components/layout/Navbar";
@@ -10,11 +9,32 @@ export default function SettingsPage() {
 
   if (currentUser?.role !== "owner") {
     return (
-      <div className="min-h-screen bg-orange-50">
+      <div className="min-h-screen p-4 sm:p-8 font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+          :root { 
+            --bg: #FAF6F0; 
+            --bg2: #FFFFFF; 
+            --border: #EADBCE; 
+          }
+          body, .font-sans {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+          }
+          .font-serif {
+            font-family: 'Playfair Display', serif !important;
+          }
+          .card { 
+            background: var(--bg2); 
+            border: 1px solid var(--border); 
+            border-radius: 24px; 
+            box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
+          }
+        `}</style>
         <Navbar />
-        <div className="max-w-xl mx-auto px-4 py-16 text-center">
-          <h2 className="text-2xl font-bold text-orange-900">Owner Only</h2>
-          <p className="text-gray-500 mt-2">Only the salon owner can access settings.</p>
+        <div className="max-w-xl mx-auto px-4 py-16 text-center card mt-10">
+          <span className="text-5xl block mb-4">🔒</span>
+          <h2 className="text-2xl font-bold text-zinc-900 font-serif mb-2">Owner Only</h2>
+          <p className="text-zinc-500 text-sm mt-1">Only the salon owner can access settings.</p>
         </div>
       </div>
     );
@@ -31,15 +51,50 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen p-4 sm:p-8 font-sans text-zinc-800" style={{ background: "var(--bg)" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        :root { 
+          --gold: #D97706; 
+          --gold2: #B45309; 
+          --bg: #FAF6F0; 
+          --bg2: #FFFFFF; 
+          --bg3: #FDFBF7; 
+          --border: #EADBCE; 
+          --text: #1C1917; 
+          --muted: #78716C; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, .font-sans {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .font-serif {
+          font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif !important;
+        }
+        .card { 
+          background: var(--bg2); 
+          border: 1px solid var(--border); 
+          border-radius: 24px; 
+          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
+          transition: all 0.2s ease;
+        }
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px -4px rgba(28, 25, 23, 0.06), 0 4px 12px -2px rgba(28, 25, 23, 0.03);
+          border-color: #D6C4AE;
+        }
+      `}</style>
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold text-orange-900 mb-1">Salon Settings</h2>
-        <p className="text-sm text-gray-500 mb-6">Manage barber access and salary configuration.</p>
+        <p className="text-amber-700 font-sans normal-case font-bold tracking-[2px] text-xs sm:text-sm uppercase mb-1">
+          Salon Preferences
+        </p>
+        <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 font-serif mb-1">Salon Settings</h2>
+        <p className="text-sm text-zinc-500 font-sans mb-6">Manage barber access and salary configuration.</p>
 
-        <div className="bg-white border border-orange-200 rounded-2xl p-6 shadow-sm mb-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-1">Barber Access Control</h3>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="card p-6 mb-6">
+          <h3 className="text-lg font-bold font-serif text-zinc-900 mb-1">Barber Access Control</h3>
+          <p className="text-sm text-zinc-500 font-sans mb-5">
             Control which barbers can view financial data. Barbers on a <strong>Fixed Salary</strong> model will never see financial data regardless of this setting.
           </p>
 
@@ -49,46 +104,46 @@ export default function SettingsPage() {
               const effectiveFinanceAccess = barber.showFinance && !isFixed;
 
               return (
-                <div key={barber.id} className="bg-orange-50 rounded-xl border border-orange-100 p-4">
-                  <div className="flex items-center justify-between mb-3">
+                <div key={barber.id} className="bg-amber-50/50 border border-amber-200/50 rounded-xl p-4 transition-all duration-200 hover:bg-amber-50">
+                  <div className="flex items-center justify-between mb-4 border-b border-amber-200/20 pb-3">
                     <div>
-                      <p className="font-bold text-gray-800">{barber.name}</p>
-                      <p className="text-xs text-gray-500">{barber.email}</p>
+                      <p className="font-bold text-zinc-900">{barber.name}</p>
+                      <p className="text-xs text-zinc-400 font-sans mt-0.5">{barber.email}</p>
                     </div>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      effectiveFinanceAccess ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                      effectiveFinanceAccess ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"
                     }`}>
                       Finance: {effectiveFinanceAccess ? "Visible" : "Hidden"}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold text-gray-600 block mb-1">Salary Model</label>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-2">Salary Model</label>
                       <select
                         value={barber.salaryModel}
                         onChange={e => changeSalaryModel(barber.id, e.target.value)}
-                        className="w-full border border-orange-300 rounded-lg px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                        className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-800 outline-none hover:bg-zinc-50 hover:border-amber-600/50 focus:border-amber-600 transition cursor-pointer"
                       >
                         <option value={SALARY_MODELS.COMMISSION}>Commission</option>
                         <option value={SALARY_MODELS.FIXED}>Fixed Salary</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-gray-600 block mb-1">Show Finance</label>
-                      <div className="flex items-center gap-2 mt-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-2">Show Finance</label>
+                      <div className="flex items-center gap-3 mt-1.5">
                         <button
                           onClick={() => toggleFinance(barber.id)}
                           disabled={isFixed}
                           className={`relative inline-flex w-11 h-6 rounded-full transition ${
-                            isFixed ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
-                          } ${barber.showFinance && !isFixed ? "bg-orange-500" : "bg-gray-300"}`}
+                            isFixed ? "opacity-30 cursor-not-allowed" : "cursor-pointer"
+                          } ${barber.showFinance && !isFixed ? "bg-amber-600" : "bg-zinc-300"}`}
                         >
                           <span className={`inline-block w-5 h-5 bg-white rounded-full shadow transform transition mt-0.5 ${
                             barber.showFinance && !isFixed ? "translate-x-5" : "translate-x-0.5"
                           }`} />
                         </button>
                         {isFixed && (
-                          <span className="text-xs text-orange-600 font-medium">Disabled (Fixed model)</span>
+                          <span className="text-xs text-amber-700 font-bold">Disabled (Fixed model)</span>
                         )}
                       </div>
                     </div>
@@ -98,18 +153,20 @@ export default function SettingsPage() {
             })}
           </div>
 
-          <button
-            onClick={() => setSaved(true)}
-            className="mt-5 bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-2 rounded-lg transition text-sm"
-          >
-            Save Settings
-          </button>
-          {saved && <span className="ml-3 text-green-600 text-sm font-semibold">Saved!</span>}
+          <div className="flex items-center gap-4 mt-6">
+            <button
+              onClick={() => setSaved(true)}
+              className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl shadow-md transition-all"
+            >
+              Save Settings
+            </button>
+            {saved && <span className="text-emerald-700 text-sm font-bold">Saved successfully!</span>}
+          </div>
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-          <strong>Access Rules:</strong>
-          <ul className="mt-1 space-y-1 list-disc list-inside text-amber-700">
+        <div className="bg-amber-50/50 border border-amber-200/50 rounded-2xl p-5 text-sm text-zinc-700">
+          <strong className="text-zinc-900 font-bold">Access Rules:</strong>
+          <ul className="mt-2 space-y-1.5 list-disc list-inside text-zinc-600 font-sans">
             <li>Each barber can only see their assigned salon's data.</li>
             <li>Each barber can only see their own queue.</li>
             <li>Finance is hidden for barbers on a Fixed Salary model, regardless of toggle.</li>
