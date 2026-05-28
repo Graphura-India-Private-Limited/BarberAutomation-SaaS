@@ -15,18 +15,21 @@ export default function ServiceCategories() {
 
   const categories = [
     {
+      id: "men", // SelectLook कोडशी मॅच होण्यासाठी सोपा ID
       title: "Men Services",
       desc: "Architectural cuts, razor-sharp beard styling, and premium treatments engineered for the modern gentleman.",
       img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80",
       path: "/customer/services/men"
     },
     {
+      id: "women",
       title: "Women Services",
       desc: "Bespoke styling, rich couture coloring, and rejuvenating hair rituals crafted to illuminate your natural elegance.",
       img: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800&q=80",
       path: "/customer/services/women"
     },
     {
+      id: "addon",
       title: "Add-On Services",
       desc: "Enhance your main ritual with therapeutic head massages, express treatments, and premium upgrades.",
       img: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80",
@@ -34,9 +37,19 @@ export default function ServiceCategories() {
     }
   ];
 
+  // 🛠️ पुढील सर्व्हिस लिस्ट पेजवर जाताना कॅटेगरी डेटा पास करणारे फंक्शन
+  const handleCategorySelect = (cat) => {
+    navigate(cat.path, {
+      state: {
+        categoryType: cat.id,
+        categoryTitle: cat.title
+      }
+    });
+  };
+
   return (
     <>
-      {/* 🧭 १. मुख्य टॉप नेव्हबार */}
+      {/* 🧭 १. मुख्य斬 टॉप नेव्हबार */}
       <Navbar />
 
       <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white">
@@ -110,7 +123,7 @@ export default function ServiceCategories() {
                   </div>
 
                   <button
-                    onClick={() => navigate(cat.path)}
+                    onClick={() => handleCategorySelect(cat)}
                     className="w-full bg-[#3E362E] text-white py-4 px-4 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 group-hover:bg-[#C5A059] group-hover:text-[#2A241F] shadow-sm cursor-pointer select-none"
                   >
                     Explore Services

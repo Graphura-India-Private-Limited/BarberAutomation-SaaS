@@ -28,7 +28,7 @@ export default function BarberSelection() {
       rating: 4.8,
       status: "Available",
       distance: 2,
-      img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400",
+      img: "https://i.pinimg.com/1200x/8d/21/29/8d2129c8a618f113eb8aa2bc596b1658.jpg",
       aiWaitTime: { queueLength: 0, past7DaysAvg: "15 mins/cut", estimatedWait: "0 mins" }
     },
     {
@@ -241,13 +241,13 @@ export default function BarberSelection() {
             </div>
           )}
 
-          {/* CONTINUE BUTTON */}
+          {/* 🔘 CONTINUE BUTTON: आता हा युझरला डायरेक्ट डिटेल्स ऐवजी 'लुक सिलेक्शन' पेजवर घेऊन जाईल */}
           {selectedBarber && (
             <div className="mt-12 text-center">
               <button
                 className="bg-[#C5A059] hover:bg-[#3E362E] text-white font-black text-xs tracking-[0.2em] uppercase px-10 py-5 rounded-xl transition-all duration-300 shadow-md cursor-pointer"
                 onClick={() =>
-                  navigate("/customer/details", {
+                  navigate("/customer/select-look", {  // 👈 इथे तुमच्या लुक पेजचा अचूक पाथ (Route) टाका
                     state: {
                       service: selectedService,
                       barber: selectedBarber
@@ -255,7 +255,7 @@ export default function BarberSelection() {
                   })
                 }
               >
-                Continue to Details →
+                Select Your Desired Look →
               </button>
             </div>
           )}

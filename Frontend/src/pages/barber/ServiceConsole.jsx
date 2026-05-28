@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 🔑 1. Bring in the navigation router hook
-import { Play, CheckCircle, Clock, History, Scissors, TrendingUp, IndianRupee, PlusCircle, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Play, CheckCircle, Scissors, TrendingUp, IndianRupee, 
+  PlusCircle, Sparkles, ArrowLeft, Clock, Zap, ChevronRight, User
+} from 'lucide-react';
 
-const ServiceConsole = () => {
-  const navigate = useNavigate(); // 🔑 2. Initialize the navigation control launcher
-  const [status, setStatus] = useState('Available');
-  const [seconds, setSeconds] = useState(0);
-  const [currentCustomer, setCurrentCustomer] = useState("Rahul Sharma");
-  const [totalServices, setTotalServices] = useState(12);
-  const [activeStep, setActiveStep] = useState(0);
+export default function ServiceConsole() {
+  const navigate = useNavigate(); 
+  const [status, setStatus] = useState('busy'); // Default to busy to sync with dashboard active state
+  const [seconds, setSeconds] = useState(720); // Syncing with dashboard's 12-minute pre-elapsed time
+  const [currentCustomer, setCurrentCustomer] = useState("Vikram Singh"); // Matches active dashboard client
+  const [activeStep, setActiveStep] = useState(1); // Defaulting to Haircut step
+  
   const steps = ["Consultation", "Haircut", "Head Massage", "Payment"];
-
   const [showServices, setShowServices] = useState(false);
   
   const extraServices = [
@@ -20,18 +22,16 @@ const ServiceConsole = () => {
     { name: "Hair Color (Black)", price: 500 }
   ];
 
+  // Global Time Counter matching parent state intervals
   useEffect(() => {
     let interval = null;
-    if (status === 'Busy') {
+    if (status === 'busy') {
       interval = setInterval(() => {
         setSeconds((prev) => prev + 1);
-        if (seconds > 0 && seconds % 10 === 0 && activeStep < steps.length - 1) {
-          setActiveStep(prev => prev + 1);
-        }
       }, 1000);
     } 
     return () => { if (interval) clearInterval(interval); };
-  }, [status, seconds, activeStep]);
+  }, [status]);
 
   const formatTime = (totalSeconds) => {
     const mins = Math.floor(totalSeconds / 60);
@@ -40,196 +40,213 @@ const ServiceConsole = () => {
   };
 
   const handleStart = () => {
-    setStatus('Busy');
+    setStatus('busy');
+    setSeconds(0);
     setActiveStep(0);
   };
 
   const handleComplete = () => {
-    setStatus('Available');
+    setStatus('available');
     setSeconds(0);
     setActiveStep(0);
-    setTotalServices(prev => prev + 1);
-    setCurrentCustomer("Ankit Verma"); 
+    // Automatically routes back safely to dashboard view on system closure
+    navigate('/barber/dashboard');
   };
 
   return (
-    <div 
-      className="min-h-screen font-serif relative overflow-hidden flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat bg-fixed"
-      style={{ 
-        backgroundImage: `linear-gradient(rgba(250, 249, 246, 0.82), rgba(250, 249, 246, 0.96)), url('image_f16fd9.jpg')`,
-        backgroundBlendMode: 'overlay'
-      }}
-    >
-      <div className="absolute top-[-5%] left-[-5%] w-80 h-80 bg-[#C5A059]/15 rounded-full blur-[110px] animate-pulse"></div>
-      <div className="absolute bottom-[-5%] right-[-5%] w-96 h-96 bg-[#3E362E]/10 rounded-full blur-[130px]"></div>
+    <div className="min-h-screen flex flex-col font-sans normal-case" style={{ background: "var(--bg)", color: "var(--text)" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        :root { 
+          --gold: #D97706; 
+          --gold2: #B45309; 
+          --bg: #FAF6F0; 
+          --bg2: #FFFFFF; 
+          --bg3: #FDFBF7; 
+          --border: #EADBCE; 
+          --text: #1C1917; 
+          --muted: #78716C; 
+        }
+        .font-sans {
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        }
+        .font-serif {
+          font-family: 'Playfair Display', Georgia, serif !important;
+        }
+        .console-card { 
+          background: var(--bg2); 
+          border: 1px solid var(--border); 
+          border-radius: 24px; 
+          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04);
+        }
+        .step-line {
+          background: var(--border);
+        }
+        .step-line-active {
+          background: var(--gold);
+        }
+      `}</style>
 
-      {/* --- HEADER --- */}
-      <header className="p-6 fixed top-0 left-0 z-50 w-full flex justify-between items-start">
+      {/* ─── HEADER BAR ─── */}
+      <header className="sticky top-0 z-30 flex items-center justify-between px-4 md:px-6 py-4"
+        style={{ background: "rgba(250,246,240,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--border)" }}>
         
-        {/* 🔑 3. FIXED CLICK ACTION: Routes directly to your specific layout window */}
-        <div 
-          onClick={() => navigate("/barber/live-session")} 
-          className="flex flex-col items-start group cursor-pointer"
-        >
-          <div className="flex items-center gap-2.5">
-            <Scissors className="w-5 h-5 text-[#C5A059] group-hover:rotate-[-30deg] transition-transform duration-300" />
-            <h1 className="text-xl font-bold text-[#3E362E] tracking-[0.2em] uppercase italic">
-              BARBER <span className="text-[#C5A059] not-italic">PRO</span>
-            </h1>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 rounded-xl text-zinc-600 hover:text-zinc-900 transition flex items-center justify-center"
+            style={{ background: "var(--bg3)", border: "1px solid var(--border)" }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h1 className="text-zinc-900 font-bold text-base font-serif tracking-normal leading-none">Live Console</h1>
+            <p className="text-[11px] mt-1 font-sans text-amber-600 font-semibold tracking-wider uppercase">Active Workout Terminal</p>
           </div>
-          <div className="h-[1px] w-full bg-[#C5A059] opacity-20 mt-1"></div>
         </div>
 
-        {/* --- LOCALIZED REVENUE DASHBOARD --- */}
-        <div className="hidden md:flex items-center gap-6 bg-white/30 backdrop-blur-2xl p-2 px-6 rounded-3xl border border-white/60 shadow-[0_8px_32px_0_rgba(197,160,89,0.1)] ring-1 ring-black/[0.03]">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#C5A059]/10 rounded-xl">
-              <IndianRupee size={16} className="text-[#C5A059]" />
-            </div>
+        {/* Sync Localized Metric Widgets */}
+        <div className="flex items-center gap-4 bg-white px-4 py-1.5 rounded-xl border border-[#EADBCE]">
+          <div className="flex items-center gap-2">
+            <IndianRupee size={14} className="text-amber-600" />
             <div className="flex flex-col">
-              <span className="text-[8px] uppercase font-black text-[#8D7B68]/60 tracking-[0.2em] leading-none mb-1">Total Revenue</span>
-              <span className="text-sm font-black text-[#3E362E] flex items-center">
-                ₹8,420.<span className="text-[10px] opacity-50">00</span>
-              </span>
-            </div>
-          </div>
-          <div className="w-[1px] h-8 bg-gradient-to-b from-transparent via-[#C5A059]/20 to-transparent"></div>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#3E362E]/5 rounded-xl">
-              <TrendingUp size={16} className="text-[#8D7B68]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[8px] uppercase font-black text-[#8D7B68]/60 tracking-[0.2em] leading-none mb-1">Daily Goal</span>
-              <span className="text-sm font-black text-[#3E362E]">84<span className="text-[10px] opacity-50">%</span></span>
+              <span className="text-[9px] text-zinc-400 font-semibold uppercase tracking-wider leading-none">Today's Revenue</span>
+              <span className="text-xs font-bold text-zinc-800 mt-0.5">₹8,450</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* SHINY TITLE SECTION */}
-      <div className="text-center mb-12 relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-12 bg-[#C5A059]/10 blur-[50px] -z-10"></div>
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/40 backdrop-blur-md border border-white/60 text-[9px] font-black text-[#C5A267] tracking-[0.25em] uppercase mb-6 shadow-[0_4px_12px_rgba(197,160,89,0.1)]">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C5A267] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C5A267]"></span>
-          </span>
-          Terminal Active • IST
-        </div>
-
-        <div className="relative">
-          <h1 className="text-6xl font-black tracking-[-0.04em] uppercase leading-none flex items-center justify-center gap-3">
-            <span className="relative inline-block bg-gradient-to-br from-[#3D3631] via-[#8D7B68] to-[#3D3631] bg-clip-text text-transparent">
-              Live
-              <svg className="absolute -bottom-2 -left-2 w-12 h-3 text-[#C5A059]/30 transform scale-x-[-1]" viewBox="0 0 100 20">
-                <path d="M0 10 Q25 0 50 10 T100 10" fill="none" stroke="currentColor" strokeWidth="2" />
-              </svg>
-            </span>
-            <span className="relative inline-block text-[#C5A059] italic font-serif font-light lowercase tracking-normal">
-              Session
-              <svg className="absolute -bottom-2 -right-4 w-12 h-3 text-[#C5A059]/30" viewBox="0 0 100 20">
-                <path d="M0 10 Q25 0 50 10 T100 10" fill="none" stroke="currentColor" strokeWidth="2" />
-              </svg>
-            </span>
-          </h1>
-          <div className="flex items-center justify-center gap-3 mt-4">
-            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#C5A059]/40"></div>
-            <div className="h-1 w-1 rounded-full bg-[#C5A059] animate-pulse"></div>
-            <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#C5A059]/40"></div>
-          </div>
-        </div>
-      </div>
-
-      {/* MAIN CONSOLE CARD */}
-      <div className="max-w-xl w-full px-6 relative z-10">
-        <div className="bg-white/70 backdrop-blur-3xl border border-white/50 rounded-[3rem] p-10 shadow-[0_50px_100px_-20px_rgba(62,54,46,0.15)] relative overflow-hidden">
+      {/* ─── TERMINAL CONSOLE CORE ─── */}
+      <main className="flex-1 flex items-center justify-center p-4 md:p-8">
+        <div className="max-w-xl w-full console-card p-6 md:p-8 space-y-8 relative overflow-hidden">
           
-          <div className="flex justify-between items-start mb-10">
-            <div>
-              <p className="text-[#C5A267] text-[10px] uppercase font-bold tracking-widest mb-1">Current Client</p>
-              <h3 className="text-3xl font-bold text-[#3D3631] tracking-tight">{currentCustomer}</h3>
+          {/* Subtle Elegance Sparkle Indicator */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-amber-500/10 to-transparent pointer-events-none rounded-bl-full" />
+
+          {/* Client Details Meta Block */}
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <span className="text-[10px] uppercase tracking-widest font-bold text-amber-600 font-sans">In Salon Chair</span>
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-zinc-400" />
+                <h3 className="text-2xl font-bold text-zinc-900 font-serif tracking-normal">{currentCustomer}</h3>
+              </div>
             </div>
-            <div className={`px-4 py-2 rounded-xl text-[9px] font-black tracking-widest border transition-all duration-700 ${
-              status === 'Busy' ? "bg-[#3D3631] text-[#C5A267] border-[#C5A267] animate-pulse" : "bg-white text-gray-300 border-gray-100"
+            
+            <div className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${
+              status === 'busy' 
+                ? "bg-amber-50 text-amber-600 border-amber-200" 
+                : "bg-emerald-50 text-emerald-600 border-emerald-200"
             }`}>
-              {status.toUpperCase()}
+              {status}
             </div>
           </div>
 
-          <div className="flex justify-between mb-12 relative px-2">
-            <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gray-100 -z-10"></div>
-            {steps.map((step, index) => (
-              <div key={index} className="flex flex-col items-center gap-2">
-                <div className={`w-3 h-3 rounded-full border-2 transition-all duration-500 ${
-                  index <= activeStep ? "bg-[#C5A267] border-[#C5A267] scale-125 shadow-lg shadow-[#C5A267]/40" : "bg-white border-gray-200"
-                }`}></div>
-                <span className={`text-[8px] font-bold uppercase tracking-tighter transition-colors ${
-                  index <= activeStep ? "text-[#3D3631]" : "text-gray-300"
-                }`}>{step}</span>
-              </div>
-            ))}
+          {/* Interactive Flow Stepper */}
+          <div className="relative px-2">
+            <div className="absolute top-3.5 left-0 w-full h-[2px] step-line -z-10" />
+            <div 
+              className="absolute top-3.5 left-0 h-[2px] step-line-active -z-10 transition-all duration-500" 
+              style={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
+            />
+            
+            <div className="flex justify-between items-center">
+              {steps.map((step, index) => (
+                <button 
+                  key={index} 
+                  onClick={() => status === 'busy' && setActiveStep(index)}
+                  className="flex flex-col items-center gap-2 focus:outline-none"
+                >
+                  <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
+                    index <= activeStep 
+                      ? "bg-amber-600 border-amber-600 text-white shadow-md shadow-amber-600/20" 
+                      : "bg-white border-zinc-200 text-zinc-400"
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <span className={`text-[9px] font-bold tracking-tight uppercase ${
+                    index <= activeStep ? "text-zinc-800" : "text-zinc-400"
+                  }`}>{step}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="relative flex items-center justify-center mb-12">
-            <svg className="w-64 h-64 transform -rotate-90">
-              <circle cx="128" cy="128" r="118" stroke="rgba(0,0,0,0.03)" strokeWidth="2" fill="transparent" />
-              <circle 
-                cx="128" cy="128" r="118" stroke="currentColor" strokeWidth="6" fill="transparent" 
-                strokeDasharray="741" 
-                strokeDashoffset={741 - (Math.min(seconds, 1800) / 1800) * 741}
-                className={`transition-all duration-1000 ease-linear ${status === 'Busy' ? 'text-[#C5A267]' : 'text-gray-100'}`} 
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[10px] font-black text-[#C5A267] tracking-[0.4em] mb-1">ELAPSED</span>
-              <div className={`text-6xl font-light tracking-tighter transition-all duration-500 font-mono ${status === 'Busy' ? 'text-[#3D3631]' : 'text-gray-200'}`}>
-                {formatTime(seconds)}
+          {/* Radial Process Timer Display */}
+          <div className="flex flex-col items-center justify-center relative py-4">
+            <div className="relative w-56 h-56 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90 absolute">
+                <circle cx="112" cy="112" r="102" stroke="rgba(217, 119, 6, 0.04)" strokeWidth="4" fill="transparent" />
+                <circle 
+                  cx="112" cy="112" r="102" stroke="var(--gold)" strokeWidth="5" fill="transparent" 
+                  strokeDasharray="640" 
+                  strokeDashoffset={640 - (Math.min(seconds, 1800) / 1800) * 640}
+                  className="transition-all duration-1000 ease-linear" 
+                />
+              </svg>
+              <div className="text-center z-10 space-y-1">
+                <span className="text-[10px] font-bold text-zinc-400 tracking-widest uppercase block">Elapsed Time</span>
+                <div className="text-5xl font-bold tracking-tight text-zinc-800 font-mono">
+                  {formatTime(seconds)}
+                </div>
+                <span className="text-[9px] text-zinc-500 font-medium flex items-center justify-center gap-1">
+                  <Zap size={10} className="text-amber-500" /> Layer Action
+                </span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 relative">
-            {status === 'Available' ? (
+          {/* Core Action Engine Grid Blocks */}
+          <div className="relative pt-2">
+            {status === 'available' ? (
               <button
                 type="button"
                 onClick={handleStart}
-                className="w-full group relative flex items-center justify-center gap-4 bg-[#3D3631] text-white py-6 rounded-2xl font-black text-xs tracking-[0.2em] transition-all hover:scale-[1.01] hover:shadow-2xl active:scale-95 cursor-pointer"
+                className="w-full flex items-center justify-center gap-3 text-white py-4 rounded-xl font-bold text-sm tracking-wide transition-all bg-zinc-900 hover:bg-zinc-800 shadow-lg cursor-pointer"
               >
-                <Play size={18} fill="#C5A267" className="text-[#C5A267]" /> START SESSION
+                <Play size={16} fill="white" /> INITIALIZE NEXT CHAIR SESSION
               </button>
             ) : (
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-6 gap-3">
                 <button
                   type="button"
                   onClick={handleComplete}
-                  className="col-span-4 flex items-center justify-center gap-4 bg-[#C5A267] text-white py-6 rounded-2xl font-black text-xs tracking-[0.2em] transition-all hover:bg-[#b08e56] active:scale-95 shadow-xl shadow-[#C5A267]/20 cursor-pointer"
+                  className="col-span-5 flex items-center justify-center gap-3 text-white py-4 rounded-xl font-bold text-sm tracking-wide transition-all shadow-md cursor-pointer"
+                  style={{ background: "linear-gradient(135deg, var(--gold), var(--gold2))" }}
                 >
-                  <CheckCircle size={20} /> COMPLETE & BILL
+                  <CheckCircle size={18} /> COMPLETE & PUSH BILL
                 </button>
+                
                 <button 
                   type="button"
                   onClick={() => setShowServices(!showServices)}
-                  className={`flex items-center justify-center border rounded-2xl transition-all shadow-sm cursor-pointer ${showServices ? 'bg-[#3D3631] text-white border-[#3D3631]' : 'bg-white border-gray-100 text-[#3D3631] hover:bg-gray-50'}`}
+                  className={`col-span-1 flex items-center justify-center border rounded-xl transition-all cursor-pointer ${
+                    showServices ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white border-zinc-200 text-zinc-800 hover:bg-zinc-50'
+                  }`}
                 >
-                  <PlusCircle size={24} strokeWidth={1.5} className={showServices ? 'rotate-45 transition-transform' : 'transition-transform'} />
+                  <PlusCircle size={22} className={showServices ? 'rotate-45 transition-transform' : 'transition-transform'} />
                 </button>
 
+                {/* Upsell Dropdown List Overlay matching architecture */}
                 {showServices && (
-                  <div className="absolute bottom-24 right-0 w-56 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-3xl p-4 shadow-2xl z-50 animate-in fade-in zoom-in duration-200">
-                    <p className="text-[10px] font-black text-[#C5A267] mb-3 uppercase tracking-widest border-b pb-2">Extra Services (₹)</p>
-                    <div className="flex flex-col gap-2">
+                  <div className="absolute bottom-20 right-0 w-64 bg-white border border-zinc-200 rounded-2xl p-3 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <p className="text-[10px] font-bold text-amber-600 mb-2 uppercase tracking-wider pb-1.5 border-b border-zinc-100 flex items-center gap-1">
+                      <Sparkles size={12} /> Add Extra Addon Services
+                    </p>
+                    <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
                       {extraServices.map((service, i) => (
                         <button 
                           key={i}
                           type="button"
                           onClick={() => {
-                            alert(`${service.name} added to bill!`);
+                            alert(`${service.name} updated to live dashboard queue state!`);
                             setShowServices(false);
                           }}
-                          className="flex justify-between items-center text-[11px] font-bold text-[#3D3631] hover:bg-[#C5A267]/10 p-2 rounded-xl transition-colors cursor-pointer"
+                          className="flex justify-between items-center text-xs font-semibold text-zinc-700 hover:bg-amber-50 hover:text-amber-800 p-2 rounded-lg transition-colors cursor-pointer"
                         >
                           <span>{service.name}</span>
-                          <span className="text-[#C5A267]">₹{service.price}</span>
+                          <span className="text-amber-600">+₹{service.price}</span>
                         </button>
                       ))}
                     </div>
@@ -238,21 +255,9 @@ const ServiceConsole = () => {
               </div>
             )}
           </div>
-        </div>
 
-        <footer className="mt-12 flex flex-col items-center gap-4">
-          <div className="px-4 py-2 bg-white/40 rounded-full flex items-center gap-6 border border-white/50 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-[8px] font-black text-[#8D7B68] tracking-widest uppercase">Server: Mumbai-1</span>
-            </div>
-            <div className="w-[1px] h-3 bg-gray-200"></div>
-            <span className="text-[8px] font-black text-[#8D7B68] tracking-widest uppercase">Digital India • 2026</span>
-          </div>
-        </footer>
-      </div>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default ServiceConsole;
+}
