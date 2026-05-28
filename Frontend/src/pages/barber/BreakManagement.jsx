@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import Navbar from "../../components/layout/Navbar";
-import Footer from "../../components/layout/Footer"; // 👈 तुमच्या प्रोजेक्टमधील फुटर इथे इम्पोर्ट केला आहे
 import { Coffee, Clock, CalendarCheck, ShieldAlert, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
+import Footer from "../../components/layout/Footer";
 
 export default function BreakManagement() {
   // --- STATE FOR LUNCH TIMING ---
@@ -86,7 +85,7 @@ export default function BreakManagement() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col selection:bg-[#C5A059] selection:text-white relative overflow-hidden">
-      <Navbar />
+      
 
       {/* Luxury Background Ambient Glows */}
       <div className="absolute top-24 left-0 w-80 h-80 bg-[#C5A059]/5 rounded-full blur-3xl pointer-events-none" />
@@ -94,17 +93,6 @@ export default function BreakManagement() {
 
       {/* MAIN CONTENT AREA */}
       <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 flex-1 text-left relative z-10">
-        
-        {/* 🔙 BACK TO HOME PAGE NAVIGATION BUTTON */}
-        <div className="mb-6">
-          <button 
-            onClick={() => window.location.href = '/'} 
-            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-[#C5A059] transition-colors duration-300 group cursor-pointer"
-          >
-            <ArrowLeft size={14} className="transform transition-transform duration-300 group-hover:-translate-x-1 stroke-[2.5px]" />
-            Back to Home Page
-          </button>
-        </div>
 
         {/* PAGE DESCRIPTIVE HERO LAYER */}
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
@@ -244,6 +232,7 @@ export default function BreakManagement() {
 
       </main>
       <Footer />
+
     </div>
   );
 }

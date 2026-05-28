@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import Navbar from "../../components/layout/Navbar"; 
-import Footer from "../../components/layout/Footer"; 
 import { Settings, Lock, Bell, ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import Footer from "../../components/layout/Footer";
 
 export default function BarberSettings() {
   const [showPassword, setShowPassword] = useState(false); 
@@ -28,25 +27,13 @@ export default function BarberSettings() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col selection:bg-[#C5A059] selection:text-white relative overflow-hidden">
-      <Navbar />
-
+      
       {/* Luxury Background Ambient Glows */}
       <div className="absolute top-24 left-0 w-80 h-80 bg-[#C5A059]/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-40 right-0 w-96 h-96 bg-[#EADDCA]/30 rounded-full blur-3xl pointer-events-none" />
 
       <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 flex-1 text-left relative z-10">
-        
-        {/* 🔙 BACK TO HOME PAGE NAVIGATION BUTTON (नवीन जोडला आहे) */}
-        <div className="mb-6">
-          <button 
-            onClick={() => window.location.href = '/'} 
-            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 hover:text-[#C5A059] transition-colors duration-300 group cursor-pointer"
-          >
-            <ArrowLeft size={14} className="transform transition-transform duration-300 group-hover:-translate-x-1 stroke-[2.5px]" />
-            Back to Home Page
-          </button>
-        </div>
-
+  
         {/* PAGE DESCRIPTIVE HERO LAYER */}
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
           <h1 className="text-3xl font-black tracking-tight text-[#3E362E] uppercase">
@@ -177,7 +164,6 @@ export default function BarberSettings() {
           </div>
         </div>
       </main>
-      
       <Footer />
     </div>
   );

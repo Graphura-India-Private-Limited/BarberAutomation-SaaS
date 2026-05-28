@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Header from "../../components/layout/Header";
 import { User, ShieldCheck, Briefcase, Phone, Award, Save } from "lucide-react";
+import Footer from "../../components/layout/Footer";
 
 const ProfileField = ({ label, value, icon: Icon }) => (
   <div className="flex items-center gap-4 p-5 rounded-2xl bg-[#3E362E]/5 border border-stone-200/60 shadow-3xs text-left">
@@ -40,9 +40,7 @@ function BarberProfile() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden">
-      {/* ✂️ GLOBAL SYSTEM MONITOR HEADER */}
-      <Header title="Staff Profile" subtitle="Manage your studio credentials" />
-
+      
       <main className="max-w-5xl mx-auto w-full px-6 py-10 flex-1">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
@@ -164,6 +162,7 @@ function BarberProfile() {
 
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

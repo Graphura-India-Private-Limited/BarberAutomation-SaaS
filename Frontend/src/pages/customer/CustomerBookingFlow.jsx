@@ -3,8 +3,11 @@ import SlotSelection from '../../components/booking/SlotSelection';
 import BookingForm from '../../components/booking/BookingForm';
 import ConfirmationPage from '../../components/booking/ConfirmationPage';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+
+const GOLD = "#C5A059";
 
 export default function Wrapper() {
   const [bookingData, setBookingData] = useState({
@@ -12,11 +15,9 @@ export default function Wrapper() {
     price: 500,
     barber: 'Rahul',
     date: null,
-    time: null, // 📑 FIXED: Changed 'timeSlot' to 'time' to match sub-components
+    time: null,
   });
   const navigate = useNavigate();
-
-  // Defaulting to Step 3 (Slot Selection view)
   const [currentStep, setCurrentStep] = useState(3); 
 
   useEffect(() => {
@@ -24,11 +25,10 @@ export default function Wrapper() {
   }, [currentStep]);
 
   const handleSlotSelected = (date, selectedTime) => {
-    setBookingData({ ...bookingData, date, time: selectedTime }); // 📑 FIXED: Saved cleanly as 'time'
+    setBookingData({ ...bookingData, date, time: selectedTime });
     setCurrentStep(4);
   };
 
-  // Handles state finalization from the confirmation forms
   const handleBookingConfirmed = (updatedDetails) => {
     if (updatedDetails) {
       setBookingData((prev) => ({ ...prev, ...updatedDetails }));
@@ -48,6 +48,14 @@ export default function Wrapper() {
     navigate("/");
   };
 
+  const handleHeaderBackAction = () => {
+    if (currentStep === 4) {
+      setCurrentStep(3);
+    } else if (currentStep === 5) {
+      handleResetFlow();
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -58,11 +66,24 @@ export default function Wrapper() {
         <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
+        {/* ── 📑 FIXED: TOP CORNER BUTTON BAR (Navbar chya lagat khali) ── */}
+        {currentStep > 3 && (
+          <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
+            <button 
+              onClick={handleHeaderBackAction} 
+              className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white"
+            >
+              <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" style={{ color: GOLD }} />
+              <span>{currentStep === 5 ? "Home" : "Back"}</span>
+            </button>
+          </div>
+        )}
+
         {/* Dynamic Step Info Banner Aura */}
-        <div className="relative h-[180px] sm:h-[220px] flex items-center justify-center overflow-hidden mb-2">
+        <div className="relative h-[150px] sm:h-[180px] flex items-center justify-center overflow-hidden mb-2">
           <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
           
-          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-6">
+          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-4">
             {currentStep === 3 && (
               <>
                 <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-3">

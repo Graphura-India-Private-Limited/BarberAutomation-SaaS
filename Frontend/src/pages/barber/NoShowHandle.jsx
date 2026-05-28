@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Header from "../../components/layout/Header";
 import { Scissors, AlertTriangle, CheckCircle, Clock, Trash2, HelpCircle } from "lucide-react";
+import Footer from "../../components/layout/Footer";
 
 const INITIAL_QUEUE = [
   { id: 1, name: "Arjun Mehta", service: "Haircut + Beard", bookingType: "Priority", waitMins: 0, noShowCount: 2, avatar: "AM", avatarColor: "bg-amber-100 text-amber-900 border-amber-300/40" },
@@ -278,11 +278,6 @@ export default function NoShowHandler() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
-      <Header 
-      title="Absence Tracking" 
-      subtitle="Live Studio Client Monitor Framework" 
-    />
-
       <main className="max-w-2xl mx-auto w-full px-6 py-10 flex-1 text-center">
         
         {/* TOP COMPONENT CAPTION CONTROLS HEADER */}
@@ -334,6 +329,7 @@ export default function NoShowHandler() {
       <AnimatePresence>
         {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       </AnimatePresence>
+      <Footer />
     </div>
   );
 }
