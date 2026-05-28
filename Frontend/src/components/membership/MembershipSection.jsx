@@ -118,12 +118,12 @@ const MembershipSection = () => {
   };
 
   return (
-    <section className="relative mx-auto max-w-7xl px-6 py-24 mb-20 overflow-hidden bg-[#FDFBF7] rounded-[4rem] border border-[#EADDCA]/50 shadow-2xl">
+  <section className="relative mx-auto max-w-[1450px] px-4 md:px-6 py-10 mb-10 overflow-hidden bg-transparent rounded-[3rem]">
       {/* Background Ambient Glows */}
       <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#C5A059]/10 blur-[100px] rounded-full -z-10"></div>
       <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#3E362E]/5 blur-[100px] rounded-full -z-10"></div>
 
-      <div className="text-center mb-16">
+      <div className="text-center mb-10">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -138,34 +138,49 @@ const MembershipSection = () => {
         <motion.h2
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          className="text-5xl md:text-7xl font-bold text-[#3E362E] font-serif italic"
-        >
-          Join The <span className="text-[#C5A059] not-italic">Elite</span> Club
+          className="text-3xl md:text-5xl font-black text-white font-serif italic leading-tight">
+         <span className="text-[#C5A059] not-italic">  Join The Elite Club</span> 
         </motion.h2>
-        <p className="text-stone-500 mt-4 font-serif italic text-lg">Invest in your presence, every single month.</p>
+        <p className="text-stone-500 mt-4 font-serif italic text-base">Invest in your presence, every single month.</p>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-3">
+      <div className="grid gap-5 md:grid-cols-3">
         {plans.map((plan, index) => (
           <motion.div
             key={plan.name}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.6 }}
-            className={`relative flex flex-col rounded-[3rem] transition-all duration-500 ${
-              plan.popular
-                ? "scale-105 z-10 shadow-2xl ring-2 ring-[#C5A059]"
-                : "bg-white border border-[#EADDCA]/40 hover:border-[#C5A059]/50"
-            }`}
+            className={`relative flex flex-col rounded-[2.5rem] transition-all duration-500 hover:-translate-y-2 ${
+  plan.popular
+    ? "scale-[1.02] z-10 shadow-[0_20px_60px_rgba(0,0,0,0.45)] ring-1 ring-[#C5A059]/40"
+    : "bg-white/[0.04] backdrop-blur-2xl border border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.45)] hover:border-[#C5A059]/40 hover:shadow-[0_0_45px_rgba(197,160,89,0.18)]"
+}`}
           >
             {/* Card Body */}
-            <div className={`flex flex-col h-full p-10 rounded-[3rem] overflow-hidden relative ${
-                plan.popular ? "bg-[#3E362E]" : "bg-white"
+            <div className="absolute top-0 left-10 right-10 h-[1px] bg-gradient-to-r from-transparent via-[#C5A059]/60 to-transparent"></div>
+            <div className={`flex flex-col h-full p-5 md:p-6 rounded-[2.5rem] overflow-hidden relative ${
+                plan.popular
+  ? "bg-gradient-to-b from-[#1a1a1a] to-black"
+  : "bg-gradient-to-b from-[#181818] to-[#101010]"
             }`}>
+             <div className="relative rounded-[2.5rem] overflow-hidden">
+
+  {/* Premium Glow */}
+  <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-[#C5A059]/10 via-transparent to-transparent opacity-80 pointer-events-none"></div>
+
+  <div className="absolute -top-20 -right-20 w-44 h-44 bg-[#C5A059]/10 blur-3xl rounded-full pointer-events-none"></div>
+
+  {/* Shine Effect */}
+  <div className="absolute inset-0 pointer-events-none">
+    <div className="absolute top-0 -left-1/2 h-full w-[60%] rotate-12 bg-gradient-to-r from-transparent via-white/10 to-transparent blur-2xl animate-shine"></div>
+  </div>
+
+</div>
 
               {/* Header */}
-              <div className="flex justify-between items-start mb-6">
-                <div className={`p-3 rounded-2xl ${plan.popular ? "bg-[#C5A059] text-white" : "bg-[#F9F5EF] text-[#C5A059]"}`}>
+<div className="relative z-10 flex justify-between items-start mb-6">
+                <div className={`p-3 rounded-2xl ${plan.popular ? "bg-[#C5A059] text-white" : "bg-gradient-to-br from-[#C5A059] to-[#E8C878] text-black shadow-[0_0_20px_rgba(197,160,89,0.35)]"}`}>
                   {plan.icon}
                 </div>
                 {plan.popular && (
@@ -175,44 +190,44 @@ const MembershipSection = () => {
                 )}
               </div>
 
-              <h3 className={`text-xl font-bold font-serif italic mb-1 ${plan.popular ? "text-white" : "text-[#3E362E]"}`}>
+              <h3 className={`text-xl font-bold font-serif italic mb-1 ${plan.popular ? "text-white": "text-white"}`}>
                 {plan.name}
               </h3>
-              <p className={`text-xs mb-8 leading-relaxed ${plan.popular ? "text-stone-400" : "text-stone-500"}`}>
+              <p className={`text-xs mb-8 leading-relaxed ${plan.popular ? "text-stone-400" : "text-stone-400"}`}>
                 {plan.description}
               </p>
 
-              <div className="flex items-baseline gap-1 mb-10 border-b border-stone-200/10 pb-8">
-                <span className={`text-5xl font-black tracking-tight ${plan.popular ? "text-white" : "text-[#3E362E]"}`}>
+              <div className="flex items-baseline gap-1 mb-5 border-b border-stone-200/10 pb-5">
+                <span className={`text-5xl font-black tracking-tight ${plan.popular ? "text-white" : "text-[#E8C878]"}`}>
                   ₹{plan.price}
                 </span>
-                <span className={`text-sm font-bold uppercase tracking-widest ${plan.popular ? "text-[#C5A059]" : "text-stone-400"}`}>
+                <span className={`text-sm font-bold uppercase tracking-widest ${plan.popular ? "text-[#C5A059]" : "text-stone-200"}`}>
                   /mo
                 </span>
               </div>
 
               {/* Features */}
-              <div className="space-y-5 mb-12 flex-grow">
+<div className="space-y-2 mb-5 flex-grow">
                 {plan.features.map((feature) => (
                   <div key={feature} className="flex items-start gap-4">
                     <div className={`mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${plan.popular ? "bg-[#C5A059]" : "bg-[#F9F5EF]"}`}>
                       <Check size={12} className={plan.popular ? "text-white" : "text-[#C5A059]"} />
                     </div>
-                    <span className={`text-sm font-medium leading-tight ${plan.popular ? "text-stone-300" : "text-stone-600"}`}>
+                    <span className={`text-[13px] font-medium leading-tight ${plan.popular ? "text-stone-300" : "text-stone-300"}`}>
                       {feature}
                     </span>
-                  </div>
+                  </div>  
                 ))}
               </div>
 
               {/* CTA Button — NOW WORKING */}
               <button
                 onClick={() => handleBecomeMember(plan)}
-                className={`w-full py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 hover:scale-[1.02] ${
-                  plan.popular
-                    ? "bg-[#C5A059] text-white hover:bg-white hover:text-[#3E362E] shadow-xl"
-                    : "bg-[#3E362E] text-white hover:bg-[#C5A059]"
-                }`}>
+                className={`w-full py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-500 hover:scale-[1.02] ${
+  plan.popular
+    ? "bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] hover:shadow-[0_0_30px_rgba(197,160,89,0.45)]"
+    : "bg-[#1f1f1f]/80 backdrop-blur-xl border border-[#C5A059]/20 text-[#F5D98F] hover:bg-[#C5A059] hover:text-[#2A241F]"
+}`}>
                 Become a Member
               </button>
             </div>
@@ -220,7 +235,7 @@ const MembershipSection = () => {
         ))}
       </div>
 
-      <div className="text-center mt-12 text-stone-400 text-[10px] uppercase tracking-[0.3em]">
+      <div className="text-center mt-5 text-stone-400 text-[9px] uppercase tracking-[0.35em]">
         * All memberships require a minimum 3-month commitment.
       </div>
 
@@ -306,7 +321,7 @@ const MembershipSection = () => {
                 ? "bg-blue-600 text-white"
                 : toast.type === "error"
                 ? "bg-red-600 text-white"
-                : "bg-[#3E362E] text-white border border-[#C5A059]/30"
+                : "bg-[#3E362E] text-white border border-[#C5A059]/30 hover:shadow-[0_0_35px_rgba(197,160,89,0.18)]"
             }`}
           >
             <div className="flex items-center gap-3">

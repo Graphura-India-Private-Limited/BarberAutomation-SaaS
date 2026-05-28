@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { 
+  LayoutDashboard, Store, Users, UserSquare2, UserPlus2, 
+  CalendarCheck, Scissors, CreditCard, Star, Activity, Settings, LogOut 
+} from "lucide-react";  
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
@@ -315,41 +319,165 @@ export default function AdminOnboarding() {
         @keyframes sl{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
       `}</style>
 
-      {/* ════ SIDEBAR ════ */}
-      <aside style={{ width:210, background:C.sidebar, display:"flex", flexDirection:"column", flexShrink:0, position:"sticky", top:0, height:"100vh", overflowY:"auto" }}>
-        <div style={{ padding:"20px 16px 16px", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:9 }}>
-            <div style={{ width:32, height:32, borderRadius:8, background:`linear-gradient(135deg,${C.gold},${C.goldD})`, display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  {/* ════ SIDEBAR ════ */}
+      <aside style={{ 
+        width: 240, 
+        background: "#FFFFFF", 
+        display: "flex", 
+        flexDirection: "column", 
+        flexShrink: 0, 
+        position: "sticky", 
+        top: 0, 
+        height: "100vh", 
+        overflowY: "auto",
+        borderRight: "1px solid #EADBCE"
+      }}>
+        {/* Brand Header */}
+        <div style={{ padding: "24px 20px 20px", borderBottom: "1px solid #FAF6F0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ 
+              width: 36, 
+              height: 36, 
+              borderRadius: 10, 
+              background: "linear-gradient(135deg, #D97706, #B45309)", 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center",
+              boxShadow: "0 4px 10px -2px rgba(217,119,6,0.2)"
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
                 <line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>
               </svg>
             </div>
             <div>
-              <div style={{ fontSize:12, fontWeight:800, color:"#fff", fontFamily:"'Cormorant Garamond',serif" }}>Barber Pro</div>
-              <div style={{ fontSize:8, color:C.gold, fontWeight:700, letterSpacing:2, textTransform:"uppercase" }}>Admin Console</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#1C1917", fontFamily: "'Plus Jakarta Sans', sans-serif", tracking: "-0.02em" }}>Barber Pro</div>
+              <div style={{ fontSize: 9, color: "#B45309", fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", marginTop: 1 }}>Admin Console</div>
             </div>
           </div>
         </div>
-        <nav style={{ padding:"10px 8px", flex:1 }}>
-          {NAV.map((n,i) => (
-            <React.Fragment key={n.k}>
-              {(i===5||i===8||i===10) && <div style={{ height:1, background:"rgba(255,255,255,0.08)", margin:"6px 8px" }}/>}
-              <button className={`nav-i${tab===n.k?" on":""}`} onClick={()=>setTab(n.k)}>
-                <span style={{ width:6, height:6, borderRadius:"50%", background:tab===n.k?C.gold:"rgba(255,255,255,0.2)", flexShrink:0 }}/>
-                {n.label}
-                {n.k==="appointments" && pendingBookings>0 && <span style={{ marginLeft:"auto", background:C.red, color:"#fff", borderRadius:10, padding:"1px 6px", fontSize:9, fontWeight:800 }}>{pendingBookings}</span>}
-              </button>
-            </React.Fragment>
-          ))}
+
+        {/* Dynamic Navigation Links Option list with Real Active Icon Assets */}
+        <nav style={{ padding: "16px 12px", flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+          {NAV.map((n, i) => {
+            const isActive = tab === n.k;
+            
+            // Safe inline dynamic icon matching function based on route keys
+            const IconComponent = {
+              dashboard: LayoutDashboard,
+              salons: Store,
+              customers: Users,
+              barbers: UserSquare2,
+              addbarber: UserPlus2,
+              appointments: CalendarCheck,
+              services: Scissors,
+              payments: CreditCard,
+              reviews: Star,
+              live: Activity,
+              settings: Settings
+            }[n.k] || LayoutDashboard;
+
+            return (
+              <React.Fragment key={n.k}>
+                {/* Visual section divider lines mapping */}
+                {(i === 5 || i === 8 || i === 10) && (
+                  <div style={{ height: 1, background: "#EADBCE", margin: "8px 10px", opacity: 0.5 }} />
+                )}
+                <button 
+                  onClick={() => setTab(n.k)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "12px",
+                    background: isActive ? "#FEF9EE" : "transparent",
+                    border: "none",
+                    borderLeft: isActive ? "3px solid #D97706" : "3px solid transparent",
+                    color: isActive ? "#B45309" : "#78716C",
+                    fontSize: "13px",
+                    fontWeight: isActive ? 700 : 500,
+                    textAlign: "left",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = "#FAF6F0";
+                      e.currentTarget.style.color = "#1C1917";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "#78716C";
+                    }
+                  }}
+                >
+                  <IconComponent size={16} strokeWidth={isActive ? 2.5 : 2} style={{ color: isActive ? "#D97706" : "#A89E95", flexShrink: 0 }} />
+                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.label}</span>
+                  
+                  {n.k === "appointments" && pendingBookings > 0 && (
+                    <span style={{ 
+                      background: "#EF4444", 
+                      color: "#ffffff", 
+                      borderRadius: "8px", 
+                      padding: "2px 6px", 
+                      fontSize: "10px", 
+                      fontWeight: 800,
+                      lineHeight: 1
+                    }}>
+                      {pendingBookings}
+                    </span>
+                  )}
+                </button>
+              </React.Fragment>
+            );
+          })}
         </nav>
-        <div style={{ padding:"10px 8px", borderTop:"1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ padding:"9px 12px", background:"rgba(197,160,89,0.1)", borderRadius:8, marginBottom:6 }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#fff" }}>Admin</div>
-            <div style={{ fontSize:9, color:"rgba(255,255,255,0.4)", marginTop:1 }}>Barber Pro Platform</div>
+
+        {/* Footer Identity & Sign Out block */}
+        <div style={{ padding: "14px 12px", borderTop: "1px solid #FAF6F0", background: "#FDFBF7" }}>
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 10,
+            padding: "10px 12px", 
+            background: "#FFFFFF", 
+            borderRadius: "12px", 
+            marginBottom: 8,
+            border: "1px solid #EADBCE"
+          }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
+            <div>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: "#1C1917" }}>Admin Hub</div>
+              <div style={{ fontSize: "10px", color: "#78716C", marginTop: 1 }}>Barber Pro System</div>
+            </div>
           </div>
-          <button className="nav-i" onClick={()=>{ localStorage.clear(); navigate("/login"); }} style={{ color:"rgba(239,68,68,0.7)" }}>
-            <span style={{ width:6, height:6, borderRadius:"50%", background:"rgba(239,68,68,0.6)" }}/>
+          
+          <button 
+            onClick={() => { localStorage.clear(); navigate("/login"); }} 
+            style={{ 
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              width: "100%",
+              padding: "10px 14px",
+              borderRadius: "12px",
+              background: "transparent",
+              border: "none",
+              color: "#EF4444", 
+              fontSize: "13px",
+              fontWeight: 700,
+              textAlign: "left",
+              cursor: "pointer",
+              transition: "all 0.2s ease"
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#FEF2F2"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+          >
+            <LogOut size={16} strokeWidth={2.5} style={{ color: "#EF4444" }} />
             Sign Out
           </button>
         </div>

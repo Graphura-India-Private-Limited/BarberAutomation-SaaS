@@ -54,6 +54,7 @@ import AdminUserManagement from "./pages/admin/AdminUserManagement";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import SalonManagement from "./pages/admin/SalonManagement";
 import SalonViewPage from "./pages/admin/SalonViewPage";
+import AdminRequests from "./pages/admin/AdminRequests";
 
 import { DashboardPage } from "./pages/admin/DashboardPage";
 import { TicketsPage } from "./pages/admin/TicketsPage";
@@ -150,6 +151,7 @@ function App() {
         {/* HOME */}
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/HomePage" element={<HomePage />} />
 
         {/* AUTH */}
         <Route path="/login" element={<Login />} />
@@ -168,15 +170,20 @@ function App() {
         <Route path="/customer/services/men" element={<MenServices />} />
         <Route path="/customer/services/women" element={<WomenServices />} />
         <Route path="/customer/services/addon" element={<AddonServices />} />
+        <Route path="/customer/services/addons" element={<AddonServices />} />
+
         <Route path="/customer/barber" element={<BarberSelection />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
+
         <Route path="/customer/booking" element={<Booking />} />
         <Route path="/customer/history" element={<BookingHistory />} />
         <Route path="/customer/flow" element={<CustomerBookingFlow />} />
+
         <Route
           path="/customer/interactions"
           element={<CustomerInteractionView />}
         />
+
         <Route
           path="/customer/customers"
           element={<CustomerManagement />}
@@ -190,6 +197,8 @@ function App() {
 
         {/* DISCOVERY */}
         <Route path="/nearby" element={<NearbyBarbers />} />
+        <Route path="/barbers" element={<NearbyBarbers />} />
+
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
 
@@ -288,7 +297,61 @@ function App() {
 
         {/* ADMIN */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminOnboarding />} />
+
+        <Route
+          path="/admin/requests"
+          element={<AdminRequests initialTab="dashboard" />}
+        />
+
+        <Route
+          path="/admin/customers"
+          element={<AdminRequests initialTab="customers" />}
+        />
+
+        <Route
+          path="/admin/barbers"
+          element={<AdminRequests initialTab="barbers" />}
+        />
+
+        <Route
+          path="/admin/add-barber"
+          element={<AdminRequests initialTab="addbarber" />}
+        />
+
+        <Route
+          path="/admin/appointments"
+          element={<AdminRequests initialTab="appointments" />}
+        />
+
+        <Route
+          path="/admin/services"
+          element={<AdminRequests initialTab="services" />}
+        />
+
+        <Route
+          path="/admin/payments"
+          element={<AdminRequests initialTab="payments" />}
+        />
+
+        <Route
+          path="/admin/reviews"
+          element={<AdminRequests initialTab="reviews" />}
+        />
+
+        <Route
+          path="/admin/live"
+          element={<AdminRequests initialTab="live" />}
+        />
+
+        <Route
+          path="/admin/platform-settings"
+          element={<AdminRequests initialTab="settings" />}
+        />
+
+        <Route
+          path="/admin/onboarding"
+          element={<AdminOnboarding />}
+        />
 
         <Route
           path="/admin/experience"
@@ -383,6 +446,7 @@ function App() {
         {/* STATIC */}
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/terms" element={<TermsPage />} />
+
         <Route
           path="/privacy-policy"
           element={<PrivacyPolicy />}

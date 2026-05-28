@@ -1,14 +1,28 @@
 import React, { useState } from "react";
+import {
+  Scissors,
+  User,
+  Mail,
+  Phone,
+  Plus,
+  X,
+  Calendar,
+  Clock,
+  Award,
+  Image,
+  ChevronRight,
+  ArrowLeft,
+} from "lucide-react";
+
 import backgroundImage from "../../assets/customerprofile.png";
 
-const ScissorIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" className={className} xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 15C7.65685 15 9 13.6569 9 12C9 11.3321 8.7818 10.715 8.4121 10.2148L11.5 12L14.5879 13.7852C14.2182 14.285 14 14.9019 14 15.5645C14 17.2213 15.3431 18.5645 17 18.5645C18.6569 18.5645 20 17.2213 20 15.5645C20 14.2964 19.2155 13.2117 18.102 12.7751L15.3 11.1574L18.102 9.53974C19.2155 9.10313 20 8.01844 20 6.75032C20 5.09347 18.6569 3.75032 17 3.75032C15.3431 3.75032 14 5.09347 14 6.75032C14 7.41292 14.2182 8.02983 14.5879 8.52959L11.5 10.3148L8.4121 8.5322C8.7818 8.03198 9 7.41492 9 6.74731C9 5.09046 7.65685 3.74731 6 3.74731C4.34315 3.74731 3 5.09046 3 6.74731C3 8.40417 4.34315 9.74731 6 9.74731C6.66508 9.74731 7.2798 9.53039 7.7788 9.16335L10.8667 10.9485L7.7788 12.7337C7.2798 12.3667 6.66508 12.1497 6 12.1497C4.34315 12.1497 3 13.4929 3 15.1497C3 16.8066 4.34315 18.1497 6 18.1497V15Z" />
-  </svg>
-);
+const GOLD = "#C5A059";
+const CHARCOAL = "#3E362E";
 
-function CustomerProfile() {
+export default function CustomerProfile() {
   const [isEditing, setIsEditing] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+
   const [profile, setProfile] = useState({
     name: "Rahul Jagtap",
     mobile: "9876543210",
@@ -18,135 +32,589 @@ function CustomerProfile() {
 
   const [family, setFamily] = useState([
     { id: 1, name: "Aryan", relation: "Son", age: "12" },
-    { id: 2, name: "Snehal", relation: "Wife", age: "32" }
+    { id: 2, name: "Snehal", relation: "Wife", age: "32" },
   ]);
 
   const [appointments] = useState([
-    { id: 101, service: "Classic Haircut", date: "24 April 2026", time: "10:30 AM", status: "Upcoming" },
-    { id: 102, service: "Beard Trim & Spa", date: "15 April 2026", time: "02:15 PM", status: "Completed" },
-    { id: 103, service: "Hair Coloring", date: "02 April 2026", time: "11:00 AM", status: "Completed" },
+    {
+      id: 101,
+      service: "Classic Haircut",
+      date: "24 April 2026",
+      time: "10:30 AM",
+      status: "Upcoming",
+    },
+    {
+      id: 102,
+      service: "Beard Trim & Spa",
+      date: "15 April 2026",
+      time: "02:15 PM",
+      status: "Completed",
+    },
+    {
+      id: 103,
+      service: "Hair Coloring",
+      date: "02 April 2026",
+      time: "11:00 AM",
+      status: "Completed",
+    },
+    {
+      id: 104,
+      service: "Head Massage & Wash",
+      date: "14 March 2026",
+      time: "04:00 PM",
+      status: "Completed",
+    },
   ]);
 
   const addMember = () => {
-    setFamily([...family, { id: Date.now(), name: "", relation: "Relation", age: "" }]);
+    setFamily([
+      ...family,
+      {
+        id: Date.now(),
+        name: "",
+        relation: "Son",
+        age: "",
+      },
+    ]);
   };
-  const removeMember = (id) => setFamily(family.filter(m => m.id !== id));
+
+  const removeMember = (id) => {
+    setFamily(family.filter((m) => m.id !== id));
+  };
+
   const updateMember = (id, field, value) => {
-    setFamily(family.map(m => m.id === id ? { ...m, [field]: value } : m));
+    setFamily(
+      family.map((m) =>
+        m.id === id ? { ...m, [field]: value } : m
+      )
+    );
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-fixed flex flex-col items-center justify-start p-4 md:p-10 relative font-sans text-[#3E362E]" style={{ backgroundImage: `url(${backgroundImage})` }}>
-      <div className="absolute inset-0 bg-[#FAF6F0]/90 backdrop-blur-md z-0"></div>
+    <div
+      className="min-h-screen bg-cover bg-center bg-fixed flex flex-col relative font-sans text-[#3E362E]"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
+    >
+      <div className="absolute inset-0 bg-[#FFFBF2]/95 backdrop-blur-md z-0"></div>
 
-      {/* Logo Section */}
-      <div className="absolute top-8 left-8 z-20 flex flex-col items-start hidden md:flex">
-        <h1 className="text-2xl font-black text-[#C5A059] tracking-normal uppercase flex items-center gap-2 font-serif">
-          <ScissorIcon className="w-6 h-6 fill-[#C5A059]" />
-          Barber <span className="text-[#3E362E]">Pro</span>
-        </h1>
-        <div className="h-[2px] w-full bg-[#C5A059] mt-1 opacity-40"></div>
-        <p className="text-[9px] text-[#8D7B68] tracking-[0.4em] uppercase mt-1">Est. 2026</p>
-      </div>
+      {/* HEADER */}
+      <header
+        className="sticky top-0 w-full border-b z-50 px-6 py-4 shadow-md"
+        style={{
+          backgroundColor: CHARCOAL,
+          borderColor: `${GOLD}30`,
+        }}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
 
-      <div className="max-w-7xl w-full mx-auto relative z-10 pb-10">
+          {/* LEFT */}
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center shadow-inner"
+              style={{
+                background: "rgba(255,255,255,0.05)",
+                border: `1.5px solid ${GOLD}40`,
+              }}
+            >
+              <Scissors size={18} color={GOLD} strokeWidth={2} />
+            </div>
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 mt-12 md:mt-20 gap-6 border-l-0 md:border-l-4 border-[#C5A059] pl-0 md:pl-6">
-          <div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-normal uppercase italic text-[#3E362E] font-serif">
-              User <span className="text-[#C5A059]">Dashboard</span>
-            </h1>
-            <p className="text-[#8D7B68] text-[9px] md:text-xs tracking-[0.5em] mt-2 uppercase font-bold text-center md:text-left">Premium Experience</p>
+            <div>
+              <div
+                className="text-xs font-black tracking-[0.25em] uppercase"
+                style={{ color: "#FFFBF2" }}
+              >
+                Barber <span style={{ color: GOLD }}>Pro</span>
+              </div>
+            </div>
           </div>
-          <button onClick={() => setIsEditing(!isEditing)} className={`w-full md:w-auto px-8 py-4 rounded-xl font-black text-[10px] tracking-widest transition-all ${isEditing ? "bg-red-50 text-red-500 border border-red-200" : "bg-[#3E362E] text-[#FFFBF2] shadow-lg"}`}>
-            {isEditing ? "CANCEL EDIT" : "MODIFY PROFILE"}
+
+          {/* RIGHT */}
+          <div className="flex items-center gap-6">
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-bold border"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.05)",
+                color: "#FFFBF2",
+                borderColor: "rgba(255,255,255,0.1)",
+              }}
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+              <span className="hidden xs:inline">
+                Premium Tier
+              </span>
+            </div>
+
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-opacity duration-200 hover:opacity-80 group"
+              style={{ color: "#FFFBF2" }}
+            >
+              <span className="hidden sm:inline">
+                Back to Marketplace
+              </span>
+
+              <ArrowLeft
+                size={16}
+                className="transition-transform group-hover:-translate-x-1"
+                style={{ color: GOLD }}
+              />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* MAIN */}
+      <main className="max-w-7xl w-full mx-auto relative z-10 px-4 md:px-8 py-10 flex-1">
+
+        {/* HERO */}
+        <div
+          className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-6 border-l-4 pl-6"
+          style={{ borderColor: GOLD }}
+        >
+          <div>
+            <h1
+              className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic"
+              style={{ color: CHARCOAL }}
+            >
+              User <span style={{ color: GOLD }}>Dashboard</span>
+            </h1>
+
+            <p className="text-[10px] md:text-xs tracking-[0.5em] mt-2 uppercase font-black text-gray-400">
+              Premium Portal Experience
+            </p>
+          </div>
+
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className={`w-full md:w-auto px-8 py-4 rounded-2xl font-black text-[10px] tracking-widest transition-all duration-300 shadow-md ${
+              isEditing
+                ? "bg-red-50 text-red-500 border border-red-200"
+                : "text-[#FFFBF2]"
+            }`}
+            style={{
+              background: isEditing ? "" : CHARCOAL,
+            }}
+          >
+            {isEditing
+              ? "CANCEL REVISIONS"
+              : "MODIFY MEMBERSHIP PROFILE"}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* TOP GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
 
-          {/* LEFT COLUMN: Profile & Stats */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Identity Card */}
-            <div className="bg-white/60 backdrop-blur-2xl border border-[#EAD8C0] p-8 rounded-[3rem] shadow-xl relative overflow-hidden">
-              <div className="w-20 h-20 bg-gradient-to-tr from-[#C5A059] to-[#F8E4A0] rounded-3xl flex items-center justify-center mb-8 rotate-3 shadow-md">
-                <span className="text-3xl font-black text-white">{profile.name[0]}</span>
+          {/* LEFT */}
+          <div className="lg:col-span-5 space-y-6">
+
+            {/* PROFILE CARD */}
+            <div className="bg-white border border-[#EAD8C0]/60 p-8 rounded-[2.5rem] shadow-xl">
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 rotate-3 shadow-md"
+                style={{
+                  background: `linear-gradient(135deg, ${GOLD}, #F8E4A0)`,
+                }}
+              >
+                <span className="text-2xl font-black text-white">
+                  {profile.name[0]}
+                </span>
               </div>
-              <div className="space-y-6">
+
+              <div className="space-y-4">
+
                 <div>
-                  <label className="text-[9px] text-[#C5A059] uppercase font-black tracking-widest mb-1 block">Primary Contact</label>
-                  <p className="text-xl font-mono text-[#3E362E] font-bold">{profile.mobile}</p>
+                  <label
+                    className="text-[9px] uppercase font-black tracking-widest mb-1 block"
+                    style={{ color: GOLD }}
+                  >
+                    Primary Contact Link
+                  </label>
+
+                  <div className="flex items-center gap-2 text-[#3E362E]">
+                    <Phone size={14} className="text-gray-400" />
+
+                    <p className="text-base font-mono font-bold">
+                      {profile.mobile}
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  <input disabled={!isEditing} value={profile.name} onChange={(e) => setProfile({...profile, name: e.target.value})} className="w-full bg-[#FDF5E6]/50 border-b border-[#EAD8C0] py-2 outline-none text-sm font-semibold" placeholder="Full Name" />
-                  <input disabled={!isEditing} value={profile.email} onChange={(e) => setProfile({...profile, email: e.target.value})} className="w-full bg-[#FDF5E6]/50 border-b border-[#EAD8C0] py-2 outline-none text-sm font-semibold" placeholder="Email" />
+
+                <div className="space-y-3 pt-1">
+
+                  <div className="flex items-center gap-3 border-b border-[#EAD8C0]/40 py-2">
+                    <User
+                      size={14}
+                      className="text-gray-400 shrink-0"
+                    />
+
+                    <input
+                      disabled={!isEditing}
+                      value={profile.name}
+                      onChange={(e) =>
+                        setProfile({
+                          ...profile,
+                          name: e.target.value,
+                        })
+                      }
+                      className="w-full bg-transparent outline-none text-sm font-bold text-[#3E362E]"
+                      placeholder="Full Name"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3 border-b border-[#EAD8C0]/40 py-2">
+                    <Mail
+                      size={14}
+                      className="text-gray-400 shrink-0"
+                    />
+
+                    <input
+                      disabled={!isEditing}
+                      value={profile.email}
+                      onChange={(e) =>
+                        setProfile({
+                          ...profile,
+                          email: e.target.value,
+                        })
+                      }
+                      className="w-full bg-transparent outline-none text-sm font-semibold text-[#3E362E]"
+                      placeholder="Email Address"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Appointment History */}
-            <div className="bg-[#3E362E] text-[#FFFBF2] p-8 rounded-[3rem] shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10"></div>
-              <h3 className="text-sm font-black tracking-normal mb-6 text-[#C5A059] font-serif">Recent Appointments</h3>
-              <div className="space-y-4">
-                {appointments.map(app => (
-                  <div key={app.id} className="border-b border-white/10 pb-3 last:border-0">
-                    <div className="flex justify-between items-start">
-                      <p className="text-xs font-bold">{app.service}</p>
-                      <span className={`text-[8px] px-2 py-1 rounded-full uppercase font-black ${app.status === 'Upcoming' ? 'bg-[#C5A059] text-white' : 'bg-white/10 text-white/60'}`}>{app.status}</span>
-                    </div>
-                    <p className="text-[10px] text-white/50 mt-1">{app.date} • {app.time}</p>
-                  </div>
-                ))}
+            {/* LOYALTY CARD */}
+            <div className="bg-white border border-[#EAD8C0]/60 p-6 rounded-[2rem] shadow-lg">
+              <div className="flex items-center justify-between mb-3">
+
+                <div className="flex items-center gap-2">
+                  <Award size={16} color={GOLD} />
+
+                  <h4 className="text-xs font-black uppercase tracking-wider">
+                    Club Loyalty Balance
+                  </h4>
+                </div>
+
+                <span
+                  className="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded bg-amber-50"
+                  style={{ color: GOLD }}
+                >
+                  Gold Tier
+                </span>
               </div>
-              <button className="w-full mt-6 py-3 border border-white/20 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">View All History</button>
+
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-2xl font-black font-mono">
+                  1,450
+                </span>
+
+                <span className="text-[9px] font-bold uppercase text-gray-400">
+                  XP Points
+                </span>
+              </div>
+
+              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: "75%",
+                    background: GOLD,
+                  }}
+                ></div>
+              </div>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Family Management */}
-          <div className="lg:col-span-8">
-            <div className="bg-white/80 backdrop-blur-3xl border border-[#EAD8C0] p-6 md:p-10 rounded-[3.5rem] shadow-2xl h-full flex flex-col">
-              <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
+          {/* RIGHT */}
+          <div className="lg:col-span-7">
+
+            <div className="bg-white/90 border border-[#EAD8C0]/60 p-6 rounded-[2.5rem] shadow-xl">
+
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-black tracking-normal text-[#3E362E] font-serif">Family <span className="text-[#C5A059]">Access</span></h2>
-                  <div className="h-[2px] w-12 bg-[#C5A059] mt-2"></div>
+                  <h2
+                    className="text-xl font-black uppercase tracking-tight"
+                    style={{ color: CHARCOAL }}
+                  >
+                    Family{" "}
+                    <span style={{ color: GOLD }}>
+                      Access Accounts
+                    </span>
+                  </h2>
+
+                  <div
+                    className="h-[2px] w-12 mt-1.5 rounded-full"
+                    style={{ background: GOLD }}
+                  ></div>
                 </div>
-                <button onClick={addMember} className="w-full sm:w-auto bg-[#C5A059]/10 text-[#C5A059] border border-[#C5A059]/30 h-12 px-6 rounded-2xl font-black text-[10px] hover:bg-[#C5A059] hover:text-white transition-all">+ ADD MEMBER</button>
+
+                <button
+                  onClick={addMember}
+                  className="w-full sm:w-auto border h-10 px-5 rounded-xl font-black text-[9px] tracking-wider transition-all duration-300 flex items-center justify-center gap-2 hover:text-white"
+                  style={{
+                    backgroundColor: `${GOLD}10`,
+                    color: GOLD,
+                    borderColor: `${GOLD}40`,
+                  }}
+                >
+                  <Plus size={12} />
+                  LINK DEPENDENT
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto max-h-[450px] pr-2 custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                 {family.map((member) => (
-                  <div key={member.id} className="relative bg-[#FDF5E6]/40 border border-[#EAD8C0] p-6 rounded-[2rem] group hover:bg-white transition-all shadow-sm">
-                    <button onClick={() => removeMember(member.id)} className="absolute top-4 right-4 text-[#A4907C] hover:text-red-500 text-[9px] font-bold">REMOVE</button>
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-[#C5A059]/30 text-[#C5A059] font-bold">{member.relation[0]}</div>
-                      <input placeholder="Name" value={member.name} onChange={(e) => updateMember(member.id, "name", e.target.value)} className="bg-transparent border-b border-[#EAD8C0] py-1 text-sm font-bold outline-none w-full" />
+                  <div
+                    key={member.id}
+                    className="relative border border-[#EAD8C0]/50 p-4 rounded-xl bg-[#FDF5E6]/30"
+                  >
+                    <button
+                      onClick={() => removeMember(member.id)}
+                      className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-[9px] font-bold uppercase"
+                    >
+                      Remove
+                    </button>
+
+                    <div className="flex items-center gap-3 mb-3">
+                      <input
+                        placeholder="Name"
+                        value={member.name}
+                        onChange={(e) =>
+                          updateMember(
+                            member.id,
+                            "name",
+                            e.target.value
+                          )
+                        }
+                        className="bg-transparent border-b border-[#EAD8C0]/60 py-0.5 text-xs font-bold outline-none w-full"
+                      />
                     </div>
-                    <div className="flex gap-3">
-                      <select value={member.relation} onChange={(e) => updateMember(member.id, "relation", e.target.value)} className="flex-1 bg-white border border-[#EAD8C0] text-[10px] rounded-lg px-2 py-2 outline-none">
-                        <option>Son</option><option>Daughter</option><option>Wife</option><option>Husband</option>
+
+                    <div className="flex gap-2">
+
+                      <select
+                        value={member.relation}
+                        onChange={(e) =>
+                          updateMember(
+                            member.id,
+                            "relation",
+                            e.target.value
+                          )
+                        }
+                        className="flex-1 bg-white border border-[#EAD8C0]/60 text-[9px] font-bold rounded-md px-2 py-1 outline-none"
+                      >
+                        <option>Son</option>
+                        <option>Daughter</option>
+                        <option>Wife</option>
+                        <option>Husband</option>
                       </select>
-                      <input placeholder="Age" value={member.age} onChange={(e) => updateMember(member.id, "age", e.target.value)} className="w-14 bg-white border border-[#EAD8C0] rounded-lg text-[10px] text-center outline-none" />
+
+                      <input
+                        placeholder="Age"
+                        value={member.age}
+                        onChange={(e) =>
+                          updateMember(
+                            member.id,
+                            "age",
+                            e.target.value.replace(/\D/g, "")
+                          )
+                        }
+                        className="w-12 bg-white border border-[#EAD8C0]/60 rounded-md text-[9px] text-center font-bold outline-none"
+                      />
                     </div>
                   </div>
                 ))}
               </div>
 
               {isEditing && (
-                <div className="mt-auto pt-8">
-                  <button className="w-full py-5 bg-[#3E362E] text-[#FFFBF2] font-black uppercase tracking-[0.2em] rounded-[2rem] shadow-xl hover:bg-[#2A241F] transition-all">
-                    Sync Changes to Account
-                  </button>
-                </div>
+                <button
+                  className="w-full mt-4 py-3 text-[#FFFBF2] font-black text-[9px] uppercase tracking-widest rounded-xl shadow-md"
+                  style={{ background: CHARCOAL }}
+                >
+                  Sync Changes
+                </button>
               )}
             </div>
           </div>
-
         </div>
-      </div>
+
+        {/* HISTORY */}
+        <div className="bg-[#3E362E] text-[#FFFBF2] p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+
+          <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
+            <h3
+              className="text-sm font-black uppercase tracking-[0.20em] flex items-center gap-2"
+              style={{ color: GOLD }}
+            >
+              <Calendar size={16} />
+              Recent Timeline Activity Logs
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {appointments.slice(0, 3).map((app) => (
+              <div
+                key={app.id}
+                className="bg-white/5 border border-white/10 p-5 rounded-2xl"
+              >
+                <div className="flex justify-between items-start gap-2 mb-3">
+
+                  <p className="text-sm font-black tracking-wide">
+                    {app.service}
+                  </p>
+
+                  <span
+                    className="text-[8px] px-2.5 py-0.5 rounded-full uppercase font-black tracking-wider"
+                    style={{
+                      backgroundColor:
+                        app.status === "Upcoming"
+                          ? GOLD
+                          : "rgba(255,255,255,0.1)",
+                    }}
+                  >
+                    {app.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-4 text-white/50 text-[10px]">
+                  <span className="flex items-center gap-1">
+                    <Calendar size={11} />
+                    {app.date}
+                  </span>
+
+                  <span className="flex items-center gap-1">
+                    <Clock size={11} />
+                    {app.time}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={() => setShowHistoryModal(true)}
+              className="w-full sm:w-64 py-3 border border-white/10 bg-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-1"
+            >
+              Launch History Ledger
+              <ChevronRight size={12} />
+            </button>
+          </div>
+        </div>
+
+        {/* STYLE PROFILE */}
+        <div className="bg-white border border-[#EAD8C0]/60 p-6 rounded-[2rem] shadow-xl mt-8">
+
+          <div className="flex items-center gap-2 mb-4">
+            <Image size={16} color={GOLD} />
+
+            <h4 className="text-xs font-black uppercase tracking-wider">
+              Style Profile Vault
+            </h4>
+          </div>
+
+          <div className="grid grid-cols-4 gap-3 max-w-xl">
+
+            <div className="aspect-square bg-gray-50 rounded-xl border-2 border-dashed border-[#EAD8C0]/60 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100">
+              <Plus size={16} className="text-gray-400" />
+            </div>
+
+            {["Classic Trim", "Taper Fade", "Beard Lineup"].map(
+              (style, i) => (
+                <div
+                  key={i}
+                  className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 border border-gray-100"
+                >
+                  <Scissors size={18} />
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* HISTORY MODAL */}
+      {showHistoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-end">
+
+          <div
+            onClick={() => setShowHistoryModal(false)}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          ></div>
+
+          <div className="relative w-full max-w-md h-full bg-[#FFFBF2] shadow-2xl p-6 overflow-y-auto z-10 border-l border-[#EAD8C0]/80">
+
+            <div className="flex items-center justify-between pb-4 border-b border-[#EAD8C0]/60 mb-6">
+
+              <div className="flex items-center gap-2">
+                <Scissors size={18} color={GOLD} />
+
+                <h3
+                  className="text-md font-black uppercase tracking-wider"
+                  style={{ color: CHARCOAL }}
+                >
+                  Complete Booking Ledger
+                </h3>
+              </div>
+
+              <button
+                onClick={() => setShowHistoryModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-xl text-gray-400"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+
+              {appointments.map((app) => (
+                <div
+                  key={app.id}
+                  className="p-4 bg-white rounded-2xl border border-[#EAD8C0]/40"
+                >
+                  <div className="flex justify-between items-start gap-2">
+
+                    <div>
+                      <p
+                        className="text-xs font-black tracking-wide"
+                        style={{ color: CHARCOAL }}
+                      >
+                        {app.service}
+                      </p>
+
+                      <p className="text-[10px] text-gray-400 font-mono mt-0.5">
+                        ID: #{app.id}
+                      </p>
+                    </div>
+
+                    <span className="text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                      {app.status}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4 mt-3 pt-3 border-t border-dashed border-gray-100 text-[10px] text-gray-500 font-medium">
+
+                    <span className="flex items-center gap-1">
+                      <Calendar size={12} />
+                      {app.date}
+                    </span>
+
+                    <span className="flex items-center gap-1">
+                      <Clock size={12} />
+                      {app.time}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default CustomerProfile;

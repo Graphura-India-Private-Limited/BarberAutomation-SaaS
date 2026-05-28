@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import shopImage from "../../assets/shop.jpg";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../Components/layout/Footer";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -104,8 +106,11 @@ export default function SalonRegistration() {
   const inputClass = "w-full bg-zinc-50/60 border border-zinc-200 rounded-2xl p-4 outline-none text-zinc-800 focus:border-amber-600 focus:bg-white transition text-sm font-medium";
 
   return (
+   <div className="min-h-screen flex flex-col">
+
+    <Navbar />
     <div
-      className="relative min-h-screen bg-cover bg-center bg-fixed p-6 font-sans text-zinc-800"
+      className="relative flex-1 bg-cover bg-center bg-fixed p-6 font-sans text-zinc-800"
       style={{ backgroundImage: `url(${shopImage})` }}
     >
       <style>{`
@@ -192,6 +197,8 @@ export default function SalonRegistration() {
           </button>
         </form>
       </div>
+    </div>
+    <Footer />
     </div>
   );
 }

@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Star, Search, Filter, X, Heart } from "lucide-react";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function AllReviews() {
   const navigate = useNavigate();
-  const [reviews,    setReviews]    = useState([]);
-  const [loading,    setLoading]    = useState(true);
-  const [search,     setSearch]     = useState("");
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [ratingFilter, setRatingFilter] = useState(0);
   const [selectedReview, setSelectedReview] = useState(null);
-  const [stats,      setStats]      = useState({ total: 0, avgSalon: 0, avgBarber: 0 });
+  const [stats, setStats] = useState({ total: 0, avgSalon: 0, avgBarber: 0 });
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetch(`${API}/review`)
       .then(r => r.json())
       .then(d => {
@@ -31,7 +34,7 @@ export default function AllReviews() {
       .catch(() => setLoading(false));
   }, []);
 
-  /* ── Filter ── */
+  /* ── Filter Logic ── */
   const filtered = reviews.filter(r => {
     const matchSearch = !search ||
       r.customer_id?.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,203 +45,240 @@ export default function AllReviews() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAF6EE] text-[#2A2620]" style={{ fontFamily:"'Manrope', sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,500&family=Manrope:wght@300;400;500;600;700&display=swap');
-        .font-display { font-family:'Playfair Display', serif; }
-        .pill-btn { background:#9B7E5A; color:white; transition:all .35s ease; letter-spacing:.18em; }
-        .pill-btn:hover { background:#7C6347; transform:translateY(-2px); }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-        .fade-up { animation:fadeUp .6s ease forwards; }
-      `}</style>
+    <>
+      <Navbar />
+      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white relative overflow-hidden flex flex-col">
+        
+        {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
+        <div className="absolute top-20 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
+        <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* ═══ HEADER ═══ */}
-      <header className="bg-white border-b border-[#EFE4D2] sticky top-0 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
-          <button onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-[11px] tracking-[0.3em] uppercase font-semibold text-[#2A2620] hover:text-[#9B7E5A] transition">
-            <ArrowLeft className="w-4 h-4"/> Home
-          </button>
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-[#2A2620]">
-            <em className="font-medium text-[#9B7E5A]">All</em> Reviews
-          </h1>
-          <button onClick={() => navigate("/write-review")}
-            className="pill-btn inline-flex items-center gap-2 px-5 py-2.5 text-[10px] uppercase font-semibold">
-            <Heart className="w-3.5 h-3.5"/> <span className="hidden sm:inline">Write Review</span>
-          </button>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-6 py-10">
-
-        {/* ═══ STATS STRIP ═══ */}
-        <div className="grid grid-cols-3 gap-4 md:gap-6 mb-10">
-          <div className="bg-white rounded-2xl p-5 md:p-6 text-center shadow-sm border border-[#EFE4D2]">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#9B7E5A] font-bold mb-2">Total Reviews</p>
-            <p className="font-display text-4xl md:text-5xl text-[#2A2620]">{stats.total}</p>
-          </div>
-          <div className="bg-white rounded-2xl p-5 md:p-6 text-center shadow-sm border border-[#EFE4D2]">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#9B7E5A] font-bold mb-2">Avg Salon</p>
-            <div className="flex items-center justify-center gap-1">
-              <Star className="w-5 h-5 fill-[#9B7E5A] text-[#9B7E5A]"/>
-              <p className="font-display text-4xl md:text-5xl text-[#2A2620]">{stats.avgSalon || "—"}</p>
-            </div>
-          </div>
-          <div className="bg-white rounded-2xl p-5 md:p-6 text-center shadow-sm border border-[#EFE4D2]">
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#9B7E5A] font-bold mb-2">Avg Barber</p>
-            <div className="flex items-center justify-center gap-1">
-              <Star className="w-5 h-5 fill-[#9B7E5A] text-[#9B7E5A]"/>
-              <p className="font-display text-4xl md:text-5xl text-[#2A2620]">{stats.avgBarber || "—"}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ═══ FILTERS ═══ */}
-        <div className="bg-white rounded-2xl p-4 md:p-5 mb-8 shadow-sm border border-[#EFE4D2] flex flex-col md:flex-row gap-3 md:items-center">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="w-4 h-4 text-[#9B7E5A] absolute left-4 top-1/2 -translate-y-1/2"/>
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search by name or content..."
-              className="w-full pl-11 pr-4 py-3 bg-[#FAF6EE] border border-[#EFE4D2] rounded-xl text-sm outline-none focus:border-[#9B7E5A] transition"
-            />
-          </div>
-
-          {/* Rating filter */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <Filter className="w-4 h-4 text-[#9B7E5A]"/>
-            <p className="text-[10px] tracking-[0.2em] uppercase font-bold text-[#9B7E5A] mr-1">Rating:</p>
-            {[0, 5, 4, 3, 2, 1].map(r => (
-              <button key={r}
-                onClick={() => setRatingFilter(r)}
-                className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition ${
-                  ratingFilter === r
-                    ? "bg-[#9B7E5A] text-white"
-                    : "bg-[#FAF6EE] text-[#9B7E5A] hover:bg-[#EFE4D2]"
-                }`}>
-                {r === 0 ? "All" : `${r}★`}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ═══ REVIEWS GRID ═══ */}
-        {loading ? (
-          <div className="text-center py-20 text-[#9B7E5A] italic">Loading reviews...</div>
-        ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center border-2 border-dashed border-[#EFE4D2]">
-            <Star className="w-10 h-10 text-[#9B7E5A] mx-auto mb-3 opacity-40"/>
-            <p className="font-display italic text-xl mb-2">No reviews found</p>
-            <p className="text-sm text-black/50 mb-6">
-              {reviews.length === 0 ? "Be the first to share your experience!" : "Try adjusting your filters."}
-            </p>
-            <button onClick={() => navigate("/write-review")}
-              className="pill-btn inline-flex items-center gap-2 px-8 py-3 text-[11px] uppercase font-semibold">
-              <Heart className="w-3.5 h-3.5"/> Write the First Review
+        {/* Premium Hero Banner (Cleaned without image background) */}
+        <div className="relative h-[320px] sm:h-[360px] flex items-center justify-center overflow-hidden mb-6">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
+          
+          {/* RETURN BUTTON */}
+          <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+            <button
+              onClick={() => navigate(-1)}
+              className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-medium text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-0.5" />
+              <span>Back</span>
             </button>
           </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filtered.map(r => {
-              const rating = Math.max(r.salon_rating || 0, r.barber_rating || 0);
-              return (
-                <div key={r._id}
-                  onClick={() => setSelectedReview(r)}
-                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-[#EFE4D2] fade-up">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex gap-0.5">
-                      {[...Array(5)].map((_, k) => (
-                        <Star key={k} className={`w-3.5 h-3.5 ${k < rating ? "fill-[#9B7E5A] text-[#9B7E5A]" : "text-[#E5E0D0]"}`}/>
-                      ))}
-                    </div>
-                    <span className="text-[9px] tracking-widest uppercase text-black/40 font-semibold">
-                      {new Date(r.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"short" })}
-                    </span>
-                  </div>
-                  <div className="text-[#9B7E5A] font-display text-4xl leading-none mb-2">"</div>
-                  <p className="font-display italic text-base leading-[1.5] mb-5 text-[#2A2620] line-clamp-4">
-                    {r.review_text || "(No written feedback)"}
-                  </p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-[#EFE4D2]">
-                    <div className="w-9 h-9 rounded-full bg-[#9B7E5A] flex items-center justify-center text-white font-bold text-xs">
-                      {(r.customer_id?.name?.[0] || "?").toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-display font-bold text-sm truncate">{r.customer_id?.name || "Anonymous"}</p>
-                      {r.barber_id?.name && (
-                        <p className="text-[9px] tracking-widest uppercase text-black/40 font-semibold truncate">
-                          Stylist: {r.barber_id.name}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
 
-      {/* ═══ MODAL ═══ */}
-      {selectedReview && (
-        <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4"
-          onClick={() => setSelectedReview(null)}>
-          <div className="bg-white rounded-3xl p-8 md:p-10 max-w-md w-full shadow-2xl border border-[#EFE4D2] fade-up"
-            onClick={e => e.stopPropagation()}>
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[#9B7E5A] flex items-center justify-center text-white font-bold text-lg">
-                  {(selectedReview.customer_id?.name?.[0] || "?").toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-display font-bold text-lg">{selectedReview.customer_id?.name || "Anonymous"}</p>
-                  <p className="text-[10px] tracking-widest uppercase text-black/50 font-semibold">
-                    {new Date(selectedReview.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })}
-                  </p>
-                </div>
+          {/* WRITE REVIEW BUTTON (Top Right) */}
+          <div className="absolute top-6 right-4 sm:right-6 md:left-auto z-20">
+            <button
+              onClick={() => navigate("/write-review")}
+              className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-bold text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
+            >
+              <Heart className="w-3.5 h-3.5 fill-current text-[#C5A059] group-hover:text-[#2A241F]" />
+              <span>Write Review</span>
+            </button>
+          </div>
+
+          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-8">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-4">
+              Guest Testimonials
+            </span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-[#3E362E] font-serif leading-none">
+              All Our <span className="text-[#C5A059] italic normal-case">Reviews</span>
+            </h1>
+            <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-5 mb-4" />
+            <p className="text-stone-500 text-xs sm:text-sm max-w-xl mx-auto font-light leading-relaxed">
+              Discover real stories and experiences shared by our esteemed guests. Authentic guest feedback beautifully driving our perfection.
+            </p>
+          </div>
+        </div>
+
+        {/* Main Content Layout */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
+          
+          {/* ═══ STATS STRIP ═══ */}
+          <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-10">
+            <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
+              <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Total Reviews</p>
+              <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.total}</p>
+            </div>
+            <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
+              <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Avg Salon</p>
+              <div className="flex items-center justify-center gap-1">
+                <Star className="w-4 h-4 sm:w-5 h-5 fill-[#C5A059] text-[#C5A059]"/>
+                <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.avgSalon || "—"}</p>
               </div>
-              <button onClick={() => setSelectedReview(null)} className="text-black/40 hover:text-black">
-                <X className="w-5 h-5"/>
-              </button>
+            </div>
+            <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
+              <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Avg Stylist</p>
+              <div className="flex items-center justify-center gap-1">
+                <Star className="w-4 h-4 sm:w-5 h-5 fill-[#C5A059] text-[#C5A059]"/>
+                <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.avgBarber || "—"}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* ═══ FILTERS ═══ */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-4 sm:p-5 mb-8 border border-white/60 shadow-sm flex flex-col lg:flex-row gap-4 lg:items-center">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="w-4 h-4 text-[#C5A059] absolute left-4 top-1/2 -translate-y-1/2"/>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search by name, experiences or feedback..."
+                className="w-full pl-11 pr-4 py-3.5 bg-[#FAF6F0]/60 border border-[#EADDCA] rounded-xl text-xs outline-none focus:border-[#C5A059] focus:bg-white transition-all duration-300"
+              />
             </div>
 
+            {/* Rating filter */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex items-center gap-2 mr-2">
+                <Filter className="w-3.5 h-3.5 text-[#C5A059]"/>
+                <span className="text-[10px] font-black tracking-wider uppercase text-[#3E362E]">Filter:</span>
+              </div>
+              {[0, 5, 4, 3, 2, 1].map(r => (
+                <button key={r}
+                  onClick={() => setRatingFilter(r)}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                    ratingFilter === r
+                      ? "bg-[#3E362E] text-white shadow-md"
+                      : "bg-[#FAF6F0] text-[#3E362E] border border-[#EADDCA] hover:bg-[#C5A059]/10"
+                  }`}>
+                  {r === 0 ? "All" : `${r} ★`}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ═══ REVIEWS GRID / CONTENT ═══ */}
+          {loading ? (
+            <div className="text-center py-24 text-stone-400 font-serif italic text-lg tracking-wide">Loading premium reviews...</div>
+          ) : filtered.length === 0 ? (
+            <div className="bg-white/40 backdrop-blur-md rounded-[32px] p-12 text-center border border-dashed border-[#EADDCA]">
+              <Star className="w-8 h-8 text-[#C5A059] mx-auto mb-4 opacity-40"/>
+              <h4 className="font-serif font-bold text-xl text-[#3E362E] mb-2">No reviews match your criteria</h4>
+              <p className="text-xs text-stone-400 font-light max-w-sm mx-auto mb-6">
+                {reviews.length === 0 ? "Be the first to share your ultimate experience with us!" : "Try modifying your search tags or rating options."}
+              </p>
+              <button onClick={() => navigate("/write-review")}
+                className="bg-[#3E362E] text-white py-3.5 px-8 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] shadow-sm cursor-pointer">
+                Write the First Review
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map(r => {
+                const rating = Math.max(r.salon_rating || 0, r.barber_rating || 0);
+                return (
+                  <div key={r._id}
+                    onClick={() => setSelectedReview(r)}
+                    className="group bg-white/90 backdrop-blur-md rounded-[28px] p-6 border border-[#EADDCA] shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-[0_22px_45px_rgba(62,54,46,0.06)] hover:border-[#C5A059]/40 transition-all duration-500 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1 relative"
+                  >
+                    <div>
+                      {/* Stars & Date Header */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex gap-0.5">
+                          {[...Array(5)].map((_, k) => (
+                            <Star key={k} className={`w-3.5 h-3.5 ${k < rating ? "fill-[#C5A059] text-[#C5A059]" : "text-stone-200"}`}/>
+                          ))}
+                        </div>
+                        <span className="text-[9px] font-bold tracking-widest uppercase text-stone-400">
+                          {new Date(r.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"short" })}
+                        </span>
+                      </div>
+
+                      <div className="text-[#C5A059] font-serif text-4xl leading-none -mb-1 opacity-60">“</div>
+                      <p className="font-serif italic text-[#3E362E] text-base leading-relaxed line-clamp-4 mb-6">
+                        {r.review_text || "(No written feedback provided by customer)"}
+                      </p>
+                    </div>
+
+                    {/* Profile Wrapper */}
+                    <div className="flex items-center gap-3 pt-4 border-t border-[#FAF6F0]">
+                      <div className="w-10 h-10 rounded-xl bg-[#3E362E] flex items-center justify-center text-[#C5A059] font-black text-sm border border-[#C5A059]/20 shadow-inner">
+                        {(r.customer_id?.name?.[0] || "?").toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-serif font-bold text-sm text-[#3E362E] truncate">{r.customer_id?.name || "Anonymous"}</p>
+                        {r.barber_id?.name && (
+                          <p className="text-[9px] font-black tracking-widest uppercase text-stone-400 truncate mt-0.5">
+                            Stylist: <span className="text-[#C5A059] font-black">{r.barber_id.name}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ═══ LUXURY EXPAND MODAL ═══ */}
+      {selectedReview && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-all duration-300"
+          onClick={() => setSelectedReview(null)}>
+          <div className="bg-white rounded-[32px] p-8 md:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA] relative animate-in fade-in zoom-in-95 duration-200"
+            onClick={e => e.stopPropagation()}>
+            
+            {/* Close Button Cross */}
+            <button onClick={() => setSelectedReview(null)} className="absolute top-6 right-6 text-stone-400 hover:text-[#3E362E] transition-colors cursor-pointer">
+              <X className="w-5 h-5"/>
+            </button>
+
+            <div className="flex items-center gap-3.5 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-[#3E362E] flex items-center justify-center text-[#C5A059] font-black text-lg border border-[#C5A059]/20">
+                {(selectedReview.customer_id?.name?.[0] || "?").toUpperCase()}
+              </div>
+              <div>
+                <p className="font-serif font-bold text-lg text-[#3E362E]">{selectedReview.customer_id?.name || "Anonymous"}</p>
+                <p className="text-[9px] font-black tracking-widest uppercase text-stone-400 mt-0.5">
+                  {new Date(selectedReview.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })}
+                </p>
+              </div>
+            </div>
+
+            {/* Micro Dual-Rating Scorecard */}
             {(selectedReview.salon_rating > 0 || selectedReview.barber_rating > 0) && (
-              <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="grid grid-cols-2 gap-3 mb-6">
                 {selectedReview.salon_rating > 0 && (
-                  <div className="bg-[#FAF6EE] rounded-xl p-3 text-center">
-                    <p className="text-[9px] tracking-widest uppercase text-[#9B7E5A] font-bold mb-1">Salon</p>
-                    <p className="text-2xl text-[#9B7E5A]">{"★".repeat(selectedReview.salon_rating)}<span className="text-[#E5E0D0]">{"★".repeat(5-selectedReview.salon_rating)}</span></p>
+                  <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
+                    <p className="text-[9px] font-black tracking-wider uppercase text-[#C5A059] mb-1">Salon Experience</p>
+                    <p className="text-sm text-[#3E362E] font-bold">{"★".repeat(selectedReview.salon_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.salon_rating)}</span></p>
                   </div>
                 )}
                 {selectedReview.barber_rating > 0 && (
-                  <div className="bg-[#FAF6EE] rounded-xl p-3 text-center">
-                    <p className="text-[9px] tracking-widest uppercase text-[#9B7E5A] font-bold mb-1">Barber</p>
-                    <p className="text-2xl text-[#9B7E5A]">{"★".repeat(selectedReview.barber_rating)}<span className="text-[#E5E0D0]">{"★".repeat(5-selectedReview.barber_rating)}</span></p>
+                  <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
+                    <p className="text-[9px] font-black tracking-wider uppercase text-[#C5A059] mb-1">Stylist Service</p>
+                    <p className="text-sm text-[#3E362E] font-bold">{"★".repeat(selectedReview.barber_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.barber_rating)}</span></p>
                   </div>
                 )}
               </div>
             )}
 
-            <div className="text-[#9B7E5A] font-display text-5xl leading-none mb-2">"</div>
-            <p className="font-display italic text-lg leading-[1.6] text-[#2A2620] mb-6">
-              {selectedReview.review_text || "No written feedback"}
+            <div className="text-[#C5A059] font-serif text-5xl leading-none opacity-60 mb-1">“</div>
+            <p className="font-serif italic text-base leading-relaxed text-[#3E362E] mb-6 whitespace-pre-wrap">
+              {selectedReview.review_text || "No written feedback provided."}
             </p>
 
             {selectedReview.barber_id?.name && (
-              <p className="text-[11px] tracking-[0.2em] uppercase text-black/50 font-semibold mb-5">
-                Stylist: <span className="text-[#9B7E5A]">{selectedReview.barber_id.name}</span>
-              </p>
+              <div className="bg-[#FAF6F0] border-l-2 border-[#C5A059] px-4 py-2.5 rounded-r-xl mb-6 text-xs font-medium text-stone-500">
+                Crafted by specialist artist: <span className="text-[#3E362E] font-black">{selectedReview.barber_id.name}</span>
+              </div>
             )}
 
             <button onClick={() => setSelectedReview(null)}
-              className="w-full pill-btn py-3.5 text-[11px] uppercase font-semibold tracking-[0.2em]">
-              Close
+              className="w-full bg-[#3E362E] text-white py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer">
+              Close Experience
             </button>
           </div>
         </div>
       )}
-    </div>
+      <Footer />
+    </>
   );
 }

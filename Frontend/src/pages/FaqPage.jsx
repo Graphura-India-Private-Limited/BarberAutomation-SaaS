@@ -42,110 +42,94 @@ function FaqPage() {
     <>
       <Navbar />
 
-      <section className="relative py-16 sm:py-20 md:py-28 overflow-hidden bg-[#FAF6F0]">
+      <section className="relative py-16 sm:py-20 md:py-28 overflow-hidden bg-[#FAF6F0] selection:bg-[#C5A059] selection:text-white">
         
         {/* Luxury Glow Background */}
-        <div className="absolute top-0 left-0 w-52 sm:w-72 h-52 sm:h-72 bg-[#C5A059]/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-60 sm:w-96 h-60 sm:h-96 bg-[#EADDCA]/40 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-0 w-52 sm:w-72 h-52 sm:h-72 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-60 sm:w-96 h-60 sm:h-96 bg-[#EADDCA]/40 rounded-full blur-3xl pointer-events-none" />
 
-        {/* --- BACK TO HOME BUTTON (Top Left Corner) --- */}
-<div className="absolute top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-8 z-20">
-  <button
-    onClick={() => {
-      navigate("/"); // Direct path to home page
-    }}
-    className="inline-flex items-center justify-center gap-2 bg-white/80 backdrop-blur-md border border-[#e6d5c3] text-[#3E362E] p-2.5 sm:px-4 sm:py-2 rounded-xl font-black uppercase text-[10px] tracking-[0.15em] hover:bg-[#3E362E] hover:text-white transition-all hover:scale-105 shadow-md cursor-pointer"
-    title="Go to Home"
-  >
-    <svg
-      className="w-4 h-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M19 12H5m7 7l-7-7 7-7"
-      />
-    </svg>
-    <span className="hidden sm:inline">Back </span>
-  </button>
-</div>
+        {/* CREATIVE MINIMAL BACK BUTTON (Using < instead of arrow) */}
+        <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+          <button
+            onClick={() => navigate("/")}
+            className="group flex items-center gap-3 bg-white/70 backdrop-blur-md border border-[#EADDCA] px-5 py-2.5 rounded-2xl text-[#3E362E] font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 shadow-sm hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] hover:scale-105 cursor-pointer"
+          >
+            <span className="text-sm font-light text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-1 inline-block">
+              &lt;
+            </span>
+            <span className="relative">Return</span>
+          </button>
+        </div>
 
-        {/* Content */}
+        {/* Content Container */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
 
           {/* Header */}
-          <div className="text-center mb-10 sm:mb-14">
-            <span className="text-[10px] sm:text-[12px] font-black uppercase tracking-[0.25em] sm:tracking-[0.35em] text-[#C5A059]">
-              Questions & Answers
+          <div className="text-center mb-14 sm:mb-20 pt-10 sm:pt-4">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm">
+              Inquiries & Assistance
             </span>
 
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tight text-[#3E362E] mt-3 sm:mt-4 leading-tight">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-[#3E362E] mt-6 leading-none">
               Frequently Asked
-              <span className="text-[#C5A059] italic font-serif">
-                {" "}Questions
+              <span className="text-[#C5A059] italic font-serif normal-case block sm:inline sm:ml-3">
+                Questions
               </span>
             </h2>
 
-            <div className="w-16 sm:w-20 h-1 bg-[#C5A059] mx-auto mt-4 sm:mt-5 rounded-full" />
+            <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-6" />
 
-            <p className="max-w-2xl mx-auto text-stone-500 mt-5 sm:mt-6 text-xs sm:text-sm md:text-base leading-relaxed font-serif italic px-2">
-              Everything you need to know about appointments, bookings,
-              payments, and salon services.
+            <p className="max-w-2xl mx-auto text-stone-500 mt-5 text-xs sm:text-sm leading-relaxed px-2 font-light">
+              Everything you need to know about premium appointments, seamless bookings, payment safety, and luxury grooming services.
             </p>
           </div>
 
-          {/* FAQ Section */}
-          <div className="space-y-4">
+          {/* DUAL COLUMN FAQ GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
             {FAQS.map((faq, index) => {
               const isOpen = openFaq === index;
 
               return (
                 <div
                   key={index}
-                  className="bg-white/80 backdrop-blur-md border border-[#e6d5c3] rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
+                  className={`group overflow-hidden border transition-all duration-500 rounded-[22px] ${
+                    isOpen 
+                      ? "bg-white border-[#C5A059] shadow-[0_15px_40px_rgba(197,160,89,0.06)] scale-[1.01]" 
+                      : "bg-white/60 backdrop-blur-md border-[#EADDCA] hover:bg-white hover:border-[#C5A059]/50"
+                  }`}
                 >
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="w-full flex items-center justify-between gap-4 p-4 sm:p-5 md:p-6 text-left"
+                    className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left cursor-pointer select-none"
                   >
-                    <h3 className="font-black text-[12px] sm:text-sm md:text-base text-[#3E2C1C] uppercase tracking-wide leading-relaxed">
+                    <h3 className="font-black text-xs sm:text-[13px] text-[#3E362E] uppercase tracking-wider leading-relaxed">
                       {faq.q}
                     </h3>
 
-                    <div
-                      className={`flex-shrink-0 transition-transform duration-300 ${
-                        isOpen ? "rotate-45" : ""
-                      }`}
-                    >
+                    {/* Minimal Dynamic Plus/Minus Icon */}
+                    <div className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                      isOpen ? "bg-[#C5A059]/20 text-[#3E362E] rotate-45" : "bg-stone-100 text-stone-400"
+                    }`}>
                       <svg
-                        className="w-5 h-5 text-[#B8864A]"
+                        className="w-3.5 h-3.5"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.5"
                         viewBox="0 0 24 24"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 4v16m8-8H4"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                       </svg>
                     </div>
                   </button>
 
+                  {/* Smooth Content Expansion */}
                   <div
-                    className={`grid transition-all duration-300 ease-in-out ${
-                      isOpen
-                        ? "grid-rows-[1fr] opacity-100"
-                        : "grid-rows-[0fr] opacity-0"
+                    className={`grid transition-all duration-500 ease-in-out ${
+                      isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <div className="px-4 sm:px-5 md:px-6 pb-5 md:pb-6 text-xs sm:text-sm leading-relaxed text-[#6b4f3b] font-serif">
+                      <div className="px-5 sm:px-6 pb-6 text-xs sm:text-sm leading-relaxed text-stone-600 font-light border-t border-stone-50 pt-4 mt-1">
                         {faq.a}
                       </div>
                     </div>
@@ -155,26 +139,22 @@ function FaqPage() {
             })}
           </div>
 
-          {/* Bottom CTA Button */}
-          <div className="text-center mt-10 sm:mt-14">
+          {/* Bottom CTA Section */}
+          <div className="text-center mt-16">
             <button
               onClick={() => navigate("/customer/services")}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#3E362E] text-white px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl font-black uppercase text-[10px] sm:text-[11px] tracking-[0.2em] hover:bg-[#C5A059] transition-all hover:scale-105 shadow-lg cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#C5A059] to-[#D4B373] text-[#2A241F] px-8 py-4 rounded-xl font-black uppercase text-[10px] sm:text-[11px] tracking-[0.2em] hover:scale-105 transition-all duration-300 shadow-md cursor-pointer"
             >
               Book Appointment
 
               <svg
-                className="w-4 h-4"
+                className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.5"
+                strokeWidth="3"
                 viewBox="0 0 24 24"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 12h14m-6-6l6 6-6 6"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
