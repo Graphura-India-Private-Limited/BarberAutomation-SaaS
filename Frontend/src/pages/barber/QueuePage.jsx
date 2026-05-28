@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth, useQueue } from "../../contexts/AppContext";
 import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 
 const STATUS_COLORS = {
   "waiting": "bg-amber-100 text-amber-900 border-amber-300",
@@ -181,14 +182,20 @@ export default function QueuePage() {
                     >
                       Remove
                     </button>
+                    
                   )}
                 </div>
+                
               </div>
             )
           ))}
         </div>
+        
+        
 
       </div>
+      <Footer />
     </div>
+    
   );
 }
