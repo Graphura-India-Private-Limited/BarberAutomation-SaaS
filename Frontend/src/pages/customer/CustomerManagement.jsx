@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Imported router redirection hook
 import {
   Users,
   Search,
@@ -8,8 +9,10 @@ import {
   Calendar,
   Mail,
   Zap,
-  ArrowUpRight
+  ArrowUpRight,
+  ArrowLeft // ✅ Imported ArrowLeft navigation icon
 } from "lucide-react";
+import Footer from "../../components/layout/Footer";
 
 // Corporate Brand Scissor SVG Icon Component
 const ScissorIcon = ({ className }) => (
@@ -23,6 +26,7 @@ const ScissorIcon = ({ className }) => (
 );
 
 export default function CustomerManagement() {
+  const navigate = useNavigate(); // ✅ Initialized the navigation router handle
   const [search, setSearch] = useState("");
 
   const customers = [
@@ -84,17 +88,29 @@ export default function CustomerManagement() {
 
       {/* ✂️ BARBER PRO GLOBAL EXECUTIVE HEADER BAR */}
       <header className="bg-[#3E362E] border-b border-[#2A241F] px-6 md:px-8 py-4 flex items-center justify-between z-30 shadow-md mb-12">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
-            <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
-          </div>
-          <div className="text-left">
-            <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
-              BARBER <span className="text-white">PRO</span>
-            </h1>
-            <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
-              Customer Intelligence
-            </p>
+        <div className="flex items-center gap-5">
+          
+          {/* ── ✅ THE CHIP INJECTION: EXPEDITED REAR-FACING BACK NAVIGATION CONTROL BUTTON ── */}
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 hover:opacity-85 group text-white bg-white/10 px-3.5 py-2.5 rounded-xl border border-white/10 cursor-pointer select-none"
+          >
+            <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5 text-[#C5A059]" />
+            <span>Exit</span>
+          </button>
+
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
+              <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
+            </div>
+            <div className="text-left">
+              <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
+                BARBER <span className="text-white">PRO</span>
+              </h1>
+              <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
+                Customer Intelligence
+              </p>
+            </div>
           </div>
         </div>
         
@@ -290,7 +306,8 @@ export default function CustomerManagement() {
         </div>
 
       </div>
-
+      
+      <Footer />
     </div>
   );
 }

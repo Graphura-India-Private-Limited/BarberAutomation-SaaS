@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+import { ArrowLeft } from "lucide-react";
 
 import {
   SERVICES,
@@ -31,6 +32,7 @@ const ScissorIcon = ({ className }) => (
     <line x1="8.12" y1="8.12" x2="12" y2="12" stroke="currentColor"/>
   </svg>
 );
+
 
 // ─── QUEUE ROW COMPONENT ──────────────────────────────────────────────────────
 function QueueRow({ entry, idx, onClick, onServe }) {
@@ -297,6 +299,7 @@ export default function SmartQueue() {
       return prev.filter(e => e.id !== id);
     });
   };
+  
 
   const handleMoveToQueue = id => {
     setBookings(prev => {
@@ -315,12 +318,27 @@ export default function SmartQueue() {
   const tabs = [['queue', 'Active Queue'], ['bookings', 'Live Bookings'], ['stats', 'Analytics Stats']];
 
   return (
+    
     <>
       <Navbar />
 
       <div className="min-h-screen pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col">
         <Toast notif={notif} />
+<header className="bg-[#FAF6F0] border-b border-[#EADBCE]/60 px-8 py-4 flex items-center justify-between z-30 shadow-xs">
+  <div className="flex items-center gap-3.5">
+    
+    {/* ── ✅ THE CHIP INJECTION: PREMIUM RETRO GRADE EXIT TOGGLE BUTTON ── */}
+    <button
+      onClick={() => navigate("/")}
+      className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 hover:opacity-85 group text-stone-800 bg-white px-3.5 py-2 rounded-xl border border-[#EADBCE] shadow-3xs cursor-pointer select-none mr-2"
+    >
+      <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5 text-[#C5A059]" />
+      <span>Exit Panel</span>
+    </button>
 
+    {/* Your existing header details follow right here... */}
+  </div>
+</header>
       
           
           {/* Top Control Automation Elements */}

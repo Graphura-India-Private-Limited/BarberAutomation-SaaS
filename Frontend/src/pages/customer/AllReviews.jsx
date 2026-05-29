@@ -106,14 +106,14 @@ export default function AllReviews() {
             <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
               <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Avg Salon</p>
               <div className="flex items-center justify-center gap-1">
-                <Star className="w-4 h-4 sm:w-5 h-5 fill-[#C5A059] text-[#C5A059]"/>
+                <Star className="w-4 h-4 sm:w-5 fill-[#C5A059] text-[#C5A059]"/>
                 <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.avgSalon || "—"}</p>
               </div>
             </div>
             <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
               <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Avg Stylist</p>
               <div className="flex items-center justify-center gap-1">
-                <Star className="w-4 h-4 sm:w-5 h-5 fill-[#C5A059] text-[#C5A059]"/>
+                <Star className="w-4 h-4 sm:w-5 fill-[#C5A059] text-[#C5A059]"/>
                 <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.avgBarber || "—"}</p>
               </div>
             </div>

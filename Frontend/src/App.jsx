@@ -147,6 +147,7 @@ function App() {
         <Route path="/customer/services/men" element={<MenServices />} />
         <Route path="/customer/services/women" element={<WomenServices />} />
         <Route path="/customer/services/addon" element={<AddonServices />} />
+        <Route path="/customer/services/addons" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
         <Route path="/customer/Select-look" element={<SelectLook />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
@@ -171,7 +172,7 @@ function App() {
         <Route path="/barber/profile" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberProfile /></BarberLayout>} />
         <Route path="/barber/breaks" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout> } />
         <Route path="/barber/live-session" element={ <BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout> } />
-        <Route path="/barber/service-handler" element={ <BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceHandler /></BarberLayout> } />
+        <Route path="/barber/service-handler" element={  <ServiceHandler /> } />
         <Route path="/barber/noshow-delay" element={ <BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><NoShowDelayPage /> </BarberLayout> } />
         <Route path="/barber/noshow-handle" element={ <BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <NoShowHandle /> </BarberLayout>} />
         <Route path="/barber/settings" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberSettings /> </BarberLayout>} />

@@ -98,10 +98,10 @@ export default function DuplicateAccount({ onBack }) {
       </div>
             
       {/* 📄 RIGHT PANEL: CENTERING INTERACTIVE VERIFICATION CARD */}
-      <div className="w-full lg:w-7/12 flex items-center justify-center p-6 md:p-12 bg-white">
+      <div className="w-full lg:w-7/12 flex items-center justify-center p-6 md:p-12 bg-[#FAF6F0]">
         
         {/* Card envelope wrapper */}
-        <div className="w-full max-w-md bg-[#FAF6F0] rounded-[2rem] border border-stone-200/60 shadow-md p-8 md:p-10 text-left animate-in fade-in duration-300">
+        <div className="w-full max-w-md bg-[#ffffff] rounded-[2rem] border border-stone-200/60 shadow-md p-8 md:p-10 text-left animate-in fade-in duration-300">
           
           {/* Form Header */}
           <div className="mb-8">

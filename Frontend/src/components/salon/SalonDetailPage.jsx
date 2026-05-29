@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 // 🧩 CRITICAL FIX: Injected the missing Header component import line
 import Header from "../layout/Header"; 
+import Footer from "../../components/layout/Footer";
 
 import {
   ArrowLeft,
@@ -211,6 +212,7 @@ export default function SalonDetailPage() {
           </div>
         </aside>
       </section>
+      <Footer/>
     </main>
   );
 }

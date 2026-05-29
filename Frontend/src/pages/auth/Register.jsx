@@ -106,7 +106,7 @@ export default function Register({ onBack }) {
       <div className="flex flex-1 items-center justify-center px-8 py-12 bg-[#FAF6F0]">
 
         {/* Card */}
-        <div className="w-full max-w-md rounded-2xl shadow-xl px-10 py-10 bg-[#f5f0e8]">
+        <div className="w-full max-w-md rounded-2xl shadow-xl px-10 py-10 bg-[#ffffff]">
 
           {/* Title */}
           <h1 className="text-3xl font-black uppercase tracking-tight mb-1 text-[#1a1a1a]">

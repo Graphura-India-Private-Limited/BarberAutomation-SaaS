@@ -1,21 +1,24 @@
 import React from 'react';
+import { X, User, Phone, Scissors, Calendar, Clock, Info, ShieldCheck, CheckCircle2, Trash2 } from 'lucide-react';
+const GOLD = "#C5A059";
+const CHARCOAL = "#3E362E";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 export const AVG_CUT = 20;
 
 export const SERVICES = [
-  { id: 'haircut', label: 'Haircut',        mins: 20, price: 15 },
-  { id: 'shave',   label: 'Shave',          mins: 15, price: 10 },
-  { id: 'beard',   label: 'Beard Trim',     mins: 10, price: 8  },
-  { id: 'combo',   label: 'Haircut + Shave',mins: 35, price: 22 },
-  { id: 'color',   label: 'Hair Color',     mins: 60, price: 45 },
-  { id: 'kids',    label: "Kids' Cut",      mins: 15, price: 10 },
+  { id: 'haircut', label: 'Haircut',         mins: 20, price: 15 },
+  { id: 'shave',   label: 'Shave',           mins: 15, price: 10 },
+  { id: 'beard',   label: 'Beard Trim',      mins: 10, price: 8  },
+  { id: 'combo',   label: 'Haircut + Shave', mins: 35, price: 22 },
+  { id: 'color',   label: 'Hair Color',      mins: 60, price: 45 },
+  { id: 'kids',    label: "Kids' Cut",       mins: 15, price: 10 },
 ];
 
 export const BARBERS = [
-  { id: 'ali',   name: 'Ali',    color: '#ea580c' },
-  { id: 'ravi',  name: 'Ravi',   color: '#0284c7' },
-  { id: 'james', name: 'James',  color: '#7c3aed' },
+  { id: 'ali',   name: 'Ali',   color: '#C5A059', emoji: '💈' },
+  { id: 'ravi',  name: 'Ravi',  color: '#3E362E', emoji: '✂️' },
+  { id: 'james', name: 'James', color: '#A37B58', emoji: '👨‍🎨' },
 ];
 
 export const SLOTS = [
@@ -61,8 +64,8 @@ export function fmtWait(position, service) {
 export function LiveDot({ active }) {
   return (
     <span
-      className="pulse-dot inline-block rounded-full flex-shrink-0"
-      style={{ width:9, height:9, background: active ? '#16a34a' : '#dc2626' }}
+      className="pulse-dot inline-block rounded-full flex-shrink-0 animate-pulse"
+      style={{ width:9, height:9, background: active ? '#15803d' : '#b91c1c' }}
     />
   );
 }
@@ -70,23 +73,23 @@ export function LiveDot({ active }) {
 export function Toast({ notif }) {
   if (!notif) return null;
   const map = {
-    success: { bg:'#16a34a', text:'#fff' },
-    warn:    { bg:'#d97706', text:'#fff' },
-    info:    { bg:'#ea580c', text:'#fff' },
+    success: { bg: '#3E362E', text: '#FAF6F0', border: '#C5A059' },
+    warn:    { bg: '#3E362E', text: '#FAF6F0', border: '#b91c1c' },
+    info:    { bg: '#3E362E', text: '#FAF6F0', border: '#EADBCE' },
   };
   const s = map[notif.type] ?? map.info;
   return (
-    <div className="animate-slide-up fixed top-4 left-1/2 -translate-x-1/2 z-[9999] px-5 py-3 rounded-2xl font-semibold text-sm shadow-2xl max-w-xs text-center"
-      style={{ background: s.bg, color: s.text }}>
+    <div className="animate-slide-up fixed top-6 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3.5 rounded-full font-sans font-bold text-xs uppercase tracking-widest shadow-2xl max-w-sm text-center border"
+      style={{ background: s.bg, color: s.text, borderColor: s.border }}>
       {notif.msg}
     </div>
   );
 }
 
-export function Chip({ children, color = '#ea580c' }) {
+export function Chip({ children, color = '#C5A059' }) {
   return (
-    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border"
-      style={{ color, borderColor: color, background: `${color}1a`, fontFamily:'DM Sans, sans-serif' }}>
+    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md border"
+      style={{ color, borderColor: `${color}40`, background: `${color}0c`, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
       {children}
     </span>
   );
@@ -94,8 +97,8 @@ export function Chip({ children, color = '#ea580c' }) {
 
 export function SourceTag({ src }) {
   return src === 'booked'
-    ? <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 border border-sky-300"> Booked</span>
-    : <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-orange-800 border border-orange-300"> Walk-in</span>;
+    ? <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-stone-100 text-stone-700 border border-stone-300/60">Booked</span>
+    : <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-[#EADBCE]/30 text-[#A37B58] border border-[#EADBCE]/60">Walk-in</span>;
 }
 
 // ─── ADD CUSTOMER MODAL ───────────────────────────────────────────────────────
@@ -121,76 +124,112 @@ export function AddCustomerModal({ onClose, onAdd }) {
   };
 
   return (
-    <div className="animate-fade fixed inset-0 z-[100] flex items-end justify-center sm:items-center"
-      style={{ background:'rgba(67,20,7,0.45)', backdropFilter:'blur(6px)' }}
-      onClick={onClose}>
-      <div className="animate-slide-up w-full max-w-lg p-6 rounded-t-3xl sm:rounded-3xl"
-        style={{ background:'#fff7ed', border:'2px solid #fed7aa', boxShadow:'0 20px 60px rgba(194,65,12,0.22)' }}
-        onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-4 bg-stone-900/40 backdrop-blur-sm transition-all duration-300 animate-in fade-in" onClick={onClose}>
+      <style>{`
+        .input-field-custom {
+          width: 100%;
+          background-color: #FFFFFF;
+          border: 1px solid #EADBCE;
+          border-radius: 14px;
+          padding: 12px 16px;
+          font-size: 14px;
+          font-weight: 700;
+          color: #1C1917;
+          outline: none;
+          transition: all 0.2s ease;
+        }
+        .input-field-custom:focus {
+          border-color: #C5A059;
+          box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.1);
+        }
+        .tab-btn-active {
+          background-color: #3E362E !important;
+          color: #FFFFFF !important;
+        }
+        .tab-btn-inactive {
+          background-color: transparent !important;
+          color: #78716C !important;
+        }
+        .tab-btn-inactive:hover {
+          color: #1C1917 !important;
+          background-color: rgba(28, 25, 23, 0.04) !important;
+        }
+      `}</style>
+
+      <div className="w-full max-w-lg bg-[#FAF6F0] rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-[#EADBCE] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300" onClick={e => e.stopPropagation()}>
 
         {/* Header */}
-        <div className="flex justify-between items-center mb-5">
-          <div>
-            <p className="font-display text-2xl font-black text-orange-950">Add Customer</p>
-            <p className="text-sm text-orange-500 font-medium mt-0.5">Walk-in or schedule a booking</p>
+        <div className="flex justify-between items-center px-6 py-5 border-b border-[#EADBCE]/50 bg-white">
+          <div className="text-left">
+            <p className="font-serif text-2xl font-black text-stone-900 tracking-tight">Add Customer</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1">Walk-in or schedule a studio booking</p>
           </div>
-          <button onClick={onClose}
-            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-orange-700 hover:bg-orange-100 transition-colors"
-            style={{ border:'2px solid #fed7aa', background:'#fff' }}>✕</button>
+          <button onClick={onClose} className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 bg-white text-stone-400 hover:text-stone-800 hover:border-stone-400 transition-all cursor-pointer shadow-3xs">
+            <X size={15} />
+          </button>
         </div>
 
         {/* Mode Toggle */}
-        <div className="flex gap-1 mb-5 p-1 rounded-xl" style={{ background:'#ffedd5', border:'2px solid #fed7aa' }}>
-          {[['queue',' Walk-in'],['booking',' Booking']].map(([m,l]) => (
+        <div className="mx-6 mt-5 p-1 rounded-2xl flex gap-1 bg-[#EFEBE4] border border-[#EADBCE]/60">
+          {[['queue','Walk-in'],['booking','Booking']].map(([m,l]) => (
             <button key={m} onClick={() => setMode(m)}
-              className={`flex-1 py-2 rounded-lg font-semibold text-sm border-none cursor-pointer transition-all ${mode===m ? 'tab-active shadow-md' : 'tab-inactive'}`}>
+              className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider border-none cursor-pointer transition-all ${mode===m ? 'tab-btn-active shadow-3xs' : 'tab-btn-inactive'}`}>
               {l}
             </button>
           ))}
         </div>
 
-        <div className="flex flex-col gap-3.5">
+        {/* Form Fields Stack */}
+        <div className="p-6 space-y-4 text-left">
           {[
-            { label:'Full Name', placeholder:'Customer name', val:name, set:setName, type:'text' },
-            { label:'Phone Number', placeholder:'e.g. 9876543210', val:phone, set:setPhone, type:'tel' },
-          ].map(({ label, placeholder, val, set, type }) => (
-            <div key={label}>
-              <label className="block text-xs font-bold uppercase tracking-widest text-orange-600 mb-1.5">{label}</label>
-              <input className="input-field" type={type} placeholder={placeholder} value={val} onChange={e=>set(e.target.value)} />
+            { label:'Full Name', placeholder:'Customer name', val:name, set:setName, type:'text', icon: <User size={11} color="#C5A059" /> },
+            { label:'Phone Number', placeholder:'e.g. 9876543210', val:phone, set:setPhone, type:'tel', icon: <Phone size={11} color="#C5A059" /> },
+          ].map(({ label, placeholder, val, set, type, icon }) => (
+            <div key={label} className="space-y-1.5">
+              <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1">{icon} {label}</label>
+              <input className="input-field-custom" type={type} placeholder={placeholder} value={val} onChange={e=>set(e.target.value)} />
             </div>
           ))}
 
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-widest text-orange-600 mb-1.5">Service</label>
-            <select className="input-field" value={service} onChange={e=>setService(e.target.value)}>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Scissors size={11} color="#C5A059" /> Service</label>
+            <select className="input-field-custom h-[48px] cursor-pointer" value={service} onChange={e=>setService(e.target.value)}>
               {SERVICES.map(s => <option key={s.id} value={s.id}>{s.label} — {s.mins}min · ₹{s.price*80}</option>)}
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-widest text-orange-600 mb-1.5">Barber</label>
-            <select className="input-field" value={barber} onChange={e=>setBarber(e.target.value)}>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Calendar size={11} color="#C5A059" /> Barber</label>
+            <select className="input-field-custom h-[48px] cursor-pointer" value={barber} onChange={e=>setBarber(e.target.value)}>
               {BARBERS.map(b => <option key={b.id} value={b.id}>{b.emoji} {b.name}</option>)}
             </select>
           </div>
 
           {mode === 'booking' && (
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-widest text-orange-600 mb-1.5">Time Slot</label>
-              <select className="input-field" value={slot} onChange={e=>setSlot(e.target.value)}>
+            <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+              <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Clock size={11} color="#C5A059" /> Time Slot</label>
+              <select className="input-field-custom h-[48px] cursor-pointer" value={slot} onChange={e=>setSlot(e.target.value)}>
                 {SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           )}
+
+          {/* Action Footer Trigger */}
+          <div className="pt-2">
+            <button 
+              disabled={!name.trim()}
+              onClick={handleSubmit}
+              className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest text-white shadow-md transition-all ${
+                name.trim() ? 'opacity-100 cursor-pointer active:scale-98 hover:opacity-95' : 'opacity-45 cursor-not-allowed'
+              }`}
+              style={{ backgroundColor: CHARCOAL }}
+            >
+              {mode === 'queue' ? '+ Add to Queue Pipeline' : '✓ Confirm System Booking'}
+            </button>
+          </div>
         </div>
 
-        <button className="btn-primary w-full mt-5 py-3.5"
-          disabled={!name.trim()}
-          style={{ opacity: name.trim() ? 1 : 0.45, cursor: name.trim() ? 'pointer' : 'not-allowed' }}
-          onClick={handleSubmit}>
-          {mode === 'queue' ? '+ Add to Queue' : '✓ Confirm Booking'}
-        </button>
-      </div>
+      </div>  
     </div>
   );
 }
@@ -201,49 +240,60 @@ export function DetailModal({ entry, isQueue, onClose, onServe, onRemove }) {
   const svc    = SERVICES.find(s => s.id === entry.service);
 
   const fields = isQueue
-    ? [['Service', svc?.label], ['Barber', `${barber?.emoji} ${barber?.name}`], ['Position', `#${entry.position}`], ['Wait', fmtWait(entry.position, entry.service)], ['Source', entry.source], ['Joined', timeAgo(entry.joinedAt)]]
-    : [['Service', svc?.label], ['Barber', `${barber?.emoji} ${barber?.name}`], ['Slot', entry.slot], ['Date', entry.date], ['Status', entry.status], ['Phone', entry.phone]];
+    ? [['Service', svc?.label], ['Barber', `${barber?.emoji || '💈'} ${barber?.name}`], ['Position', `#${entry.position}`], ['Wait Time', fmtWait(entry.position, entry.service)], ['Source Log', entry.source], ['Joined Stream', timeAgo(entry.joinedAt)]]
+    : [['Service', svc?.label], ['Barber', `${barber?.emoji || '💈'} ${barber?.name}`], ['Target Slot', entry.slot], ['Date Log', entry.date], ['System Status', entry.status], ['Phone Signature', entry.phone]];
 
   return (
-    <div className="animate-fade fixed inset-0 z-[100] flex items-end justify-center sm:items-center"
-      style={{ background:'rgba(67,20,7,0.45)', backdropFilter:'blur(6px)' }}
-      onClick={onClose}>
-      <div className="animate-slide-up w-full max-w-lg p-6 rounded-t-3xl sm:rounded-3xl"
-        style={{ background:'#fff7ed', border:'2px solid #fed7aa', boxShadow:'0 20px 60px rgba(194,65,12,0.22)' }}
-        onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-4 bg-stone-900/40 backdrop-blur-sm transition-all duration-300 animate-in fade-in" onClick={onClose}>
+      <div className="w-full max-w-lg bg-[#FAF6F0] rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-[#EADBCE] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300" onClick={e => e.stopPropagation()}>
 
-        <div className="flex justify-between items-start mb-5">
-          <div>
-            <p className="font-display text-2xl font-black text-orange-950">{entry.name}</p>
-            <p className="text-sm text-orange-500 font-medium mt-0.5">{entry.phone}</p>
+        {/* Modal Header */}
+        <div className="flex justify-between items-center px-6 py-5 border-b border-[#EADBCE]/50 bg-white">
+          <div className="text-left">
+            <p className="font-serif text-2xl font-black text-stone-900 tracking-tight">{entry.name}</p>
+            <p className="text-[10px] font-mono font-bold text-[#A37B58] tracking-wide uppercase mt-1">Contact: {entry.phone}</p>
           </div>
-          <button onClick={onClose}
-            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-orange-700 hover:bg-orange-100 transition-colors"
-            style={{ border:'2px solid #fed7aa', background:'#fff' }}>✕</button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5 mb-5">
-          {fields.map(([k, v]) => (
-            <div key={k} className="rounded-xl p-3" style={{ background:'#fff', border:'2px solid #fed7aa' }}>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-orange-400 mb-1">{k}</p>
-              <p className="text-sm font-bold text-orange-950 capitalize">{v ?? '—'}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex gap-2.5">
-          <button className="flex-1 py-3 rounded-xl font-bold text-[15px] cursor-pointer transition-colors"
-            style={{ background:'#fff', border:'2px solid #fca5a5', color:'#dc2626' }}
-            onClick={() => { onRemove(entry.id); onClose(); }}>
-            {isQueue ? 'Remove' : 'Cancel Booking'}
+          <button onClick={onClose} className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 bg-white text-stone-400 hover:text-stone-800 hover:border-stone-400 transition-all cursor-pointer shadow-3xs">
+            <X size={15} />
           </button>
-          {isQueue && entry.position === 1 && (
-            <button className="btn-primary flex-1 py-3"
-              onClick={() => { onServe(entry.id); onClose(); }}>
-              ✓ Mark Served
-            </button>
-          )}
         </div>
+
+        {/* Info Grid Allocation */}
+        <div className="p-6 text-left">
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {fields.map(([k, v]) => (
+              <div key={k} className="rounded-2xl p-4 bg-white border border-[#EADBCE]/70 shadow-3xs transition-all duration-200 hover:border-[#C5A059]/40">
+                <p className="text-[9px] font-black uppercase tracking-widest text-stone-400 mb-1 flex items-center gap-1">
+                  <Info size={10} color="#C5A059" /> {k}
+                </p>
+                <p className="text-sm font-extrabold text-stone-900 capitalize tracking-tight">{v ?? '—'}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Action Operations Controller Hub */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button 
+              className="flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest border border-rose-200 bg-rose-50/40 text-rose-700 hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1.5"
+              onClick={() => { onRemove(entry.id); onClose(); }}
+            >
+              <Trash2 size={13} />
+              {isQueue ? 'Remove from Queue' : 'Cancel Booking'}
+            </button>
+            
+            {isQueue && entry.position === 1 && (
+              <button 
+                className="flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest text-white shadow-md active:scale-98 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                style={{ backgroundColor: CHARCOAL }}
+                onClick={() => { onServe(entry.id); onClose(); }}
+              >
+                <CheckCircle2 size={13} color={GOLD} />
+                Mark as Served
+              </button>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

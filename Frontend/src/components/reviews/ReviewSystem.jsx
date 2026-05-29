@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -89,127 +91,138 @@ const ReviewSystem = ({ bookingData }) => {
   /* ── SUCCESS SCREEN ── */
   if (submitted) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center p-4 font-sans relative bg-[#FAF7F2]">
-        <div className="bg-white rounded-[2rem] shadow-2xl p-12 text-center max-w-md border border-stone-200/40">
-          <div className="w-20 h-20 rounded-full bg-green-100 mx-auto mb-6 flex items-center justify-center">
-            <CheckCircle className="w-12 h-12 text-green-600" />
+      <div className="min-h-screen w-full flex flex-col justify-between font-sans relative bg-[#FAF7F2]">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2rem] shadow-2xl p-12 text-center max-w-md border border-stone-200/40 w-full">
+            <div className="w-20 h-20 rounded-full bg-green-100 mx-auto mb-6 flex items-center justify-center">
+              <CheckCircle className="w-12 h-12 text-green-600" />
+            </div>
+            <h2 className="text-3xl font-serif font-bold text-[#2D2926] mb-2 italic">Thank You!</h2>
+            <p className="text-[#A68942] text-[10px] uppercase tracking-[0.25em] mb-4 font-bold">Review Submitted</p>
+            <p className="text-[#8C8475] text-sm mb-6">Your feedback helps us improve. Redirecting you home...</p>
+            <button onClick={() => navigate("/")}
+              className="bg-[#3C3530] text-white px-8 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#2D2926] transition cursor-pointer">
+              Go Home Now
+            </button>
           </div>
-          <h2 className="text-3xl font-serif font-bold text-[#2D2926] mb-2 italic">Thank You!</h2>
-          <p className="text-[#A68942] text-[10px] uppercase tracking-[0.25em] mb-4 font-bold">Review Submitted</p>
-          <p className="text-[#8C8475] text-sm mb-6">Your feedback helps us improve. Redirecting you home...</p>
-          <button onClick={() => navigate("/")}
-            className="bg-[#3C3530] text-white px-8 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#2D2926] transition cursor-pointer">
-            Go Home Now
-          </button>
         </div>
+        <Footer />
       </div>
     );
   }
 
   /* ── FORM ── */
   return (
-    <div className="min-h-screen w-full bg-[#FAF7F2] p-4 md:p-10 font-sans relative flex items-center justify-center overflow-x-hidden">
+    <div className="min-h-screen w-full bg-[#FAF7F2] font-sans text-stone-800 antialiased flex flex-col justify-between relative overflow-x-hidden">
+      
+      <div>
+        {/* ── GLOBAL NAVBAR HEADER ── */}
+        <Navbar />
 
-      {/* Brand Identity Header (Positioned absolutely so it doesn't break alignment flow) */}
-      <div className="absolute top-6 left-6 md:top-10 md:left-10 z-30">
-        <div className="flex flex-col items-start">
-          <h1 className="text-xl md:text-2xl font-black text-[#C5A059] tracking-[0.2em] uppercase flex items-center gap-2">
-            <ScissorIcon className="w-6 h-6 text-[#C5A059] stroke-[1.5px]" />
-            Barber <span className="text-stone-900">Pro</span>
-          </h1>
-          <div className="h-[1px] w-full bg-[#C5A059] mt-1 opacity-50"/>
-          <p className="text-[8px] text-stone-500 tracking-[0.4em] uppercase mt-1 opacity-70">Premium Grooming</p>
-        </div>
-      </div>
-
-      {/* Review Modal Card Container */}
-      <div className="w-full max-w-lg bg-[#FDFBF0] rounded-[2rem] shadow-xl border border-stone-200/40 relative z-10 mt-20 md:mt-0 animate-fade-in text-left">
-        <div className="p-8 md:p-12">
-
-          {/* Badge */}
-          <div className="flex justify-center mb-6">
-            <div className="bg-[#FAF6E9] p-4 rounded-2xl border border-[#F2EDE0] shadow-sm">
-              <ScissorIcon className="w-8 h-8 text-[#A68942] stroke-[1.2px]" />
-            </div>
-          </div>
-
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#2D2926] text-center mb-2 italic">Review Session</h2>
-          <p className="text-[#A68942] text-center text-[10px] uppercase tracking-[0.25em] mb-10 font-bold opacity-80">
-            Share your elite experience
-          </p>
-
-          <div className="space-y-8">
-            {/* Salon Rating */}
-            <div className="space-y-3">
-              <label className="text-[#8C8475] text-[9px] uppercase font-black tracking-widest block text-center">Salon Ambience</label>
-              <div className="flex justify-center gap-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button key={star}
-                    type="button"
-                    onMouseEnter={() => setSalonHover(star)}
-                    onMouseLeave={() => setSalonHover(0)}
-                    onClick={() => { setSalonRating(star); setError(""); }}
-                    className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
-                    <span className={`text-4xl ${star <= (salonHover || salonRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
-                  </button>
-                ))}
-              </div>
-              {salonRating > 0 && <p className="text-center text-[10px] text-[#A68942] font-bold">{salonRating} / 5</p>}
-            </div>
-
-            {/* Barber Rating */}
-            <div className="space-y-3">
-              <label className="text-[#8C8475] text-[9px] uppercase font-black tracking-widest block text-center">Stylist: {barberName}</label>
-              <div className="flex justify-center gap-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button key={star}
-                    type="button"
-                    onMouseEnter={() => setBarberHover(star)}
-                    onMouseLeave={() => setBarberHover(0)}
-                    onClick={() => { setBarberRating(star); setError(""); }}
-                    className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
-                    <span className={`text-4xl ${star <= (barberHover || barberRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
-                  </button>
-                ))}
-              </div>
-              {barberRating > 0 && <p className="text-center text-[10px] text-[#A68942] font-bold">{barberRating} / 5</p>}
-            </div>
-          </div>
-
-          {/* Textarea Input Container */}
-          <div className="mt-10 mb-4">
-            <textarea
-              value={reviewText}
-              onChange={(e) => { setReviewText(e.target.value); setError(""); }}
-              placeholder="Your feedback matters..."
-              maxLength={500}
-              className="w-full bg-[#FAF6E9] border border-[#E5E0D0] rounded-2xl p-5 text-[#2D2926] focus:border-[#A68942] focus:ring-0 outline-none transition-all h-28 resize-none placeholder-[#BDB7AB] text-sm shadow-inner"
-            />
-            <p className="text-right text-[9px] text-[#BDB7AB] mt-1">{reviewText.length}/500</p>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-              <p className="text-red-600 text-xs font-semibold">{error}</p>
-            </div>
-          )}
-
-          {/* Action Trigger Button */}
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={loading || !token}
-            className="w-full bg-[#3C3530] hover:bg-[#2D2926] text-white font-bold py-5 rounded-2xl transition-all shadow-xl uppercase tracking-widest text-[10px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-            {loading ? "Submitting..." : "Submit Review"}
+        {/* ── EXIT BACK BUTTON CAPSULE ── */}
+        <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
+          <button 
+            onClick={() => navigate("/")} 
+            className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white cursor-pointer select-none"
+          >
+            <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1 text-[#C5A059]" />
+            <span>Cancel Review</span>
           </button>
+        </div>
 
-          <p className="text-center text-[#8C8475] text-[8px] mt-8 uppercase tracking-[0.3em] opacity-60">
-            Professional Grooming Standards
-          </p>
+        {/* Review Modal Card Container */}
+        <div className="w-full max-w-lg bg-[#FDFBF0] rounded-[2rem] shadow-xl border border-stone-200/40 relative z-10 mx-auto my-12 animate-fade-in text-left">
+          <div className="p-8 md:p-12">
+
+            {/* Badge */}
+            <div className="flex justify-center mb-6">
+              <div className="bg-[#FAF6E9] p-4 rounded-2xl border border-[#F2EDE0] shadow-sm">
+                <ScissorIcon className="w-8 h-8 text-[#A68942] stroke-[1.2px]" />
+              </div>
+            </div>
+
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#2D2926] text-center mb-2 italic">Review Session</h2>
+            <p className="text-[#A68942] text-center text-[10px] uppercase tracking-[0.25em] mb-10 font-bold opacity-80">
+              Share your elite experience
+            </p>
+
+            <div className="space-y-8">
+              {/* Salon Rating */}
+              <div className="space-y-3">
+                <label className="text-[#8C8475] text-[9px] uppercase font-black tracking-widest block text-center">Salon Ambience</label>
+                <div className="flex justify-center gap-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button key={star}
+                      type="button"
+                      onMouseEnter={() => setSalonHover(star)}
+                      onMouseLeave={() => setSalonHover(0)}
+                      onClick={() => { setSalonRating(star); setError(""); }}
+                      className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
+                      <span className={`text-4xl ${star <= (salonHover || salonRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
+                    </button>
+                  ))}
+                </div>
+                {salonRating > 0 && <p className="text-center text-[10px] text-[#A68942] font-bold">{salonRating} / 5</p>}
+              </div>
+
+              {/* Barber Rating */}
+              <div className="space-y-3">
+                <label className="text-[#8C8475] text-[9px] uppercase font-black tracking-widest block text-center">Stylist: {barberName}</label>
+                <div className="flex justify-center gap-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button key={star}
+                      type="button"
+                      onMouseEnter={() => setBarberHover(star)}
+                      onMouseLeave={() => setBarberHover(0)}
+                      onClick={() => { setBarberRating(star); setError(""); }}
+                      className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
+                      <span className={`text-4xl ${star <= (barberHover || barberRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
+                    </button>
+                  ))}
+                </div>
+                {barberRating > 0 && <p className="text-center text-[10px] text-[#A68942] font-bold">{barberRating} / 5</p>}
+              </div>
+            </div>
+
+            {/* Textarea Input Container */}
+            <div className="mt-10 mb-4">
+              <textarea
+                value={reviewText}
+                onChange={(e) => { setReviewText(e.target.value); setError(""); }}
+                placeholder="Your feedback matters..."
+                maxLength={500}
+                className="w-full bg-[#FAF6E9] border border-[#E5E0D0] rounded-2xl p-5 text-[#2D2926] focus:border-[#A68942] focus:ring-0 outline-none transition-all h-28 resize-none placeholder-[#BDB7AB] text-sm shadow-inner"
+              />
+              <p className="text-right text-[9px] text-[#BDB7AB] mt-1">{reviewText.length}/500</p>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                <p className="text-red-600 text-xs font-semibold">{error}</p>
+              </div>
+            )}
+
+            {/* Action Trigger Button */}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={loading || !token}
+              className="w-full bg-[#3C3530] hover:bg-[#2D2926] text-white font-bold py-5 rounded-2xl transition-all shadow-xl uppercase tracking-widest text-[10px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+              {loading ? "Submitting..." : "Submit Review"}
+            </button>
+
+            <p className="text-center text-[#8C8475] text-[8px] mt-8 uppercase tracking-[0.3em] opacity-60">
+              Professional Grooming Standards
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* ── BRAND FOOTER MODULE ── */}
+      <Footer />
 
       {/* Embedded Fade-In Keyframe Logic */}
       <style dangerouslySetInnerHTML={{ __html: `

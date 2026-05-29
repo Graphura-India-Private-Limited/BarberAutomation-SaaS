@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Icons from "lucide-react";
+import Footer from "../../components/layout/Footer";
 
 const NearbyBarbers = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const NearbyBarbers = () => {
   const Navigation = Icons.Navigation;
   const Star = Icons.Star;
   const Scissors = Icons.Scissors;
+  const ArrowLeft = Icons.ArrowLeft; // ✅ Imported ArrowLeft navigation icon
 
   // १. User ची Location मिळवणे
   const handleGetLocation = () => {
@@ -57,6 +59,7 @@ const NearbyBarbers = () => {
           { id: "3", name: "Urban Edge Barber", distance: "2.3 km", rating: 4.5, image: "https://images.unsplash.com/photo-1621605815841-aa33c5447a33?q=80&w=500" },
         ];
         setSalons(demoData);
+        loading(false);
         setLoading(false);
       }, 1200);
     } catch (err) {
@@ -66,29 +69,42 @@ const NearbyBarbers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-stone-800 antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-stone-800 antialiased overflow-x-hidden justify-between">
 
       {/* ✂️ BARBER PRO GLOBAL EXECUTIVE STICKY NAVIGATION HEADER */}
-      <header className="sticky top-0 bg-[#3E362E] border-b border-[#2A241F] px-8 py-4 flex items-center justify-between z-50 shadow-md">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
-            <svg className="w-5 h-5 text-[#C5A059]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-4.242-4.242M14.121 14.121a3 3 0 10-4.243-4.242m4.243 4.242a3 3 0 11-4.243-4.243m0 0L4 4m5.172 5.172L4 14m5.172-5.172l4.242 4.242" />
-            </svg>
-          </div>
-          <div className="text-left">
-            <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
-              BARBER <span className="text-white">PRO</span>
-            </h1>
-            <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
-              Premium Grooming Systems
-            </p>
+      <header className="sticky top-0 bg-[#3E362E] border-b border-[#2A241F] px-6 md:px-8 py-4 flex items-center justify-between z-50 shadow-md">
+        <div className="flex items-center gap-5">
+          
+          {/* ── ✅ THE CHIP INJECTION: EXECUTIVE REAR-FACING EXIT BUTTON ── */}
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 hover:opacity-85 group text-white bg-white/10 px-3.5 py-2.5 rounded-xl border border-white/10 cursor-pointer select-none"
+          >
+            <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5 text-[#C5A059]" />
+            <span>Exit</span>
+          </button>
+
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
+              <svg className="w-5 h-5 text-[#C5A059]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 14.121L19 19m-4.879-4.879l-4.242-4.242M14.121 14.121a3 3 0 10-4.243-4.242m4.243 4.242a3 3 0 11-4.243-4.243m0 0L4 4m5.172 5.172L4 14m5.172-5.172l4.242 4.242" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
+                BARBER <span className="text-white">PRO</span>
+              </h1>
+              <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
+                Premium Grooming Systems
+              </p>
+            </div>
           </div>
         </div>
         
         <div className="text-right hidden sm:block">
           <div className="text-[10px] text-stone-400 uppercase font-black tracking-widest leading-none">Discovery Radar</div>
-          <div className="text-sm text-white font-black mt-1 leading-none">
+          <div className="text-sm text-white font-black mt-1 bg-white/10 px-3 py-1 rounded-md border border-white/5 inline-block leading-none">
             Salons Studio List
           </div>
         </div>
@@ -130,7 +146,7 @@ const NearbyBarbers = () => {
           {error && (
             <div className="text-center py-16 bg-red-50 rounded-3xl border border-red-200/60 max-w-xl mx-auto shadow-xs px-8 flex items-center gap-4">
               <div className="text-red-500 text-2xl">⚠️</div>
-              <div>
+              <div className="text-left">
                 <p className="text-red-900 text-xs font-black uppercase tracking-wider">Radar Connection Dropped</p>
                 <p className="text-red-600 text-xs font-semibold mt-0.5 leading-normal">{error}</p>
               </div>
@@ -190,7 +206,8 @@ const NearbyBarbers = () => {
           
         </div>
       </section>
-
+      
+      <Footer />
     </div>
   );
 };
