@@ -95,13 +95,13 @@ export default function WomenServices() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6F0] via-transparent to-black/50" />
           
           {/* RETURN BUTTON */}
-          <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+          <div className="absolute top-24 left-4 sm:left-6 md:left-8 z-[10000]">
             <button
               onClick={() => navigate("/")}
               className="group flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-2xl text-white font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 shadow-sm hover:bg-white hover:text-[#3E362E] hover:border-white hover:scale-105 cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] transition-transform duration-300 transform group-hover:-translate-x-0.5" />
-              <span>Return</span>
+              
             </button>
           </div>
 

@@ -89,7 +89,7 @@ export default function AddonServices() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6F0] via-transparent to-black/50" />
           
           {/* RETURN BACK BUTTON (Top Left) */}
-          <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+         <div className="absolute top-24 left-4 sm:left-6 md:left-8 z-[10000]">
             <button
               onClick={() => navigate(-1)}
               className="group flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-xl text-white font-medium text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-white hover:text-[#3E362E] hover:border-white cursor-pointer"
@@ -97,7 +97,6 @@ export default function AddonServices() {
               <span className="text-sm font-light text-[#C5A059] group-hover:text-[#3E362E] transition-transform duration-300 inline-block">
                 &lt;
               </span>
-              <span>Back</span>
             </button>
           </div>
 

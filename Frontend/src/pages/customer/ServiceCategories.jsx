@@ -1,21 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-
-// 🧭 तुमचे लेआउट कॉम्पोनंट्स इंपोर्ट केले
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
 export default function ServiceCategories() {
   const navigate = useNavigate();
 
-  // विंडो स्क्रोल रिसेट
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const categories = [
     {
-      id: "men", // SelectLook कोडशी मॅच होण्यासाठी सोपा ID
+      id: "men", 
       title: "Men Services",
       desc: "Architectural cuts, razor-sharp beard styling, and premium treatments engineered for the modern gentleman.",
       img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80",
@@ -37,7 +34,6 @@ export default function ServiceCategories() {
     }
   ];
 
-  // 🛠️ पुढील सर्व्हिस लिस्ट पेजवर जाताना कॅटेगरी डेटा पास करणारे फंक्शन
   const handleCategorySelect = (cat) => {
     navigate(cat.path, {
       state: {
@@ -49,7 +45,7 @@ export default function ServiceCategories() {
 
   return (
     <>
-      {/* 🧭 १. मुख्य斬 टॉप नेव्हबार */}
+      
       <Navbar />
 
       <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white">
@@ -62,11 +58,11 @@ export default function ServiceCategories() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6F0] via-transparent to-black/40" />
           
-          {/* Subtle Ambient Glow */}
+          
           <div className="absolute top-0 right-0 w-80 h-80 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
           
-          {/* RETURN BUTTON (Top Left Corner) */}
-          <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+         
+          <div className="absolute top-24 left-4 sm:left-6 md:left-8 z-[10000]">
             <button
               onClick={() => navigate("/")}
               className="group flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 rounded-2xl text-white font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 shadow-sm hover:bg-white hover:text-[#3E362E] hover:border-white hover:scale-105 cursor-pointer"
@@ -74,7 +70,6 @@ export default function ServiceCategories() {
               <span className="text-sm font-light text-[#C5A059] transition-transform duration-300 transform group-hover:-translate-x-1 inline-block">
                 &lt;
               </span>
-              <span className="relative">Return</span>
             </button>
           </div>
 
