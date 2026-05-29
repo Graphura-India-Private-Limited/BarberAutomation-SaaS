@@ -593,7 +593,7 @@ export default function HomePage() {
       {/* ── MEMBERSHIP ── */}
       <MembershipSection />
 
-      {/* ── TESTIMONIALS ── */}
+       {/* ── 5. CUSTOMER TESTIMONIALS SECTION ── */}
       <section className="relative w-full overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] py-20 sm:py-24 px-4 flex flex-col items-center justify-center">
         <div className="absolute top-[-100px] left-[-100px] w-[320px] h-[320px] bg-[#C5A059]/20 blur-[120px] rounded-full animate-pulse pointer-events-none" />
         <div className="absolute bottom-[-100px] right-[-100px] w-[320px] h-[320px] bg-white/10 blur-[120px] rounded-full animate-pulse pointer-events-none" />
@@ -604,13 +604,16 @@ export default function HomePage() {
           <h2 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight bg-gradient-to-r from-[#C5A059] via-[#FFE6A7] to-[#C5A059] bg-clip-text text-transparent leading-tight">
             Customer Reviews
           </h2>
-          <div className="w-20 h-[3px] bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] mx-auto mt-5 rounded-full" />
+          <div className="w-20 h-[3px] bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] mx-auto mt-5 rounded-full shadow-[0_0_20px_rgba(197,160,89,0.7)]" />
         </div>
 
-        <div className="relative w-full max-w-[1450px] px-10 sm:px-16">
-          <button type="button" onClick={handlePrev}
-            className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 cursor-pointer">
-            <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+        <div className="relative w-full max-w-[1450px] px-2 sm:px-8">
+          <button
+            type="button"
+            onClick={handlePrev}
+            className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.08)] cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
@@ -618,7 +621,7 @@ export default function HomePage() {
           <div className="overflow-hidden py-6 w-full">
             <div
               className="flex gap-5 lg:gap-7 transition-transform duration-700 ease-out"
-              style={{ transform: `translateX(calc(-${currentIdx * (100 / visibleCount)}% - ${currentIdx * (visibleCount > 1 ? 28 / visibleCount : 0)}px))` }}
+              style={{ transform: `translateX(-${currentIdx * 100}%)` }}
             >
               {displayReviews.map((item, idx) => {
                 const isReal = !!item._id;
@@ -629,14 +632,13 @@ export default function HomePage() {
                 return (
                   <div
                     key={item._id || `${name}-${idx}`}
-                    onClick={() => isReal && setSelectedReview(item)}
-                    style={{ minWidth: `calc(${100 / visibleCount}% - ${(visibleCount - 1) * 28 / visibleCount}px)` }}
-                    className="relative rounded-[32px] bg-white/10 backdrop-blur-2xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.25)] overflow-hidden p-6 sm:p-7 flex flex-col items-center justify-between text-center transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:border-[#C5A059]/40 hover:shadow-[0_0_45px_rgba(197,160,89,0.35)] group shrink-0 cursor-pointer min-h-[460px]"
+                    onClick={() => isReal && setSelectedReview && setSelectedReview(item)}
+                    className="relative min-w-full sm:min-w-[48%] lg:min-w-[31%] xl:min-w-[23.5%] max-w-[350px] min-h-[460px] rounded-[32px] bg-white/10 backdrop-blur-2xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.25)] overflow-hidden p-6 sm:p-7 flex flex-col items-center justify-between text-center transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:border-[#C5A059]/40 hover:shadow-[0_0_45px_rgba(197,160,89,0.35)] group shrink-0 cursor-pointer"
                   >
                     <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-[120%] transition-all duration-1000 rotate-12 pointer-events-none" />
 
                     <div className="relative z-10 mt-2">
-                      <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#C5A059] p-1 bg-white/10 float-avatar">
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#C5A059] p-1 bg-white/10 shadow-[0_0_25px_rgba(197,160,89,0.5)] animate-[float_4s_ease-in-out_infinite]">
                         {avatar ? (
                           <img src={avatar} alt={name} className="w-full h-full object-cover rounded-full" />
                         ) : (
@@ -647,7 +649,7 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    <div className="relative z-10 text-[40px] font-serif text-[#FFE6A7] mt-4 leading-none">"</div>
+                    <div className="relative z-10 text-[40px] font-serif text-[#FFE6A7] mt-4 drop-shadow-[0_0_15px_rgba(255,230,167,0.8)] leading-none">"</div>
 
                     <p className="relative z-10 text-stone-200 italic font-serif text-[14px] leading-relaxed flex-grow flex items-center justify-center mt-4 line-clamp-5">
                       {text}
@@ -658,10 +660,10 @@ export default function HomePage() {
                     <div className="relative z-10 w-full mt-6">
                       <button
                         type="button"
-                        onClick={(e) => { e.stopPropagation(); navigate("/customer/services"); }}
-                        className="w-full py-3.5 px-4 rounded-full bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] hover:scale-105 transition-all duration-300 cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); if (navigate) navigate("/customer/services"); }}
+                        className="relative overflow-hidden w-full py-3.5 px-4 rounded-full bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_0_25px_rgba(197,160,89,0.45)] hover:scale-105 transition-all duration-300 cursor-pointer"
                       >
-                        Book This Experience
+                        <span className="relative z-10">Book This Experience</span>
                       </button>
                     </div>
                   </div>
@@ -670,29 +672,31 @@ export default function HomePage() {
             </div>
           </div>
 
-          <button type="button" onClick={handleNext}
-            className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 cursor-pointer">
-            <svg fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
+          <button
+            type="button"
+            onClick={handleNext}
+            className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.08)] cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>
-
-          {/* Dot indicators */}
-          <div className="flex justify-center gap-2 mt-6">
-            {Array.from({ length: maxIdx + 1 }).map((_, i) => (
-              <button key={i} onClick={() => setCurrentIdx(i)}
-                className={`rounded-full transition-all cursor-pointer border-none ${i === currentIdx ? "w-6 h-2 bg-[#C5A059]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`} />
-            ))}
-          </div>
         </div>
 
         <div className="relative z-20 mt-14 flex flex-col sm:flex-row gap-4">
-          <button type="button" onClick={() => navigate("/reviews")}
-            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[11px] hover:scale-105 transition-all duration-300 cursor-pointer">
-            See All Reviews{reviews.length > 0 && ` (${reviews.length})`}
+          <button
+            type="button"
+            onClick={() => { if (navigate) navigate("/reviews"); }}
+            className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[11px] shadow-[0_0_30px_rgba(197,160,89,0.45)] hover:scale-105 transition-all duration-300 cursor-pointer"
+          >
+            See All Reviews{reviews && reviews.length > 0 && ` (${reviews.length})`}
           </button>
-          <button type="button" onClick={() => navigate("/write-review")}
-            className="px-8 py-4 rounded-2xl border border-[#C5A059]/40 bg-white/5 backdrop-blur-xl text-[#FFE6A7] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-[#C5A059]/10 hover:border-[#FFE6A7] transition-all duration-300 cursor-pointer">
+
+          <button
+            type="button"
+            onClick={() => { if (navigate) navigate("/write-review"); }}
+            className="px-8 py-4 rounded-2xl border border-[#C5A059]/40 bg-white/5 backdrop-blur-xl text-[#FFE6A7] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-[#C5A059]/10 hover:border-[#FFE6A7] transition-all duration-300 cursor-pointer"
+          >
             Write a Review
           </button>
         </div>
