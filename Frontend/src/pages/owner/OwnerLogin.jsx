@@ -183,9 +183,13 @@ export default function OwnerLogin() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-[11px] font-bold uppercase tracking-widest text-gray-600">Password</label>
-                  <button type="button" className="text-xs font-semibold hover:underline" style={{ color: GOLD }}>
-                    Forgot password?
-                  </button>
+                  <button
+    type="button"
+    onClick={() => navigate("/forgot-password")}
+    className="text-[11px] font-black uppercase tracking-widest text-[#C5A059] hover:text-[#3E362E] hover:underline bg-transparent border-none cursor-pointer select-none transition-colors duration-200"
+  >
+    Forgot Password?
+  </button>
                 </div>
                 <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
                   <div className="flex items-center px-4 border-r bg-gray-50" style={{ borderColor: "#E5E7EB" }}>
@@ -252,14 +256,17 @@ export default function OwnerLogin() {
               <UserCircle size={18} className="text-gray-500" />
               Register Your Salon
             </Link>
-
-            {/* Help */}
-            <p className="text-center text-xs text-gray-400 mt-3">
-              Need help?{" "}
-              <a href="mailto:support@barberpro.in" className="font-semibold hover:underline" style={{ color: GOLD }}>
-                Contact Support
-              </a>
-            </p>
+   {/* Help */ }
+           <p className="text-center text-xs text-gray-400 mt-3">
+             Need help?{" "}
+             <Link 
+               to="/support" 
+               className="font-semibold hover:underline cursor-pointer transition-all" 
+               style={{ color: GOLD }}
+             >
+               Contact Support
+             </Link>
+           </p>
 
             {/* Security note */}
             <div className="flex items-center justify-center gap-1.5 mt-2">

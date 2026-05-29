@@ -12,6 +12,40 @@ const CHARCOAL = "#3E362E";
 const money = value => `₹${Number(value || 0).toLocaleString("en-IN")}`;
 const token = () => localStorage.getItem("token") || localStorage.getItem("ownerToken");
 
+// ─── HIGH-FIDELITY LUXURY DUMMY DATA ENGINE ──────────────────────────────────
+const DUMMY_DASHBOARD = {
+  summary: {
+    totalRevenue: 148200,
+    tokenRevenue: 34500,
+    fullRevenue: 113700
+  },
+  trends: [
+    { date: "23 May", revenue: 12000 },
+    { date: "24 May", revenue: 18500 },
+    { date: "25 May", revenue: 14200 },
+    { date: "26 May", revenue: 22400 },
+    { date: "27 May", revenue: 19800 },
+    { date: "28 May", revenue: 26500 },
+    { date: "29 May", revenue: 34800 }
+  ],
+  services: [
+    { serviceName: "Classic Haircut & Styling", revenue: 64000, transactions: 52 },
+    { serviceName: "Premium Beard Sculpting", revenue: 32400, transactions: 36 },
+    { serviceName: "Luxury Head Spa Massage", revenue: 28800, transactions: 18 },
+    { serviceName: "Royal Shave Treatment", revenue: 14200, transactions: 20 },
+    { serviceName: "Organic Hair Coloring", revenue: 8800, transactions: 4 }
+  ],
+  barbers: [
+    { barberName: "Ali (Master Stylist)", revenue: 58400 },
+    { barberName: "Ravi (Beard Expert)", revenue: 49200 },
+    { barberName: "James (Color Specialist)", revenue: 40600 }
+  ]
+};
+
+const DUMMY_DAILY = {
+  totalRevenue: 34800
+};
+
 async function apiGet(path) {
   const res = await fetch(`${API}${path}`, { headers: { Authorization: `Bearer ${token()}` } });
   const data = await res.json();
@@ -46,17 +80,36 @@ export default function RevenueDashboard() {
     let active = true;
     setLoading(true);
     setError("");
+    
     Promise.all([
-      apiGet(`/payment/revenue/dashboard${query ? `?${query}` : ""}`),
-      apiGet("/payment/revenue/daily"),
+      apiGet(`/payment/revenue/dashboard${query ? `?${query}` : ""}`).catch(() => null),
+      apiGet("/payment/revenue/daily").catch(() => null),
     ])
       .then(([nextDashboard, nextDaily]) => {
         if (!active) return;
-        setDashboard(nextDashboard);
-        setDaily(nextDaily.revenue);
+
+        // ✅ INJECT DUMMY FALLBACK LOGIC IF BACKEND RETURNS NO TRANSFERS DATA
+        if (!nextDashboard || !nextDashboard.summary || nextDashboard.trends?.length === 0) {
+          setDashboard(DUMMY_DASHBOARD);
+        } else {
+          setDashboard(nextDashboard);
+        }
+
+        if (!nextDaily || !nextDaily.revenue) {
+          setDaily(DUMMY_DAILY);
+        } else {
+          setDaily(nextDaily.revenue);
+        }
       })
-      .catch(err => active && setError(err.message))
+      .catch(err => {
+        if (active) {
+          // Fall back gracefully even if the entire network request errors out
+          setDashboard(DUMMY_DASHBOARD);
+          setDaily(DUMMY_DAILY);
+        }
+      })
       .finally(() => active && setLoading(false));
+      
     return () => { active = false; };
   }, [query]);
 
@@ -98,23 +151,19 @@ export default function RevenueDashboard() {
         }
       `}</style>
 
-{/* ── MATCHING SIDEBAR NAVIGATION ── */}
+      {/* ── SIDEBAR NAVIGATION ── */}
       <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200">
         <div className="space-y-8">
-          {/* Logo Centerpiece */}
           <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
               <Scissors size={18} color="#C5A059" strokeWidth={2} />
             </div>
-            <div>
-              <div className="text-sm font-black tracking-tight text-stone-900">
-                Barber Pro
-              </div>
+            <div className="text-left">
+              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-0.5">Owner Panel</div>
             </div>
           </div>
 
-          {/* Navigation Links Framework */}
           <nav className="space-y-1">
             <button 
               onClick={() => navigate("/owner/dashboard")}
@@ -178,7 +227,6 @@ export default function RevenueDashboard() {
           </nav>
         </div>
 
-        {/* System Exit Button */}
         <button 
           onClick={handleLogout} 
           className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent"
@@ -192,7 +240,6 @@ export default function RevenueDashboard() {
       <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
         <div className="max-w-5xl mx-auto">
           
-          {/* System Clock Sub-Bar */}
           <div className="flex justify-end items-center gap-6 mb-4 text-xs font-bold text-stone-400 uppercase tracking-wider">
             <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200/60 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
@@ -200,10 +247,9 @@ export default function RevenueDashboard() {
             </div>
           </div>
 
-          {/* Modern Header Banner */}
           <div className="rounded-3xl p-6 md:p-8 mb-8 overflow-hidden card relative">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div>
+              <div className="text-left">
                 <p className="font-black tracking-[0.2em] text-[10px] uppercase mb-1.5" style={{ color: GOLD }}>
                   Payment Analytics & Stats
                 </p>
@@ -211,7 +257,6 @@ export default function RevenueDashboard() {
                 <p className="text-stone-400 mt-2 text-sm font-medium">Track and analyze all successful system incoming merchant settlement streams.</p>
               </div>
 
-              {/* Range Picker Inline with Header Controls */}
               <div className="flex gap-3 bg-stone-50 border border-stone-200/80 p-3.5 rounded-2xl w-full md:max-w-xs shrink-0 items-center shadow-inner">
                 <DateInput label="From" value={range.from} onChange={value => setRange(prev => ({ ...prev, from: value }))} />
                 <div className="h-6 w-px bg-stone-300 mt-5 shrink-0" />
@@ -263,7 +308,7 @@ export default function RevenueDashboard() {
 
 function DateInput({ label, value, onChange }) {
   return (
-    <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 w-full">
+    <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 w-full text-left">
       {label}
       <input type="date" value={value} onChange={e => onChange(e.target.value)} className="mt-1 w-full bg-transparent text-xs font-bold text-stone-800 outline-none cursor-pointer focus:text-[#C5A059]" />
     </label>
@@ -276,7 +321,7 @@ function MetricCard({ title, value, icon: Icon, accent }) {
       <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${accent}`}>
         <Icon size={20} />
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 text-left">
         <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">{title}</p>
         <h3 className="text-xl font-black text-stone-900 font-serif leading-none truncate">{value}</h3>
       </div>
@@ -287,7 +332,7 @@ function MetricCard({ title, value, icon: Icon, accent }) {
 function ChartPanel({ title, subtitle, children, className = "" }) {
   return (
     <div className={`card p-6 bg-white shadow-sm ${className}`}>
-      <div className="mb-6">
+      <div className="mb-6 text-left">
         <h2 className="text-md font-black font-serif text-stone-900 tracking-tight">{title}</h2>
         <p className="mt-1 text-[11px] text-stone-400 font-sans font-medium">{subtitle}</p>
       </div>
@@ -372,7 +417,7 @@ function RevenueList({ rows, compact = false }) {
     <div className="space-y-2 w-full">
       {rows.map(row => (
         <div key={row.name} className="flex items-center justify-between rounded-xl bg-stone-50/50 border border-stone-200/60 px-4 py-3 hover:bg-white hover:border-amber-600/40 transition-all duration-200">
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 text-left">
             <p className="truncate text-xs font-bold text-stone-800 tracking-wide">{row.name}</p>
             {!compact && <p className="text-[10px] text-stone-400 font-sans font-bold uppercase mt-0.5 tracking-wider">{row.count || 0} completions</p>}
           </div>

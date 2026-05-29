@@ -1,11 +1,10 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// 🧩 CRITICAL FIX: Injected the missing Header component import line
 import Header from "../layout/Header"; 
 import Footer from "../../components/layout/Footer";
 
 import {
-  ArrowLeft,
+  ArrowLeft, // Used for the floating action overlay button
   CalendarClock,
   Clock,
   MapPin,
@@ -49,7 +48,7 @@ const demoSalons = [
     reviews: 82,
     distance: "2.3 km",
     image:
-      "https://images.unsplash.com/photo-1621605815841-aa33c5447a33?q=80&w=1400",
+      "https://img.magnific.com/free-photo/handsome-man-barber-shop-styling-hair_1303-20978.jpg?semt=ais_hybrid&w=740&q=80",
     hours: "10:30 AM - 9:30 PM",
   },
 ];
@@ -65,7 +64,7 @@ export default function SalonDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   
-  // Find matching salon dynamically or fall back to the first item if index isn't passed
+  // Find matching salon dynamically or fall back to the first item
   const salon = demoSalons.find((item) => item.id === id) || demoSalons[0];
 
   return (
@@ -77,18 +76,6 @@ export default function SalonDetailPage() {
         rightElement={
           <div className="flex items-center gap-4">
             
-            {/* 🧭 Action 1: Back Button Text Route Link */}
-            <button 
-              type="button"
-              onClick={() => navigate(-1)}
-              className="hidden md:flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-stone-400 hover:text-white transition-colors cursor-pointer bg-transparent border-none"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to List
-            </button>
-
             {/* Separator line visible only on desktop */}
             <div className="hidden md:block h-4 w-[1px] bg-stone-700" />
 
@@ -119,6 +106,17 @@ export default function SalonDetailPage() {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1612] via-[#1A1612]/60 to-transparent" />
+
+        {/* ── ✅ FLOATING BACK BUTTON MOUNTED NATIVELY ON IMAGE CANVAS ── */}
+        <div className="absolute top-6 left-6 sm:left-8 lg:left-10 z-30">
+          <button
+            type="button"
+            onClick={() => navigate(-1)} // Takes user back cleanly to the discovery workspace radar loop
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-black/30 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all duration-300 hover:bg-white hover:text-stone-900 hover:scale-105 active:scale-95 group cursor-pointer"
+          >
+            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
+          </button>
+        </div>
 
         <div className="relative mx-auto flex min-h-[60vh] max-w-7xl flex-col justify-end px-6 pb-12 pt-24 sm:px-8 lg:px-10">
           <div className="max-w-3xl text-white text-left">
