@@ -5,36 +5,36 @@ import {
   ChevronDown, Eye, EyeOff, Lock, ArrowRight,
 } from "lucide-react";
 
-const API  = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const DEMO = { mobile: "9000000000", password: "Admin@123" };
 
-const GOLD        = "#C5A059";
-const BROWN       = "#8B6B3E";
+const GOLD = "#C5A059";
+const BROWN = "#8B6B3E";
 const BROWN_HOVER = "#735A32";
 
 const FEATURES = [
-  { icon: ShieldCheck, title: "SECURITY",  sub: "Protected access" },
-  { icon: Users,       title: "USERS",     sub: "Manage accounts" },
-  { icon: Clock,       title: "REQUESTS",  sub: "Review quickly" },
-  { icon: ShieldAlert, title: "AUDIT",     sub: "Track activity" },
+  { icon: ShieldCheck, title: "SECURITY", sub: "Protected access" },
+  { icon: Users, title: "USERS", sub: "Manage accounts" },
+  { icon: Clock, title: "REQUESTS", sub: "Review quickly" },
+  { icon: ShieldAlert, title: "AUDIT", sub: "Track activity" },
 ];
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const [mobile,   setMobile]  = useState("");
-  const [password, setPassword]= useState("");
-  const [showPwd,  setShowPwd] = useState(false);
-  const [loading,  setLoading] = useState(false);
-  const [error,    setError]   = useState("");
-  const [success,  setSuccess] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (mobile.length !== 10) { setError("Enter valid 10-digit mobile"); return; }
-    if (!password)             { setError("Enter password"); return; }
+    if (!password) { setError("Enter password"); return; }
     setLoading(true); setError(""); setSuccess("");
     try {
-      const res  = await fetch(`${API}/auth/admin/login/mobile`, {
+      const res = await fetch(`${API}/auth/admin/login/mobile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile, password }),
@@ -42,7 +42,7 @@ export default function AdminLogin() {
       const data = await res.json();
       if (data.success) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("role",  "admin");
+        localStorage.setItem("role", "admin");
         setSuccess("Access granted! Redirecting...");
         setTimeout(() => navigate("/admin/requests"), 1000);
       } else {
@@ -62,11 +62,28 @@ export default function AdminLogin() {
       <div className="w-full h-screen bg-white flex">
 
         {/* ── LEFT: Admin Hero ── */}
-        <div className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden"
+        {/* <div className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden"
           style={{ background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 40%, #16213e 70%, #0f3460 100%)" }}
+        > */}
+        <div
+          className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden"
+          style={{
+            backgroundImage:
+              "url('https://t4.ftcdn.net/jpg/03/74/32/65/360_F_374326500_IZuSyagnKizUonpTAxmG9xoJA7LLLavU.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         >
-          <div className="absolute inset-0 opacity-10"
+          <div className="absolute inset-0 bg-black/60" />
+          {/* <div className="absolute inset-0 opacity-10"
             style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #C5A059 0%, transparent 50%), radial-gradient(circle at 80% 20%, #8B6B3E 0%, transparent 40%)" }}
+          /> */}
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 20% 50%, #C5A059 0%, transparent 50%), radial-gradient(circle at 80% 20%, #8B6B3E 0%, transparent 40%)"
+            }}
           />
 
           {/* Logo */}
@@ -124,7 +141,7 @@ export default function AdminLogin() {
             {/* Title */}
             <div className="text-center mb-4">
               <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                Admin Login 
+                Admin Login
               </h2>
               <p className="text-gray-400 text-xs mt-1">Sign in to access the admin dashboard</p>
             </div>
@@ -206,7 +223,7 @@ export default function AdminLogin() {
                 </div>
               </div>
 
-              {error   && <p className="text-red-500 text-xs font-medium text-center">{error}</p>}
+              {error && <p className="text-red-500 text-xs font-medium text-center">{error}</p>}
               {success && <p className="text-green-600 text-xs font-medium text-center">{success}</p>}
 
               {/* Access Dashboard button */}
