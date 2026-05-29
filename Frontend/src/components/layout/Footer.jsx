@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSubscriptions } from "../../contexts/AppContext.jsx";
 import {
   Scissors,
   Phone, 
@@ -14,6 +15,26 @@ import {
 
 const Footer = () => {
   const navigate = useNavigate();
+  const { addSubscriber } = useSubscriptions();
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+
+  const handleNewsletterSubmit = (event) => {
+    event.preventDefault();
+    const trimmedEmail = newsletterEmail.trim();
+    if (!trimmedEmail) {
+      setNewsletterMessage("Please enter a valid email address.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setNewsletterMessage("Please enter a valid email address.");
+      return;
+    }
+    addSubscriber(trimmedEmail);
+    setNewsletterEmail("");
+    setNewsletterMessage("Subscribed! Check admin dashboard for the email.");
+    window.setTimeout(() => setNewsletterMessage(""), 4000);
+  };
 
   const SERVICE_LINKS = [
     { label: "Men Services", path: "/customer/services/men" },
@@ -380,57 +401,26 @@ const Footer = () => {
           </div>
 
           {/* NEWSLETTER */}
-<div className="
-  p-1
-
-  rounded-xl
-
-  bg-white/[0.05]
-  backdrop-blur-xl
-
-  border border-white/[0.08]
-
-  flex items-center
-">
-            <input
-  type="email"
-  placeholder="Drop your email..."
-  className="
-    flex-1
-    bg-transparent
-
-    px-3 py-2.5
-
-    text-xs
-    text-white
-
-    placeholder:text-stone-500
-
-    outline-none
-  "
-/>
-           <button className="
-  w-10 h-10
-
-  rounded-lg
-
-  bg-gradient-to-r
-  from-[#C5A059]
-  via-[#E8C878]
-  to-[#C5A059]
-
-  text-[#2A241F]
-
-  flex items-center justify-center
-
-  hover:scale-105
-
-  transition-all duration-300
-">
-  <Send className="w-3.5 h-3.5" />
-</button>
-          </div>
-
+          <form onSubmit={handleNewsletterSubmit} className="p-1 rounded-xl bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="Drop your email..."
+                className="flex-1 bg-transparent px-3 py-2.5 text-xs text-white placeholder:text-stone-500 outline-none"
+              />
+              <button
+                type="submit"
+                className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] flex items-center justify-center hover:scale-105 transition-all duration-300"
+              >
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            {newsletterMessage && (
+              <p className="text-[11px] text-stone-200 font-medium">{newsletterMessage}</p>
+            )}
+          </form>
         </div>
 
       </div>

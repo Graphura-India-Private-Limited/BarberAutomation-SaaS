@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 // ── Seed Data ────────────────────────────────────────────
 export const SALARY_MODELS = { FIXED: "fixed", COMMISSION: "commission" };
@@ -85,3 +85,39 @@ export function QueueProvider({ children }) {
 }
 
 export const useQueue = () => useContext(QueueContext);
+
+const SubscriptionContext = createContext(null);
+
+export function SubscriptionProvider({ children }) {
+  const [subscriptions, setSubscriptions] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem("footerSubscriptions");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("footerSubscriptions", JSON.stringify(subscriptions));
+    } catch {
+      // ignore localStorage write failures
+    }
+  }, [subscriptions]);
+
+  const addSubscriber = (email) => {
+    setSubscriptions((prev) => [
+      ...prev,
+      { id: Date.now(), email, createdAt: new Date().toISOString() },
+    ]);
+  };
+
+  return (
+    <SubscriptionContext.Provider value={{ subscriptions, addSubscriber }}>
+      {children}
+    </SubscriptionContext.Provider>
+  );
+}
+
+export const useSubscriptions = () => useContext(SubscriptionContext);

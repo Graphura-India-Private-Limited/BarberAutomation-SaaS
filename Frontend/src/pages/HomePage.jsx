@@ -91,6 +91,7 @@ export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [selectedReview, setSelectedReview] = useState(null);
+
   const dropRef = useRef(null);
 
   useEffect(() => {
@@ -198,6 +199,7 @@ export default function HomePage() {
       return prev + 1;
     });
   };
+
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans overflow-x-hidden">
