@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../layout/Header"; 
 import Footer from "../../components/layout/Footer";
+import Navbar from "../../components/layout/Navbar";
 
 import {
   ArrowLeft, // Used for the floating action overlay button
@@ -69,78 +70,102 @@ export default function SalonDetailPage() {
 
   return (
     <main className="min-h-screen bg-[#FAF6F0] text-[#1A1612] font-sans antialiased flex flex-col">
-      
-      {/* ✂️ GLOBAL SHARED NAV HEADER PANEL */}
-      <Header 
-        subtitle="Studio Profile Details" 
-        rightElement={
-          <div className="flex items-center gap-4">
-            
-            {/* Separator line visible only on desktop */}
-            <div className="hidden md:block h-4 w-[1px] bg-stone-700" />
+      <Navbar />
+    
 
-            {/* 🔗 Action 2: Premium Share Native Action Toggle Button */}
-            <button 
-              type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                alert("Studio profile link copied to clipboard!");
-              }}
-              className="flex items-center gap-2 bg-[#A37B58] hover:bg-[#8F6947] text-white px-4 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer shadow-xs active:scale-[0.98]"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 10.742l4.574-2.286m0 5.088l-4.574-2.286M16 12a3 3 0 11-6 0 3 3 0 016 0zM4 6a3 3 0 11-6 0 3 3 0 016 0zm0 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Share Studio
-            </button>
+      {/* 📸 PREMIUM HERO IMAGE DISPLAY */}
+<section className="relative h-[72vh] md:h-[88vh] overflow-hidden flex items-end">
 
-          </div>
-        }
-      />
+  {/* Background Image */}
+  <img
+    src={salon.image}
+    alt={salon.name}
+    className="absolute inset-0 w-full h-full object-cover scale-[1.03]"
+  />
 
-      {/* 📸 HERO CONTENT IMAGE DISPLAY */}
-      <section className="relative min-h-[60vh] overflow-hidden flex-shrink-0">
-        <img
-          src={salon.image}
-          alt={salon.name}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1A1612] via-[#1A1612]/60 to-transparent" />
+  {/* Luxury Dark Overlay */}
+  <div className="absolute inset-0 bg-gradient-to-t from-[#120F0C] via-[#120F0C]/55 to-black/20" />
 
-        {/* ── ✅ FLOATING BACK BUTTON MOUNTED NATIVELY ON IMAGE CANVAS ── */}
-        <div className="absolute top-6 left-6 sm:left-8 lg:left-10 z-30">
-          <button
-            type="button"
-            onClick={() => navigate(-1)} // Takes user back cleanly to the discovery workspace radar loop
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-black/30 backdrop-blur-md border border-white/20 text-white shadow-lg transition-all duration-300 hover:bg-white hover:text-stone-900 hover:scale-105 active:scale-95 group cursor-pointer"
-          >
-            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-0.5" />
-          </button>
+  {/* Soft Golden Ambient Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,160,89,0.18),transparent_35%)]" />
+
+  {/* Floating Back Button */}
+<div className="absolute top-20 md:top-24 left-6 sm:left-8 lg:left-10 z-[10000]">
+  <button
+    type="button"
+    onClick={() => navigate(-1)}
+    className="w-11 h-11 rounded-full flex items-center justify-center bg-black/35 backdrop-blur-xl border border-white/15 text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-white hover:text-stone-900 hover:scale-105 active:scale-95 group"
+  >
+    <ArrowLeft
+      size={17}
+      className="transition-transform duration-300 group-hover:-translate-x-0.5"
+    />
+  </button>
+</div>
+
+  {/* Hero Content */}
+  <div className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pb-14 md:pb-20">
+
+    <div className="max-w-3xl text-left text-white">
+
+      {/* Premium Badges */}
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+
+        <div className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 shadow-lg">
+          <Star
+            size={14}
+            className="fill-[#C5A059] text-[#C5A059]"
+          />
+          <span className="text-[11px] font-black uppercase tracking-wider text-stone-900">
+            {salon.rating} Rating
+          </span>
         </div>
 
-        <div className="relative mx-auto flex min-h-[60vh] max-w-7xl flex-col justify-end px-6 pb-12 pt-24 sm:px-8 lg:px-10">
-          <div className="max-w-3xl text-white text-left">
-            <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-black uppercase tracking-wider">
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-stone-900 shadow-sm">
-                <Star size={14} className="fill-[#C5A059] text-[#C5A059]" />
-                {salon.rating} ({salon.reviews} reviews)
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-black/40 px-3 py-2 backdrop-blur-md border border-white/10">
-                <MapPin size={14} className="text-[#C5A059]" />
-                {salon.distance} away
-              </span>
-            </div>
-
-            <h1 className="font-serif text-4xl font-black leading-tight sm:text-6xl tracking-tight">
-              {salon.name}
-            </h1>
-            <p className="mt-4 max-w-xl text-sm font-medium text-stone-200/90 leading-relaxed sm:text-base">
-              Premium grooming, reliable queue updates, and quick booking in one
-              polished studio experience.
-            </p>
-          </div>
+        <div className="inline-flex items-center gap-2 rounded-xl bg-black/35 backdrop-blur-xl border border-white/10 px-4 py-2">
+          <MapPin
+            size={14}
+            className="text-[#C5A059]"
+          />
+          <span className="text-[11px] font-black uppercase tracking-wider text-white">
+            {salon.distance} Away
+          </span>
         </div>
-      </section>
+
+      </div>
+
+      {/* Heading */}
+      <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
+        {salon.name}
+      </h1>
+
+      {/* Description */}
+      <p className="mt-5 max-w-2xl text-sm sm:text-base text-stone-200/90 leading-relaxed font-medium">
+        Premium grooming, real-time queue updates, experienced stylists,
+        and luxury salon comfort — all designed for a smooth modern
+        booking experience.
+      </p>
+
+      {/* CTA Buttons */}
+      <div className="mt-8 flex flex-wrap items-center gap-4">
+
+        <button
+          onClick={() => navigate(`/book/${salon.id}`)}
+          className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] text-[11px] font-black uppercase tracking-[0.25em] shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-105 transition-all duration-300"
+        >
+          Book Appointment
+        </button>
+
+        <button
+          onClick={() => navigate(`/salon/${salon.id}/services`)}
+          className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl text-white text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all duration-300"
+        >
+          Explore Services
+        </button>
+
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* 🧱 DATA PROFILE DETAILS LAYOUT COLUMNS GRID */}
       <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-10 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:px-10 flex-1">

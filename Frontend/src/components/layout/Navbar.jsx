@@ -67,7 +67,7 @@ const Navbar = () => {
   const NAV_ITEMS = [
     { label: "Home", path: "/", icon: Home },
     { label: "Services", hasDropdown: true, icon: Sparkles },
-    { label: "Location", path: "/barbers", icon: Users },
+    { label: "Studios", path: "/barbers", icon: Users },
     { label: "About", section: "about", icon: Info },
     { label: "Contact", section: "contact", icon: Phone },
   ];
@@ -109,8 +109,8 @@ const Navbar = () => {
   return (
     <>
       {/* ══ NAVBAR CONTAINER FIXED CONSOLE ══ */}
-      <nav
-  className={`sticky top-0 z-50 transition-all duration-500 ${
+     <nav
+  className={`fixed top-0 left-0 w-full z-[9999] transition-all duration-500 ${
     scrolled
       ? "bg-[#241F1B]/92 backdrop-blur-2xl border-b border-[#C5A059]/10 shadow-[0_10px_40px_rgba(0,0,0,0.45)]"
       : "bg-gradient-to-r from-[#2A241F] via-[#3E362E] to-[#2A241F] border-b border-white/5"
