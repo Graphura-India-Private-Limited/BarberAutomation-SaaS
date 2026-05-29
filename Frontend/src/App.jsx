@@ -70,6 +70,7 @@ import AllReviews          from "./pages/customer/AllReviews";
 import FaqPage             from "./pages/FaqPage";
 import TermsPage           from "./pages/TermsPage";
 import PrivacyPolicy       from "./pages/PrivacyPolicy";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 import ContactSupport      from "./pages/customer/ContactSupport";
 
 /* ── Components ── */
@@ -229,6 +230,7 @@ function App() {
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/support" element={<ContactSupport />} />
       </Routes>
     </BrowserRouter>

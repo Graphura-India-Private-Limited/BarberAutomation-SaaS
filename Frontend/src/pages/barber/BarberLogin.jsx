@@ -178,15 +178,20 @@ export default function BarberLogin() {
                   />
                 </div>
               </div>
+              
 
               {/* Password */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-gray-600">Password</label>
-                  <button type="button" className="text-xs font-semibold hover:underline" style={{ color: GOLD }}>
-                    Forgot password?
-                  </button>
-                </div>
+                {/* ── PREMIUM FORGOT PASSWORD REDIRECT LINK ── */}
+<div className="flex justify-end w-full px-1">
+  <button
+    type="button"
+    onClick={() => navigate("/forgot-password")}
+    className="text-[11px] font-black uppercase tracking-widest text-[#C5A059] hover:text-[#3E362E] hover:underline bg-transparent border-none cursor-pointer select-none transition-colors duration-200"
+  >
+    Forgot Password?
+  </button>
+</div>
                 <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
                   <div className="flex items-center px-4 border-r bg-gray-50" style={{ borderColor: "#E5E7EB" }}>
                     <Lock size={15} className="text-gray-400" />
