@@ -195,6 +195,15 @@ export default function HomePage() {
   const handlePrev = () => setCurrentIdx((prev) => (prev <= 0 ? maxIdx : prev - 1));
   const handleNext = () => setCurrentIdx((prev) => (prev >= maxIdx ? 0 : prev + 1));
 
+  const slidePercentage =
+  window.innerWidth >= 1280
+    ? 25
+    : window.innerWidth >= 1024
+    ? 33.5
+    : window.innerWidth >= 640
+    ? 50
+    : 90;
+
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans overflow-x-hidden">
       <style dangerouslySetInnerHTML={{ __html: `
@@ -466,7 +475,7 @@ export default function HomePage() {
               >
                 <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent rotate-12 group-hover:left-[120%] transition-all duration-1000 z-20 pointer-events-none" />
                 <div className="absolute inset-0 z-0">
-                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-90 scale-100 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
+                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-400 scale-100 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#F9F5EF] via-[#F9F5EF]/20 to-transparent" />
                 </div>
                 <div className="relative z-10 p-6 md:p-7 flex flex-col justify-end h-full">
@@ -611,72 +620,143 @@ export default function HomePage() {
           <button
             type="button"
             onClick={handlePrev}
-            className="absolute left-0 sm:left-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.08)] cursor-pointer"
+           className="absolute left-[-5px] sm:left-0 lg:left-[-25px] top-1/2 -translate-y-1/2 z-40 ..."
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
 
-          <div className="overflow-hidden py-6 w-full">
-            <div
-              className="flex gap-5 lg:gap-7 transition-transform duration-700 ease-out"
-              style={{ transform: `translateX(-${currentIdx * 100}%)` }}
-            >
-              {displayReviews.map((item, idx) => {
-                const isReal = !!item._id;
-                const name = isReal ? (item.customer_id?.name || "Anonymous") : item.name;
-                const text = isReal ? (item.review_text || "(No written feedback)") : item.review_text || item.text;
-                const avatar = item.avatar;
+         <div className="overflow-hidden py-6 w-full">
+  <div
+    className="flex items-stretch gap-5 lg:gap-7 transition-transform duration-700 ease-out"
+    style={{
+      transform: `translateX(-${currentIdx * slidePercentage}%)`,
+    }}
+  >
+    {displayReviews.map((item, idx) => {
+      const isReal = !!item._id;
+      const name = isReal
+        ? item.customer_id?.name || "Anonymous"
+        : item.name;
 
-                return (
-                  <div
-                    key={item._id || `${name}-${idx}`}
-                    onClick={() => isReal && setSelectedReview && setSelectedReview(item)}
-                    className="relative min-w-full sm:min-w-[48%] lg:min-w-[31%] xl:min-w-[23.5%] max-w-[350px] min-h-[460px] rounded-[32px] bg-white/10 backdrop-blur-2xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.25)] overflow-hidden p-6 sm:p-7 flex flex-col items-center justify-between text-center transition-all duration-500 hover:-translate-y-3 hover:scale-[1.02] hover:border-[#C5A059]/40 hover:shadow-[0_0_45px_rgba(197,160,89,0.35)] group shrink-0 cursor-pointer"
-                  >
-                    <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-[120%] transition-all duration-1000 rotate-12 pointer-events-none" />
+      const text = isReal
+        ? item.review_text || "(No written feedback)"
+        : item.review_text || item.text;
 
-                    <div className="relative z-10 mt-2">
-                      <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#C5A059] p-1 bg-white/10 shadow-[0_0_25px_rgba(197,160,89,0.5)] animate-[float_4s_ease-in-out_infinite]">
-                        {avatar ? (
-                          <img src={avatar} alt={name} className="w-full h-full object-cover rounded-full" />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-gradient-to-br from-[#C5A059] via-[#E8C878] to-[#C5A059] flex items-center justify-center text-white text-2xl font-black">
-                            {(name[0] || "?").toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+      const avatar = item.avatar;
 
-                    <div className="relative z-10 text-[40px] font-serif text-[#FFE6A7] mt-4 drop-shadow-[0_0_15px_rgba(255,230,167,0.8)] leading-none">"</div>
+      return (
+        <div
+          key={item._id || `${name}-${idx}`}
+          onClick={() =>
+            isReal &&
+            setSelectedReview &&
+            setSelectedReview(item)
+          }
+          className="
+            relative
+            w-[85%]
+            sm:w-[48%]
+            lg:w-[31%]
+            xl:w-[23%]
+            min-h-[420px]
+            flex-shrink-0
+            rounded-[30px]
+            border border-white/10
+            bg-white/[0.07]
+            backdrop-blur-2xl
+            overflow-hidden
+            p-6 sm:p-7
+            flex flex-col
+            items-center
+            text-center
+            transition-all
+            duration-500
+            hover:-translate-y-3
+            hover:shadow-[0_0_40px_rgba(197,160,89,0.25)]
+            hover:border-[#C5A059]/40
+            group
+            cursor-pointer
+          "
+        >
+          {/* Glow */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-transparent opacity-50 pointer-events-none" />
 
-                    <p className="relative z-10 text-stone-200 italic font-serif text-[14px] leading-relaxed flex-grow flex items-center justify-center mt-4 line-clamp-5">
-                      {text}
-                    </p>
+          {/* Shine Effect */}
+          <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-[120%] transition-all duration-1000 rotate-12 pointer-events-none" />
 
-                    <h3 className="relative z-10 mt-5 text-[17px] font-semibold tracking-wide text-[#FFE6A7]">— {name}</h3>
-
-                    <div className="relative z-10 w-full mt-6">
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); if (navigate) navigate("/customer/services"); }}
-                        className="relative overflow-hidden w-full py-3.5 px-4 rounded-full bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] shadow-[0_0_25px_rgba(197,160,89,0.45)] hover:scale-105 transition-all duration-300 cursor-pointer"
-                      >
-                        <span className="relative z-10">Book This Experience</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+          {/* Avatar */}
+          <div className="relative z-10 mt-1">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#C5A059] p-1 bg-black/20 shadow-[0_0_30px_rgba(197,160,89,0.5)]">
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt={name}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-[#C5A059] via-[#E8C878] to-[#C5A059] flex items-center justify-center text-white text-2xl font-black">
+                  {(name[0] || "?").toUpperCase()}
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Quote */}
+          <div className="relative z-10 text-[55px] leading-none text-[#E8C878] mt-5 font-serif">
+            “
+          </div>
+
+          {/* Review Text */}
+          <p className="relative z-10 mt-3 text-stone-200 italic font-serif text-[15px] leading-8 line-clamp-5 flex-grow flex items-center">
+            {text}
+          </p>
+
+          {/* Name */}
+          <h3 className="relative z-10 mt-6 text-[#FFE6A7] text-[20px] font-bold">
+            — {name}
+          </h3>
+
+          {/* Button */}
+          <div className="relative z-10 w-full mt-7">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/customer/services");
+              }}
+              className="
+                w-full
+                py-3.5
+                rounded-full
+                bg-gradient-to-r
+                from-[#C5A059]
+                via-[#E8C878]
+                to-[#C5A059]
+                text-[#2A241F]
+                font-black
+                uppercase
+                tracking-[0.25em]
+                text-[10px]
+                shadow-[0_0_30px_rgba(197,160,89,0.35)]
+                hover:scale-[1.03]
+                transition-all
+                duration-300
+              "
+            >
+              BOOK THIS EXPERIENCE
+            </button>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
           <button
             type="button"
             onClick={handleNext}
-            className="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 z-40 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white flex items-center justify-center hover:bg-[#C5A059] hover:scale-110 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.08)] cursor-pointer"
-          >
+           className="absolute right-[-5px] sm:right-0 lg:right-[-25px] top-1/2 -translate-y-1/2 z-40 ...">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>

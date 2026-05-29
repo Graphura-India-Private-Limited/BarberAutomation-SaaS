@@ -92,6 +92,12 @@ const Navbar = () => {
       desc: "Premium Addons",
       icon: Sparkles,
     },
+    {
+      label: "All Services",
+      path: "/customer/services",
+      desc: "Explore All",
+      icon: Home,
+    },
   ];
 
   const handleNav = (path) => {
