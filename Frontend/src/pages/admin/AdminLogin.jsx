@@ -229,13 +229,17 @@ export default function AdminLogin() {
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
-            {/* Contact Support */}
-            <p className="text-center text-sm text-gray-400">
-              Need support?{" "}
-              <a href="mailto:support@barberpro.in" className="font-semibold hover:underline" style={{ color: GOLD }}>
-                Contact Support
-              </a>
-            </p>
+            {/* Help */ }
+           <p className="text-center text-xs text-gray-400 mt-3">
+             Need help?{" "}
+             <Link 
+               to="/support" 
+               className="font-semibold hover:underline cursor-pointer transition-all" 
+               style={{ color: GOLD }}
+             >
+               Contact Support
+             </Link>
+           </p>
 
             {/* Security note */}
             <div className="flex items-center justify-center gap-1.5 mt-3">

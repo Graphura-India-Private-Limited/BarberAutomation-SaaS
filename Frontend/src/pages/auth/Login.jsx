@@ -317,13 +317,17 @@ export default function Login() {
               </div>
             )}
 
-            {/* Help */}
-            <p className="text-center text-xs text-gray-400 mt-3">
-              Need help?{" "}
-              <a href="mailto:support@barberpro.in" className="font-semibold hover:underline" style={{ color: GOLD }}>
-                Contact Support
-              </a>
-            </p>
+         {/* Help */ }
+<p className="text-center text-xs text-gray-400 mt-3">
+  Need help?{" "}
+  <Link 
+    to="/support" 
+    className="font-semibold hover:underline cursor-pointer transition-all" 
+    style={{ color: GOLD }}
+  >
+    Contact Support
+  </Link>
+</p>
 
             {/* Security note */}
             <div className="flex items-center justify-center gap-1.5 mt-2">
