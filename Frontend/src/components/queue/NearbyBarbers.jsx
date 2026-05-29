@@ -61,7 +61,7 @@ const NearbyBarbers = () => {
         const demoData = [
           { id: "1", name: "The Royal Groom", distance: "0.8 km", rating: 4.9, image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=500" },
           { id: "2", name: "Vintage Scissors", distance: "1.5 km", rating: 4.7, image: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=500" },
-          { id: "3", name: "Urban Edge Barber", distance: "2.3 km", rating: 4.5, image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjUecbMvI6HJW1ICkWc_5H_3ZUnWlx55f8pA&s" },
+          { id: "3", name: "Urban Edge Barber", distance: "2.3 km", rating: 4.5, image: "https://img.magnific.com/free-photo/handsome-man-barber-shop-styling-hair_1303-20978.jpg?semt=ais_hybrid&w=740&q=80" },
         ];
         setSalons(demoData);
         setLoading(false);

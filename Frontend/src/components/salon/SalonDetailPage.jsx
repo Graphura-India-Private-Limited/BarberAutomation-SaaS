@@ -48,7 +48,7 @@ const demoSalons = [
     reviews: 82,
     distance: "2.3 km",
     image:
-      "https://images.unsplash.com/photo-1621605815841-aa33c5447a33?q=80&w=1400",
+      "https://img.magnific.com/free-photo/handsome-man-barber-shop-styling-hair_1303-20978.jpg?semt=ais_hybrid&w=740&q=80",
     hours: "10:30 AM - 9:30 PM",
   },
 ];
