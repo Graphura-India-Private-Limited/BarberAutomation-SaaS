@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { 
   Scissors, Plus, ToggleLeft, ToggleRight, Sparkles, 
-  Clock, DollarSign, Layers, PlusCircle, Search, Edit2 
+  Clock, DollarSign, Layers, PlusCircle, Search, Edit2, Menu, Bell 
 } from "lucide-react";
-
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
@@ -20,15 +19,17 @@ const INITIAL_SERVICES = [
 
 export default function BarberServices() {
   const [services, setServices] = useState(INITIAL_SERVICES);
-  const [activeCategory, setActiveCategory] = useState("all"); // "all" | "Men" | "Addon"
+  const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Header States
+  const [sideOpen, setSideOpen] = useState(false);
+  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
-  // Toggle Activation State mutation
   const toggleServiceStatus = (id) => {
     setServices(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
   };
 
-  // Filter Catalog Pipeline
   const filteredServices = services.filter(svc => {
     const matchesSearch = svc.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "all" || svc.category === activeCategory;
@@ -36,14 +37,30 @@ export default function BarberServices() {
   });
 
   return (
-    /* ✅ Structural flex parameters securely anchor your custom brand footer at the absolute viewport baseline */
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col justify-between">
+    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
       
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="text-left">
+            <h1 className="text-white font-bold text-xl font-serif">Catalog</h1>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10"><Bell className="w-4 h-4" /></button>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
+            {profile.initials}
+          </div>
+        </div>
+      </header>
+
       <div>
-        {/* ── MAIN WORKSPACE CONTENT CANVAS ── */}
         <main className="max-w-6xl mx-auto w-full px-5 py-10 text-left">
           
-          {/* Header Description Title Blocks */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
             <div>
               <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
@@ -62,10 +79,7 @@ export default function BarberServices() {
             </div>
           </div>
 
-          {/* ── CATALOG CONTROLS FILTER STRIP BAR ── */}
           <div className="bg-white border border-stone-200/80 rounded-2xl p-5 mb-6 shadow-3xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            
-            {/* Search Input Field Box */}
             <div className="relative flex items-center flex-1 max-w-md">
               <Search size={15} className="absolute left-3.5 text-stone-400" />
               <input 
@@ -77,7 +91,6 @@ export default function BarberServices() {
               />
             </div>
 
-            {/* Filter buttons list matrix row */}
             <div className="flex items-center gap-2">
               {[
                 { id: "all", label: "Complete Menu" },
@@ -100,7 +113,6 @@ export default function BarberServices() {
             </div>
           </div>
 
-          {/* ── DYNAMIC CATALOG CARDS GRID DISPLAY LAYER ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredServices.length === 0 ? (
               <div className="col-span-12 text-center py-16 bg-white border border-stone-200/50 rounded-2xl shadow-3xs text-stone-400 text-xs font-black uppercase tracking-widest">
@@ -114,7 +126,6 @@ export default function BarberServices() {
                     !svc.active ? "opacity-60 grayscale-[30%] border-stone-200" : "border-stone-200/60"
                   }`}
                 >
-                  {/* Popular Trend Sticker Tagline */}
                   {svc.active && svc.popular && (
                     <div className="absolute top-0 right-0">
                       <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-800 bg-emerald-50 border-l border-b border-emerald-200/80 px-2.5 py-1 rounded-bl-xl shadow-3xs">
@@ -123,7 +134,6 @@ export default function BarberServices() {
                     </div>
                   )}
 
-                  {/* Top Credentials Stack */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[9px] font-mono font-bold text-stone-400 bg-stone-50 px-2 py-0.5 rounded border border-stone-200/40">
@@ -138,7 +148,6 @@ export default function BarberServices() {
                       {svc.name}
                     </h3>
                     
-                    {/* Operational parameters line elements row */}
                     <div className="flex items-center gap-4 pt-1.5 text-stone-500 text-xs font-bold">
                       <span className="flex items-center gap-1">
                         <Clock size={12} className="text-stone-400" /> {svc.duration}
@@ -149,7 +158,6 @@ export default function BarberServices() {
                     </div>
                   </div>
 
-                  {/* Activation Action Toggles Switch Row */}
                   <div className="flex items-center justify-between pt-5 mt-5 border-t border-stone-50">
                     <button type="button" className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1">
                       <Edit2 size={11} /> Modify
@@ -172,16 +180,12 @@ export default function BarberServices() {
                       </button>
                     </div>
                   </div>
-
                 </div>
               ))
             )}
           </div>
-
         </main>
       </div>
-
-
     </div>
   );
 }

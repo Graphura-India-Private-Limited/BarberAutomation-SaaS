@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { 
   Scissors, User, Coffee, AlertCircle, LogOut, Check, 
   ChevronDown, Menu, X, Clock, Settings, Users, 
-  Calendar, IndianRupee, Star, Scissors as ServicesIcon 
+  Calendar, IndianRupee, Star, Scissors as ServicesIcon, Play // <--- Added Play here
 } from "lucide-react";
 
 const STATUS_CFG = {
@@ -30,6 +30,7 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
     { id: "breaks", label: "Break Requests", icon: Coffee, route: "/barber/breaks", badge: 1 }, 
     { id: "noshow", label: "No-Show / Late", icon: AlertCircle, route: "/barber/noshow-handle" },
     { id: "services", label: "Services", icon: ServicesIcon, route: "/barber/services" },
+    {id: "console", label: "Live Console", icon: Play, route: "/barber/service-console" },
     { id: "profile", label: "My Profile", icon: User, route: "/barber/profile" },
     { id: "settings", label: "Settings", icon: Settings, route: "/barber/settings" },
   ];
@@ -121,7 +122,6 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
                 <n.icon className="w-4 h-4 shrink-0 transition-colors" style={{ color: isActive ? "#8B5A2B" : "#A39796" }} />
                 <span className="text-xs uppercase tracking-wider font-sans">{n.label}</span>
                 
-                {/* Break Requests साठी स्क्रीनशॉटसारखा ऑरेंज बॅज */}
                 {n.badge && (
                   <span className="ml-auto w-5 h-5 rounded-full bg-[#8B5A2B] text-white flex items-center justify-center text-[10px] font-black font-sans">
                     {n.badge}

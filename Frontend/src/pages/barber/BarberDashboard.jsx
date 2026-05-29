@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { BarChart, Bar, ResponsiveContainer, XAxis, Cell } from "recharts";
 import {
   Scissors, Calendar, Clock, Star, TrendingUp, User,
   CheckCircle, PlayCircle, LogOut, Bell, Phone,
@@ -24,6 +26,7 @@ const NAV = [
   { id: "breaks",      label: "Break Requests",   icon: Coffee,    badge: 1 },
   { id: "noshow",      label: "No-Show / Late",   icon: AlertCircle },
   { id: "services",    label: "Services",         icon: Scissors },
+  {id: "console", label: "Live Console",    icon: PlayCircle },
   { id: "profile",     label: "My Profile",       icon: User },
   { id: "settings",    label: "Settings",         icon: Settings },
 ];
@@ -71,16 +74,51 @@ export default function BarberDashboard() {
     photo: null,
   });
 
-  const [stats] = useState({
-    todayRevenue: 8450,
-    liveQueue: 4,
-    activeBarbers: "3/4",
-    avgWait: 18,
-    todayCustomers: 12,
-    weekRevenue: 52300,
-    completedToday: 8,
-    rating: 4.8,
-  });
+    const [stats] = useState({
+      todayRevenue: 8450,
+      liveQueue: 4,
+      activeBarbers: "3/4",
+      avgWait: 18,
+      todayCustomers: 12,
+      weekRevenue: 52300,
+      completedToday: 8,
+      rating: 4.8,
+    });
+
+    const statsData = [
+  {
+    label: "Today's Revenue",
+    value: `₹${stats.todayRevenue.toLocaleString()}`,
+    sub: "+17% vs yesterday",
+    icon: IndianRupee,
+    up: true,
+    color: "#8B5A2B"
+  },
+  {
+    label: "Live Queue",
+    value: stats.liveQueue,
+    sub: "1 in service",
+    icon: Users,
+    up: null,
+    color: "#4A3E3D"
+  },
+  {
+    label: "Active Barbers",
+    value: stats.activeBarbers,
+    sub: "1 on break",
+    icon: UserCheck,
+    up: null,
+    color: "#8B5A2B"
+  },
+  {
+    label: "Avg Wait Time",
+    value: `${stats.avgWait} min`,
+    sub: "Peak: 28 min at 2PM",
+    icon: Timer,
+    up: false,
+    color: "#4A3E3D"
+  },
+];
 
   const [queue] = useState([
     { id:1, customer:"Rahul Sharma",  service:"Premium Haircut",    amount:499, time:"10:30 AM", position:1, mobile:"98765 43210", wait:"5 min" },
@@ -308,6 +346,11 @@ export default function BarberDashboard() {
                   noshow:   "/barber/noshow-handle",
                   breaks:   "/barber/breaks",
                   queue:    "/barber/queue",
+                  bookings: "/barber/bookings",
+                  earnings: "/barber/earnings",
+                  reviews:  "/barber/reviews",
+                  dashboard:"/barber/dashboard",
+                  console:  "/barber/service-console",
                 };
                 if (routes[id]) navigate(routes[id]);
               }}
@@ -427,6 +470,7 @@ export default function BarberDashboard() {
     ))}
   </div>
 
+
   {/* ── CURRENT SERVICE (active) ── */}
   {currentSvc && (
     <div className="rounded-[22px] p-5 md:p-6 relative overflow-hidden shadow-[0_15px_40px_rgba(74,62,61,0.03)] border border-[#E6D5C3] transition-all duration-500"
@@ -466,170 +510,68 @@ export default function BarberDashboard() {
     </div>
   )}
 
-  {/* ── MID ROW: Weekly Revenue + Break Requests ── */}
-<div className="grid lg:grid-cols-5 gap-4 ">
+<motion.div 
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="bg-white/50 p-6 rounded-3xl border border-[#E6D5C3]"
+>
+  {/* Header Section */}
+  <div className="flex justify-between items-start mb-8">
+    <div>
+      <h3 className="font-serif text-[#4A3E3D] text-lg font-black">WEEKLY REVENUE</h3>
+      <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Mon — Sun</p>
+    </div>
+    <div className="px-4 py-2 rounded-full border border-[#E6D5C3] text-[11px] font-bold text-[#4A3E3D]">
+      THIS WEEK ₹52,300
+    </div>
+  </div>
 
-    {/* Weekly Revenue Chart */}
-    <div className="bg-white/80 backdrop-blur-md p-6 lg:col-span-3 rounded-[22px] border border-[#E6D5C3] shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
+  {/* Chart Section */}
+  <div className="h-48 w-full">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={WEEK_DATA} barGap={8}>
+        <XAxis 
+          dataKey="day" 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{ fontSize: 10, fontWeight: 700, fill: '#A39796' }} 
+          dy={10}
+        />
+        <Bar 
+          dataKey="val" 
+          radius={[8, 8, 8, 8]}
+          label={{ 
+            position: 'top', 
+            fontSize: 10, 
+            fontWeight: 700, 
+            fill: '#4A3E3D',
+            formatter: (val) => `₹${(val/1000).toFixed(1)}k` 
+          }}
+        >
+          {WEEK_DATA.map((entry, index) => (
+            <Cell 
+              key={`cell-${index}`} 
+              fill={entry.current ? "#8B5A2B" : "#F5EFE9"} 
+            />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</motion.div>
+
+  {/* Target Progress Section */}
+<div className="bg-white/50 p-4 rounded-2xl border border-[#E6D5C3] mt-2">
+  <div className="flex justify-between text-[10px] font-black uppercase mb-1">
+    <span className="text-[#8B5A2B]">Daily Target</span>
+    <span className="text-stone-500">{(stats.todayRevenue / 15000 * 100).toFixed(0)}%</span>
+  </div>
+  <div className="h-1.5 w-full bg-[#E6D5C3] rounded-full overflow-hidden">
+    <div className="h-full bg-[#8B5A2B]" style={{ width: `${(stats.todayRevenue / 15000 * 100)}%` }} />
+  </div>
+</div>
+
     
-    <div className="flex items-center justify-between mb-6"> {/* mb-5 ऐवजी mb-6 करा */}
-      <div>
-        <h3 className="font-serif tracking-normal font-black text-[#4A3E3D] text-base uppercase">Weekly Revenue</h3>
-        <p className="text-[11px] mt-0.5 font-sans text-stone-400 font-medium">Mon — Sun</p>
-      </div>
-      
-      <div className="px-4 py-1.5 rounded-full text-[10px] font-black font-sans uppercase tracking-wider bg-[#FDFBF7] text-[#8B5A2B] border border-[#E6D5C3]">
-        This Week ₹{stats.weekRevenue.toLocaleString()}
-      </div>
-    </div>
-
-      {/* Bars */}
-      <div className="flex items-end justify-between gap-2 h-28">
-        {WEEK_DATA.map((d, i) => {
-          const pct = (d.val / maxVal) * 100;
-          return (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-              <p className="text-[10px] font-black font-sans normal-case text-[#4A3E3D]">
-                ₹{(d.val / 1000).toFixed(1)}k
-              </p>
-              <div
-                className="w-full rounded-t-lg transition-all duration-300 cursor-pointer hover:opacity-100"
-                style={{
-                  height: `${pct * 0.65}px`,
-                  background: d.current
-                    ? "linear-gradient(180deg, #A06D3B, #8B5A2B)"
-                    : "rgba(230, 213, 195, 0.5)",
-                  opacity: d.current ? 1 : 0.7,
-                  minHeight: 8,
-                  maxHeight: 72,
-                }}
-                title={`${d.day}: ₹${d.val.toLocaleString()}`}
-              />
-              <p className="text-[10px] font-bold font-sans uppercase tracking-wider" style={{ color: d.current ? "#8B5A2B" : "#A39796" }}>{d.day}</p>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-
-    {/* Break Requests */}
-    <div className="bg-white/80 backdrop-blur-md p-5 lg:col-span-2 rounded-[22px] border border-[#E6D5C3] shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-serif tracking-normal font-black text-[#4A3E3D] text-sm uppercase">Break Requests</h3>
-        <span className="w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center text-white font-sans bg-[#8B5A2B]">
-          {breakRequests.filter(r => r.status === "pending").length}
-        </span>
-      </div>
-      <div className="space-y-3">
-        {breakRequests.map(r => (
-          <div key={r.id} className="bg-[#FDFBF7]/60 p-3 rounded-xl border border-[#E6D5C3]/50">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <p className="text-[#4A3E3D] font-black text-sm font-serif tracking-normal">{r.name}</p>
-              <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-full font-sans border ${
-                r.status === "pending"
-                  ? "text-amber-800 bg-amber-50 border-amber-200/50"
-                  : "text-emerald-800 bg-emerald-50 border-emerald-200/50"
-              }`}>{r.status}</span>
-            </div>
-            <p className="text-[11px] mb-0.5 font-sans normal-case text-stone-500 font-medium flex items-center gap-1">
-              <Coffee className="w-3 h-3 text-[#8B5A2B]" /> {r.type} · {r.time} ({r.duration})
-            </p>
-            {r.status === "pending" && (
-              <div className="flex gap-2 mt-2.5">
-                <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-white transition hover:opacity-90 flex items-center justify-center gap-1 font-sans cursor-pointer bg-emerald-700 shadow-sm">
-                  <Check className="w-3 h-3" /> Approve
-                </button>
-                <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition duration-300 flex items-center justify-center gap-1 font-sans cursor-pointer bg-red-50 text-red-700 border border-red-200/40 hover:bg-red-100/50">
-                  <X className="w-3 h-3" /> Reject
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-
-  {/* ── BOTTOM ROW: Queue + Reviews ── */}
-  <div className="grid lg:grid-cols-5 gap-4">
-
-    {/* My Queue */}
-    <div className="bg-white/80 backdrop-blur-md p-5 md:p-6 lg:col-span-3 rounded-[22px] border border-[#E6D5C3] shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-serif tracking-normal font-black text-[#4A3E3D] text-base flex items-center gap-2 uppercase">
-          My Queue
-          <span className="text-sm font-bold font-sans normal-case text-[#8B5A2B]">({queue.length})</span>
-        </h3>
-        <button onClick={() => navigate("/barber/queue")}
-          className="text-xs font-black font-sans uppercase tracking-wider flex items-center gap-1 text-[#8B5A2B] hover:opacity-80 transition cursor-pointer">
-          View All <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-      <div className="space-y-2.5">
-        {queue.map((q, i) => (
-          <div key={q.id} className="bg-[#FDFBF7]/60 p-3.5 flex items-center gap-3 rounded-xl border border-[#E6D5C3]/40 hover:border-[#8B5A2B]/40 hover:bg-white transition-all duration-300">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0"
-              style={{ 
-                background: i === 0 ? "rgba(139,90,43,0.08)" : "#FDFBF7", 
-                color: i === 0 ? "#8B5A2B" : "#A39796", 
-                border: i === 0 ? "1px solid rgba(139,90,43,0.3)" : "1px solid #E6D5C3" 
-              }}>
-              #{q.position}
-            </div>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-[#4A3E3D] font-black text-sm truncate font-serif tracking-normal">{q.customer}</p>
-              <p className="text-[11px] truncate font-sans normal-case text-stone-500 font-medium">{q.service} · ₹{q.amount}</p>
-            </div>
-            <div className="text-right flex-shrink-0 hidden sm:block">
-              <p className="text-[10px] font-bold font-sans uppercase tracking-wider text-[#8B5A2B]">{q.wait} wait</p>
-              <p className="text-[10px] font-sans normal-case text-stone-400 font-medium">{q.time}</p>
-            </div>
-            {i === 0 && (
-              <button
-                onClick={() => showToast(`Started service for ${q.customer}`)}
-                className="px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-wider text-white flex items-center gap-1.5 flex-shrink-0 transition duration-300 hover:opacity-90 shadow-sm cursor-pointer"
-                style={{ background: "linear-gradient(135deg, #8B5A2B, #734A22)" }}
-              >
-                <PlayCircle className="w-3.5 h-3.5 text-[#E6D5C3]" /> Start
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-
-    {/* Recent Reviews */}
-    <div className="bg-white/80 backdrop-blur-md p-5 lg:col-span-2 rounded-[22px] border border-[#E6D5C3] shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-serif tracking-normal font-black text-[#4A3E3D] text-sm flex items-center gap-2 uppercase">
-          <Star className="w-4 h-4 fill-[#8B5A2B] text-[#8B5A2B]" /> Reviews
-        </h3>
-        <span className="text-[11px] font-black font-sans uppercase tracking-wider text-[#8B5A2B]">★ {profile.rating}</span>
-      </div>
-      <div className="space-y-3">
-        {reviews.map(r => (
-          <div key={r.id} className="bg-[#FDFBF7]/60 p-3 rounded-xl border border-[#E6D5C3]/40">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0 font-serif tracking-normal shadow-xs"
-                style={{ background: "linear-gradient(135deg, #8B5A2B, #4A3E3D)" }}>
-                {r.name[0]}
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-[#4A3E3D] font-black text-xs truncate font-serif tracking-normal">{r.name}</p>
-                <p className="text-[9px] font-sans normal-case text-stone-400 font-medium">{r.time}</p>
-              </div>
-              <div className="flex gap-0.5 flex-shrink-0">
-                {[...Array(r.rating)].map((_,i) => (
-                  <Star key={i} className="w-2.5 h-2.5 fill-[#8B5A2B] text-[#8B5A2B]" />
-                ))}
-              </div>
-            </div>
-            <p className="text-[11px] italic leading-relaxed font-sans normal-case text-stone-600 text-left">"{r.text}"</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
 
  {/* ── QUICK ACTIONS STRIP ── */}
   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -653,6 +595,8 @@ export default function BarberDashboard() {
 
 </main>
       </div>
+
+      
 
       {/* Luxury Theme Aligned Toast */}
       {toast && (
