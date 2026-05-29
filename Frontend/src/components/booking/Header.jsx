@@ -12,7 +12,7 @@ export default function Header() {
         {/* Logo Section */}
         <div className="flex flex-col items-start cursor-pointer font-serif" onClick={() => navigate("/")}>
           <div className="flex items-center gap-2.5">
-            <Scissors className="w-5 h-5浏览 text-[#C5A059]" />
+            <Scissors className="w-5 h-5 text-[#C5A059]" />
             <h1 className="text-lg md:text-xl font-bold tracking-[0.2em] uppercase italic text-stone-200">
               BARBER <span className="text-[#C5A059] not-italic">PRO</span>
             </h1>

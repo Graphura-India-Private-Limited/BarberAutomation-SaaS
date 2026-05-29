@@ -36,7 +36,12 @@ const NearbyBarbers = () => {
         setLocation(coords);
         fetchNearbySalons(coords.lat, coords.lng);
       },
+      // (err) => {
+      //   setError("Location access denied. Please search manually.");
+      //   setLoading(false);
+      // }
       (err) => {
+        console.error(err);
         setError("Location access denied. Please search manually.");
         setLoading(false);
       }
@@ -59,7 +64,6 @@ const NearbyBarbers = () => {
           { id: "3", name: "Urban Edge Barber", distance: "2.3 km", rating: 4.5, image: "https://images.unsplash.com/photo-1621605815841-aa33c5447a33?q=80&w=500" },
         ];
         setSalons(demoData);
-        loading(false);
         setLoading(false);
       }, 1200);
     } catch (err) {
@@ -74,7 +78,7 @@ const NearbyBarbers = () => {
       {/* ✂️ BARBER PRO GLOBAL EXECUTIVE STICKY NAVIGATION HEADER */}
       <header className="sticky top-0 bg-[#3E362E] border-b border-[#2A241F] px-6 md:px-8 py-4 flex items-center justify-between z-50 shadow-md">
         <div className="flex items-center gap-5">
-          
+
           {/* ── ✅ THE CHIP INJECTION: EXECUTIVE REAR-FACING EXIT BUTTON ── */}
           <button
             type="button"
@@ -101,7 +105,7 @@ const NearbyBarbers = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="text-right hidden sm:block">
           <div className="text-[10px] text-stone-400 uppercase font-black tracking-widest leading-none">Discovery Radar</div>
           <div className="text-sm text-white font-black mt-1 bg-white/10 px-3 py-1 rounded-md border border-white/5 inline-block leading-none">
@@ -113,7 +117,7 @@ const NearbyBarbers = () => {
       {/* 🗺️ DISCOVERY MAP CONTENT VIEW CANVAS */}
       <section className="py-12 px-6 bg-[#FAF6F0] flex-1">
         <div className="max-w-7xl mx-auto pt-4">
-          
+
           {/* Section Main Header Titles */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 text-left">
             <div className="space-y-2">
@@ -122,8 +126,8 @@ const NearbyBarbers = () => {
                 Nearby <span className="italic font-serif font-medium lowercase text-[#C5A059]">Masters</span>
               </h2>
             </div>
-            
-            <button 
+
+            <button
               type="button"
               onClick={handleGetLocation}
               className="group relative flex items-center gap-3 bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer active:scale-[0.98]"
@@ -158,13 +162,22 @@ const NearbyBarbers = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {salons.map((salon) => (
                 <div key={salon.id} className="group relative bg-white rounded-[2rem] overflow-hidden shadow-xs hover:shadow-xl transition-all duration-500 border border-stone-200/50 flex flex-col">
-                  
+
                   {/* Image Header Area Section */}
                   <div className="h-64 overflow-hidden relative bg-stone-100 flex-shrink-0">
-                    <img 
-                      src={salon.image} 
-                      alt={salon.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    {/* <img
+                      src={salon.image}
+                      alt={salon.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    /> */}
+                    <img
+                      src={salon.image}
+                      alt={salon.name}
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://images.unsplash.com/photo-1621605815841-aa33c5447a33?q=80&w=500";
+                      }}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-lg flex items-center gap-1 shadow-sm border border-stone-200/20">
                       {Star && <Star size={11} className="fill-[#C5A059] text-[#C5A059]" />}
@@ -203,10 +216,10 @@ const NearbyBarbers = () => {
               ))}
             </div>
           )}
-          
+
         </div>
       </section>
-      
+
       <Footer />
     </div>
   );
