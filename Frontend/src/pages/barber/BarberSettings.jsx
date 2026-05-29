@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { Settings, Lock, Bell, ShieldCheck, Eye, EyeOff, ArrowLeft } from "lucide-react";
-
+import { Settings, Lock, Bell, ShieldCheck, Eye, EyeOff, Menu } from "lucide-react";
 
 export default function BarberSettings() {
   const [showPassword, setShowPassword] = useState(false); 
   const [notifications, setNotifications] = useState(true);
   const [soundAlerts, setSoundAlerts] = useState(true);
   
+  // Header States
+  const [sideOpen, setSideOpen] = useState(false);
+  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
+
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
@@ -26,15 +29,32 @@ export default function BarberSettings() {
   const formInputStyle = "w-full pl-4 pr-11 py-3 bg-white border border-[#EADDCA] rounded-xl text-stone-900 font-semibold outline-none focus:border-[#C5A059] focus:shadow-[0_0_0_4px_rgba(197,160,89,0.08)] text-sm transition-all duration-300 h-11";
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col selection:bg-[#C5A059] selection:text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col relative overflow-hidden">
       
+      {/* हेडर सेक्शन */}
+      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="text-left">
+            <h1 className="text-white font-bold text-xl font-serif">Settings</h1>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
+            {profile.initials}
+          </div>
+        </div>
+      </header>
+
       {/* Luxury Background Ambient Glows */}
       <div className="absolute top-24 left-0 w-80 h-80 bg-[#C5A059]/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-40 right-0 w-96 h-96 bg-[#EADDCA]/30 rounded-full blur-3xl pointer-events-none" />
 
       <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 flex-1 text-left relative z-10">
-  
-        {/* PAGE DESCRIPTIVE HERO LAYER */}
+ 
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
           <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
             Control <span className="text-[#C5A059]">Panel</span>
@@ -46,7 +66,6 @@ export default function BarberSettings() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          {/* 📑 LEFT COL: MENU TABS DESCRIPTION */}
           <div className="md:col-span-1 space-y-4">
             <div className="bg-white/70 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-5 shadow-3xs">
               <h3 className="text-sm font-black uppercase tracking-wider text-stone-900 mb-3 flex items-center gap-2">
@@ -58,10 +77,8 @@ export default function BarberSettings() {
             </div>
           </div>
 
-          {/* ⚙️ RIGHT COL: INTERACTIVE CONFIGURATIONS MATRIX */}
           <div className="md:col-span-2 space-y-6">
             
-            {/* PANEL 1: SECURITY & PASSWORD TRANSFORMS */}
             <div className="bg-white/70 backdrop-blur-md border border-[#EADDCA] rounded-[22px] p-6 md:p-8 shadow-sm">
               <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
                 <Lock className="text-[#C5A059]" size={18} />
@@ -69,7 +86,6 @@ export default function BarberSettings() {
               </div>
 
               <form onSubmit={handlePasswordUpdate} className="space-y-4">
-                {/* Current Password */}
                 <div className="flex flex-col gap-1.5 relative">
                   <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Current Password</label>
                   <input 
@@ -79,36 +95,19 @@ export default function BarberSettings() {
                     onChange={e => setPasswords({...passwords, current: e.target.value})}
                     className={formInputStyle}
                   />
-                  <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-[29px] text-stone-400 hover:text-[#C5A059] transition-colors"
-                  >
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-[29px] text-stone-400 hover:text-[#C5A059] transition-colors">
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
 
-                {/* New & Confirm Password Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5 relative">
                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">New Secure Token</label>
-                    <input 
-                      type={showPassword ? "text" : "password"}
-                      required
-                      value={passwords.new}
-                      onChange={e => setPasswords({...passwords, new: e.target.value})}
-                      className={formInputStyle}
-                    />
+                    <input type={showPassword ? "text" : "password"} required value={passwords.new} onChange={e => setPasswords({...passwords, new: e.target.value})} className={formInputStyle} />
                   </div>
                   <div className="flex flex-col gap-1.5 relative">
                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Confirm New Token</label>
-                    <input 
-                      type={showPassword ? "text" : "password"}
-                      required
-                      value={passwords.confirm}
-                      onChange={e => setPasswords({...passwords, confirm: e.target.value})}
-                      className={formInputStyle}
-                    />
+                    <input type={showPassword ? "text" : "password"} required value={passwords.confirm} onChange={e => setPasswords({...passwords, confirm: e.target.value})} className={formInputStyle} />
                   </div>
                 </div>
 
@@ -118,7 +117,6 @@ export default function BarberSettings() {
               </form>
             </div>
 
-            {/* PANEL 2: RADAR & AUDIO NOTIFICATIONS SYSTEM */}
             <div className="bg-white/70 backdrop-blur-md border border-[#EADDCA] rounded-[22px] p-6 md:p-8 shadow-sm">
               <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
                 <Bell className="text-[#C5A059]" size={18} />
@@ -129,42 +127,24 @@ export default function BarberSettings() {
                 <div className="flex items-center justify-between p-3 rounded-xl hover:bg-white transition-colors">
                   <div>
                     <p className="text-sm font-extrabold text-[#3E362E]">Live Queue Push Notifications</p>
-                    <p className="text-[11px] text-stone-400 mt-0.5 font-medium leading-none">Alert me instantly when a new customer arrives in the pipeline.</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5 font-medium leading-none">Alert me instantly when a new customer arrives.</p>
                   </div>
-                  <input 
-                    type="checkbox" 
-                    checked={notifications}
-                    onChange={() => setNotifications(!notifications)}
-                    className="w-4 h-4 accent-[#3E362E] cursor-pointer"
-                  />
+                  <input type="checkbox" checked={notifications} onChange={() => setNotifications(!notifications)} className="w-4 h-4 accent-[#3E362E] cursor-pointer" />
                 </div>
 
                 <div className="flex items-center justify-between p-3 rounded-xl hover:bg-white transition-colors">
                   <div>
                     <p className="text-sm font-extrabold text-[#3E362E]">Auditory Radar Alerts</p>
-                    <p className="text-[11px] text-stone-400 mt-0.5 font-medium leading-none">Play a sound chime when a customer turn is approaching limit caps.</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5 font-medium leading-none">Play a sound chime when a customer turn is approaching.</p>
                   </div>
-                  <input 
-                    type="checkbox" 
-                    checked={soundAlerts}
-                    onChange={() => setSoundAlerts(!soundAlerts)}
-                    className="w-4 h-4 accent-[#3E362E] cursor-pointer"
-                  />
+                  <input type="checkbox" checked={soundAlerts} onChange={() => setSoundAlerts(!soundAlerts)} className="w-4 h-4 accent-[#3E362E] cursor-pointer" />
                 </div>
-              </div>
-
-              <div className="flex items-start gap-3 rounded-xl bg-[#FAF6F0] border border-[#EADDCA]/60 p-4 text-xs text-stone-500 mt-6 leading-relaxed">
-                <ShieldCheck size={15} className="shrink-0 text-[#C5A059] mt-0.5" />
-                <span className="font-medium">
-                  All preferences configured here are saved locally to your current workspace interface profile safely.
-                </span>
               </div>
             </div>
 
           </div>
         </div>
       </main>
-      
     </div>
   );
 }

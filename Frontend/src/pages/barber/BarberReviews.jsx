@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Star, MessageSquare, Award, ThumbsUp, Filter, Calendar, Heart, ShieldCheck } from "lucide-react";
-
+import { 
+  Star, MessageSquare, Award, ThumbsUp, Filter, Calendar, 
+  Heart, ShieldCheck, Menu, Bell // <--- Menu और Bell यहाँ इम्पोर्ट किए गए
+} from "lucide-react";
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
-// Mock Review Analysis Parameters
+// Mock Data
 const MOCK_REVIEW_STATS = {
   averageRating: 4.9,
   totalReviews: 124,
@@ -15,15 +17,16 @@ const MOCK_REVIEW_STATS = {
 };
 
 const MOCK_REVIEWS_LIST = [
-  { id: "REV-801", client: "Mayur K.", rating: 5, date: "Today", service: "Classic Haircut + Beard Styling", text: "Best haircut experience in town! Sameer has insane precision with hair fades. The hot towel finish is pure luxury.", helpfulCount: 12, verified: true },
-  { id: "REV-794", client: "Rohan Das", rating: 5, date: "Yesterday", service: "Premium Grooming & Face Massage", text: "Superb styling guidance. He recommended a drop fade that fits my structure completely. Highly professional.", helpfulCount: 8, verified: true },
-  { id: "REV-782", client: "Karan Verma", service: "Beard Trim & Shape", rating: 4, date: "3 days ago", text: "Excellent beard lining accuracy with the straight razor. Minor wait time, but completely worth it.", helpfulCount: 3, verified: true },
-  { id: "REV-750", client: "Nikhil Joshi", service: "Premium Combo Set", rating: 5, date: "1 week ago", text: "Incredible attention to detail. The salon space uses high-tier hygiene methods. Definitely coming back.", helpfulCount: 15, verified: true },
+  { id: "REV-801", client: "Mayur K.", rating: 5, date: "Today", service: "Classic Haircut + Beard Styling", text: "Best haircut experience in town! Sameer has insane precision with hair fades.", helpfulCount: 12, verified: true },
 ];
 
 export default function BarberReviews() {
-  const [reviews, setReviews] = useState(MOCK_REVIEWS_LIST);
-  const [selectedFilter, setSelectedFilter] = useState("all"); // "all" | "five" | "four"
+  const [reviews] = useState(MOCK_REVIEWS_LIST);
+  const [selectedFilter, setSelectedFilter] = useState("all");
+  
+  // परिभाषित किए गए स्टेट और ऑब्जेक्ट
+  const [sideOpen, setSideOpen] = useState(false);
+  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
   const filteredReviews = reviews.filter(rev => {
     if (selectedFilter === "five") return rev.rating === 5;
@@ -32,9 +35,27 @@ export default function BarberReviews() {
   });
 
   return (
-    /* ✅ Structural flex parameters securely anchor your custom brand footer at the absolute viewport baseline */
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col justify-between">
       
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="text-left">
+            <h1 className="text-white font-bold text-xl font-serif">Reviews</h1>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10"><Bell className="w-4 h-4" /></button>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
+            {profile.initials}
+          </div>
+        </div>
+      </header>
+        
       <div>
         {/* ── MAIN WORKSPACE CONTENT CANVAS ── */}
         <main className="max-w-6xl mx-auto w-full px-5 py-10 text-left">

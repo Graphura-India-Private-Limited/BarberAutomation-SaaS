@@ -1,238 +1,142 @@
 import React, { useState } from 'react';
-import { Coffee, Clock, CalendarCheck, ShieldAlert, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
-
+import { Coffee, Clock, CalendarCheck, ShieldAlert, CheckCircle2, AlertCircle, Menu, Bell } from "lucide-react";
 
 export default function BreakManagement() {
-  // --- STATE FOR LUNCH TIMING ---
+  // --- स्टेट्स ---
   const [lunchStart, setLunchStart] = useState('');
   const [lunchEnd, setLunchEnd] = useState('');
+  const [sideOpen, setSideOpen] = useState(false); // साइडबार के लिए
+  const profile = { salonName: "Master Barber Lounge", initials: "MB" }; // प्रोफाइल डेटा
 
-  // --- STATE FOR LONG BREAKS ---
-  const [breakStart, setBreakStart] = useState('');
-  const [breakDuration, setBreakDuration] = useState('');
-  const [breakReason, setBreakReason] = useState('');
-
-  // --- REQUESTS RECORD DATA ---
   const [requests, setRequests] = useState([
     { id: 1, type: 'Lunch Schedule', details: '01:00 PM - 02:00 PM', status: 'Approved' }
   ]);
 
-  // --- SUBMIT HANDLERS ---
+  const [breakRequests, setBreakRequests] = useState([
+    { id: 101, name: "Rahul S.", type: "Coffee Break", time: "02:00 PM", duration: "15m", status: "pending" },
+    { id: 102, name: "Anita K.", type: "Short Break", time: "03:30 PM", duration: "10m", status: "approved" }
+  ]);
+
+  // --- हैंडल्स ---
   const handleLunchSubmit = (e) => {
     e.preventDefault();
     if (!lunchStart || !lunchEnd) return;
-
     const formatTime = (timeStr) => {
       const [hour, minute] = timeStr.split(':');
       const ampm = hour >= 12 ? 'PM' : 'AM';
       const formattedHour = hour % 12 || 12;
       return `${formattedHour}:${minute} ${ampm}`;
     };
-
-    const newRequest = {
-      id: Date.now(),
-      type: 'Lunch Update',
-      details: `${formatTime(lunchStart)} - ${formatTime(lunchEnd)}`,
-      status: 'Pending'
-    };
+    const newRequest = { id: Date.now(), type: 'Lunch Update', details: `${formatTime(lunchStart)} - ${formatTime(lunchEnd)}`, status: 'Pending' };
     setRequests([newRequest, ...requests]);
-    setLunchStart('');
-    setLunchEnd('');
+    setLunchStart(''); setLunchEnd('');
   };
 
-  const handleBreakSubmit = (e) => {
-    e.preventDefault();
-    if (!breakStart || !breakDuration) return;
-
-    const formatTime = (timeStr) => {
-      const [hour, minute] = timeStr.split(':');
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const formattedHour = hour % 12 || 12;
-      return `${formattedHour}:${minute} ${ampm}`;
-    };
-
-    const newRequest = {
-      id: Date.now(),
-      type: 'Long Break',
-      details: `${breakDuration} Mins at ${formatTime(breakStart)}`,
-      status: 'Pending'
-    };
-    setRequests([newRequest, ...requests]);
-    setBreakStart('');
-    setBreakDuration('');
-    setBreakReason('');
-  };
-
-  // Status Badge Mapper Utility
   const getStatusBadge = (status) => {
-    if (status === 'Approved') {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-lg">
-          <CheckCircle2 size={11} className="stroke-[2.5px]" />
-          Approved
-        </span>
-      );
-    }
-    return (
+    return status === 'Approved' ? (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-lg">
+        <CheckCircle2 size={11} /> Approved
+      </span>
+    ) : (
       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-amber-50 text-amber-700 border border-amber-200/60 rounded-lg">
-        <AlertCircle size={11} className="stroke-[2.5px]" />
-        Pending
+        <AlertCircle size={11} /> Pending
       </span>
     );
   };
 
-  const formInputStyle = "w-full p-3.5 border border-[#EADDCA] rounded-xl focus:outline-none focus:border-[#C5A059] focus:shadow-[0_0_0_4px_rgba(197,160,89,0.08)] bg-white font-medium text-xs text-[#3E362E] placeholder-stone-400 transition-all duration-300 h-11";
+  const formInputStyle = "w-full p-3.5 border border-[#EADDCA] rounded-xl focus:outline-none focus:border-[#C5A059] bg-white font-medium text-xs text-[#3E362E] transition-all h-11";
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col selection:bg-[#C5A059] selection:text-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased">
       
-
-      {/* Luxury Background Ambient Glows */}
-      <div className="absolute top-24 left-0 w-80 h-80 bg-[#C5A059]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-40 right-0 w-96 h-96 bg-[#EADDCA]/30 rounded-full blur-3xl pointer-events-none" />
-
-      {/* MAIN CONTENT AREA */}
-      <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 flex-1 text-left relative z-10">
-
-        {/* PAGE DESCRIPTIVE HERO LAYER */}
+      {/* हेडर सेक्शन */}
+      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="text-left">
+            <h1 className="text-white font-bold text-xl font-serif">Breaks</h1>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10"><Bell className="w-4 h-4" /></button>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
+            {profile.initials}
+          </div>
+        </div>
+      </header>
+      <main className="max-w-5xl mx-auto w-full py-10">
+        
+        {/* HEADER */}
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
-          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
-            Break <span className="text-[#C5A059]">Management</span>
-          </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#C5A059] mt-1">
-            Submit Schedule Intervals & Absences to Salon Owner
-          </p>
+          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">Break <span className="text-[#C5A059]">Management</span></h1>
         </div>
 
-        {/* INTERACTIVE REQUEST ACTIONS CARDS HOLDER */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* 3-GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* 🥪 LUNCH SETUP CONTAINER */}
-          <div className="bg-white/70 backdrop-blur-md p-6 rounded-[22px] border border-[#EADDCA] shadow-[0_15px_40px_rgba(0,0,0,0.01)] flex flex-col justify-between hover:bg-white transition-all duration-500">
-            <div>
-              <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
-                <Coffee className="text-[#C5A059]" size={18} />
-                <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Daily Lunch Schedule</h2>
-              </div>
-              
-              <form onSubmit={handleLunchSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Start Time</label>
-                    <input 
-                      type="time" 
-                      required
-                      value={lunchStart}
-                      onChange={(e) => setLunchStart(e.target.value)}
-                      className={formInputStyle}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">End Time</label>
-                    <input 
-                      type="time" 
-                      required
-                      value={lunchEnd}
-                      onChange={(e) => setLunchEnd(e.target.value)}
-                      className={formInputStyle}
-                    />
-                  </div>
-                </div>
-                
-                <button type="submit" className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-[10px] uppercase tracking-[0.2em] py-4 rounded-xl transition duration-300 shadow-xs cursor-pointer mt-2">
-                  Request Schedule Change
-                </button>
+          {/* LUNCH & LONG BREAK FORMS */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* LUNCH FORM */}
+            <div className="bg-white/70 p-6 rounded-[22px] border border-[#EADDCA]">
+              <h2 className="text-sm font-black uppercase mb-4">Daily Lunch</h2>
+              <form onSubmit={handleLunchSubmit} className="space-y-4">
+                <input type="time" required value={lunchStart} onChange={(e) => setLunchStart(e.target.value)} className={formInputStyle} />
+                <input type="time" required value={lunchEnd} onChange={(e) => setLunchEnd(e.target.value)} className={formInputStyle} />
+                <button type="submit" className="w-full bg-[#3E362E] text-[#C5A059] py-3 rounded-xl font-black text-[10px] uppercase">Request Change</button>
               </form>
             </div>
           </div>
 
-          {/* ⏱️ LONG BREAK FORM PANEL CONTAINER */}
-          <div className="bg-white/70 backdrop-blur-md p-6 rounded-[22px] border border-[#EADDCA] shadow-[0_15px_40px_rgba(0,0,0,0.01)] flex flex-col justify-between hover:bg-white transition-all duration-500">
-            <div>
-              <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
-                <Clock className="text-[#C5A059]" size={18} />
-                <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Request Long Break</h2>
-              </div>
-
-              <form onSubmit={handleBreakSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Start Time</label>
-                    <input 
-                      type="time" 
-                      required
-                      value={breakStart}
-                      onChange={(e) => setBreakStart(e.target.value)}
-                      className={formInputStyle}
-                    />
+          {/* BREAK REQUESTS FEED (The new component you provided) */}
+          <div className="bg-white/80 backdrop-blur-md p-5 lg:col-span-2 rounded-[22px] border border-[#E6D5C3] shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-serif font-black text-[#4A3E3D] text-sm uppercase">Break Requests</h3>
+              <span className="w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center text-white bg-[#8B5A2B]">
+                {breakRequests.filter(r => r.status === "pending").length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {breakRequests.map(r => (
+                <div key={r.id} className="bg-[#FDFBF7]/60 p-3 rounded-xl border border-[#E6D5C3]/50">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <p className="text-[#4A3E3D] font-black text-sm font-serif">{r.name}</p>
+                    <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full border ${r.status === "pending" ? "text-amber-800 bg-amber-50" : "text-emerald-800 bg-emerald-50"}`}>{r.status}</span>
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Duration (Mins)</label>
-                    <input 
-                      type="number" 
-                      min="30"
-                      required
-                      value={breakDuration}
-                      onChange={(e) => setBreakDuration(e.target.value)}
-                      className={formInputStyle}
-                      placeholder="e.g. 45"
-                    />
-                  </div>
+                  <p className="text-[11px] mb-0.5 text-stone-500 flex items-center gap-1">
+                    <Coffee className="w-3 h-3 text-[#8B5A2B]" /> {r.type} · {r.time} ({r.duration})
+                  </p>
+                  {r.status === "pending" && (
+                    <div className="flex gap-2 mt-2.5">
+                      <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-white bg-emerald-700">Approve</button>
+                      <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-red-700 bg-red-50 border border-red-200">Reject</button>
+                    </div>
+                  )}
                 </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Reason (Optional)</label>
-                  <input 
-                    type="text" 
-                    value={breakReason}
-                    onChange={(e) => setBreakReason(e.target.value)}
-                    className={formInputStyle}
-                    placeholder="Doctor appointment, personal errand..."
-                  />
-                </div>
-
-                <button type="submit" className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-[10px] uppercase tracking-[0.2em] py-4 rounded-xl transition duration-300 shadow-xs cursor-pointer">
-                  Submit For Approval
-                </button>
-              </form>
+              ))}
             </div>
           </div>
-
         </div>
 
-        {/* 📜 HISTORICAL MONITOR STATUS QUEUE FLOW PANEL */}
-        <div className="bg-white/60 backdrop-blur-md p-6 rounded-[22px] border border-[#EADDCA] shadow-[0_15px_40px_rgba(0,0,0,0.01)] mt-10">
-          <div className="flex items-center gap-2.5 mb-6 border-b border-[#EADDCA]/40 pb-4">
-            <CalendarCheck className="text-[#C5A059]" size={18} />
-            <h2 className="text-sm font-black uppercase tracking-[0.15em] text-[#3E362E]">Request Status History</h2>
-          </div>
-
+        {/* STATUS HISTORY */}
+        <div className="mt-10 bg-white/60 p-6 rounded-[22px] border border-[#EADDCA]">
+          <h2 className="text-sm font-black uppercase mb-6">Request Status History</h2>
           <div className="space-y-3">
             {requests.map((req) => (
-              <div key={req.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border border-[#EADDCA]/40 rounded-xl bg-white/40 hover:bg-white transition-all duration-300 gap-3">
-                <div className="text-left">
-                  <p className="font-black text-[#3E362E] text-base leading-none mb-2">{req.type}</p>
-                  <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">{req.details}</p>
+              <div key={req.id} className="flex justify-between p-4 border border-[#EADDCA]/40 rounded-xl bg-white/40">
+                <div>
+                  <p className="font-black text-[#3E362E]">{req.type}</p>
+                  <p className="text-[10px] font-bold text-stone-400 uppercase">{req.details}</p>
                 </div>
-                <div className="flex sm:justify-end">
-                  {getStatusBadge(req.status)}
-                </div>
+                {getStatusBadge(req.status)}
               </div>
             ))}
-          </div>
-
-          {/* Quick Informational Notice Seam Guard */}
-          <div className="flex items-start gap-3 rounded-xl bg-[#FAF6F0] border border-[#EADDCA]/60 p-4 text-xs text-stone-500 mt-6 leading-relaxed">
-            <ShieldAlert size={15} className="shrink-0 text-[#C5A059] mt-0.5" />
-            <span className="font-medium">
-              Approved breaks sync live with the client booking portal. Active client reservation slots will dynamically close to safeguard your schedule layout.
-            </span>
           </div>
         </div>
 
       </main>
-     
-
     </div>
   );
 }

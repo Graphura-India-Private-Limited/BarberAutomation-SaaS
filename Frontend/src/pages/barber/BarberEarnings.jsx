@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { 
   DollarSign, TrendingUp, Award, Calendar, ArrowUpRight, 
-  Wallet, Sparkles, CheckCircle2, ArrowRight, Download 
+  Wallet, Sparkles, CheckCircle2, ArrowRight, Download, Menu, Bell 
 } from "lucide-react";
 
 
-// Mock financial datasets configured specifically for the barber's workspace session profile
 const MOCK_EARNINGS_SUMMARY = {
   todayEarned: 1840,
   thisWeekEarned: 12450,
@@ -16,24 +15,40 @@ const MOCK_EARNINGS_SUMMARY = {
 const MOCK_PAYOUT_HISTORY = [
   { id: "PAY-99321", date: "25 May 2026", amount: 11200, type: "Weekly Payout", status: "Settled" },
   { id: "PAY-98110", date: "18 May 2026", amount: 9850, type: "Weekly Payout", status: "Settled" },
-  { id: "PAY-97054", date: "11 May 2026", amount: 13100, type: "Weekly Payout", status: "Settled" },
-  { id: "PAY-95431", date: "04 May 2026", amount: 10400, type: "Weekly Payout", status: "Settled" },
 ];
 
 const MOCK_DAILY_COMMISSIONS = [
   { id: "TR-881", service: "Classic Haircut + Beard Combo", time: "10:30 AM", basePrice: 599, cutEarned: 270, tip: 50 },
   { id: "TR-884", service: "Premium Grooming & Facial Spa", time: "11:45 AM", basePrice: 799, cutEarned: 360, tip: 100 },
-  { id: "TR-890", service: "Hair Spa Treatment", time: "02:15 PM", basePrice: 599, cutEarned: 270, tip: 20 },
-  { id: "TR-895", service: "Classic Shave & Hot Towel", time: "05:00 PM", basePrice: 249, cutEarned: 112, tip: 0 },
 ];
 
 export default function BarberEarnings() {
   const [payouts] = useState(MOCK_PAYOUT_HISTORY);
   const [dailyCuts] = useState(MOCK_DAILY_COMMISSIONS);
+  
+  const [sideOpen, setSideOpen] = useState(false);
+  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
   return (
-    /* ✅ Structural flex settings make sure the custom brown footer snaps cleanly to the viewport base */
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col justify-between">
+   
+      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="text-left">
+            <h1 className="text-white font-bold text-xl font-serif">Earning</h1>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10"><Bell className="w-4 h-4" /></button>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
+            {profile.initials}
+          </div>
+        </div>
+      </header>
       
       <div>
         {/* ── MAIN ANALYTICAL DATA CANVAS ── */}

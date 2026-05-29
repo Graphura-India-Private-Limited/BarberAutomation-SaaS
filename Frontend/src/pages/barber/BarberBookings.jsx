@@ -1,18 +1,13 @@
 import React, { useState } from "react";
 import { 
   Calendar, Clock, CheckCircle2, AlertCircle, XCircle, 
-  Search, SlidersHorizontal, User, Sparkles, Scissors, Landmark 
+  Search, SlidersHorizontal, User, Sparkles, Scissors, Landmark, Menu, Bell 
 } from "lucide-react";
 
-
-// Mock operational dataset built to align with your dashboard models
+// Mock operational dataset
 const INITIAL_BOOKINGS = [
   { id: "BK-2026-01", customer: "Mayur K.", service: "Classic Haircut", time: "10:30 AM", date: "Today", price: 299, status: "confirmed", notes: "Prefers low fade drop" },
   { id: "BK-2026-02", customer: "Rahul Verma", service: "Beard Trim & Shape", time: "11:45 AM", date: "Today", price: 199, status: "in-service", notes: "Lineup with straight razor" },
-  { id: "BK-2026-03", customer: "Sneha Kapoor", service: "Hair Spa & Treatment", time: "02:15 PM", date: "Today", price: 599, status: "confirmed", notes: "Premium addon mask requested" },
-  { id: "BK-2026-04", customer: "Arjun Singh", service: "Premium Grooming Combo", time: "04:00 PM", date: "Today", price: 799, status: "pending", notes: "First time client" },
-  { id: "BK-2026-05", customer: "Nikhil Joshi", service: "Classic Haircut", time: "11:00 AM", date: "Tomorrow", price: 299, status: "confirmed", notes: "" },
-  { id: "BK-2026-06", customer: "Karan Verma", service: "Shave & Massage", time: "01:30 PM", date: "Tomorrow", price: 249, status: "cancelled", notes: "Rescheduled via support client" }
 ];
 
 const STATUS_CONFIG = {
@@ -24,14 +19,16 @@ const STATUS_CONFIG = {
 
 export default function BarberBookings() {
   const [bookings, setBookings] = useState(INITIAL_BOOKINGS);
-  const [filter, setFilter] = useState("all"); // "all" | "today" | "pending" | "in-service"
+  const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  
+  // परिभाषित स्टेट्स
+  const [sideOpen, setSideOpen] = useState(false);
+  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
-  // Pipeline Filter Handlers
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = booking.customer.toLowerCase().includes(search.toLowerCase()) || 
                           booking.service.toLowerCase().includes(search.toLowerCase());
-    
     if (!matchesSearch) return false;
     if (filter === "today") return booking.date === "Today";
     if (filter === "pending") return booking.status === "pending";
@@ -39,22 +36,38 @@ export default function BarberBookings() {
     return true;
   });
 
-  // Action mutations for slot lifecycle controls
   const updateBookingStatus = (id, nextStatus) => {
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status: nextStatus } : b));
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col justify-between">
-      
-      <div>
+   <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
+      {/* Header */}
+     <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="text-left">
+            <h1 className="text-white font-bold text-xl font-serif">Bookings</h1>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10"><Bell className="w-4 h-4" /></button>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
+            {profile.initials}
+          </div>
+        </div>
+      </header>
         
 
         {/* ── WORKSPACE DASHBOARD CONTENT CANVAS ── */}
-        <main className="max-w-6xl mx-auto w-full px-5 py-10 text-left">
+       <main className="flex-grow max-w-6xl mx-auto w-full px-5 py-6 text-left">
           
           {/* Main Module Headline Context */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
+         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
+          
             <div>
               <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
                 Reservation <span className="text-[#C5A059]">Ledger</span>
@@ -207,8 +220,5 @@ export default function BarberBookings() {
 
         </main>
       </div>
-
-
-    </div>
   );
 }
