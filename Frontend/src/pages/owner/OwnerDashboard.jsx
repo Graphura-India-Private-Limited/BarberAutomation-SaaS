@@ -149,7 +149,8 @@ export default function OwnerDashboard() {
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
             <Scissors className="w-6 h-6 text-amber-600" />
           </div>
-          <p className="text-stone-600 text-sm font-semibold tracking-wide">Loading Owner Console...</p>
+          {/* Rule 3 Body Description style fallback */}
+          <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans">Loading Owner Console...</p>
         </div>
       </div>
     );
@@ -158,7 +159,7 @@ export default function OwnerDashboard() {
   return (
     <div className="min-h-screen flex font-sans text-stone-800" style={{ background: "#FAF6F0" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght=0,400..900;1,400..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
         .font-serif { font-family: 'Playfair Display', serif !important; }
         
@@ -177,43 +178,46 @@ export default function OwnerDashboard() {
       `}</style>
 
       {/* ── STICKY LIGHT NAVIGATION SIDEBAR ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200">
+      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
         <div className="space-y-8">
-          <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
+          <div className="flex items-center gap-3 text-left border-b pb-5 border-stone-100">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
               <Scissors size={18} color="#C5A059" strokeWidth={2} />
             </div>
             <div>
               <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-0.5">Owner Panel</div>
+              {/* Rule 2 Kicker Label Standard */}
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
             </div>
           </div>
 
           <nav className="space-y-1">
-            <button className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold">
+            {/* Rule 4 Primary UI Action Link Standardized Buttons */}
+            <button className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl bg-amber-50/60 text-[#C5A059] border border-amber-200/40 cursor-pointer">
               <LayoutDashboard size={18} color="#C5A059" />
               <span>Console Home</span>
             </button>
-            <button onClick={() => navigate("/owner/manage-services")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50">
+            <button onClick={() => navigate("/owner/manage-services")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
               <Scissors size={18} className="text-stone-400" />
               <span>Barbers & Services</span>
             </button>
-            <button onClick={() => navigate("/owner/dashboard/analytics")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50">
+            <button onClick={() => navigate("/owner/dashboard/analytics")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
               <BarChart2 size={18} className="text-stone-400" />
               <span>Analytics Metrics</span>
             </button>
-            <button onClick={() => navigate("/owner/payments")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50">
+            <button onClick={() => navigate("/owner/payments")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
               <CreditCard size={18} className="text-stone-400" />
               <span>Payment Gateway</span>
             </button>
-            <button onClick={() => navigate("/owner/revenue")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50">
+            <button onClick={() => navigate("/owner/revenue")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
               <DollarSign size={18} className="text-stone-400" />
               <span>Revenue Stream</span>
             </button>
           </nav>
         </div>
 
-        <button onClick={handleLogout} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent">
+        {/* Rule 4 Standardized Exit Button */}
+        <button onClick={handleLogout} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer">
           <LogOut size={18} className="text-red-400" />
           <span>Exit Workspace</span>
         </button>
@@ -226,9 +230,11 @@ export default function OwnerDashboard() {
           {/* Main Dashboard Header */}
           <header className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200 text-left">
             <div>
-              <h1 className="text-3xl md:text-4xl font-black font-serif text-stone-900 tracking-tight">
-                Dashboard <span style={{ color: "#C5A059" }}>Overview</span>
-              </h1>
+              {/* Rule 1 Master Single-Line Header Title Layout Standard */}
+              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase">Dashboard</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Overview</span>
+              </h2>
               <p className="text-stone-400 text-[11px] font-mono mt-1">
                 {salon?.salon_name || "The Royal Cuts"} · {new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' })} pm
               </p>
@@ -237,11 +243,13 @@ export default function OwnerDashboard() {
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#EADBCE] shadow-2xs">
                 <span className={`h-2 w-2 rounded-full ${statusMeta.dot}`} />
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-500">{statusMeta.label}</span>
+                {/* Rule 2 Kicker Subtitle Metadata Tag */}
+                <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">{statusMeta.label}</span>
               </div>
+              {/* Rule 4 System Trigger Button */}
               <button 
                 onClick={() => setEditing(prev => !prev)} 
-                className="flex items-center gap-2 px-5 py-3.5 rounded-xl font-black text-[10px] tracking-widest text-white uppercase shadow-sm transition-all active:scale-95"
+                className="flex items-center gap-2 px-5 py-3.5 rounded-xl font-extrabold text-xs tracking-wider text-white uppercase shadow-sm transition-all active:scale-95 cursor-pointer font-sans"
                 style={{ background: CHARCOAL }}
               >
                 <Edit size={14} color="#C5A059" />
@@ -250,15 +258,16 @@ export default function OwnerDashboard() {
             </div>
           </header>
 
-          {/* ── BARBER-STYLE HIGHLIGHT METRIC COUNTERS ── */}
+          {/* ── HIGHLIGHT METRIC COUNTERS ── */}
           {!editing && (
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-left">
               <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs">
                 <div className="w-11 h-11 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0">
                   <TrendingUp className="text-orange-600 w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">Today's Revenue</p>
+                  {/* Rule 2 Card Counter Label standard */}
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Today's Revenue</p>
                   <h3 className="text-xl font-black text-stone-900 font-serif">₹{salon?.basic_pricing ? salon.basic_pricing * 14 : "8,450"}</h3>
                 </div>
               </div>
@@ -267,7 +276,7 @@ export default function OwnerDashboard() {
                   <Users className="text-amber-600 w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">Live Queue</p>
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Live Queue</p>
                   <h3 className="text-xl font-black text-stone-900 font-serif">4 <span className="text-xs text-stone-400 font-sans font-medium">Waiting</span></h3>
                 </div>
               </div>
@@ -276,7 +285,7 @@ export default function OwnerDashboard() {
                   <Activity className="text-emerald-600 w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">Active Staff</p>
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Active Staff</p>
                   <h3 className="text-xl font-black text-stone-900 font-serif">{salon?.number_of_barbers || "3"} / 4</h3>
                 </div>
               </div>
@@ -285,15 +294,15 @@ export default function OwnerDashboard() {
                   <Clock className="text-purple-600 w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">Avg Wait Time</p>
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Avg Wait Time</p>
                   <h3 className="text-xl font-black text-stone-900 font-serif">18 min</h3>
                 </div>
               </div>
             </section>
           )}
 
-          {error && <p className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-center text-xs font-bold text-red-600">{error}</p>}
-          {message && <p className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4 text-center text-xs font-bold text-green-700">{message}</p>}
+          {error && <p className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-center text-xs font-bold text-red-600 font-sans">{error}</p>}
+          {message && <p className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4 text-center text-xs font-bold text-green-700 font-sans">{message}</p>}
 
           {/* ── CORE GRID WORKSPACE PLATFORMS ── */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 text-left">
@@ -307,8 +316,10 @@ export default function OwnerDashboard() {
                 {/* Left Side Info Panel Stack */}
                 <section className="space-y-6 lg:col-span-5">
                   <div className="card p-6">
-                    <h2 className="mb-4 text-sm font-black uppercase tracking-wider text-stone-900 flex items-center gap-2">
-                      <Scissors size={14} style={{ color: "#C5A059" }} /> Registered Salon Info
+                    {/* Rule 1 Secondary Module Title Alignment */}
+                    <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-4">
+                      <span className="font-bold uppercase">Registered</span>
+                      <span className="italic text-[#C5A059] normal-case font-medium">Salon Info</span>
                     </h2>
                     <div className="space-y-3.5">
                       <Info label="Business Name" value={salon?.salon_name} />
@@ -319,15 +330,17 @@ export default function OwnerDashboard() {
                   </div>
 
                   <div className="card p-6">
-                    <h2 className="mb-4 text-sm font-black uppercase tracking-wider text-stone-900 flex items-center gap-2">
-                      <ImageIcon size={14} style={{ color: "#C5A059" }} /> Media Gallery Vault
+                    <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-4">
+                      <span className="font-bold uppercase">Media</span>
+                      <span className="italic text-[#C5A059] normal-case font-medium">Gallery Vault</span>
                     </h2>
                     <div className="grid grid-cols-3 gap-2.5">
                       {(form.images || []).map((url, index) => (
                         <img key={index} src={url} alt={`Preview ${index + 1}`} className="aspect-square rounded-xl object-cover border border-stone-100" />
                       ))}
                       {(!form.images || form.images.length === 0) && (
-                        <div className="col-span-3 py-8 rounded-xl border border-dashed border-stone-200 text-center text-[10px] font-black uppercase tracking-widest text-stone-400">
+                        /* Rule 2 Empty State Text Styling */
+                        <div className="col-span-3 py-8 rounded-xl border border-dashed border-stone-200 text-center text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
                           No images uploaded yet
                         </div>
                       )}
@@ -335,20 +348,25 @@ export default function OwnerDashboard() {
                   </div>
                 </section>
 
-                {/* Right Side Barber-Style Dashboard Graphs */}
+                {/* Right Side Dashboard Graphs */}
                 <section className="space-y-6 lg:col-span-7">
                   
-                  {/* BARBER INSPIRED WEEKLY REVENUE GRAPHIC */}
+                  {/* WEEKLY REVENUE GRAPHIC */}
                   <div className="card p-6 flex flex-col justify-between" style={{ minHeight: "260px" }}>
                     <div className="flex justify-between items-center mb-4">
                       <div>
-                        <h3 className="text-sm font-black uppercase tracking-wider text-stone-900">Weekly Revenue Breakdown</h3>
-                        <p className="text-[10px] font-medium text-stone-400 mt-0.5">Mon — Sun parameters pipeline</p>
+                        {/* Rule 1 Header Segment variation matching internal layout elements */}
+                        <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                          <span className="font-bold uppercase">Weekly</span>
+                          <span className="italic text-[#C5A059] normal-case font-medium">Revenue</span>
+                        </h2>
+                        {/* Rule 3 Body text label metrics subtext setup */}
+                        <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Mon — Sun parameters pipeline</p>
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/50">This Week ₹52,300</span>
+                      <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/50 font-sans">This Week ₹52,300</span>
                     </div>
 
-                    {/* Barber-style clean bar data distribution metrics layout chart */}
+                    {/* Chart visual display tracking bar lines */}
                     <div className="flex justify-between items-end h-32 pt-4 px-2">
                       {[
                         { day: "Mon", val: "₹3.2k", h: "35%" },
@@ -362,7 +380,7 @@ export default function OwnerDashboard() {
                         <div key={i} className="flex flex-col items-center gap-2 flex-1 group">
                           <span className="text-[9px] font-mono font-bold text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity">{item.val}</span>
                           <div className="w-full max-w-[32px] rounded-t-md transition-all duration-300" style={{ height: item.h, backgroundColor: item.active ? GOLD : "#FAF1E6" }} />
-                          <span className="text-[9px] font-black uppercase tracking-wider text-stone-400 mt-1">{item.day}</span>
+                          <span className="text-[11px] font-extrabold uppercase tracking-widest text-stone-400 font-sans mt-1">{item.day}</span>
                         </div>
                       ))}
                     </div>
@@ -370,7 +388,10 @@ export default function OwnerDashboard() {
 
                   {/* Onboarding Checklist Status Matrix */}
                   <div className="card p-6">
-                    <h2 className="mb-5 text-sm font-black uppercase tracking-wider text-stone-900">Activation Metrics Check</h2>
+                    <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5">
+                      <span className="font-bold uppercase">Activation</span>
+                      <span className="italic text-[#C5A059] normal-case font-medium">Metrics Check</span>
+                    </h2>
                     <div className="space-y-2.5">
                       <ChecklistItem done={!!salon?.salon_name} label="Salon identity and metadata records submitted" />
                       <ChecklistItem done={!!salon?.latitude && !!salon?.longitude} label="Geographical GPS coordinates tagged" />
@@ -393,18 +414,20 @@ const emptyForm = { salon_name: "", owner_name: "", email: "", address: "", lati
 
 function Info({ label, value }) {
   return (
-    <div className="border-b last:border-0 pb-2.5 last:pb-0 border-stone-50">
-      <label className="text-[9px] font-black uppercase tracking-wider block text-stone-400">{label}</label>
-      <p className="font-bold text-stone-900 mt-0.5 text-sm">{value || "Value entry missing"}</p>
+    <div className="border-b last:border-0 pb-2.5 last:pb-0 text-left border-stone-50">
+      {/* Rule 2 Core Label Meta */}
+      <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block font-sans">{label}</label>
+      <p className="font-bold text-stone-900 mt-0.5 text-sm font-sans">{value || "Value entry missing"}</p>
     </div>
   );
 }
 
 function ChecklistItem({ done, label }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-stone-100 bg-stone-50/40 p-3 text-xs">
-      <span className="font-semibold text-stone-600 tracking-wide">{label}</span>
-      <span className={`rounded px-2 py-0.5 text-[9px] font-black uppercase tracking-wider border ${done ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-600 border-amber-200/60"}`}>
+    <div className="flex items-center justify-between rounded-xl border border-stone-100 bg-stone-50/40 p-3 text-xs text-left">
+      {/* Rule 3 Inline description tag block */}
+      <span className="font-normal text-stone-600 leading-relaxed font-sans">{label}</span>
+      <span className={`rounded px-2 py-0.5 text-[9px] font-black uppercase tracking-wider border font-sans ${done ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-600 border-amber-200/60"}`}>
         {done ? "Completed" : "Awaiting Action"}
       </span>
     </div>
@@ -412,10 +435,14 @@ function ChecklistItem({ done, label }) {
 }
 
 function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, busy, canResubmit }) {
-  const inputClass = "w-full rounded-xl border border-stone-200 bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400";
+  const inputClass = "w-full rounded-xl border border-stone-200 bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400 font-sans";
   return (
-    <div className="card p-6 shadow-md bg-white">
-      <h2 className="mb-5 text-md font-black uppercase tracking-wider text-stone-900 border-b pb-3 border-stone-100">Edit Salon Workspace Profile</h2>
+    <div className="card p-6 shadow-md bg-white text-left">
+      {/* Rule 1 Layout block inside edit portal system section layout details */}
+      <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5 border-b pb-3 border-stone-100">
+        <span className="font-bold uppercase">Edit Workspace</span>
+        <span className="italic text-[#C5A059] normal-case font-medium">Profile</span>
+      </h2>
       <div className="grid gap-4 md:grid-cols-2">
         <input className={inputClass} value={form.salon_name} onChange={e => setField("salon_name", e.target.value)} placeholder="Salon Name" />
         <input className={inputClass} value={form.owner_name} onChange={e => setField("owner_name", e.target.value)} placeholder="Owner Full Name" />
@@ -429,9 +456,10 @@ function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, bu
       <textarea className={`${inputClass} mt-4 min-h-16 resize-none`} value={form.address} onChange={e => setField("address", e.target.value)} placeholder="Physical Destination Address" />
       
       <div className="mt-5 flex flex-wrap gap-3 pt-4 border-t border-stone-50">
-        <button type="button" onClick={tagLocation} className="rounded-xl border border-[#C5A059] text-[#C5A059] px-5 py-3 text-xs font-black uppercase tracking-widest flex items-center gap-1.5"><MapPin size={14} /> Tag GPS Geolocation</button>
-        <button type="button" onClick={() => saveProfile(false)} disabled={busy} className="rounded-xl bg-stone-900 text-white px-6 py-3 text-xs font-black uppercase tracking-widest hover:bg-stone-800 disabled:opacity-40 shadow-sm">Save Staged Changes</button>
-        {canResubmit && <button type="button" onClick={() => saveProfile(true)} disabled={busy} className="rounded-xl px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-sm" style={{ background: GOLD }}>Resubmit Request</button>}
+        {/* Rule 4 Standardized internal layout buttons links controls */}
+        <button type="button" onClick={tagLocation} className="rounded-xl border border-[#C5A059] text-[#C5A059] px-5 py-3 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer font-sans"><MapPin size={14} /> Tag GPS Geolocation</button>
+        <button type="button" onClick={() => saveProfile(false)} disabled={busy} className="rounded-xl bg-stone-900 text-white px-6 py-3 text-xs font-extrabold uppercase tracking-wider hover:bg-stone-800 disabled:opacity-40 shadow-sm cursor-pointer font-sans">Save Staged Changes</button>
+        {canResubmit && <button type="button" onClick={() => saveProfile(true)} disabled={busy} className="rounded-xl px-6 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-sm cursor-pointer font-sans" style={{ background: GOLD }}>Resubmit Request</button>}
       </div>
     </div>
   );

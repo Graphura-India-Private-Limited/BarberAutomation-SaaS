@@ -107,29 +107,27 @@ const AnalyticsDashboard = () => {
         }
       `}</style>
 
-   {/* ── MATCHING SIDEBAR NAVIGATION ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200">
+      {/* ── SIDEBAR NAVIGATION (Rule 4 Text Styles Used) ── */}
+      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
         <div className="space-y-8">
-          {/* Logo Centerpiece */}
           <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
               <Scissors size={18} color="#C5A059" strokeWidth={2} />
             </div>
-            <div>
-              <div className="text-sm font-black tracking-tight text-stone-900">
-                Barber Pro
-              </div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-0.5">Owner Panel</div>
+            <div className="text-left">
+              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
+              {/* Rule 2 Kicker Label */}
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
             </div>
           </div>
 
-          {/* Navigation Links Framework */}
           <nav className="space-y-1">
+            {/* Rule 4 UI Navigation Links Setup */}
             <button 
               onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -139,9 +137,9 @@ const AnalyticsDashboard = () => {
 
             <button 
               onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -151,9 +149,9 @@ const AnalyticsDashboard = () => {
 
             <button 
               onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -163,9 +161,9 @@ const AnalyticsDashboard = () => {
 
             <button 
               onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -175,9 +173,9 @@ const AnalyticsDashboard = () => {
 
             <button 
               onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -187,10 +185,10 @@ const AnalyticsDashboard = () => {
           </nav>
         </div>
 
-        {/* System Exit Button */}
+        {/* Rule 4 Standardized Action Exit Button */}
         <button 
           onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent"
+          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
         >
           <LogOut size={18} className="text-red-400" />
           <span>Exit Workspace</span>
@@ -201,26 +199,37 @@ const AnalyticsDashboard = () => {
       <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
         <div className="max-w-5xl mx-auto">
           
-          {/* Top Integrated Headline Bar */}
+          {/* Top Header Card Container Block */}
           <div className="rounded-2xl p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-5 card">
-            <div className="flex items-center">
-              <h1 className="text-3xl font-black font-serif tracking-tight text-stone-900">Owner Dashboard</h1>
-              <span className="text-stone-400 text-xs font-black tracking-widest uppercase ml-4 border-l pl-4 border-stone-200">Analytics & Reports</span>
+            <div className="text-left">
+              {/* Rule 1 Master Title Layout Setup */}
+              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase">Owner</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Dashboard</span>
+              </h2>
+              {/* Rule 3 Muted Body text explanation standard */}
+              <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-1">Analytics overview & system reports portal management control.</p>
             </div>
 
-            {/* Dashboard Category Tabs */}
-            <div className="flex bg-stone-100 p-1 rounded-xl border border-stone-200/60 shadow-inner self-start md:self-auto">
+            {/* Selector Categories Navigation Controls */}
+            <div className="flex bg-stone-100 p-1 rounded-xl border border-stone-200/60 shadow-inner self-start md:self-auto font-sans">
               <button 
                 onClick={() => setActiveTab('overview')}
-                className={`px-5 py-2.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all duration-200 ${activeTab === 'overview' ? 'text-white shadow-sm' : 'text-stone-500 hover:text-stone-800'}`}
-                style={{ backgroundColor: activeTab === 'overview' ? CHARCOAL : 'transparent' }}
+                className="px-5 py-2.5 rounded-lg text-xs font-extrabold tracking-wider uppercase transition-all duration-200 shadow-sm focus:outline-none cursor-pointer"
+                style={{ 
+                  backgroundColor: activeTab === 'overview' ? CHARCOAL : 'transparent',
+                  color: activeTab === 'overview' ? '#FFFFFF' : '#78716C'
+                }}
               >
                 Salon Overview
               </button>
               <button 
                 onClick={() => setActiveTab('reports')}
-                className={`px-5 py-2.5 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all duration-200 ${activeTab === 'reports' ? 'text-white shadow-sm' : 'text-stone-500 hover:text-stone-800'}`}
-                style={{ backgroundColor: activeTab === 'reports' ? CHARCOAL : 'transparent' }}
+                className="px-5 py-2.5 rounded-lg text-xs font-extrabold tracking-wider uppercase transition-all duration-200 shadow-sm focus:outline-none cursor-pointer"
+                style={{ 
+                  backgroundColor: activeTab === 'reports' ? CHARCOAL : 'transparent',
+                  color: activeTab === 'reports' ? '#FFFFFF' : '#78716C'
+                }}
               >
                 System Reports
               </button>
@@ -229,32 +238,37 @@ const AnalyticsDashboard = () => {
 
           {activeTab === 'overview' ? (
             <>
-              {/* Metrics Parameter Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {/* Performance Counter Framework Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 text-left">
                 {performanceMetrics.map((metric, index) => (
-                  <div key={index} className="card p-5 flex items-center gap-4">
+                  <div key={index} className="card p-5 flex items-center gap-4 bg-white">
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${metric.bg}`}>
                       <metric.icon className={`w-5 h-5 ${metric.color}`} strokeWidth={2} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">{metric.title}</p>
+                      {/* Rule 2 Minor Kicker Label inside counter nodes */}
+                      <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">{metric.title}</p>
                       <h3 className="text-xl font-black text-stone-900 font-serif leading-tight">{metric.value}</h3>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Graphical Charts Row */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Graphic Performance Layout Charts Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 text-left">
                 
-                {/* Line Chart Component Wrapper */}
-                <div className="card p-6 lg:col-span-2 flex flex-col justify-between">
+                {/* Traffic Trend Stream Graph Card Line */}
+                <div className="card p-6 lg:col-span-2 flex flex-col justify-between bg-white">
                   <div className="mb-6">
-                    <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">Queue & Traffic Trend</h3>
-                    <p className="text-[11px] text-stone-400 font-medium mt-1">Daily customer traffic and wait times</p>
+                    {/* Rule 1 Mid-Level Workspace Section Header */}
+                    <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                      <span className="font-bold uppercase">Queue & Traffic</span>
+                      <span className="italic text-[#C5A059] normal-case font-medium">Trend</span>
+                    </h2>
+                    {/* Rule 3 Core Paragraph Details */}
+                    <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Daily customer traffic index logs and active wait times breakdown.</p>
                   </div>
                   
-                  {/* FIXED CONTAINER LAYOUT: Placed accurate absolute left paddings to maintain design harmony */}
                   <div className="relative h-60 w-full pl-8 pr-2 mb-6">
                     <div className="absolute inset-0 pl-8 pr-2 flex flex-col justify-between">
                       {[0, 1, 2, 3, 4].map((i) => (
@@ -264,15 +278,12 @@ const AnalyticsDashboard = () => {
                       ))}
                     </div>
                     
-                    {/* Adjusted position grid framework to avoid text overflow */}
                     <div className="absolute bottom-0 left-8 right-2 translate-y-5 flex justify-between text-[10px] font-bold font-mono text-stone-400">
                       <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                     </div>
 
-                    {/* Adjusted SVG view boundary points mapping layout scale safely */}
                     <div className="absolute inset-0 left-8 pr-2 pb-px pt-2">
                       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-                        {/* Normalized Y coordinates from (70, 60, 75, 50, 20) into centralized viewport matrix */}
                         <path 
                           d="M0,75 Q16.6,60 33.3,70 T66.6,45 T100,25 L100,100 L0,100 Z" 
                           fill="url(#orange-gradient)" 
@@ -297,15 +308,20 @@ const AnalyticsDashboard = () => {
 
                   <div className="flex justify-center items-center gap-2 mt-4 pt-2 border-t border-stone-100">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: GOLD }}></div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-stone-400">Customer Traffic Analytics</span>
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Customer Traffic Analytics Ledger</span>
                   </div>
                 </div>
 
-                {/* Donut Chart Container */}
-                <div className="card p-6 flex flex-col justify-between">
+                {/* Donut Segmentation Chart Card Node */}
+                <div className="card p-6 flex flex-col justify-between bg-white">
                   <div>
-                    <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">Queue Breakdown</h3>
-                    <p className="text-[11px] text-stone-400 font-medium mt-1">Current status of daily visitors</p>
+                    {/* Rule 1 Segment Card Title */}
+                    <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                      <span className="font-bold uppercase">Queue</span>
+                      <span className="italic text-[#C5A059] normal-case font-medium">Breakdown</span>
+                    </h2>
+                    {/* Rule 3 Metric summary description label */}
+                    <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Current execution allocation status of daily visitors parameters.</p>
                   </div>
                   
                   <div className="flex flex-col items-center justify-center my-auto py-4">
@@ -316,31 +332,38 @@ const AnalyticsDashboard = () => {
                     </div>
                   </div>
 
-                  <div className="w-full flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-[9px] font-black uppercase tracking-wider text-stone-500">
-                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: GOLD }}></div> Served (45%)</div>
-                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: CHARCOAL }}></div> Waiting (30%)</div>
-                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div> Delayed (15%)</div>
-                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500"></div> Drops (10%)</div>
+                  {/* Rule 2 Labels Grid setup for pie-charts details definitions links */}
+                  <div className="w-full flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: GOLD }}></div> Served</div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: CHARCOAL }}></div> Waiting</div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div> Delayed</div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500"></div> Drops</div>
                   </div>
                 </div>
               </div>
 
-              {/* Barber Analytics Table Block */}
-              <div className="card p-6">
+              {/* Barber Analytics Performance Table Card Block */}
+              <div className="card p-6 bg-white text-left">
                 <div className="mb-5">
-                  <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">Barber Performance Ledger</h3>
-                  <p className="text-[11px] text-stone-400 font-medium mt-1">Customers served, efficiency metric logs & revenue shares per specialist</p>
+                  {/* Rule 1 Section Grid Title Layout */}
+                  <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                    <span className="font-bold uppercase">Barber Performance</span>
+                    <span className="italic text-[#C5A059] normal-case font-medium">Ledger</span>
+                  </h2>
+                  {/* Rule 3 Table summary information context text layout */}
+                  <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Customers served, efficiency metrics track logs, and real-time revenue shares.</p>
                 </div>
 
-                <div className="overflow-x-auto custom-scrollbar">
+                <div className="overflow-x-auto custom-scrollbar font-sans">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-stone-100">
-                        <th className="pb-3 text-[10px] font-black uppercase tracking-wider text-stone-400">Styling Specialist</th>
-                        <th className="pb-3 text-[10px] font-black uppercase tracking-wider text-stone-400 text-center">Served Today</th>
-                        <th className="pb-3 text-[10px] font-black uppercase tracking-wider text-stone-400 text-center">User Rating</th>
-                        <th className="pb-3 text-[10px] font-black uppercase tracking-wider text-stone-400 text-right">Revenue</th>
-                        <th className="pb-3 text-[10px] font-black uppercase tracking-wider text-stone-400 pl-8 w-1/3">Efficiency Rate</th>
+                        {/* Rule 2 Table Header Cell Typography Label Elements */}
+                        <th className="pb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Styling Specialist</th>
+                        <th className="pb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">Served Today</th>
+                        <th className="pb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">User Rating</th>
+                        <th className="pb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-right">Revenue</th>
+                        <th className="pb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-8 w-1/3">Efficiency Rate</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-50">
@@ -378,37 +401,38 @@ const AnalyticsDashboard = () => {
               </div>
             </>
           ) : (
-            /* SYSTEM REPORTS PANEL BLOCK */
-            <div className="space-y-6">
+            /* ── CENTRAL SYSTEM REPORTS MANAGEMENT WORKSPACE ── */
+            <div className="space-y-6 text-left">
               
-              {/* Dynamic Filtering Sub-Bar */}
-              <div className="card p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+              {/* Dynamic Filtering Sub-Bar controls component panel wrapper */}
+              <div className="card p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm bg-white font-sans">
                 
-                {/* Time Filter Action Hub */}
+                {/* Time Allocation Filter Actions Hub */}
                 <div className="flex bg-stone-100 p-1 rounded-xl border border-stone-200/60 w-full md:w-auto shadow-inner">
-                  {['daily', 'weekly', 'monthly'].map(t => (
-                    <button
-                      key={t}
-                      onClick={() => setTimeFilter(t)}
-                      className="flex-1 md:flex-none px-5 py-2 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all duration-200 shadow-sm border border-transparent focus:outline-none"
-                      style={{ 
-                        backgroundColor: timeFilter === t ? '#FFFFFF' : 'transparent',
-                        color: timeFilter === t ? CHARCOAL : '#78716C',
-                        borderColor: timeFilter === t ? '#EADBCE' : 'transparent'
-                      }}
-                    >
-                      {t}
-                    </button>
-                  ))}
+                {['daily', 'weekly', 'monthly'].map(t => (
+            <button
+              key={t}
+              onClick={() => setTimeFilter(t)}
+              /* ── ✅ FIXED: COMMENT WRAPPED SAFELY IN JSX EXPRESSION BRACKETS ── */
+              className="flex-1 md:flex-none px-5 py-2 rounded-lg text-xs font-extrabold tracking-wider uppercase transition-all duration-200 shadow-sm border focus:outline-none cursor-pointer font-sans"
+              style={{ 
+                backgroundColor: timeFilter === t ? '#FFFFFF' : 'transparent',
+                color: timeFilter === t ? CHARCOAL : '#78716C',
+                borderColor: timeFilter === t ? '#EADBCE' : 'transparent'
+              }}
+            >
+              {t}
+            </button>
+          ))}
                 </div>
 
-                {/* Report Variable Filter Hub */}
+                {/* Report Type Core Categorization Filters Hub Wrapper links */}
                 <div className="flex bg-stone-100 p-1 rounded-xl border border-stone-200/60 w-full md:w-auto shadow-inner">
                   {['salon-wise', 'revenue-wise', 'booking-wise'].map(type => (
                     <button
                       key={type}
                       onClick={() => setReportType(type)}
-                      className="flex-1 md:flex-none px-4 py-2 rounded-lg text-[10px] font-black tracking-wider uppercase transition-all duration-200 focus:outline-none"
+                      className="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-extrabold tracking-wider uppercase transition-all duration-200 focus:outline-none cursor-pointer"
                       style={{ 
                         backgroundColor: reportType === type ? CHARCOAL : 'transparent',
                         color: reportType === type ? '#FFFBF2' : '#78716C'
@@ -420,77 +444,91 @@ const AnalyticsDashboard = () => {
                 </div>
               </div>
 
-              {/* Top Highlights Context Summary Headers */}
+              {/* Franchise Volume Highlights Labels Segment Row */}
               <div>
-                <h3 className="text-md font-black font-serif tracking-tight text-stone-900 flex items-center gap-2">
-                  <Crown className="w-4 h-4" style={{ color: GOLD }} /> Top Performing Outlets
-                </h3>
-                <p className="text-[11px] text-stone-400 font-medium mt-1">Highlighted franchise locations based on key operational metrics.</p>
+                {/* Rule 1 Segment Header Composition */}
+                <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                  <span className="font-bold uppercase">Top Performing</span>
+                  <span className="italic text-[#C5A059] normal-case font-medium">Outlets</span>
+                </h2>
+                {/* Rule 3 Muted description summary standard label tag */}
+                <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Highlighted tracking metrics displaying core performance indexes per branch node.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Delay Element */}
                 <div className="bg-gradient-to-br from-green-50/50 to-white rounded-2xl p-5 border border-green-200/50 relative overflow-hidden card">
                   <div className="absolute top-0 right-0 p-4 opacity-5"><Clock className="w-12 h-12 text-green-700" /></div>
-                  <p className="text-[9px] font-black uppercase tracking-wider text-green-700 mb-2">Minimum Waiting Lag</p>
+                  {/* Rule 2 Card Internal Section Kicker Subheader */}
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-green-700 mb-2 font-sans">Minimum Waiting Lag</p>
                   <h4 className="text-md font-black font-serif text-stone-900 mb-2 truncate">{topSalons.leastDelay.name}</h4>
-                  <div className="flex items-baseline gap-1.5">
+                  <div className="flex items-baseline gap-1.5 font-sans">
                     <span className="text-2xl font-mono font-black text-green-700 leading-none">{topSalons.leastDelay.delayAvg}</span>
-                    <span className="text-[9px] font-bold uppercase text-stone-400">delay index</span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-stone-400">delay index</span>
                   </div>
                 </div>
 
                 {/* Customer Volume Element */}
                 <div className="bg-gradient-to-br from-blue-50/50 to-white rounded-2xl p-5 border border-blue-200/50 relative overflow-hidden card">
                   <div className="absolute top-0 right-0 p-4 opacity-5"><Users className="w-12 h-12 text-blue-700" /></div>
-                  <p className="text-[9px] font-black uppercase tracking-wider text-blue-700 mb-2">Highest Traffic Volume</p>
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-blue-700 mb-2 font-sans">Highest Traffic Volume</p>
                   <h4 className="text-md font-black font-serif text-stone-900 mb-2 truncate">{topSalons.mostCustomers.name}</h4>
-                  <div className="flex items-baseline gap-1.5">
+                  <div className="flex items-baseline gap-1.5 font-sans">
                     <span className="text-2xl font-mono font-black text-blue-700 leading-none">{topSalons.mostCustomers.customers}</span>
-                    <span className="text-[9px] font-bold uppercase text-stone-400">visitors today</span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-stone-400">visitors today</span>
                   </div>
                 </div>
 
                 {/* Gross Revenue Element */}
                 <div className="bg-gradient-to-br from-amber-50/40 to-white rounded-2xl p-5 border border-amber-200/50 relative overflow-hidden card">
                   <div className="absolute top-0 right-0 p-4 opacity-5"><TrendingUp className="w-12 h-12 text-amber-600" /></div>
-                  <p className="text-[9px] font-black uppercase tracking-wider text-amber-700 mb-2">Peak Revenue Released</p>
+                  <p className="text-[11px] font-extrabold uppercase tracking-widest text-amber-700 mb-2 font-sans">Peak Revenue Released</p>
                   <h4 className="text-md font-black font-serif text-stone-900 mb-2 truncate">{topSalons.highestRevenue.name}</h4>
-                  <div className="flex items-baseline gap-1.5">
+                  <div className="flex items-baseline gap-1.5 font-sans">
                     <span className="text-2xl font-mono font-black text-amber-700 leading-none">₹{topSalons.highestRevenue.revenue.toLocaleString()}</span>
-                    <span className="text-[9px] font-bold uppercase text-stone-400">gross income</span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-stone-400">gross income</span>
                   </div>
                 </div>
               </div>
 
-              {/* Detailed Breakdown Ledger Spreadsheet */}
-              <div className="card overflow-hidden">
+              {/* Detailed Spreadsheet Audit Matrix Ledger Data Container */}
+              <div className="card overflow-hidden bg-white">
                 <div className="p-6 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white">
                   <div>
-                    <h3 className="text-sm font-black font-serif tracking-tight text-stone-900 flex items-center gap-2">
-                      <Store className="w-4 h-4" style={{ color: GOLD }} />
-                      {reportType.replace('-', ' ').toUpperCase()} BREAKDOWN REPORT
-                    </h3>
-                    <p className="text-[11px] text-stone-400 font-medium mt-1">Detailed structural audit across active branch collections ({timeFilter})</p>
+                    {/* Rule 1 Table block header mapping key properties values */}
+                    <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                      <span className="font-bold uppercase">{reportType.replace('-', ' ')}</span>
+                      <span className="italic text-[#C5A059] normal-case font-medium">Breakdown Report</span>
+                    </h2>
+                    {/* Rule 3 spreadsheet description notes label layout */}
+                    <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Detailed structural matrix audit metrics across active franchise coordinates logs ({timeFilter})</p>
                   </div>
-                  <button className="rounded-xl border h-10 px-4 text-[10px] font-black tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2 hover:text-white"
+                  {/* Rule 4 Dynamic Export Layout Document Button */}
+                  <button className="rounded-xl border h-10 px-4 text-xs font-extrabold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer font-sans"
                     style={{ backgroundColor: `${GOLD}10`, color: GOLD, borderColor: `${GOLD}40` }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = GOLD}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = `${GOLD}10`}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = GOLD;
+                      e.currentTarget.style.color = '#FFFFFF';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = `${GOLD}10`;
+                      e.currentTarget.style.color = GOLD;
+                    }}
                   >
                     Export CSV Matrix
                   </button>
                 </div>
                 
-                <div className="overflow-x-auto custom-scrollbar">
+                <div className="overflow-x-auto custom-scrollbar font-sans">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-stone-50/50 border-b border-stone-100">
-                        <th className="py-3.5 px-6 text-[10px] font-black uppercase tracking-wider text-stone-400">Active Salon Node</th>
-                        <th className="py-3.5 px-6 text-[10px] font-black uppercase tracking-wider text-stone-400 text-center">Bookings</th>
-                        <th className="py-3.5 px-6 text-[10px] font-black uppercase tracking-wider text-stone-400 text-center">Customers Served</th>
-                        <th className="py-3.5 px-6 text-[10px] font-black uppercase tracking-wider text-stone-400 text-center">Avg Operational Delay</th>
-                        <th className="py-3.5 px-6 text-[10px] font-black uppercase tracking-wider text-stone-400 text-right">Revenue Yield</th>
+                        {/* Rule 2 Database Spreadsheet Ledger Header Labels style maps */}
+                        <th className="py-3.5 px-6 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Active Salon Node</th>
+                        <th className="py-3.5 px-6 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">Bookings</th>
+                        <th className="py-3.5 px-6 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">Customers Served</th>
+                        <th className="py-3.5 px-6 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">Avg Operational Delay</th>
+                        <th className="py-3.5 px-6 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-right">Revenue Yield</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-50">
@@ -508,7 +546,7 @@ const AnalyticsDashboard = () => {
                         </tr>
                       ))}
                       
-                      {/* Summation Row */}
+                      {/* Operational Ledger Data Summary Footer Row Block */}
                       <tr className="bg-stone-100/50 font-bold border-t-2 border-stone-200 text-stone-900 text-sm">
                         <td className="py-4 px-6 font-black uppercase tracking-wide text-xs">Total Cumulative Pipeline</td>
                         <td className="py-4 px-6 text-center font-mono font-black">{displayData.reduce((acc, curr) => acc + curr.bookings, 0)}</td>

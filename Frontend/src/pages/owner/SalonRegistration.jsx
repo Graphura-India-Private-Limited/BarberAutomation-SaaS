@@ -74,7 +74,7 @@ export default function SalonRegistration() {
       setError("Please geo-tag your studio location coordinates before submission.");
       return;
     }
-    setLoading(true);
+    loading(true);
     setError("");
     setMessage("");
     try {
@@ -106,7 +106,7 @@ export default function SalonRegistration() {
     }
   };
 
-  const inputClass = "w-full bg-white border border-[#EADBCE] rounded-2xl p-4 outline-none text-[#3E362E] placeholder-stone-400 focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all text-sm font-bold shadow-3xs";
+  const inputClass = "w-full bg-white border border-[#EADBCE] rounded-2xl p-4 outline-none text-[#3E362E] placeholder-stone-400 focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all text-sm font-medium font-sans shadow-3xs";
 
   return (
     <div
@@ -135,28 +135,38 @@ export default function SalonRegistration() {
 
       <div className="relative z-10 w-full max-w-5xl py-6 flex-grow flex flex-col">
         
-        {/* ── TOP ACTION NAVIGATION BAR (No Header Component) ── */}
+        {/* ── TOP ACTION NAVIGATION BAR (Rule 4 Type Setup) ── */}
         <div className="w-full flex justify-start mb-8">
           <button 
             type="button"
             onClick={() => navigate("/")} 
-            className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADBCE] shadow-md cursor-pointer select-none"
+            className="flex items-center gap-2 text-xs font-extrabold tracking-wider uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADBCE] shadow-md cursor-pointer select-none font-sans"
           >
             <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1 text-[#C5A059]" />
             <span>Cancel</span>
           </button>
         </div>
 
-        {/* Form Identity Title */}
+        {/* Form Identity Title (Rule 1 & Rule 2 Mix Composition Setup) */}
         <div className="text-center mb-10">
-          <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.3em] text-[#A37B58]">
+          <span className="mb-2 block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
             Graphura India Private Limited
           </span>
-          <h1 className="text-4xl font-black font-serif tracking-tight text-stone-900 md:text-5xl">
-            Register Your Salon
-          </h1>
+          <div className="text-center mb-5">
+          <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2">
+    {/* ── 📬 OWNER: INDEPENDENT WEIGHT TO DIAL IN THE MID-BOLDNESS ── */}
+    <span className="font-bold uppercase">
+      Register Your
+    </span>
+    
+    {/* ── 📬 LOGIN: REMAINS ELEGANT AND REFINED ── */}
+    <span className="italic text-[#C5A059] normal-case font-medium">
+      Salon
+    </span>
+  </h2>
+  </div>
           <div className="w-12 h-[1.5px] bg-[#C5A059] mx-auto mt-4 mb-3" />
-          <p className="mx-auto max-w-2xl text-xs sm:text-sm font-medium tracking-wide text-stone-500 font-sans">
+          <p className="mx-auto max-w-2xl text-sm font-normal leading-relaxed text-stone-600 font-sans">
             Submit your salon profile setup for system validation. Customers can discover and book slots only after approval sequence completion.
           </p>
         </div>
@@ -213,8 +223,8 @@ export default function SalonRegistration() {
             <Field label="Shop Gallery Images (Max 5)">
               <div className="relative w-full h-[50px]">
                 <input type="file" id="gallery-uploads" accept="image/*" multiple onChange={handleImages} className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" />
-                <label htmlFor="gallery-uploads" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-bold shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
-                  <span className="text-stone-500 text-xs font-semibold">{form.images.length > 0 ? `${form.images.length} files selected` : "Upload storefront photos..."}</span>
+                <label htmlFor="gallery-uploads" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                  <span className="text-stone-500 text-xs font-normal">{form.images.length > 0 ? `${form.images.length} files selected` : "Upload storefront photos..."}</span>
                   <Upload size={14} color={GOLD} />
                 </label>
               </div>
@@ -230,7 +240,7 @@ export default function SalonRegistration() {
               <button 
                 type="button" 
                 onClick={handleGeoTag} 
-                className={`h-24 w-full md:w-auto rounded-2xl border px-6 text-xs font-black uppercase tracking-wider transition-all duration-200 shadow-3xs flex flex-col justify-center items-center gap-2 cursor-pointer ${
+                className={`h-24 w-full md:w-auto rounded-2xl border px-6 text-xs font-extrabold uppercase tracking-wider transition-all duration-200 shadow-3xs flex flex-col justify-center items-center gap-2 cursor-pointer font-sans ${
                   form.latitude 
                     ? "border-emerald-200 bg-emerald-50/50 text-emerald-800 shadow-none" 
                     : "border-[#C5A059] bg-white text-[#C5A059] hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E]"
@@ -257,38 +267,39 @@ export default function SalonRegistration() {
 
           {/* Error and Success Dialog Framework boxes */}
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 text-rose-700 text-xs font-bold animate-in fade-in duration-200">
+            <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 text-rose-700 text-xs font-medium font-sans animate-in fade-in duration-200">
               <AlertTriangle size={14} className="shrink-0" />
               <span>{error}</span>
             </div>
           )}
           {message && (
-            <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2 text-emerald-800 text-xs font-bold animate-in fade-in duration-200">
+            <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2 text-emerald-800 text-xs font-medium font-sans animate-in fade-in duration-200">
               <ShieldCheck size={14} className="shrink-0" />
               <span>{message}</span>
             </div>
           )}
 
-         {/* Dispatch Submitter */}
-<div className="pt-4">
-  <button 
-    disabled={loading} 
-    className="w-full h-14 md:h-16 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-black uppercase tracking-widest text-white shadow-md transition-all duration-200 hover:opacity-95 disabled:opacity-50 cursor-pointer active:scale-[0.98] hover:shadow-lg"
-    style={{ backgroundColor: CHARCOAL }}
-  >
-    {loading ? "Registering Studio System..." : "Submit Profile for Approval"}
-  </button>
-</div>
+          {/* Dispatch Submitter (Rule 4 Type Setup) */}
+          <div className="pt-4">
+            <button 
+              disabled={loading} 
+              className="w-full h-14 md:h-16 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white shadow-md transition-all duration-200 hover:opacity-95 disabled:opacity-50 cursor-pointer active:scale-[0.98] hover:shadow-lg font-sans"
+              style={{ backgroundColor: CHARCOAL }}
+            >
+              {loading ? "Registering Studio System..." : "Submit Profile for Approval"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 }
 
+// Subheading Framework Component (Rule 2 Type Setup)
 function Field({ label, children }) {
   return (
     <label className="block space-y-1.5">
-      <span className="ml-0.5 text-[10px] font-black uppercase tracking-wider text-stone-400">{label}</span>
+      <span className="ml-0.5 text-[11px] font-extrabold uppercase tracking-widest text-stone-400 font-sans">{label}</span>
       {children}
     </label>
   );

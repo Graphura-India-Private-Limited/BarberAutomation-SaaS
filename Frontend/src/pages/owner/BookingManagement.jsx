@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Check,
   X,
@@ -15,7 +16,13 @@ import {
   LogOut,
   SlidersHorizontal
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+
+// ── ✅ SYSTEM THEME STRUCTURED GLOBAL CONSUMER WRAPPERS ──
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
+
+const CHARCOAL = "#3E362E";
+const GOLD = "#C5A059";
 
 export default function BookingManagement() {
   const navigate = useNavigate();
@@ -94,10 +101,9 @@ export default function BookingManagement() {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/owner/login");
   };
 
-  // Dynamic Compound Filter Engine (Combines text searching and segment button states)
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
       const matchesSearch = b.name.toLowerCase().includes(search.toLowerCase());
@@ -106,10 +112,9 @@ export default function BookingManagement() {
     });
   }, [bookings, search, selectedTypeFilter]);
 
-  // Compute live contextual counts for the metrics cards
   const stats = useMemo(() => {
     return {
-      today: bookings.length * 32, // Mock scalar scaling factor aligned with your original layout UI state
+      today: bookings.length * 32, 
       customers: new Set(bookings.map(b => b.name)).size,
       pendingCount: bookings.filter(b => b.status === "Pending").length
     };
@@ -122,106 +127,76 @@ export default function BookingManagement() {
   };
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 selection:bg-amber-100" style={{ background: "#FAF6F0" }}>
+    <div className="min-h-screen font-sans text-stone-800 selection:bg-amber-100 flex flex-col pt-24" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        body { background-color: #FAF6F0; }
-        .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
         .font-serif { font-family: 'Playfair Display', serif !important; }
         
         .card { 
           background: #FFFFFF; 
           border: 1px solid #EADBCE; 
           border-radius: 24px; 
-          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02);
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.03);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 24px -4px rgba(28, 25, 23, 0.06);
+          border-color: #C5A059;
         }
         .card-active {
-          border-color: #D97706 !with-shadow !important;
-          box-shadow: 0 0 0 2px #D97706, 0 10px 25px -4px rgba(217, 119, 6, 0.15) !important;
+          border-color: #C5A059 !important;
+          box-shadow: 0 0 0 2px #C5A059, 0 12px 24px -4px rgba(197, 160, 89, 0.15) !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #EADBCE;
+          border-radius: 10px;
         }
       `}</style>
 
-      {/* ── STICKY TOP PLATFORM HEADER ── */}
-      <header className="w-full border-b border-[#EADBCE] bg-white/90 backdrop-blur-md sticky top-0 z-40 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D97706] to-[#F59E0B] flex items-center justify-center shadow-md">
-            <Scissors size={20} className="text-white" strokeWidth={2.5} />
-          </div>
-          <div>
-            <h4 className="text-stone-900 font-extrabold tracking-[0.2em] text-xs uppercase">Barber Pro</h4>
-            <p className="text-[#B45309] text-[9px] font-black tracking-[0.3em] uppercase mt-0.5">Owner Console</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-6 relative">
-          <div className="hidden sm:flex flex-col text-right">
-            <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">System Clock</span>
-            <span className="text-xs font-extrabold text-stone-800 mt-0.5">{time} IST</span>
-          </div>
-
-          {/* Bell Icon Trigger Wrapper */}
-          <div className="relative">
-            <button 
-              onClick={() => setIsNotifOpen(!isNotifOpen)}
-              className={`p-3 rounded-xl border text-stone-600 transition relative cursor-pointer shadow-sm ${isNotifOpen ? 'bg-amber-50 border-amber-500 text-[#D97706]' : 'bg-white border-stone-200 hover:bg-stone-50'}`}
-            >
-              <Bell size={18} />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            </button>
-            
-            {/* Animated Micro Activity Dropdown Menu */}
-            {isNotifOpen && (
-              <div className="absolute right-0 mt-3 w-80 rounded-2xl border border-[#EADBCE] bg-white p-4 shadow-xl z-50 animate-fade-in">
-                <div className="flex items-center justify-between mb-3 pb-2 border-b border-stone-100">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-stone-500">Live Activity Feed</h4>
-                  <button onClick={() => setIsNotifOpen(false)} className="text-[10px] font-bold text-amber-700 hover:underline">Dismiss</button>
-                </div>
-                <div className="space-y-3">
-                  {activities.map((act) => (
-                    <div key={act.id} className="text-xs border-l-2 border-[#D97706] pl-2.5 py-0.5">
-                      <p className="text-stone-800 font-medium">{act.text}</p>
-                      <span className="text-[10px] text-stone-400 font-sans">{act.time}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <button onClick={handleLogout} className="flex items-center gap-2 border border-stone-200 hover:border-stone-400 hover:bg-stone-50 px-4 py-2.5 rounded-xl text-stone-600 text-xs font-bold uppercase tracking-widest transition-all duration-200 cursor-pointer">
-            <LogOut size={14} /> Exit
-          </button>
-        </div>
-      </header>
+      {/* ── ✅ GLOBAL CUSTOM NAVBAR ELEMENT ── */}
+      <Navbar />
 
       {/* ── MAIN WORKSPACE CONTENT GRID ── */}
-      <main className="mx-auto max-w-7xl px-4 py-8 md:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 md:px-8 flex-grow w-full">
         
-        {/* ── CONTEXT HEADER TITLE CARD ── */}
-        <div className="relative rounded-3xl p-8 mb-6 overflow-hidden card bg-white">
+        {/* ── CONTEXT HEADER TITLE CARD (Rule 1 & Rule 2 Standard Set) ── */}
+        <div className="relative rounded-3xl p-6 md:p-8 mb-6 overflow-hidden card bg-white text-left">
           <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <p className="text-amber-700 font-bold tracking-[0.2em] text-xs uppercase mb-1">
+              {/* Rule 2: Minor Heading kicker badge styling */}
+              <p className="font-extrabold uppercase tracking-widest text-[11px] text-[#C5A059] mb-1.5 font-sans">
                 Elite Grooming Management
               </p>
-              <h1 className="text-3xl lg:text-4xl font-black font-serif tracking-tight text-stone-900 leading-none">Booking Dashboard</h1>
-              <p className="text-stone-500 mt-2 text-sm">Monitor floor allocation flow, approve queue intents, and confirm appointment configurations.</p>
+              {/* Rule 1: Single-Line Master Header Layout Setup */}
+              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase">Booking</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Dashboard</span>
+              </h2>
+              {/* Rule 3: Muted Description Styling */}
+              <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-2">Monitor floor allocation flow, approve queue intents, and confirm appointment configurations.</p>
             </div>
+            {/* Rule 4: Primary UI Action Link Button */}
             <button
               onClick={handleNewBookingClick}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 px-5 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer self-start sm:self-center"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer self-start sm:self-center font-sans border-none outline-none"
+              style={{ background: CHARCOAL }}
             >
-              <Plus size={16} /> New Booking
+              <Plus size={16} color={GOLD} /> New Booking
             </button>
           </div>
         </div>
 
         {/* ── SYSTEM MATRIX SUMMARY NUMBERS ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 text-left">
           {[
             { title: "Today's Bookings", value: stats.today, icon: Calendar, color: "bg-orange-50 text-orange-700 border-orange-100" },
-            { title: "Customers", value: stats.customers, icon: Users, color: "bg-amber-50 text-amber-700 border-amber-100" },
+            { title: "Customers Total", value: stats.customers, icon: Users, color: "bg-amber-50 text-amber-700 border-amber-100" },
             { title: "Revenue Index", value: "12k", icon: IndianRupee, color: "bg-emerald-50 text-emerald-700 border-emerald-100" },
             { title: "Pending Reviews", value: stats.pendingCount, icon: Clock3, color: "bg-sky-50 text-sky-700 border-sky-100" },
           ].map((item) => (
@@ -230,7 +205,8 @@ export default function BookingManagement() {
                 <item.icon size={22} />
               </div>
               <div>
-                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-1">{item.title}</h3>
+                {/* Rule 2: Minor Heading kicker tag structure */}
+                <h3 className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans mb-0.5">{item.title}</h3>
                 <p className="text-2xl font-black font-serif tracking-normal text-stone-900 leading-none">{item.value}</p>
               </div>
             </div>
@@ -238,27 +214,28 @@ export default function BookingManagement() {
         </div>
 
         {/* ── SEARCH INDEX CONSOLE ── */}
-        <div className="card p-4 mb-6 flex items-center gap-3 bg-white">
-          <Search className="text-amber-600 shrink-0" size={18} />
+        <div className="card p-4 mb-6 flex items-center gap-3 bg-white text-left font-sans">
+          <Search className="text-[#C5A059] shrink-0" size={18} />
           <input
             type="text"
             placeholder="Search active guest by name identifier..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent outline-none w-full text-stone-800 placeholder-stone-400 text-sm font-medium"
+            className="bg-transparent outline-none w-full text-stone-800 placeholder-stone-400 text-sm font-medium font-sans"
           />
           {selectedTypeFilter !== "ALL" && (
+            /* Rule 4: Standardized Link/Badge Action button */
             <button 
               onClick={() => setSelectedTypeFilter("ALL")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black bg-stone-100 text-stone-500 uppercase tracking-wider hover:bg-stone-200 transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase tracking-wider bg-stone-100 text-stone-500 hover:bg-stone-200 transition cursor-pointer font-sans border-none outline-none"
             >
               <SlidersHorizontal size={12} /> Clear Filter
             </button>
           )}
         </div>
 
-        {/* ── INTERACTIVE FILTER SEGMENTS (Now updates the table state instantly) ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        {/* ── INTERACTIVE FILTER SEGMENTS ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
           {[
             { filterKey: "Queue", title: "Queue Bookings", icon: Clock3, desc: "On-demand routing slot entries" },
             { filterKey: "Slot", title: "Slot Bookings", icon: Calendar, desc: "Pre-arranged appointment times" },
@@ -269,14 +246,15 @@ export default function BookingManagement() {
               <div 
                 key={item.filterKey} 
                 onClick={() => setSelectedTypeFilter(isTargetActive ? "ALL" : item.filterKey)}
-                className={`card p-5 flex items-center gap-4 cursor-pointer select-none bg-white ${isTargetActive ? 'card-active ring-2 ring-[#D97706] border-[#D97706]' : 'hover:border-[#D6C4AE]'}`}
+                className={`card p-5 flex items-center gap-4 cursor-pointer select-none bg-white ${isTargetActive ? 'card-active' : 'hover:border-[#C5A059]'}`}
               >
-                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all ${isTargetActive ? 'bg-amber-600 border-amber-700 text-white' : 'bg-amber-50/60 border-amber-100 text-amber-700'}`}>
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all ${isTargetActive ? 'text-white' : 'bg-amber-50/60 border-amber-100 text-[#C5A059]'}`} style={{ backgroundColor: isTargetActive ? CHARCOAL : '' }}>
                   <item.icon size={22} />
                 </div>
                 <div>
                   <h2 className="text-base font-black font-serif text-stone-900 leading-tight">{item.title}</h2>
-                  <p className="text-[11px] font-medium text-stone-400 mt-0.5">{item.desc}</p>
+                  {/* Rule 3: Balanced small description string */}
+                  <p className="text-stone-600 text-[11px] font-normal leading-relaxed font-sans mt-0.5">{item.desc}</p>
                 </div>
               </div>
             );
@@ -284,20 +262,23 @@ export default function BookingManagement() {
         </div>
 
         {/* ── LEDGER TABLE CONTENT CONTAINER ── */}
-        <div className="card p-6 bg-white overflow-hidden mb-8">
+        <div className="card p-6 bg-white overflow-hidden mb-8 text-left">
           <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
-            <h2 className="text-xl font-black font-serif text-stone-900 tracking-tight">
-              Live Operations Queue {selectedTypeFilter !== "ALL" && <span className="text-sm font-sans font-bold text-[#D97706] lowercase">({selectedTypeFilter} only)</span>}
+            {/* Rule 1: Master Section Sub-Header Title Layout */}
+            <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+              <span className="font-bold uppercase">Live Operations</span>
+              <span className="italic text-[#C5A059] normal-case font-medium">Queue</span>
+              {selectedTypeFilter !== "ALL" && <span className="text-xs font-sans font-bold text-[#C5A059] lowercase">({selectedTypeFilter} only)</span>}
             </h2>
-            <span className="text-[10px] font-black uppercase tracking-widest bg-stone-100 px-2.5 py-1 rounded-md text-stone-500">
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-50 px-2.5 py-1 rounded-md font-sans">
               {filteredBookings.length} Active Rows
             </span>
           </div>
           
-          <div className="overflow-x-auto w-full custom-scrollbar">
-            <table className="w-full min-w-[640px] text-sm">
+          <div className="overflow-x-auto w-full custom-scrollbar font-sans">
+            <table className="w-full min-w-[640px] text-sm border-collapse">
               <thead>
-                <tr className="border-b border-stone-100 text-stone-400 text-[11px] font-black uppercase tracking-[0.15em]">
+                <tr className="border-b border-stone-100 text-stone-400 text-[11px] font-extrabold uppercase tracking-widest font-sans">
                   <th className="text-left py-4 pr-4">Customer Entity</th>
                   <th className="text-left pr-4">Pipeline Type</th>
                   <th className="text-left pr-4">Target Window</th>
@@ -308,7 +289,7 @@ export default function BookingManagement() {
               <tbody className="divide-y divide-stone-50">
                 {filteredBookings.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-12 text-stone-400 italic font-medium">
+                    <td colSpan={5} className="text-center py-12 text-stone-400 italic font-medium font-sans">
                       No matching transaction entries discovered in this viewport segment.
                     </td>
                   </tr>
@@ -323,16 +304,16 @@ export default function BookingManagement() {
                       </td>
                       <td className="pr-4 whitespace-nowrap text-stone-500 font-medium font-mono">{booking.slot}</td>
                       <td className="pr-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${getStatusStyle(booking.status)}`}>
+                        <span className={`px-2.5 py-0.5 rounded border text-[10px] font-black uppercase tracking-wider ${getStatusStyle(booking.status)}`}>
                           {booking.status}
                         </span>
                       </td>
                       <td>
-                        <div className="flex gap-2 justify-end">
+                        <div className="flex gap-2 justify-end font-sans">
                           <button
                             onClick={() => approveBooking(booking.id)}
                             disabled={booking.status === "Approved"}
-                            className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                            className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
                             title="Approve Slot"
                           >
                             <Check size={14} strokeWidth={3} />
@@ -340,14 +321,14 @@ export default function BookingManagement() {
                           <button
                             onClick={() => rejectBooking(booking.id)}
                             disabled={booking.status === "Rejected"}
-                            className="bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                            className="bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
                             title="Reject Slot"
                           >
                             <X size={14} strokeWidth={3} />
                           </button>
                           <button
                             onClick={() => handleEditClick(booking)}
-                            className="bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100 p-2 rounded-xl transition shrink-0 cursor-pointer"
+                            className="bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100 p-2 rounded-xl transition shrink-0 cursor-pointer outline-none"
                             title="Edit Allocation"
                           >
                             <Edit size={14} />
@@ -363,40 +344,46 @@ export default function BookingManagement() {
         </div>
       </main>
 
+      {/* ── ✅ GLOBAL CUSTOM FOOTER ELEMENT ── */}
+      <Footer />
+
       {/* ── MODAL ADD/EDIT APPOINTMENT FORM DIALOGUE ── */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-stone-950/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white border border-[#EADBCE] rounded-[2rem] p-8 w-full max-w-md shadow-2xl relative">
+          <div className="bg-white border border-[#EADBCE] rounded-[2rem] p-8 w-full max-w-md shadow-2xl relative text-left">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-5 right-5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 p-1.5 rounded-xl transition cursor-pointer"
+              className="absolute top-5 right-5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 p-1.5 rounded-xl transition cursor-pointer border-none outline-none bg-transparent"
             >
               <X size={16} />
             </button>
 
-            <h2 className="text-2xl font-black mb-6 font-serif text-stone-900 tracking-tight">
-              {editingBooking ? "Modify Booking Parameters" : "Generate Internal Slot"}
+            {/* Rule 1: Modal Inner Subsection Headline Composition */}
+            <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-6">
+              <span className="font-bold uppercase">{editingBooking ? "Modify Booking" : "Generate Internal"}</span>
+              <span className="italic text-[#C5A059] normal-case font-medium">{editingBooking ? "Parameters" : "Slot"}</span>
             </h2>
 
-            <form onSubmit={handleFormSubmit} className="space-y-4">
+            <form onSubmit={handleFormSubmit} className="space-y-4 font-sans">
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">Customer Identifier Name</label>
+                {/* Rule 2: Form Input structural label metadata header formatting */}
+                <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2 font-sans">Customer Identifier Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="E.g., Nitin Kumar"
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold placeholder-stone-400"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-medium placeholder-stone-400 font-sans"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">Target Workflow Pipeline</label>
+                <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2 font-sans">Target Workflow Pipeline</label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-medium cursor-pointer font-sans"
                 >
                   <option value="Queue">Queue Booking</option>
                   <option value="Slot">Slot Booking</option>
@@ -405,11 +392,11 @@ export default function BookingManagement() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-wider text-stone-400 mb-2">Preferred Allocation Time</label>
+                <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2 font-sans">Preferred Allocation Time</label>
                 <select
                   value={formData.slot}
                   onChange={(e) => setFormData({ ...formData, slot: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
+                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3.5 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-medium cursor-pointer font-sans"
                 >
                   <option value="10:00 AM">10:00 AM</option>
                   <option value="11:00 AM">11:00 AM</option>
@@ -420,17 +407,19 @@ export default function BookingManagement() {
                 </select>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-3 pt-4 font-sans">
+                {/* Rule 4: Action Form navigation item elements buttons templates */}
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="w-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest cursor-pointer"
+                  className="w-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition py-3.5 rounded-xl font-extrabold text-xs uppercase tracking-wider cursor-pointer font-sans border-none outline-none"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-amber-600 to-amber-500 text-white transition py-3.5 rounded-xl font-extrabold text-xs uppercase tracking-widest shadow-md hover:from-amber-700 cursor-pointer"
+                  className="w-full text-white transition py-3.5 rounded-xl font-extrabold text-xs uppercase tracking-wider shadow-md cursor-pointer font-sans border-none outline-none hover:opacity-95"
+                  style={{ background: CHARCOAL }}
                 >
                   {editingBooking ? "Save Rules" : "Confirm Slot"}
                 </button>

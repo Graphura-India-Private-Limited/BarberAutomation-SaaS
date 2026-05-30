@@ -129,29 +129,27 @@ export default function PaymentDashboard() {
       
       {toast && <Toast message={toast} onClose={() => setToast("")} />}
 
-  {/* ── MATCHING SIDEBAR NAVIGATION ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200">
+      {/* ── SIDEBAR NAVIGATION (Rule 4 Text Styles Utilized) ── */}
+      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
         <div className="space-y-8">
-          {/* Logo Centerpiece */}
           <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
               <Scissors size={18} color="#C5A059" strokeWidth={2} />
             </div>
-            <div>
-              <div className="text-sm font-black tracking-tight text-stone-900">
-                Barber Pro
-              </div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-0.5">Owner Panel</div>
+            <div className="text-left">
+              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
+              {/* Rule 2 Kicker Tag standard */}
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
             </div>
           </div>
 
-          {/* Navigation Links Framework */}
           <nav className="space-y-1">
+            {/* Rule 4 UI Layout Link elements */}
             <button 
               onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -161,9 +159,9 @@ export default function PaymentDashboard() {
 
             <button 
               onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -173,9 +171,9 @@ export default function PaymentDashboard() {
 
             <button 
               onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -185,9 +183,9 @@ export default function PaymentDashboard() {
 
             <button 
               onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -197,9 +195,9 @@ export default function PaymentDashboard() {
 
             <button 
               onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -209,10 +207,10 @@ export default function PaymentDashboard() {
           </nav>
         </div>
 
-        {/* System Exit Button */}
+        {/* Rule 4 Exit Trigger Action button */}
         <button 
           onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent"
+          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
         >
           <LogOut size={18} className="text-red-400" />
           <span>Exit Workspace</span>
@@ -223,27 +221,35 @@ export default function PaymentDashboard() {
       <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
         <div className="max-w-5xl mx-auto">
           
-          {/* ── SYSTEM TIMING & LOGOUT ACTIONS CONTAINER ── */}
-          <div className="flex justify-end items-center gap-6 mb-4 text-xs font-bold text-stone-400 uppercase tracking-wider">
+          {/* SYSTEM TIMING METADATA */}
+          <div className="flex justify-end items-center gap-6 mb-4 font-sans">
             <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200/60 shadow-sm">
               <ClockIcon />
-              <span>System Clock: <span className="text-stone-800 font-mono">{time} IST</span></span>
+              {/* Rule 2 Timestamp subheader format modification */}
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">System Clock: <span className="text-stone-800 font-mono tracking-normal">{time} IST</span></span>
             </div>
           </div>
 
-          {/* ── CONTEXT HEADER TITLE CARD ── */}
-          <div className="relative rounded-3xl p-6 md:p-8 mb-8 overflow-hidden card">
+          {/* Context Header Title Card Block */}
+          <div className="relative rounded-3xl p-6 md:p-8 mb-8 overflow-hidden card text-left bg-white">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                <p className="font-black tracking-[0.2em] text-[10px] uppercase mb-1.5" style={{ color: GOLD }}>
+                {/* Rule 2 Kicker description tag */}
+                <p className="font-extrabold uppercase tracking-widest text-[11px] text-[#C5A059] mb-1.5 font-sans">
                   Finances & Razorpay Integration
                 </p>
-                <h1 className="text-3xl lg:text-4xl font-black font-serif tracking-tight text-stone-900">Payment Management</h1>
-                <p className="text-stone-400 mt-2 text-sm font-medium">Track token installments, fully captured orders, and pending deposits processed through Razorpay.</p>
+                {/* Rule 1 Single-Line Header Title */}
+                <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                  <span className="font-bold uppercase">Payment</span>
+                  <span className="italic text-[#C5A059] normal-case font-medium">Management</span>
+                </h2>
+                {/* Rule 3 Core body paragraph description text */}
+                <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-2">Track token installments, fully captured orders, and pending deposits processed through Razorpay.</p>
               </div>
+              {/* Rule 4 Ledger Refresher Action Button */}
               <button 
                 onClick={() => setPage(1)} 
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-black tracking-widest uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 self-start md:self-center cursor-pointer hover:opacity-90"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 self-start md:self-center cursor-pointer hover:opacity-90 font-sans"
                 style={{ background: CHARCOAL }}
               >
                 <RefreshCw size={14} color={GOLD} /> Refresh Ledger
@@ -254,16 +260,17 @@ export default function PaymentDashboard() {
             </div>
           </div>
 
-          {/* ── FILTER UTILITY SECTION ── */}
-          <section className="mb-6 grid gap-4 p-5 card md:grid-cols-5 bg-white shadow-sm">
+          {/* Filter Selection Panel Utility row */}
+          <section className="mb-6 grid gap-4 p-5 card md:grid-cols-5 bg-white shadow-sm text-left">
             <FilterSelect label="Type" value={filters.paymentType} onChange={value => updateFilter("paymentType", value)} options={["ALL", "TOKEN", "FULL"]} />
             <FilterSelect label="Status" value={filters.status} onChange={value => updateFilter("status", value)} options={["ALL", "PENDING", "SUCCESS", "FAILED", "REFUNDED"]} />
             
-            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">
+            {/* Rule 2 Layout Labels and Input details tracking system configs */}
+            <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
               Target Date
               <div className="mt-2 flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50/50 px-3 py-2.5 hover:bg-white focus-within:border-[#C5A059] focus-within:bg-white transition-all">
                 <Calendar size={15} className="text-stone-400" />
-                <input type="date" value={filters.date} onChange={e => updateFilter("date", e.target.value)} className="w-full bg-transparent text-xs outline-none text-stone-800 font-bold" />
+                <input type="date" value={filters.date} onChange={e => updateFilter("date", e.target.value)} className="w-full bg-transparent text-xs outline-none text-stone-800 font-bold font-sans" />
               </div>
             </label>
 
@@ -275,18 +282,19 @@ export default function PaymentDashboard() {
               objectOptions
             />
 
-            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">
+            <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
               ID Search Query
               <div className="mt-2 flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50/50 px-3 py-2.5 hover:bg-white focus-within:border-[#C5A059] focus-within:bg-white transition-all">
                 <Search size={15} className="text-stone-400" />
-                <input value={filters.q} onChange={e => updateFilter("q", e.target.value)} placeholder="Order or payment ID" className="w-full bg-transparent text-xs outline-none text-stone-800 font-bold placeholder-stone-400" />
+                <input value={filters.q} onChange={e => updateFilter("q", e.target.value)} placeholder="Order or payment ID" className="w-full bg-transparent text-xs outline-none text-stone-800 font-bold placeholder-stone-400 font-sans" />
               </div>
             </label>
           </section>
 
-          {/* ── LEDGER ROW ENGINE ── */}
-          <section className="card overflow-hidden bg-white shadow-sm">
-            <div className="hidden grid-cols-[1.4fr_1fr_1fr_1fr_1fr_0.8fr] border-b border-stone-100 bg-stone-50/50 px-6 py-4 text-[10px] font-black uppercase tracking-wider text-stone-400 md:grid">
+          {/* Ledger Row Spreadsheet Ledger Container */}
+          <section className="card overflow-hidden bg-white shadow-sm text-left font-sans">
+            {/* Rule 2 Table Grid Header Categories */}
+            <div className="hidden grid-cols-[1.4fr_1fr_1fr_1fr_1fr_0.8fr] border-b border-stone-100 bg-stone-50/50 px-6 py-4 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] md:grid">
               <span>Transaction Reference</span><span>Customer</span><span>Barber</span><span>Amount</span><span>Status</span><span className="text-right">Action</span>
             </div>
             
@@ -299,9 +307,10 @@ export default function PaymentDashboard() {
             </div>
           </section>
 
-          {/* ── PAGINATION SYSTEM ── */}
-          <div className="mt-6 flex items-center justify-between px-2">
-            <p className="text-xs font-bold text-stone-400 uppercase tracking-wide">{data.pagination.total || 0} transactions logged</p>
+          {/* Central Workspace Pagination Row element */}
+          <div className="mt-6 flex items-center justify-between px-2 font-sans">
+            {/* Rule 3 Muted metrics counter logs description view */}
+            <p className="text-stone-600 text-sm font-normal leading-relaxed">{data.pagination.total || 0} transactions logged</p>
             <div className="flex items-center gap-3">
               <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="rounded-xl border border-stone-200 bg-white p-2 text-stone-600 hover:bg-stone-50 disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-all cursor-pointer"><ChevronLeft size={16} /></button>
               <span className="text-xs font-black text-stone-900 font-mono tracking-tight">Page {page} of {data.pagination.pages || 1}</span>
@@ -312,7 +321,7 @@ export default function PaymentDashboard() {
         </div>
       </main>
 
-      {/* ── SIDE PANEL DATA DIALOGUE OVERLAY ── */}
+      {/* Modal overlays engine blocks drawer controller */}
       {selected && <TransactionModal payment={selected} onClose={() => setSelected(null)} />}
     </div>
   );
@@ -328,20 +337,25 @@ function ClockIcon() {
 
 function FilterSelect({ label, value, onChange, options, objectOptions = false }) {
   return (
-    <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">
+    <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
       {label}
-      <select value={value} onChange={e => onChange(e.target.value)} className="mt-2 w-full bg-stone-50/50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-bold text-stone-700 outline-none hover:bg-white focus:border-[#C5A059] focus:bg-white transition cursor-pointer">
+      <select 
+        value={value} 
+        onChange={(e) => onChange(e.target.value)} 
+        className="mt-2 w-full bg-stone-50/50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-bold text-stone-700 outline-none hover:bg-white focus:border-[#C5A059] focus:bg-white transition cursor-pointer font-sans"
+      >
         {options.map(option => objectOptions ? (
           <option key={option.id} value={option.id}>{option.name}</option>
-        ) : <option key={option} value={option}>{option}</option>)}
+        ) : (
+          <option key={option} value={option}>{option}</option>
+        ))}
       </select>
     </label>
   );
 }
-
 function PaymentRow({ payment, onOpen, onRetry }) {
   return (
-    <div className="grid gap-3 p-6 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_0.8fr] md:items-center hover:bg-stone-50/30 transition-colors group">
+    <div className="grid gap-3 p-6 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_0.8fr] md:items-center hover:bg-stone-50/30 transition-colors group text-left font-sans">
       <div>
         <p className="font-bold font-serif text-stone-900 text-sm truncate max-w-[200px]">{payment.razorpay_order_id || "Pending order intent"}</p>
         <p className="mt-1 text-[11px] text-stone-400 font-medium font-sans">{fmtDate(payment.created_at)}</p>
@@ -355,9 +369,10 @@ function PaymentRow({ payment, onOpen, onRetry }) {
       <div>
         <span className={`w-max rounded-md border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${statusClass[payment.status] || statusClass.PENDING}`}>{payment.status}</span>
       </div>
-      <div className="flex justify-start gap-2 md:justify-end border-t md:border-0 pt-3 md:pt-0 border-stone-100">
-        <button onClick={onOpen} className="rounded-xl border border-stone-200 bg-white px-4 py-2 text-xs font-bold text-stone-700 hover:border-stone-400 shadow-sm transition-all cursor-pointer">View</button>
-        {payment.status === "FAILED" && <button onClick={onRetry} className="rounded-xl hover:opacity-95 px-4 py-2 text-xs font-bold text-white shadow-md transition-all cursor-pointer" style={{ background: CHARCOAL }}>Retry</button>}
+      <div className="flex justify-start gap-2 md:justify-end border-t md:border-0 pt-3 md:pt-0 border-stone-100 font-sans">
+        {/* Rule 4 Internal View and Retry controls items */}
+        <button onClick={onOpen} className="rounded-xl border border-stone-200 bg-white px-4 py-2 text-xs font-extrabold tracking-wider uppercase text-stone-700 hover:border-stone-400 shadow-sm transition-all cursor-pointer">View</button>
+        {payment.status === "FAILED" && <button onClick={onRetry} className="rounded-xl hover:opacity-95 px-4 py-2 text-xs font-extrabold tracking-wider uppercase text-white shadow-md transition-all cursor-pointer" style={{ background: CHARCOAL }}>Retry</button>}
       </div>
     </div>
   );
@@ -366,12 +381,16 @@ function PaymentRow({ payment, onOpen, onRetry }) {
 function TransactionModal({ payment, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-stone-900/40 backdrop-blur-sm p-0 md:items-center md:justify-center md:p-6 animate-in fade-in duration-200">
-      <div className="w-full max-w-xl rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-2xl border border-stone-200 flex flex-col justify-start">
+      <div className="w-full max-w-xl rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-2xl border border-stone-200 flex flex-col justify-start text-left">
         <div className="mb-6 flex items-center justify-between pb-4 border-b border-stone-100">
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-stone-50 border border-stone-200 p-3" style={{ color: GOLD }}><CreditCard size={20} /></div>
             <div>
-              <h2 className="text-lg font-black font-serif text-stone-900 tracking-tight">Transaction Details</h2>
+              {/* Rule 1 Nested Side Drawer Header Title */}
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase">Transaction</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Details</span>
+              </h2>
               <p className="text-[10px] text-stone-400 font-mono font-bold mt-0.5">{payment.razorpay_payment_id || "Payment mapping pending capture"}</p>
             </div>
           </div>
@@ -394,9 +413,10 @@ function TransactionModal({ payment, onClose }) {
 
 function Detail({ label, value, highlight = false }) {
   return (
-    <div className="bg-[#FAF6F0]/60 rounded-xl p-4 border border-[#EADBCE]/60 transition-all">
-      <p className="text-[9px] font-black uppercase tracking-wider text-stone-400">{label}</p>
-      <p className={`mt-1.5 break-words text-sm font-bold ${highlight ? 'font-mono text-stone-900 text-base' : 'text-stone-900'}`}>{value}</p>
+    <div className="bg-[#FAF6F0]/60 rounded-xl p-4 border border-[#EADBCE]/60 transition-all text-left">
+      {/* Rule 2 Meta item info cards titles */}
+      <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">{label}</p>
+      <p className={`mt-1.5 break-words text-sm font-bold font-sans ${highlight ? 'font-mono text-stone-900 text-base' : 'text-stone-900'}`}>{value}</p>
     </div>
   );
 }
@@ -406,7 +426,16 @@ function SkeletonRows() {
 }
 
 function EmptyState({ title, subtitle }) {
-  return <div className="p-14 text-center"><p className="text-md font-black font-serif text-stone-900 tracking-tight">{title}</p><p className="mt-1.5 text-xs font-medium text-stone-400">{subtitle}</p></div>;
+  return (
+    <div className="p-14 text-center">
+      {/* Rule 1 Fallback variant mapping empty space frames */}
+      <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+        <span className="font-bold uppercase">{title}</span>
+      </h2>
+      {/* Rule 3 Core placeholder descriptions texts layout views */}
+      <p className="mx-auto max-w-2xl text-sm font-normal leading-relaxed text-stone-400 font-sans mt-1.5">{subtitle}</p>
+    </div>
+  );
 }
 
 function Toast({ message, onClose }) {
@@ -414,5 +443,6 @@ function Toast({ message, onClose }) {
     const timer = setTimeout(onClose, 3000);
     return () => clearTimeout(timer);
   }, [onClose]);
-  return <div className="fixed right-4 top-6 z-50 rounded-xl bg-stone-900 px-5 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-xl">{message}</div>;
+  {/* Rule 4 Popup Toast Text system standard */}
+  return <div className="fixed right-4 top-6 z-50 rounded-xl bg-stone-900 px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-xl font-sans">{message}</div>;
 }

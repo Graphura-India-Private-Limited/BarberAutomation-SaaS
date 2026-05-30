@@ -96,7 +96,8 @@ export default function ManageServices() {
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
             <Scissors className="w-6 h-6 text-amber-600" />
           </div>
-          <p className="text-stone-600 text-sm font-semibold tracking-wide">Loading Operational Catalog...</p>
+          {/* Rule 3 Body Style Text */}
+          <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans">Loading Operational Catalog...</p>
         </div>
       </div>
     );
@@ -112,11 +113,17 @@ export default function ManageServices() {
         `}</style>
         <div className="mx-auto max-w-xl text-center card p-10">
           <span className="text-5xl block mb-4">⌛</span>
-          <h1 className="text-2xl font-bold text-zinc-900 font-serif">Approval Required</h1>
-          <p className="mt-3 text-sm text-zinc-500">
+          {/* Rule 1 Fallback Title */}
+          <h2 className="font-serif text-2xl sm:text-3xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+            <span className="font-bold uppercase">Approval</span>
+            <span className="italic text-[#C5A059] normal-case font-medium">Required</span>
+          </h2>
+          {/* Rule 3 Body Description text */}
+          <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-3">
             Barber management, queue controls and service pricing unlock after admin approval.
           </p>
-          <button onClick={() => navigate("/owner/dashboard")} className="mt-8 rounded-xl text-white font-black text-[10px] tracking-widest uppercase px-6 py-4 hover:opacity-95 transition shadow-md" style={{ background: CHARCOAL }}>
+          {/* Rule 4 Action Trigger */}
+          <button onClick={() => navigate("/owner/dashboard")} className="mt-8 rounded-xl text-white font-extrabold text-xs tracking-wider uppercase px-6 py-4 hover:opacity-95 transition shadow-md cursor-pointer font-sans" style={{ background: CHARCOAL }}>
             Back to Status
           </button>
         </div>
@@ -144,29 +151,27 @@ export default function ManageServices() {
         }
       `}</style>
 
-  {/* ── MATCHING SIDEBAR NAVIGATION ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200">
+      {/* ── SIDEBAR NAVIGATION (Rule 4 Layout Links Set) ── */}
+      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
         <div className="space-y-8">
-          {/* Logo Centerpiece */}
           <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
               <Scissors size={18} color="#C5A059" strokeWidth={2} />
             </div>
-            <div>
-              <div className="text-sm font-black tracking-tight text-stone-900">
-                Barber Pro
-              </div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-0.5">Owner Panel</div>
+            <div className="text-left">
+              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
+              {/* Rule 2 Tag kicker header label */}
+              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
             </div>
           </div>
 
-          {/* Navigation Links Framework */}
           <nav className="space-y-1">
+            {/* Rule 4 UI Dashboard Buttons standard formatting */}
             <button 
               onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -176,9 +181,9 @@ export default function ManageServices() {
 
             <button 
               onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -188,9 +193,9 @@ export default function ManageServices() {
 
             <button 
               onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -200,9 +205,9 @@ export default function ManageServices() {
 
             <button 
               onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -212,9 +217,9 @@ export default function ManageServices() {
 
             <button 
               onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl transition-all ${
+              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
                 window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40 font-extrabold"
+                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
                   : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
               }`}
             >
@@ -224,10 +229,10 @@ export default function ManageServices() {
           </nav>
         </div>
 
-        {/* System Exit Button */}
+        {/* Rule 4 Standalone Exit link action element */}
         <button 
           onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-bold tracking-wide rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent"
+          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
         >
           <LogOut size={18} className="text-red-400" />
           <span>Exit Workspace</span>
@@ -238,30 +243,34 @@ export default function ManageServices() {
       <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
         <div className="max-w-4xl mx-auto">
           
-          {/* Breadcrumb Control Action */}
+          {/* Rule 4 Action Breadcrumb Link */}
           <button 
             onClick={() => navigate("/owner/dashboard")} 
-            className="mb-6 flex items-center gap-2 text-[10px] font-black tracking-widest uppercase text-stone-400 hover:text-stone-600 transition-colors group"
+            className="mb-6 flex items-center gap-2 text-xs font-extrabold tracking-wider uppercase text-stone-400 hover:text-stone-600 transition-colors group cursor-pointer font-sans"
           >
-            <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform" style={{ color: GOLD }} /> 
+            <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform text-[#C5A059]" /> 
             Back to Console
           </button>
 
-          {/* Manage Services Title Heading */}
-          <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200">
+          {/* Manage Services Main Dashboard Heading Component */}
+          <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200 text-left">
             <div>
-              <h1 className="text-4xl font-black font-serif text-stone-900 tracking-tight">
-                Manage <span style={{ color: GOLD }}>Services</span>
-              </h1>
-              <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-stone-400">
+              {/* Rule 1 Master Header Composition standard */}
+              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase">Manage</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Services</span>
+              </h2>
+              {/* Rule 2 Workspace title kicker label metadata standard */}
+              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2 font-sans">
                 Current Workspace: {salon?.salon_name}
               </p>
             </div>
             
             {!isAdding && (
+              /* Rule 4 Action trigger button link components mapping standard strings */
               <button 
                 onClick={() => setIsAdding(true)} 
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-black text-[10px] tracking-widest text-white uppercase shadow-md transition-all active:scale-95 hover:opacity-90"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-extrabold text-xs tracking-wider text-white uppercase shadow-md transition-all active:scale-95 hover:opacity-90 cursor-pointer font-sans"
                 style={{ background: CHARCOAL }}
               >
                 <Plus size={14} style={{ color: GOLD }} />
@@ -270,40 +279,44 @@ export default function ManageServices() {
             )}
           </header>
 
-          {error && <p className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-center text-xs font-bold text-red-600">{error}</p>}
+          {error && <p className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-center text-xs font-bold text-red-600 font-sans">{error}</p>}
 
-          {/* Inline Add Form overlay block */}
+          {/* Inline Addition layout block workflow details module */}
           {isAdding && (
-            <div className="mb-8 card p-6 shadow-lg">
-              <h2 className="mb-5 text-sm font-black uppercase tracking-wider text-stone-900 flex items-center gap-2">
-                <Tags size={14} style={{ color: GOLD }} /> New Service Specification
+            <div className="mb-8 card p-6 shadow-lg text-left">
+              {/* Rule 1 Nested module subtitle layout rules standard */}
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5">
+                <span className="font-bold uppercase">New Service</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Specification</span>
               </h2>
-              <form onSubmit={handleAddService} className="grid gap-4 md:grid-cols-5">
+              <form onSubmit={handleAddService} className="grid gap-4 md:grid-cols-5 font-sans">
                 <div className="md:col-span-2">
-                  <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 mb-1.5 block">Service Name</label>
-                  <input required placeholder="e.g., Luxury Beard Trim" value={newService.name} onChange={e => setNewService(prev => ({ ...prev, name: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-semibold outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400" />
+                  {/* Rule 2 Input Field descriptors metadata tags labels */}
+                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Name</label>
+                  <input required placeholder="e.g., Luxury Beard Trim" value={newService.name} onChange={e => setNewService(prev => ({ ...prev, name: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 mb-1.5 block">Ticket Rate (₹)</label>
-                  <input required type="number" min="1" placeholder="Price" value={newService.price} onChange={e => setNewService(prev => ({ ...prev, price: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-semibold outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400" />
+                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Ticket Rate (₹)</label>
+                  <input required type="number" min="1" placeholder="Price" value={newService.price} onChange={e => setNewService(prev => ({ ...prev, price: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 mb-1.5 block">Session Minutes</label>
-                  <input type="number" min="5" placeholder="Duration" value={newService.duration} onChange={e => setNewService(prev => ({ ...prev, duration: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-semibold outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400" />
+                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Session Minutes</label>
+                  <input type="number" min="5" placeholder="Duration" value={newService.duration} onChange={e => setNewService(prev => ({ ...prev, duration: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
                 </div>
                 <div>
-                  <label className="text-[9px] font-black uppercase tracking-wider text-stone-400 mb-1.5 block">Category Slot</label>
-                  <select value={newService.category} onChange={e => setNewService(prev => ({ ...prev, category: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-semibold outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-700 cursor-pointer">
+                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Category Slot</label>
+                  <select value={newService.category} onChange={e => setNewService(prev => ({ ...prev, category: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-700 cursor-pointer font-sans">
                     <option value="men">Men</option>
                     <option value="women">Women</option>
                     <option value="addon">Addon</option>
                   </select>
                 </div>
-                <div className="flex gap-3 md:col-span-5 pt-2 border-t border-stone-100 mt-2">
-                  <button type="submit" className="rounded-xl px-5 py-3 text-xs font-black tracking-widest uppercase text-white shadow-md hover:opacity-95 transition-all" style={{ background: CHARCOAL }}>
+                <div className="flex gap-3 md:col-span-5 pt-2 border-t border-stone-100 mt-2 font-sans">
+                  {/* Rule 4 Inside form data trigger action submission keys */}
+                  <button type="submit" className="rounded-xl px-5 py-3 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer font-sans" style={{ background: CHARCOAL }}>
                     Save Catalog Item
                   </button>
-                  <button type="button" onClick={() => setIsAdding(false)} className="rounded-xl bg-stone-100 border border-stone-200 text-stone-500 hover:bg-stone-200 font-black text-xs uppercase tracking-widest px-5 py-3 transition-all">
+                  <button type="button" onClick={() => setIsAdding(false)} className="rounded-xl bg-stone-100 border border-stone-200 text-stone-500 hover:bg-stone-200 font-extrabold text-xs uppercase tracking-wider px-5 py-3 transition-all cursor-pointer font-sans">
                     Dismiss
                   </button>
                 </div>
@@ -311,25 +324,29 @@ export default function ManageServices() {
             </div>
           )}
 
-          {/* Active Services Listing Frame Stack */}
-          <div className="space-y-4">
+          {/* Active Services List Mapping Grid items container */}
+          <div className="space-y-4 text-left">
             {services.map(service => (
-              <div key={service._id} className="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm">
+              <div key={service._id} className="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm bg-white">
                 <div>
                   <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">{service.name}</h3>
-                  <div className="flex items-center gap-3 text-stone-400 text-[10px] font-bold uppercase tracking-widest mt-2">
-                    <span className="px-2 py-0.5 rounded bg-stone-100 border border-stone-200/60 text-stone-600">{service.category}</span>
-                    <span className="flex items-center gap-1"><Clock size={12} style={{ color: GOLD }} /> {service.duration || 30} Mins</span>
+                  <div className="flex items-center gap-3 mt-2 font-sans">
+                    {/* Rule 2 Category Metadata badge labels styling config tags */}
+                    <span className="px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-100 border border-stone-200/60 rounded">{service.category}</span>
+                    {/* Rule 3 Core layout description sub-labels features details indicators */}
+                    <span className="flex items-center gap-1 text-stone-600 text-sm font-normal leading-relaxed"><Clock size={12} style={{ color: GOLD }} /> {service.duration || 30} Mins</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto pt-3 md:pt-0 border-t md:border-0 border-stone-100">
+                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto pt-3 md:pt-0 border-t md:border-0 border-stone-100 font-sans">
                   <div className="text-left md:text-right">
                     <p className="text-2xl font-black font-mono text-stone-900">₹{service.price}</p>
-                    <p className="text-[9px] font-black uppercase tracking-wider mt-0.5" style={{ color: GOLD }}>Base Price</p>
+                    {/* Rule 2 Fee metadata tracker label kicker tag */}
+                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Base Price</p>
                   </div>
+                  {/* Rule 4 Core Action item Delete configuration system elements button link links */}
                   <button 
                     onClick={() => deleteService(service._id)} 
-                    className="rounded-xl border border-red-200 bg-red-50/50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-1"
+                    className="rounded-xl border border-red-200 bg-red-50/50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 text-xs font-extrabold tracking-wider uppercase transition-all shadow-sm flex items-center gap-1 cursor-pointer"
                   >
                     <Trash2 size={12} /> Delete
                   </button>
@@ -339,7 +356,8 @@ export default function ManageServices() {
           </div>
 
           {services.length === 0 && (
-            <div className="bg-white border border-[#EADBCE] border-dashed rounded-3xl p-12 text-center text-stone-400 text-xs font-black uppercase tracking-widest">
+            /* Rule 2 Empty catalog container context identifier text info */
+            <div className="bg-white border border-[#EADBCE] border-dashed rounded-3xl p-12 text-center text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
               No services added to your catalog yet.
             </div>
           )}

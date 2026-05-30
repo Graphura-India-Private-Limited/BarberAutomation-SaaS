@@ -123,15 +123,23 @@ export default function OwnerLogin() {
                 <Store size={22} color={BROWN} />
               </div>
             </div>
-
-            {/* Title */}
-            <div className="text-center mb-4">
-              <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                Owner Login <span>💈</span>
-              </h2>
-              <p className="text-gray-400 text-xs mt-1">Sign in to manage your salon</p>
-            </div>
-
+{/* Title */}
+<div className="text-center mb-5">
+  <h2 className="font-serif text-2xl sm:text-3xl tracking-normal text-stone-900 flex items-center justify-center gap-2">
+    {/* ── 📬 OWNER: INDEPENDENT WEIGHT TO DIAL IN THE MID-BOLDNESS ── */}
+    <span className="font-bold uppercase">
+      Owner
+    </span>
+    
+    {/* ── 📬 LOGIN: REMAINS ELEGANT AND REFINED ── */}
+    <span className="italic text-[#C5A059] normal-case font-medium">
+      login
+    </span>
+  </h2>
+  <p className="text-stone-400 text-xs font-medium tracking-wide mt-1.5">
+    Sign in to manage your salon
+  </p>
+</div>
             {/* Test credentials */}
             <div
               className="rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between"
