@@ -63,7 +63,7 @@ import CustomerInteractionView from "./pages/customer/CustomerInteractionView";
 import AdminUserManagement from "./pages/admin/AdminUserManagement";
 import AdminAnalytics      from "./pages/admin/AdminAnalytics";
 import BookingManagement   from "./pages/owner/BookingManagement";
-import SalonViewPage       from "./pages/admin/SalonViewPage";
+
 import SalonManagement     from "./pages/admin/SalonManagement";
 import CustomerManagement   from "./pages/customer/CustomerManagement";
 import AllReviews          from "./pages/customer/AllReviews";
@@ -218,7 +218,7 @@ function App() {
         <Route path="/admin/settings"  element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
         <Route path="/admin/customer-issues" element={<AdminLayout page="customer"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.CUSTOMER} /></AdminLayout>} />
         <Route path="/admin/salon-issues"    element={<AdminLayout page="salon"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.SALON} /></AdminLayout>} />
-        <Route path="/admin/salon-view" element={<SalonViewPage />} />
+      
 
         {/* --- UTILITY & FALLBACK SECURITY CORE --- */}
         <Route path="/staff-login" element={<StaffLogin />} />
