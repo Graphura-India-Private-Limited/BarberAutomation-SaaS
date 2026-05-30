@@ -29,10 +29,10 @@ export function DashboardPage({ tickets, onSelectTicket }) {
         <div className="bg-rose-50/60 border border-rose-200 rounded-2xl px-5 py-4 flex items-start gap-3.5 shadow-xs">
           <AlertTriangle size={18} className="text-rose-600 shrink-0 mt-0.5" />
           <div className="text-left">
-            <p className="text-xs font-black uppercase tracking-wider text-rose-800">
+            <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-rose-800">
               {stats.critical} Critical Ticket{stats.critical > 1 ? 's' : ''} Require Immediate Attention
             </p>
-            <p className="text-sm font-medium text-rose-600/90 mt-1">Please review details and execute support escalation procedures immediately.</p>
+            <p className="font-sans text-sm font-normal leading-relaxed text-rose-600/90 mt-1">Please review details and execute support escalation procedures immediately.</p>
           </div>
         </div>
       )}
@@ -40,7 +40,7 @@ export function DashboardPage({ tickets, onSelectTicket }) {
       {/* ── CORE VOLUME SEGMENT METRICS ── */}
       <div>
         <div className="mb-4 text-left">
-          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">System Volume Analysis</p>
+          <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">System Volume Analysis</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCardItem label="Total Tickets" value={stats.total} icon={Ticket} bg="bg-stone-50" border="border-stone-200" sub="All time ledger logs" />
@@ -53,7 +53,7 @@ export function DashboardPage({ tickets, onSelectTicket }) {
       {/* ── STATE DISPATCH COUNTER METRICS ── */}
       <div>
         <div className="mb-4 text-left">
-          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">Active Queue Pipeline States</p>
+          <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Active Queue Pipeline States</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCardItem label="Open Status" value={stats.open} icon={Clock} bg="bg-white" border="border-stone-200" />
@@ -69,16 +69,16 @@ export function DashboardPage({ tickets, onSelectTicket }) {
         {/* Progress Timeline Distribution */}
         <div className="card p-6 bg-white shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">Status Breakdown</h3>
-            <p className="text-[11px] text-stone-400 font-medium mt-1">Audit density share split across live nodes</p>
+            <h3 className="font-sans font-black uppercase text-base tracking-tight text-stone-900">Status Breakdown</h3>
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mt-1">Audit density share split across live nodes</p>
           </div>
           
           <div className="space-y-4 my-auto py-2">
             {breakdown.map(b => (
               <div key={b.label} className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-stone-600 tracking-wide">{b.label}</span>
-                  <span className="text-sm font-mono font-black text-stone-900">{b.value}</span>
+                  <span className="font-sans text-xs font-extrabold uppercase tracking-widest text-[#C5A059]">{b.label}</span>
+                  <span className="font-sans font-black text-sm text-stone-900">{b.value}</span>
                 </div>
                 <div className="w-full bg-stone-100 rounded-full h-1.5 overflow-hidden">
                   <div
@@ -94,38 +94,38 @@ export function DashboardPage({ tickets, onSelectTicket }) {
         {/* Donut Style Split Data Ratio */}
         <div className="card p-6 bg-white shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">Issue Type Split</h3>
-            <p className="text-[11px] text-stone-400 font-medium mt-1">Distribution ratio between client segments</p>
+            <h3 className="font-sans font-black uppercase text-base tracking-tight text-stone-900">Issue Type Split</h3>
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mt-1">Distribution ratio between client segments</p>
           </div>
           
           <div className="flex items-center justify-center gap-8 my-auto py-4">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full border-4 flex items-center justify-center mx-auto bg-stone-50 font-mono font-black text-stone-900 text-lg shadow-inner" style={{ borderColor: GOLD }}>
+              <div className="w-16 h-16 rounded-full border-4 flex items-center justify-center mx-auto bg-stone-50 font-sans font-black text-stone-900 text-lg shadow-inner" style={{ borderColor: GOLD }}>
                 {stats.customerIssues}
               </div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Customer</p>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2">Customer</p>
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full border-4 flex items-center justify-center mx-auto bg-stone-50 font-mono font-black text-stone-900 text-lg shadow-inner" style={{ borderColor: CHARCOAL }}>
+              <div className="w-16 h-16 rounded-full border-4 flex items-center justify-center mx-auto bg-stone-50 font-sans font-black text-stone-900 text-lg shadow-inner" style={{ borderColor: CHARCOAL }}>
                 {stats.salonIssues}
               </div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Salon Outlet</p>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 mt-2">Salon Outlet</p>
             </div>
           </div>
 
           <div className="flex gap-2.5 pt-2 border-t border-stone-50">
             <div className="flex-1 bg-stone-50/60 border border-stone-200/60 rounded-xl p-3 text-center">
-              <p className="text-xl font-mono font-black" style={{ color: GOLD }}>
+              <p className="font-sans font-black text-xl" style={{ color: GOLD }}>
                 {stats.total > 0 ? Math.round((stats.customerIssues / stats.total) * 100) : 0}%
               </p>
-              <p className="text-[9px] font-black uppercase tracking-wider text-stone-400 mt-0.5">B2C Weight</p>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">B2C Weight</p>
             </div>
             <div className="flex-1 bg-stone-50/60 border border-stone-200/60 rounded-xl p-3 text-center">
-              <p className="text-xl font-mono font-black" style={{ color: CHARCOAL }}>
+              <p className="font-sans font-black text-xl" style={{ color: CHARCOAL }}>
                 {stats.total > 0 ? Math.round((stats.salonIssues / stats.total) * 100) : 0}%
               </p>
-              <p className="text-[9px] font-black uppercase tracking-wider text-stone-400 mt-0.5">B2B Weight</p>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 mt-0.5">B2B Weight</p>
             </div>
           </div>
         </div>
@@ -133,30 +133,30 @@ export function DashboardPage({ tickets, onSelectTicket }) {
         {/* Quick Parameters Checklist Summary */}
         <div className="card p-6 bg-white shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">Quick Summary</h3>
-            <p className="text-[11px] text-stone-400 font-medium mt-1">Core performance index reference parameters</p>
+            <h3 className="font-sans font-black uppercase text-base tracking-tight text-stone-900">Quick Summary</h3>
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mt-1">Core performance index reference parameters</p>
           </div>
           
           <ul className="divide-y divide-stone-50 my-auto">
-            <li className="flex items-center justify-between py-2.5 text-xs font-bold">
-              <span className="text-stone-500">Unassigned Pipeline Pool</span>
-              <span className="font-mono text-stone-900 bg-stone-50 px-2 py-0.5 rounded border border-stone-200/60 font-black">
+            <li className="flex items-center justify-between py-2.5">
+              <span className="font-sans text-sm font-normal leading-relaxed text-stone-600">Unassigned Pipeline Pool</span>
+              <span className="font-sans font-black text-xs uppercase tracking-wider text-stone-900 bg-stone-50 px-2 py-0.5 rounded border border-stone-200/60">
                 {tickets.filter(t => t.assignee === 'Unassigned').length}
               </span>
             </li>
-            <li className="flex items-center justify-between py-2.5 text-xs font-bold">
-              <span className="text-stone-500">Escalated Today</span>
-              <span className="font-mono text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 font-black">{stats.escalated}</span>
+            <li className="flex items-center justify-between py-2.5">
+              <span className="font-sans text-sm font-normal leading-relaxed text-stone-600">Escalated Today</span>
+              <span className="font-sans font-black text-xs uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">{stats.escalated}</span>
             </li>
-            <li className="flex items-center justify-between py-2.5 text-xs font-bold">
-              <span className="text-stone-500">Resolution SLA Rate</span>
-              <span className="font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-black">
+            <li className="flex items-center justify-between py-2.5">
+              <span className="font-sans text-sm font-normal leading-relaxed text-stone-600">Resolution SLA Rate</span>
+              <span className="font-sans font-black text-xs uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                 {stats.total > 0 ? Math.round(((stats.resolved + stats.closed) / stats.total) * 100) : 0}%
               </span>
             </li>
-            <li className="flex items-center justify-between py-2.5 text-xs font-bold">
-              <span className="text-stone-500">Active Pipeline Load</span>
-              <span className="font-mono text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 font-black">{stats.open + stats.inProgress}</span>
+            <li className="flex items-center justify-between py-2.5">
+              <span className="font-sans text-sm font-normal leading-relaxed text-stone-600">Active Pipeline Load</span>
+              <span className="font-sans font-black text-xs uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">{stats.open + stats.inProgress}</span>
             </li>
           </ul>
         </div>
@@ -178,9 +178,9 @@ function StatCardItem({ label, value, icon: Icon, bg, border, sub, isCritical = 
         <Icon size={18} strokeWidth={2.5} className={!isCritical ? 'text-stone-500' : ''} style={{ color: (!isCritical && Icon === Ticket) ? GOLD : '' }} />
       </div>
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">{label}</p>
-        <h3 className={`text-2xl font-black font-serif leading-none tracking-tight ${isCritical ? 'text-rose-700' : 'text-stone-900'}`}>{value}</h3>
-        {sub && <p className="text-[9px] font-bold text-stone-400 mt-1 truncate font-sans uppercase tracking-wide">{sub}</p>}
+        <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5">{label}</p>
+        <h3 className={`font-sans font-black text-2xl leading-none tracking-tight ${isCritical ? 'text-rose-700' : 'text-stone-900'}`}>{value}</h3>
+        {sub && <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 mt-1 truncate">{sub}</p>}
       </div>
     </div>
   );

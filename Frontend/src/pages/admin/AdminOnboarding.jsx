@@ -18,32 +18,32 @@ const C = {
 
 /* ══ HELPERS ══ */
 const Badge = ({ label, color }) => (
-  <span style={{ padding:"3px 10px", borderRadius:20, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:.8, background:`${color}15`, color, border:`1px solid ${color}30` }}>
+  <span style={{ padding:"3px 10px", borderRadius:20, fontSize:10, fontWeight:700, textTransform:"uppercase", letterSpacing:.8, background:`${color}15`, color, border:`1px solid ${color}30`, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
     {label}
   </span>
 );
 
 const Avatar = ({ name, size=32, color=C.gold, bg="#FEF3DC" }) => (
-  <div style={{ width:size, height:size, borderRadius:size/3, background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:size*.38, fontWeight:800, color, flexShrink:0, border:`1px solid ${color}30` }}>
+  <div style={{ width:size, height:size, borderRadius:size/3, background:bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:size*.38, fontWeight:800, color, flexShrink:0, border:`1px solid ${color}30`, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
     {name?.[0]?.toUpperCase()||"?"}
   </div>
 );
 
 const StatCard = ({ label, value, color, sub }) => (
   <div style={{ background:C.card, borderRadius:14, padding:"18px 20px", border:`1px solid ${C.border}`, boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-    <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:"uppercase", letterSpacing:.8, marginBottom:8 }}>{label}</div>
-    <div style={{ fontSize:26, fontWeight:900, color:C.ink, fontFamily:"'Cormorant Garamond',serif", lineHeight:1 }}>{value}</div>
-    {sub && <div style={{ fontSize:11, color, fontWeight:600, marginTop:5 }}>{sub}</div>}
+    <div style={{ fontSize:11, color:C.muted, fontWeight:800, textTransform:"uppercase", letterSpacing:1.2, marginBottom:8, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{label}</div>
+    <div style={{ fontSize:26, fontWeight:900, color:C.ink, fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{value}</div>
+    {sub && <div style={{ fontSize:11, color, fontWeight:600, marginTop:5, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{sub}</div>}
   </div>
 );
 
 const TH = ({ children }) => (
-  <th style={{ padding:"10px 16px", textAlign:"left", fontSize:9, fontWeight:800, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, whiteSpace:"nowrap", background:"#FAFAF8", borderBottom:`1px solid ${C.border}` }}>
+  <th style={{ padding:"10px 16px", textAlign:"left", fontSize:9, fontWeight:800, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, whiteSpace:"nowrap", background:"#FAFAF8", borderBottom:`1px solid ${C.border}`, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
     {children}
   </th>
 );
 const TD = ({ children, style={} }) => (
-  <td style={{ padding:"12px 16px", borderBottom:`1px solid ${C.border}`, ...style }}>{children}</td>
+  <td style={{ padding:"12px 16px", borderBottom:`1px solid ${C.border}`, fontFamily:"'Plus Jakarta Sans',sans-serif", ...style }}>{children}</td>
 );
 
 const NAV = [
@@ -88,7 +88,7 @@ export default function AdminOnboarding() {
   const [salonTab,   setSalonTab]  = useState("requests");
   const [reason,     setReason]    = useState("");
   const [busy,       setBusy]      = useState(false);
-  const [addedBarbers, setAddedBarbers] = useState([]); // track barbers added this session
+  const [addedBarbers, setAddedBarbers] = useState([]);
 
   const [newBarber, setNewBarber] = useState({
     name:"", mobile:"", password:"", specialization:"", experience:"", salon_id:"",
@@ -197,7 +197,6 @@ export default function AdminOnboarding() {
       const d = await r.json();
       if (d.success) {
         pop("Barber added successfully!");
-        /* Save credentials to show in dashboard */
         setAddedBarbers(prev => [...prev, {
           name: newBarber.name,
           mobile: newBarber.mobile,
@@ -207,7 +206,6 @@ export default function AdminOnboarding() {
           addedAt: new Date().toLocaleString(),
         }]);
         setNewBarber({ name:"", mobile:"", password:"", specialization:"", experience:"", salon_id:"", email:"", photo:null, photoPreview:null, document:null, documentName:"" });
-        /* Refresh barbers list */
         const br = await fetch(`${API}/admin/barbers`, { headers:h() }).then(r=>r.json());
         if (br.success) setBarbers(br.barbers||[]);
       } else pop(d.message||"Failed","error");
@@ -295,21 +293,21 @@ export default function AdminOnboarding() {
   const totalRevenue = payments.filter(p=>p.status==="captured").reduce((a,b)=>a+(b.amount||0),0);
 
   return (
-    <div style={{ display:"flex", minHeight:"100vh", background:C.bg, color:C.ink, fontFamily:"'DM Sans','Segoe UI',sans-serif" }}>
+    <div style={{ display:"flex", minHeight:"100vh", background:C.bg, color:C.ink, fontFamily:"'Plus Jakarta Sans','Segoe UI',sans-serif" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#DDD5CC;border-radius:4px}
-        .nb{background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
-        .nav-i{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:rgba(255,255,255,0.45);width:100%;border:none;background:transparent;transition:all .18s;text-align:left;font-family:'DM Sans',sans-serif}
+        .nb{background:none;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+        .nav-i{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:rgba(255,255,255,0.45);width:100%;border:none;background:transparent;transition:all .18s;text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
         .nav-i:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.9)}
         .nav-i.on{background:rgba(197,160,89,0.18);color:#C5A059;border-left:2px solid #C5A059;padding-left:10px}
         .tr:hover td{background:#FAFAF8}
-        .inp{background:#FAFAF8;border:1.5px solid #EAE4DC;border-radius:9px;padding:10px 13px;font-size:13px;color:#1A1410;outline:none;font-family:'DM Sans',sans-serif;width:100%;transition:border .2s}
+        .inp{background:#FAFAF8;border:1.5px solid #EAE4DC;border-radius:9px;padding:10px 13px;font-size:13px;color:#1A1410;outline:none;font-family:'Plus Jakarta Sans',sans-serif;width:100%;transition:border .2s}
         .inp:focus{border-color:#C5A059;background:#fff}
         .inp::placeholder{color:#A09080}
         select.inp option{background:#fff;color:#1A1410}
-        .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;letter-spacing:.5px;text-transform:uppercase;transition:all .18s}
+        .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;border:none;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.8px;text-transform:uppercase;transition:all .18s}
         .btn:hover{filter:brightness(.95);transform:translateY(-1px)}
         .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
         .upload-box{border:2px dashed #EAE4DC;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border .2s;background:#FAFAF8}
@@ -319,7 +317,7 @@ export default function AdminOnboarding() {
         @keyframes sl{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
       `}</style>
 
-  {/* ════ SIDEBAR ════ */}
+      {/* ════ SIDEBAR ════ */}
       <aside style={{ 
         width: 240, 
         background: "#FFFFFF", 
@@ -336,13 +334,9 @@ export default function AdminOnboarding() {
         <div style={{ padding: "24px 20px 20px", borderBottom: "1px solid #FAF6F0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ 
-              width: 36, 
-              height: 36, 
-              borderRadius: 10, 
+              width: 36, height: 36, borderRadius: 10, 
               background: "linear-gradient(135deg, #D97706, #B45309)", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
+              display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: "0 4px 10px -2px rgba(217,119,6,0.2)"
             }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -351,83 +345,53 @@ export default function AdminOnboarding() {
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#1C1917", fontFamily: "'Plus Jakarta Sans', sans-serif", tracking: "-0.02em" }}>Barber Pro</div>
-              <div style={{ fontSize: 9, color: "#B45309", fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", marginTop: 1 }}>Admin Console</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "#1C1917", fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: "-0.02em" }}>Barber Pro</div>
+              <div style={{ fontSize: 9, color: "#B45309", fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", marginTop: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Admin Console</div>
             </div>
           </div>
         </div>
 
-        {/* Dynamic Navigation Links Option list with Real Active Icon Assets */}
+        {/* Navigation */}
         <nav style={{ padding: "16px 12px", flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
           {NAV.map((n, i) => {
             const isActive = tab === n.k;
-            
-            // Safe inline dynamic icon matching function based on route keys
             const IconComponent = {
-              dashboard: LayoutDashboard,
-              salons: Store,
-              customers: Users,
-              barbers: UserSquare2,
-              addbarber: UserPlus2,
-              appointments: CalendarCheck,
-              services: Scissors,
-              payments: CreditCard,
-              reviews: Star,
-              live: Activity,
-              settings: Settings
+              dashboard: LayoutDashboard, salons: Store, customers: Users,
+              barbers: UserSquare2, addbarber: UserPlus2, appointments: CalendarCheck,
+              services: Scissors, payments: CreditCard, reviews: Star,
+              live: Activity, settings: Settings
             }[n.k] || LayoutDashboard;
 
             return (
               <React.Fragment key={n.k}>
-                {/* Visual section divider lines mapping */}
                 {(i === 5 || i === 8 || i === 10) && (
                   <div style={{ height: 1, background: "#EADBCE", margin: "8px 10px", opacity: 0.5 }} />
                 )}
                 <button 
                   onClick={() => setTab(n.k)}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "12px",
+                    display: "flex", alignItems: "center", gap: 12, width: "100%",
+                    padding: "10px 14px", borderRadius: "12px",
                     background: isActive ? "#FEF9EE" : "transparent",
                     border: "none",
                     borderLeft: isActive ? "3px solid #D97706" : "3px solid transparent",
                     color: isActive ? "#B45309" : "#78716C",
-                    fontSize: "13px",
-                    fontWeight: isActive ? 700 : 500,
-                    textAlign: "left",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
+                    fontSize: "12px", fontWeight: isActive ? 800 : 500,
+                    textAlign: "left", cursor: "pointer", transition: "all 0.2s ease",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    letterSpacing: isActive ? "0.01em" : "normal",
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background = "#FAF6F0";
-                      e.currentTarget.style.color = "#1C1917";
-                    }
+                    if (!isActive) { e.currentTarget.style.background = "#FAF6F0"; e.currentTarget.style.color = "#1C1917"; }
                   }}
                   onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "#78716C";
-                    }
+                    if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#78716C"; }
                   }}
                 >
                   <IconComponent size={16} strokeWidth={isActive ? 2.5 : 2} style={{ color: isActive ? "#D97706" : "#A89E95", flexShrink: 0 }} />
                   <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.label}</span>
-                  
                   {n.k === "appointments" && pendingBookings > 0 && (
-                    <span style={{ 
-                      background: "#EF4444", 
-                      color: "#ffffff", 
-                      borderRadius: "8px", 
-                      padding: "2px 6px", 
-                      fontSize: "10px", 
-                      fontWeight: 800,
-                      lineHeight: 1
-                    }}>
+                    <span style={{ background: "#EF4444", color: "#ffffff", borderRadius: "8px", padding: "2px 6px", fontSize: "10px", fontWeight: 800, lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       {pendingBookings}
                     </span>
                   )}
@@ -437,43 +401,18 @@ export default function AdminOnboarding() {
           })}
         </nav>
 
-        {/* Footer Identity & Sign Out block */}
+        {/* Footer */}
         <div style={{ padding: "14px 12px", borderTop: "1px solid #FAF6F0", background: "#FDFBF7" }}>
-          <div style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: 10,
-            padding: "10px 12px", 
-            background: "#FFFFFF", 
-            borderRadius: "12px", 
-            marginBottom: 8,
-            border: "1px solid #EADBCE"
-          }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: "#FFFFFF", borderRadius: "12px", marginBottom: 8, border: "1px solid #EADBCE" }}>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
             <div>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: "#1C1917" }}>Admin Hub</div>
-              <div style={{ fontSize: "10px", color: "#78716C", marginTop: 1 }}>Barber Pro System</div>
+              <div style={{ fontSize: "12px", fontWeight: 800, color: "#1C1917", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Admin Hub</div>
+              <div style={{ fontSize: "10px", color: "#78716C", marginTop: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Barber Pro System</div>
             </div>
           </div>
-          
           <button 
             onClick={() => { localStorage.clear(); navigate("/login"); }} 
-            style={{ 
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              width: "100%",
-              padding: "10px 14px",
-              borderRadius: "12px",
-              background: "transparent",
-              border: "none",
-              color: "#EF4444", 
-              fontSize: "13px",
-              fontWeight: 700,
-              textAlign: "left",
-              cursor: "pointer",
-              transition: "all 0.2s ease"
-            }}
+            style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", padding: "10px 14px", borderRadius: "12px", background: "transparent", border: "none", color: "#EF4444", fontSize: "12px", fontWeight: 800, textAlign: "left", cursor: "pointer", transition: "all 0.2s ease", fontFamily: "'Plus Jakarta Sans', sans-serif", textTransform: "uppercase", letterSpacing: "0.05em" }}
             onMouseEnter={(e) => e.currentTarget.style.background = "#FEF2F2"}
             onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
           >
@@ -486,11 +425,11 @@ export default function AdminOnboarding() {
       {/* ════ MAIN ════ */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0 }}>
         <header style={{ background:C.bg2, borderBottom:`1px solid ${C.border}`, padding:"0 24px", height:54, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, position:"sticky", top:0, zIndex:20, boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-          <h1 style={{ fontSize:15, fontWeight:800, color:C.ink, fontFamily:"'Cormorant Garamond',serif" }}>
+          <h1 style={{ fontSize:15, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>
             {NAV.find(n=>n.k===tab)?.label}
           </h1>
           <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-            <span style={{ fontSize:11, color:C.muted }}>{new Date().toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}</span>
+            <span style={{ fontSize:11, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:500 }}>{new Date().toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"})}</span>
             <button onClick={fetchAll} className="btn" style={{ background:`${C.gold}18`, color:C.gold, border:`1px solid ${C.gold}30`, padding:"6px 12px" }}>
               {loading ? "Loading..." : "Refresh"}
             </button>
@@ -515,22 +454,22 @@ export default function AdminOnboarding() {
                 {/* Recent Bookings */}
                 <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                   <div style={{ padding:"14px 18px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                    <span style={{ fontSize:13, fontWeight:800, color:C.ink }}>Recent Bookings</span>
-                    <button className="nb" onClick={()=>setTab("appointments")} style={{ fontSize:11, color:C.gold, fontWeight:700 }}>View All</button>
+                    <span style={{ fontSize:13, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>Recent Bookings</span>
+                    <button className="nb" onClick={()=>setTab("appointments")} style={{ fontSize:11, color:C.gold, fontWeight:800, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>View All</button>
                   </div>
-                  {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12 }}>Loading...</div>
-                  : bookings.length===0 ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12 }}>No bookings yet</div>
+                  {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Loading...</div>
+                  : bookings.length===0 ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No bookings yet</div>
                   : bookings.slice(0,4).map((b,i) => (
                     <div key={b._id} style={{ padding:"11px 18px", borderBottom:i<3?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                       <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                         <Avatar name={b.customer_id?.name||"C"} size={30} color={C.blue} bg="#EFF6FF"/>
                         <div>
-                          <div style={{ fontSize:12, fontWeight:700, color:C.ink }}>{b.customer_id?.name||"Customer"}</div>
-                          <div style={{ fontSize:10, color:C.muted }}>{b.services?.[0]?.service_name||"Service"} · {b.salon_id?.salon_name||"Salon"}</div>
+                          <div style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.customer_id?.name||"Customer"}</div>
+                          <div style={{ fontSize:10, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.services?.[0]?.service_name||"Service"} · {b.salon_id?.salon_name||"Salon"}</div>
                         </div>
                       </div>
                       <div style={{ textAlign:"right" }}>
-                        <div style={{ fontSize:12, fontWeight:700, color:C.ink }}>₹{b.total_amount}</div>
+                        <div style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>₹{b.total_amount}</div>
                         <Badge label={b.status} color={bkStatus(b.status)}/>
                       </div>
                     </div>
@@ -540,18 +479,18 @@ export default function AdminOnboarding() {
                 {/* Barber Status */}
                 <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                   <div style={{ padding:"14px 18px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                    <span style={{ fontSize:13, fontWeight:800, color:C.ink }}>Barber Status</span>
-                    <button className="nb" onClick={()=>setTab("live")} style={{ fontSize:11, color:C.gold, fontWeight:700 }}>Live View</button>
+                    <span style={{ fontSize:13, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>Barber Status</span>
+                    <button className="nb" onClick={()=>setTab("live")} style={{ fontSize:11, color:C.gold, fontWeight:800, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>Live View</button>
                   </div>
-                  {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12 }}>Loading...</div>
-                  : barbers.length===0 ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12 }}>No barbers added yet</div>
+                  {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Loading...</div>
+                  : barbers.length===0 ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No barbers added yet</div>
                   : barbers.slice(0,3).map((b,i) => (
                     <div key={b._id} style={{ padding:"11px 18px", borderBottom:i<2?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                       <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                         <img src={barberImg(i)} alt={b.name} style={{ width:34, height:34, borderRadius:8, objectFit:"cover", border:`1px solid ${C.border}` }}/>
                         <div>
-                          <div style={{ fontSize:12, fontWeight:700, color:C.ink }}>{b.name}</div>
-                          <div style={{ fontSize:10, color:C.muted }}>{b.specialization} · {b.salon_id?.salon_name||"—"}</div>
+                          <div style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.name}</div>
+                          <div style={{ fontSize:10, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.specialization} · {b.salon_id?.salon_name||"—"}</div>
                         </div>
                       </div>
                       <Badge label={b.status} color={bStatus(b.status)}/>
@@ -562,18 +501,18 @@ export default function AdminOnboarding() {
                 {/* Pending Salon Requests */}
                 <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                   <div style={{ padding:"14px 18px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between" }}>
-                    <span style={{ fontSize:13, fontWeight:800, color:C.ink }}>Pending Salon Requests</span>
-                    <button className="nb" onClick={()=>setTab("salons")} style={{ fontSize:11, color:C.gold, fontWeight:700 }}>View All</button>
+                    <span style={{ fontSize:13, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>Pending Salon Requests</span>
+                    <button className="nb" onClick={()=>setTab("salons")} style={{ fontSize:11, color:C.gold, fontWeight:800, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>View All</button>
                   </div>
                   {salons.filter(s=>s.status==="pending").length===0
-                    ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12 }}>No pending requests</div>
+                    ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No pending requests</div>
                     : salons.filter(s=>s.status==="pending").slice(0,3).map((s,i) => (
                     <div key={s._id} style={{ padding:"11px 18px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                       <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                         <img src={salonImg(i)} alt={s.salon_name} style={{ width:36, height:36, borderRadius:8, objectFit:"cover" }}/>
                         <div>
-                          <div style={{ fontSize:12, fontWeight:700, color:C.ink }}>{s.salon_name}</div>
-                          <div style={{ fontSize:10, color:C.muted }}>{s.owner_name} · {s.mobile}</div>
+                          <div style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{s.salon_name}</div>
+                          <div style={{ fontSize:10, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{s.owner_name} · {s.mobile}</div>
                         </div>
                       </div>
                       <div style={{ display:"flex", gap:6 }}>
@@ -587,19 +526,19 @@ export default function AdminOnboarding() {
                 {/* Added Barbers Credentials */}
                 <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                   <div style={{ padding:"14px 18px", borderBottom:`1px solid ${C.border}` }}>
-                    <span style={{ fontSize:13, fontWeight:800, color:C.ink }}>Barber Credentials (This Session)</span>
+                    <span style={{ fontSize:13, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>Barber Credentials (This Session)</span>
                   </div>
                   {addedBarbers.length===0
-                    ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12 }}>No barbers added this session</div>
+                    ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No barbers added this session</div>
                     : addedBarbers.map((b,i) => (
                     <div key={i} style={{ padding:"11px 18px", borderBottom:`1px solid ${C.border}` }}>
-                      <div style={{ fontSize:12, fontWeight:700, color:C.ink, marginBottom:4 }}>{b.name}</div>
+                      <div style={{ fontSize:12, fontWeight:700, color:C.ink, marginBottom:4, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.name}</div>
                       <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-                        <span style={{ fontSize:10, color:C.muted }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
-                        <span style={{ fontSize:10, color:C.muted }}>Pass: <strong style={{ color:C.red }}>{b.password}</strong></span>
-                        <span style={{ fontSize:10, color:C.muted }}>Salon: <strong style={{ color:C.gold }}>{b.salon}</strong></span>
+                        <span style={{ fontSize:10, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
+                        <span style={{ fontSize:10, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Pass: <strong style={{ color:C.red }}>{b.password}</strong></span>
+                        <span style={{ fontSize:10, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Salon: <strong style={{ color:C.gold }}>{b.salon}</strong></span>
                       </div>
-                      <div style={{ fontSize:9, color:C.muted, marginTop:2 }}>Added: {b.addedAt}</div>
+                      <div style={{ fontSize:9, color:C.muted, marginTop:2, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Added: {b.addedAt}</div>
                     </div>
                   ))}
                 </div>
@@ -623,7 +562,7 @@ export default function AdminOnboarding() {
                   <div style={{ width:24, height:24, border:`2px solid ${C.border}`, borderTopColor:C.gold, borderRadius:"50%", animation:"sp 1s linear infinite", margin:"0 auto" }}/>
                 </div>
               ) : SALONS_FILTERED.length===0 ? (
-                <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No {salonTab} salons</div>
+                <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No {salonTab} salons</div>
               ) : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:14 }}>
                   {SALONS_FILTERED.map((s,i)=>(
@@ -632,37 +571,37 @@ export default function AdminOnboarding() {
                         <img src={s.images?.[0] || salonImg(i)} alt={s.salon_name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,.5),transparent)" }}/>
                         <div style={{ position:"absolute", bottom:10, left:12 }}>
-                          <div style={{ fontSize:14, fontWeight:800, color:"#fff", fontFamily:"'Cormorant Garamond',serif" }}>{s.salon_name}</div>
+                          <div style={{ fontSize:14, fontWeight:800, color:"#fff", fontFamily:"'Playfair Display',serif" }}>{s.salon_name}</div>
                         </div>
                         <div style={{ position:"absolute", top:10, right:10 }}>
                           <Badge label={s.status} color={s.status==="approved"?C.green:s.status==="rejected"?C.red:C.amber}/>
                         </div>
                       </div>
                       <div style={{ padding:"14px 16px" }}>
-                        <div style={{ fontSize:12, fontWeight:700, color:C.ink }}>{s.owner_name}</div>
-                        <div style={{ fontSize:11, color:C.muted, marginBottom:6 }}>{s.mobile} · {s.address||"No address"}</div>
+                        <div style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{s.owner_name}</div>
+                        <div style={{ fontSize:11, color:C.muted, marginBottom:6, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{s.mobile} · {s.address||"No address"}</div>
                         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:10 }}>
                           <div style={{ background:"#F7F5F2", borderRadius:8, padding:"7px 8px" }}>
-                            <div style={{ fontSize:9, color:C.muted, fontWeight:800, textTransform:"uppercase" }}>Pricing</div>
-                            <div style={{ fontSize:12, color:C.ink, fontWeight:800 }}>Rs. {s.basic_pricing || 0}+</div>
+                            <div style={{ fontSize:9, color:C.muted, fontWeight:800, textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Pricing</div>
+                            <div style={{ fontSize:12, color:C.ink, fontWeight:800, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Rs. {s.basic_pricing || 0}+</div>
                           </div>
                           <div style={{ background:"#F7F5F2", borderRadius:8, padding:"7px 8px" }}>
-                            <div style={{ fontSize:9, color:C.muted, fontWeight:800, textTransform:"uppercase" }}>Barbers</div>
-                            <div style={{ fontSize:12, color:C.ink, fontWeight:800 }}>{s.number_of_barbers || 0}</div>
+                            <div style={{ fontSize:9, color:C.muted, fontWeight:800, textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Barbers</div>
+                            <div style={{ fontSize:12, color:C.ink, fontWeight:800, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{s.number_of_barbers || 0}</div>
                           </div>
                         </div>
                         {(s.services_offered?.length > 0 || s.support_number) && (
-                          <div style={{ fontSize:10, color:C.muted, marginBottom:10, lineHeight:1.5 }}>
+                          <div style={{ fontSize:10, color:C.muted, marginBottom:10, lineHeight:1.5, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                             {s.services_offered?.length > 0 && <div><strong style={{ color:C.ink }}>Services:</strong> {s.services_offered.join(", ")}</div>}
                             {s.support_number && <div><strong style={{ color:C.ink }}>Support:</strong> {s.support_number}</div>}
                           </div>
                         )}
                         {salonTab==="rejected" && s.rejection_reason && (
-                          <div style={{ fontSize:10, color:C.red, background:`${C.red}10`, border:`1px solid ${C.red}25`, borderRadius:8, padding:8, marginBottom:10 }}>
+                          <div style={{ fontSize:10, color:C.red, background:`${C.red}10`, border:`1px solid ${C.red}25`, borderRadius:8, padding:8, marginBottom:10, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                             Rejection reason: {s.rejection_reason}
                           </div>
                         )}
-                        <div style={{ fontSize:10, color:C.muted, marginBottom:12 }}>
+                        <div style={{ fontSize:10, color:C.muted, marginBottom:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                           Registered: {s.created_at ? new Date(s.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "—"}
                         </div>
                         {salonTab==="requests" && (
@@ -687,18 +626,18 @@ export default function AdminOnboarding() {
             <div style={{ animation:"fu .4s ease" }}>
               <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                 <div style={{ padding:"12px 18px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                  <span style={{ fontSize:13, fontWeight:800, color:C.ink }}>{customers.length} Customers</span>
+                  <span style={{ fontSize:13, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>{customers.length} Customers</span>
                   <input className="inp" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..." style={{ width:180, padding:"6px 10px", fontSize:11 }}/>
                 </div>
-                {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
-                : customers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No customers yet</div>
+                {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Loading...</div>
+                : customers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No customers yet</div>
                 : (
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
                     <thead><tr>{["Customer","Mobile","Email","Points","Joined","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
                     <tbody>
                       {customers.filter(c=>!search||c.name?.toLowerCase().includes(search.toLowerCase())||c.mobile?.includes(search)).map(c=>(
                         <tr key={c._id} className="tr">
-                          <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={c.name||"C"} size={30} color={C.blue} bg="#EFF6FF"/><span style={{ fontSize:12, fontWeight:700, color:C.ink }}>{c.name||"—"}</span></div></TD>
+                          <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={c.name||"C"} size={30} color={C.blue} bg="#EFF6FF"/><span style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{c.name||"—"}</span></div></TD>
                           <TD style={{ fontSize:11, color:C.muted, fontFamily:"monospace" }}>{c.mobile}</TD>
                           <TD style={{ fontSize:11, color:C.muted }}>{c.email||"—"}</TD>
                           <TD style={{ fontSize:12, fontWeight:700, color:C.gold }}>{c.loyalty_points||0}</TD>
@@ -723,7 +662,7 @@ export default function AdminOnboarding() {
           {tab==="barbers" && (
             <div style={{ animation:"fu .4s ease" }}>
               {barbers.length===0 && !loading
-                ? <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No barbers added yet. Go to "Add Barber" to add one!</div>
+                ? <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No barbers added yet. Go to "Add Barber" to add one!</div>
                 : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
                   {barbers.map((b,i)=>(
@@ -732,16 +671,16 @@ export default function AdminOnboarding() {
                         <img src={barberImg(i)} alt={b.name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,.6),transparent)" }}/>
                         <div style={{ position:"absolute", bottom:10, left:12 }}>
-                          <div style={{ fontSize:14, fontWeight:800, color:"#fff", fontFamily:"'Cormorant Garamond',serif" }}>{b.name}</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.7)" }}>{b.specialization}</div>
+                          <div style={{ fontSize:14, fontWeight:800, color:"#fff", fontFamily:"'Playfair Display',serif" }}>{b.name}</div>
+                          <div style={{ fontSize:11, color:"rgba(255,255,255,.7)", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.specialization}</div>
                         </div>
                         <div style={{ position:"absolute", top:10, right:10 }}>
                           <Badge label={b.status} color={bStatus(b.status)}/>
                         </div>
                       </div>
                       <div style={{ padding:"14px 16px" }}>
-                        <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>{b.mobile} · {b.salon_id?.salon_name||"—"}</div>
-                        <div style={{ fontSize:11, color:C.muted, marginBottom:10 }}>{b.experience} yrs exp · Rating: ⭐{b.rating||"N/A"}</div>
+                        <div style={{ fontSize:11, color:C.muted, marginBottom:4, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.mobile} · {b.salon_id?.salon_name||"—"}</div>
+                        <div style={{ fontSize:11, color:C.muted, marginBottom:10, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.experience} yrs exp · Rating: ⭐{b.rating||"N/A"}</div>
                         <div style={{ display:"flex", gap:6, marginBottom:8 }}>
                           {["available","break","offline"].map(s=>(
                             <button key={s} className="btn" disabled={b.status===s}
@@ -767,19 +706,17 @@ export default function AdminOnboarding() {
           {tab==="addbarber" && (
             <div style={{ animation:"fu .4s ease", maxWidth:640 }}>
               <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:28 }}>
-                <div style={{ fontSize:18, fontWeight:800, color:C.ink, fontFamily:"'Cormorant Garamond',serif", marginBottom:4 }}>Add New Barber</div>
-                <div style={{ fontSize:12, color:C.muted, marginBottom:20 }}>Credentials will be saved and barber can login to their dashboard</div>
+                <div style={{ fontSize:18, fontWeight:800, color:C.ink, fontFamily:"'Playfair Display',serif", marginBottom:4 }}>Add New Barber</div>
+                <div style={{ fontSize:12, color:C.muted, marginBottom:20, fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:400, lineHeight:1.6 }}>Credentials will be saved and barber can login to their dashboard</div>
 
-                {/* Info box */}
                 <div style={{ background:"#EFF6FF", border:`1px solid ${C.blue}30`, borderRadius:10, padding:"10px 14px", marginBottom:20 }}>
-                  <div style={{ fontSize:11, color:C.blue, fontWeight:700 }}>After adding barber, they can login at /barber/login with:</div>
-                  <div style={{ fontSize:11, color:C.ink, marginTop:4 }}>Mobile number + Password you set below</div>
+                  <div style={{ fontSize:11, color:C.blue, fontWeight:700, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>After adding barber, they can login at /barber/login with:</div>
+                  <div style={{ fontSize:11, color:C.ink, marginTop:4, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Mobile number + Password you set below</div>
                 </div>
 
-                {/* Photo + Doc */}
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:20 }}>
                   <div>
-                    <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:.8, marginBottom:8 }}>Profile Photo</label>
+                    <label style={{ display:"block", fontSize:9, fontWeight:800, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:8, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Profile Photo</label>
                     <div className="upload-box" onClick={()=>photoRef.current?.click()}>
                       {newBarber.photoPreview ? (
                         <div style={{ position:"relative" }}>
@@ -790,28 +727,28 @@ export default function AdminOnboarding() {
                       ) : (
                         <div>
                           <div style={{ fontSize:28, marginBottom:6 }}>📷</div>
-                          <div style={{ fontSize:12, fontWeight:600, color:C.muted }}>Click to upload photo</div>
-                          <div style={{ fontSize:10, color:C.border }}>JPG, PNG up to 5MB</div>
+                          <div style={{ fontSize:12, fontWeight:600, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Click to upload photo</div>
+                          <div style={{ fontSize:10, color:C.border, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>JPG, PNG up to 5MB</div>
                         </div>
                       )}
                     </div>
                     <input ref={photoRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handlePhotoChange}/>
                   </div>
                   <div>
-                    <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:.8, marginBottom:8 }}>ID / Document</label>
+                    <label style={{ display:"block", fontSize:9, fontWeight:800, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:8, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>ID / Document</label>
                     <div className="upload-box" onClick={()=>docRef.current?.click()} style={{ height:newBarber.documentName?"auto":"164px", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
                       {newBarber.documentName ? (
                         <div style={{ width:"100%", padding:12, background:"#F0FDF4", borderRadius:8, border:`1px solid ${C.green}30` }}>
                           <div style={{ fontSize:20, marginBottom:4 }}>📄</div>
-                          <div style={{ fontSize:11, fontWeight:700, color:C.green }}>{newBarber.documentName}</div>
+                          <div style={{ fontSize:11, fontWeight:700, color:C.green, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{newBarber.documentName}</div>
                           <button className="nb" onClick={e=>{e.stopPropagation();setNewBarber(p=>({...p,document:null,documentName:""}))}}
-                            style={{ marginTop:6, fontSize:10, color:C.red, fontWeight:700 }}>Remove</button>
+                            style={{ marginTop:6, fontSize:10, color:C.red, fontWeight:700, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Remove</button>
                         </div>
                       ) : (
                         <div style={{ textAlign:"center" }}>
                           <div style={{ fontSize:28, marginBottom:6 }}>📄</div>
-                          <div style={{ fontSize:12, fontWeight:600, color:C.muted }}>Upload ID/Aadhar</div>
-                          <div style={{ fontSize:10, color:C.border }}>PDF, JPG, PNG</div>
+                          <div style={{ fontSize:12, fontWeight:600, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Upload ID/Aadhar</div>
+                          <div style={{ fontSize:10, color:C.border, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>PDF, JPG, PNG</div>
                         </div>
                       )}
                     </div>
@@ -819,7 +756,6 @@ export default function AdminOnboarding() {
                   </div>
                 </div>
 
-                {/* Fields */}
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
                   {[
                     { key:"name",           label:"Full Name *",     placeholder:"Rahul Sharma",       type:"text" },
@@ -830,13 +766,13 @@ export default function AdminOnboarding() {
                     { key:"email",          label:"Email (Optional)",placeholder:"barber@email.com",   type:"email" },
                   ].map(f=>(
                     <div key={f.key}>
-                      <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:.8, marginBottom:6 }}>{f.label}</label>
+                      <label style={{ display:"block", fontSize:9, fontWeight:800, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:6, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{f.label}</label>
                       <input className="inp" type={f.type} placeholder={f.placeholder}
                         value={newBarber[f.key]} onChange={e=>setNewBarber(p=>({...p,[f.key]:e.target.value}))}/>
                     </div>
                   ))}
                   <div>
-                    <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:.8, marginBottom:6 }}>Assign Salon *</label>
+                    <label style={{ display:"block", fontSize:9, fontWeight:800, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:6, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Assign Salon *</label>
                     <select className="inp" value={newBarber.salon_id} onChange={e=>setNewBarber(p=>({...p,salon_id:e.target.value}))}>
                       <option value="">Select approved salon...</option>
                       {salons.filter(s=>s.status==="approved").map(s=>(
@@ -844,7 +780,7 @@ export default function AdminOnboarding() {
                       ))}
                     </select>
                     {salons.filter(s=>s.status==="approved").length===0 && (
-                      <div style={{ fontSize:10, color:C.red, marginTop:4 }}>No approved salons! Approve a salon first.</div>
+                      <div style={{ fontSize:10, color:C.red, marginTop:4, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No approved salons! Approve a salon first.</div>
                     )}
                   </div>
                 </div>
@@ -856,19 +792,18 @@ export default function AdminOnboarding() {
                 </button>
               </div>
 
-              {/* Credentials history */}
               {addedBarbers.length>0 && (
                 <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:20, marginTop:16 }}>
-                  <div style={{ fontSize:13, fontWeight:800, color:C.ink, marginBottom:12 }}>Added Barbers — Login Credentials</div>
+                  <div style={{ fontSize:11, fontWeight:800, color:C.ink, marginBottom:12, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.08em" }}>Added Barbers — Login Credentials</div>
                   {addedBarbers.map((b,i)=>(
                     <div key={i} style={{ background:"#F0FDF4", border:`1px solid ${C.green}30`, borderRadius:10, padding:"12px 14px", marginBottom:8 }}>
-                      <div style={{ fontSize:12, fontWeight:800, color:C.ink, marginBottom:6 }}>{b.name} · {b.salon}</div>
+                      <div style={{ fontSize:12, fontWeight:800, color:C.ink, marginBottom:6, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.name} · {b.salon}</div>
                       <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
-                        <span style={{ fontSize:11, color:C.muted }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
-                        <span style={{ fontSize:11, color:C.muted }}>Password: <strong style={{ color:C.red, fontFamily:"monospace" }}>{b.password}</strong></span>
-                        <span style={{ fontSize:11, color:C.muted }}>Login at: <strong style={{ color:C.blue }}>/barber/login</strong></span>
+                        <span style={{ fontSize:11, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
+                        <span style={{ fontSize:11, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Password: <strong style={{ color:C.red, fontFamily:"monospace" }}>{b.password}</strong></span>
+                        <span style={{ fontSize:11, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Login at: <strong style={{ color:C.blue }}>/barber/login</strong></span>
                       </div>
-                      <div style={{ fontSize:10, color:C.muted, marginTop:4 }}>Added: {b.addedAt}</div>
+                      <div style={{ fontSize:10, color:C.muted, marginTop:4, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Added: {b.addedAt}</div>
                     </div>
                   ))}
                 </div>
@@ -881,17 +816,17 @@ export default function AdminOnboarding() {
             <div style={{ animation:"fu .4s ease" }}>
               <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                 <div style={{ padding:"12px 18px", borderBottom:`1px solid ${C.border}` }}>
-                  <span style={{ fontSize:13, fontWeight:800, color:C.ink }}>{bookings.length} Appointments</span>
+                  <span style={{ fontSize:13, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>{bookings.length} Appointments</span>
                 </div>
-                {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
-                : bookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No bookings yet</div>
+                {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Loading...</div>
+                : bookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No bookings yet</div>
                 : (
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
                     <thead><tr>{["Customer","Service","Barber","Salon","Date","Amount","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
                     <tbody>
                       {bookings.map(b=>(
                         <tr key={b._id} className="tr">
-                          <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={b.customer_id?.name||"C"} size={28} color={C.blue} bg="#EFF6FF"/><span style={{ fontSize:12, fontWeight:700, color:C.ink }}>{b.customer_id?.name||"—"}</span></div></TD>
+                          <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={b.customer_id?.name||"C"} size={28} color={C.blue} bg="#EFF6FF"/><span style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.customer_id?.name||"—"}</span></div></TD>
                           <TD style={{ fontSize:11, color:C.muted }}>{b.services?.[0]?.service_name||"—"}</TD>
                           <TD style={{ fontSize:11, color:C.gold }}>{b.barber_id?.name||"—"}</TD>
                           <TD style={{ fontSize:11, color:C.muted }}>{b.salon_id?.salon_name||"—"}</TD>
@@ -919,7 +854,7 @@ export default function AdminOnboarding() {
           {tab==="services" && (
             <div style={{ animation:"fu .4s ease" }}>
               <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:18, marginBottom:14 }}>
-                <div style={{ fontSize:13, fontWeight:800, color:C.ink, marginBottom:14 }}>Add New Service</div>
+                <div style={{ fontSize:11, fontWeight:800, color:C.ink, marginBottom:14, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.08em" }}>Add New Service</div>
                 <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
                   <input className="inp" placeholder="Service name" value={newService.name} onChange={e=>setNewService(p=>({...p,name:e.target.value}))} style={{ flex:2, minWidth:150 }}/>
                   <select className="inp" value={newService.category} onChange={e=>setNewService(p=>({...p,category:e.target.value}))} style={{ flex:1, minWidth:100 }}>
@@ -938,7 +873,7 @@ export default function AdminOnboarding() {
                 </div>
               </div>
               <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
-                {services.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No services yet</div>
+                {services.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No services yet</div>
                 : (
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
                     <thead><tr>{["Service","Salon","Category","Price","Duration","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
@@ -975,14 +910,14 @@ export default function AdminOnboarding() {
                 <StatCard label="Refunded"  value={payments.filter(p=>p.status==="refunded").length} sub="Returned" color={C.red}/>
               </div>
               <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
-                {payments.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No payments yet</div>
+                {payments.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No payments yet</div>
                 : (
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
                     <thead><tr>{["Customer","Salon","Amount","Type","Status","Date"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
                     <tbody>
                       {payments.map(p=>(
                         <tr key={p._id} className="tr">
-                          <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={p.customer_id?.name||"C"} size={28} color={C.purple} bg="#F5F3FF"/><span style={{ fontSize:12, fontWeight:700, color:C.ink }}>{p.customer_id?.name||"—"}</span></div></TD>
+                          <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={p.customer_id?.name||"C"} size={28} color={C.purple} bg="#F5F3FF"/><span style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{p.customer_id?.name||"—"}</span></div></TD>
                           <TD style={{ fontSize:11, color:C.gold }}>{p.salon_id?.salon_name||"—"}</TD>
                           <TD style={{ fontSize:12, fontWeight:700, color:C.ink }}>₹{(p.amount||0)/100}</TD>
                           <TD><Badge label={p.payment_type||"token"} color={p.payment_type==="full"?C.green:C.blue}/></TD>
@@ -1000,7 +935,7 @@ export default function AdminOnboarding() {
           {/* ══ REVIEWS ══ */}
           {tab==="reviews" && (
             <div style={{ animation:"fu .4s ease" }}>
-              {reviews.length===0 ? <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No reviews yet</div>
+              {reviews.length===0 ? <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No reviews yet</div>
               : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
                   {reviews.map(r=>(
@@ -1009,8 +944,8 @@ export default function AdminOnboarding() {
                         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                           <Avatar name={r.customer_id?.name||"C"} size={32} color={C.purple} bg="#F5F3FF"/>
                           <div>
-                            <div style={{ fontSize:12, fontWeight:700, color:C.ink }}>{r.customer_id?.name||"Customer"}</div>
-                            <div style={{ fontSize:10, color:C.muted }}>{r.salon_id?.salon_name||"—"}</div>
+                            <div style={{ fontSize:12, fontWeight:700, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{r.customer_id?.name||"Customer"}</div>
+                            <div style={{ fontSize:10, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{r.salon_id?.salon_name||"—"}</div>
                           </div>
                         </div>
                         <button className="btn" onClick={()=>deleteReview(r._id)} style={{ background:`${C.red}10`, color:C.red, border:`1px solid ${C.red}30`, padding:"4px 8px", fontSize:10 }}>Delete</button>
@@ -1018,8 +953,8 @@ export default function AdminOnboarding() {
                       <div style={{ display:"flex", gap:2, marginBottom:8 }}>
                         {[1,2,3,4,5].map(s=>(<span key={s} style={{ fontSize:14, color:s<=r.rating?C.gold:"#D1C5BA" }}>★</span>))}
                       </div>
-                      <div style={{ fontSize:12, color:C.muted, lineHeight:1.6 }}>{r.review_text||"No comment"}</div>
-                      <div style={{ fontSize:10, color:C.border, marginTop:8 }}>{r.created_at?new Date(r.created_at).toLocaleDateString("en-IN"):"—"}</div>
+                      <div style={{ fontSize:12, color:C.muted, lineHeight:1.6, fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:400 }}>{r.review_text||"No comment"}</div>
+                      <div style={{ fontSize:10, color:C.border, marginTop:8, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{r.created_at?new Date(r.created_at).toLocaleDateString("en-IN"):"—"}</div>
                     </div>
                   ))}
                 </div>
@@ -1032,10 +967,10 @@ export default function AdminOnboarding() {
             <div style={{ animation:"fu .4s ease" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16, background:C.card, padding:"10px 16px", borderRadius:10, border:`1px solid ${C.border}`, width:"fit-content" }}>
                 <div style={{ width:8, height:8, borderRadius:"50%", background:C.green }}/>
-                <span style={{ fontSize:12, color:C.green, fontWeight:700 }}>Live Monitoring Active</span>
-                <span style={{ fontSize:11, color:C.muted }}>{barbers.length} barbers tracked</span>
+                <span style={{ fontSize:11, color:C.green, fontWeight:800, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.08em" }}>Live Monitoring Active</span>
+                <span style={{ fontSize:11, color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{barbers.length} barbers tracked</span>
               </div>
-              {barbers.length===0 ? <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No barbers to monitor</div>
+              {barbers.length===0 ? <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>No barbers to monitor</div>
               : (
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
                   {barbers.map((b,i)=>(
@@ -1044,15 +979,15 @@ export default function AdminOnboarding() {
                         <img src={barberImg(i)} alt={b.name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,.6),transparent)" }}/>
                         <div style={{ position:"absolute", bottom:10, left:12 }}>
-                          <div style={{ fontSize:14, fontWeight:800, color:"#fff" }}>{b.name}</div>
-                          <div style={{ fontSize:11, color:"rgba(255,255,255,.7)" }}>{b.specialization}</div>
+                          <div style={{ fontSize:14, fontWeight:800, color:"#fff", fontFamily:"'Playfair Display',serif" }}>{b.name}</div>
+                          <div style={{ fontSize:11, color:"rgba(255,255,255,.7)", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{b.specialization}</div>
                         </div>
                         <div style={{ position:"absolute", top:10, right:10 }}>
                           <Badge label={b.status} color={bStatus(b.status)}/>
                         </div>
                       </div>
                       <div style={{ padding:"14px 16px" }}>
-                        <div style={{ fontSize:11, color:C.muted, marginBottom:12 }}>Salon: <span style={{ color:C.gold, fontWeight:700 }}>{b.salon_id?.salon_name||"—"}</span></div>
+                        <div style={{ fontSize:11, color:C.muted, marginBottom:12, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Salon: <span style={{ color:C.gold, fontWeight:700 }}>{b.salon_id?.salon_name||"—"}</span></div>
                         <div style={{ display:"flex", gap:6 }}>
                           {["available","break","offline"].map(s=>(
                             <button key={s} className="btn" disabled={b.status===s}
@@ -1075,7 +1010,7 @@ export default function AdminOnboarding() {
             <div style={{ animation:"fu .4s ease", maxWidth:560 }}>
               <div style={{ background:C.card, borderRadius:14, border:`1px solid ${C.border}`, overflow:"hidden" }}>
                 <div style={{ padding:"14px 18px", borderBottom:`1px solid ${C.border}` }}>
-                  <span style={{ fontSize:13, fontWeight:800, color:C.ink }}>System Settings</span>
+                  <span style={{ fontSize:11, fontWeight:800, color:C.ink, fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.08em" }}>System Settings</span>
                 </div>
                 {[
                   { label:"Platform Name",      placeholder:"Barber Pro",            type:"text" },
@@ -1088,7 +1023,7 @@ export default function AdminOnboarding() {
                   { label:"GST %",              placeholder:"18",                    type:"number" },
                 ].map((f,i)=>(
                   <div key={i} style={{ padding:"12px 18px", borderBottom:`1px solid ${C.border}`, display:"flex", alignItems:"center", gap:16 }}>
-                    <label style={{ fontSize:12, fontWeight:600, color:C.ink, minWidth:160 }}>{f.label}</label>
+                    <label style={{ fontSize:12, fontWeight:500, color:C.ink, minWidth:160, fontFamily:"'Plus Jakarta Sans',sans-serif", lineHeight:1.6 }}>{f.label}</label>
                     <input className="inp" type={f.type} placeholder={f.placeholder} style={{ flex:1 }}/>
                   </div>
                 ))}
@@ -1111,9 +1046,9 @@ export default function AdminOnboarding() {
           onClick={()=>{ setModal(null); setReason(""); }}>
           <div style={{ background:C.card, border:`1px solid ${C.border}`, width:"100%", maxWidth:400, borderRadius:14, padding:24, boxShadow:"0 20px 60px rgba(0,0,0,.15)" }}
             onClick={e=>e.stopPropagation()}>
-            <div style={{ fontSize:16, fontWeight:800, color:C.ink, fontFamily:"'Cormorant Garamond',serif", marginBottom:4 }}>Reject Salon</div>
-            <div style={{ fontSize:11, color:C.muted, marginBottom:16 }}>{modal.salon?.salon_name} — {modal.salon?.owner_name}</div>
-            <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:.8, marginBottom:6 }}>Rejection Reason</label>
+            <div style={{ fontSize:18, fontWeight:800, color:C.ink, fontFamily:"'Playfair Display',serif", marginBottom:4 }}>Reject Salon</div>
+            <div style={{ fontSize:11, color:C.muted, marginBottom:16, fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:400, lineHeight:1.6 }}>{modal.salon?.salon_name} — {modal.salon?.owner_name}</div>
+            <label style={{ display:"block", fontSize:9, fontWeight:800, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:6, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Rejection Reason</label>
             <textarea className="inp" value={reason} onChange={e=>setReason(e.target.value)} placeholder="Provide reason..." style={{ height:80, resize:"none", lineHeight:1.6 }}/>
             <div style={{ display:"flex", gap:8, marginTop:14 }}>
               <button className="nb btn" onClick={()=>{ setModal(null); setReason(""); }} style={{ flex:1, padding:10, border:`1px solid ${C.border}`, borderRadius:8, color:C.muted, fontSize:12, background:"#fff" }}>Cancel</button>
@@ -1128,9 +1063,9 @@ export default function AdminOnboarding() {
 
       {/* ══ TOAST ══ */}
       {toast && (
-        <div style={{ position:"fixed", bottom:20, right:20, zIndex:100, padding:"12px 20px", borderRadius:10, fontWeight:700, fontSize:12, color:"#fff", animation:"sl .3s ease", background:toast.type==="error"?C.red:C.green, boxShadow:"0 8px 24px rgba(0,0,0,.2)" }}>
-          {toast.msg}
-        </div>
+        <div style={{ position:"fixed", bottom:20, right:20, zIndex:100, padding:"12px 20px", borderRadius:10, fontWeight:800, fontSize:12, color:"#fff", animation:"sl .3s ease", background:toast.type==="error"?C.red:C.green, boxShadow:"0 8px 24px rgba(0,0,0,.2)", fontFamily:"'Plus Jakarta Sans',sans-serif", textTransform:"uppercase", letterSpacing:"0.05em" }}>
+        {toast.msg}
+      </div>
       )}
     </div>
   );

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TicketFilters } from '../../Components/TicketFilters.jsx';
 import { TicketTable } from '../../Components/TicketTable.jsx';
@@ -18,7 +19,6 @@ export function TicketsPage({
   typeFilter,
 }) {
   
-  // Dynamic pipeline filter mapping defensive evaluation
   const displayTickets = typeFilter
     ? filteredTickets.filter(t => t.type === typeFilter)
     : filteredTickets;
@@ -26,20 +26,23 @@ export function TicketsPage({
   return (
     <div className="p-6 space-y-8 text-stone-800 animate-in fade-in duration-300">
       
-      {/* ── CONTEXTUAL SECTION HEADER ── */}
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-5 border-stone-200/60 text-left">
         <div>
-          <h1 className="text-3xl font-black font-serif text-stone-900 tracking-tight uppercase">
-            Support <span style={{ color: GOLD }}>Tickets</span>
+          <h1 className="font-sans font-black uppercase text-4xl sm:text-5xl tracking-tight text-stone-900">
+            Support Tickets
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 mt-1">
+          <p className="font-serif italic text-3xl sm:text-4xl text-[#C5A059] normal-case mt-1">
+            {typeFilter ? `${typeFilter} Segment Pipeline` : "Escalation Workspace"}
+          </p>
+          <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2">
             {typeFilter ? `${typeFilter} Segment Pipeline` : "All Central Escalation Workspace Logs"}
           </p>
         </div>
         
         <div className="flex items-center gap-2 bg-white border border-stone-200 px-3.5 py-2 rounded-xl shadow-2xs">
           <Inbox size={14} style={{ color: GOLD }} />
-          <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
+          <span className="font-sans text-xs font-extrabold uppercase tracking-wider text-stone-500">
             {displayTickets.length} Records Loaded
           </span>
         </div>
@@ -60,7 +63,7 @@ export function TicketsPage({
       <div className="card bg-white overflow-hidden shadow-sm border border-stone-200/80">
         <div className="px-6 py-4 border-b border-stone-100 bg-stone-50/40 flex items-center gap-2 text-left">
           <Layers size={14} style={{ color: GOLD }} />
-          <h3 className="text-[10px] font-black uppercase tracking-wider text-stone-400">
+          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">
             Active Workspace Stream Ledger
           </h3>
         </div>

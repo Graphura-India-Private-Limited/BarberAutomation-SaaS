@@ -84,12 +84,12 @@ export function CustomersModule({ customers, loading, customerSearch, setCustome
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <AdminAvatar name={customer.name || "C"} src={photo} size={36} />
-                    <span className="font-semibold" style={{ color: C.ink }}>{customer.name || "Anonymous"}</span>
+                    <span className="font-sans text-sm font-semibold" style={{ color: C.ink }}>{customer.name || "Anonymous"}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4" style={{ color: C.ink }}>{customer.email || "—"}</td>
-                <td className="px-6 py-4" style={{ color: C.ink }}>{customer.phone || customer.mobile || "—"}</td>
-                <td className="px-6 py-4 text-sm" style={{ color: C.muted }}>{formatJoined(customer.createdAt || customer.created_at)}</td>
+                <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{customer.email || "—"}</td>
+                <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{customer.phone || customer.mobile || "—"}</td>
+                <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{formatJoined(customer.createdAt || customer.created_at)}</td>
                 <td className="px-6 py-4"><StatusPill active={active} /></td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 relative">
@@ -100,7 +100,7 @@ export function CustomersModule({ customers, loading, customerSearch, setCustome
                     {menuOpenId === customer._id && (
                       <div className="absolute right-0 top-full mt-1 z-20 min-w-[140px] rounded-md border bg-white py-1 shadow-lg" style={{ borderColor: C.border }}>
                         <button type="button" onClick={() => { blockCustomer(customer._id, !customer.blocked); setMenuOpenId(null); }}
-                          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50" style={{ color: C.ink }}>
+                          className="w-full px-4 py-2 text-left font-sans text-sm font-normal hover:bg-gray-50" style={{ color: C.ink }}>
                           {customer.blocked ? "Mark as active" : "Mark as inactive"}
                         </button>
                       </div>
@@ -161,7 +161,7 @@ export function SalonsModule({
               key={key}
               type="button"
               onClick={() => { setSalonTab(key); setPage(1); }}
-              className="admin-tab-btn px-4 py-2 rounded-md text-[11px] font-bold tracking-wide"
+              className="admin-tab-btn px-4 py-2 rounded-md font-sans text-[11px] font-extrabold uppercase tracking-widest"
               style={{
                 background: salonTab === key ? C.brown : "#fff",
                 color: salonTab === key ? "#fff" : C.brown,
@@ -176,12 +176,12 @@ export function SalonsModule({
           <div className="flex items-center gap-2 rounded-md border bg-white px-3 py-2 w-full sm:max-w-md" style={{ borderColor: C.border }}>
             <Search size={16} color={C.brown} />
             <input value={salonSearch} onChange={(e) => { setSalonSearch(e.target.value); setPage(1); }}
-              placeholder="Search salon..." className="bg-transparent outline-none text-sm w-full" />
+              placeholder="Search salon..." className="bg-transparent outline-none font-sans text-sm font-normal w-full" />
           </div>
-          <button type="button" className="flex items-center gap-2 rounded-md border bg-white px-4 py-2 text-sm font-semibold whitespace-nowrap" style={{ borderColor: C.border, color: C.ink }}>
+          <button type="button" className="flex items-center gap-2 rounded-md border bg-white px-4 py-2 font-sans text-xs font-extrabold uppercase tracking-wider whitespace-nowrap" style={{ borderColor: C.border, color: C.ink }}>
             <Filter size={16} color={C.brown} /> Filters <ChevronDown size={14} color={C.muted} />
           </button>
-          <button type="button" className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold text-white whitespace-nowrap" style={{ background: C.brown }}>
+          <button type="button" className="flex items-center gap-2 rounded-md px-4 py-2 font-sans text-xs font-extrabold uppercase tracking-wider text-white whitespace-nowrap" style={{ background: C.brown }}>
             <Plus size={16} /> Add Salon
           </button>
         </div>
@@ -197,22 +197,22 @@ export function SalonsModule({
         ) : (
           paged.map((s) => (
             <tr key={s._id} className="border-t" style={{ borderColor: C.border }}>
-              <td className="px-6 py-4 font-semibold" style={{ color: C.ink }}>{s.salon_name || "—"}</td>
-              <td className="px-6 py-4 font-semibold" style={{ color: C.ink }}>{s.owner_name || "—"}</td>
-              <td className="px-6 py-4" style={{ color: C.ink }}>{s.owner_email || s.email || "—"}</td>
-              <td className="px-6 py-4" style={{ color: C.ink }}>{s.phone || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>{s.salon_name || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>{s.owner_name || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{s.owner_email || s.email || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{s.phone || "—"}</td>
               <td className="px-6 py-4"><StatusBadge label={s.status || "unknown"} color={salonStatusColor(s.status)} /></td>
-              <td className="px-6 py-4 text-sm" style={{ color: C.muted }}>{formatJoined(s.requested_on || s.createdAt || s.created_at)}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{formatJoined(s.requested_on || s.createdAt || s.created_at)}</td>
               <td className="px-6 py-4">
                 <div className="flex flex-wrap gap-2">
                   {s.status === "pending" && (
                     <>
-                      <button type="button" onClick={() => updateSalonStatus(s._id, "approved")} className="px-3 py-1.5 rounded-full text-[11px] font-semibold bg-green-50 text-green-700">Approve</button>
-                      <button type="button" onClick={() => updateSalonStatus(s._id, "rejected")} className="px-3 py-1.5 rounded-full text-[11px] font-semibold bg-red-50 text-red-700">Reject</button>
+                      <button type="button" onClick={() => updateSalonStatus(s._id, "approved")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Approve</button>
+                      <button type="button" onClick={() => updateSalonStatus(s._id, "rejected")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Reject</button>
                     </>
                   )}
                   {s.status === "rejected" && (
-                    <button type="button" onClick={() => updateSalonStatus(s._id, "pending")} className="px-3 py-1.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-700">Reconsider</button>
+                    <button type="button" onClick={() => updateSalonStatus(s._id, "pending")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-gray-100 text-gray-700">Reconsider</button>
                   )}
                 </div>
               </td>
@@ -285,13 +285,13 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <AdminAvatar name={b.name} src={b.photo || barberImg(i)} size={36} />
-                    <span className="font-semibold" style={{ color: C.ink }}>{b.name}</span>
+                    <span className="font-sans text-sm font-semibold" style={{ color: C.ink }}>{b.name}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4" style={{ color: C.ink }}>{b.email || "—"}</td>
-                <td className="px-6 py-4" style={{ color: C.ink }}>{b.mobile || "—"}</td>
-                <td className="px-6 py-4" style={{ color: C.muted }}>{b.specialization || "—"}</td>
-                <td className="px-6 py-4" style={{ color: C.muted }}>{b.experience != null ? `${b.experience} yrs` : "—"}</td>
+                <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{b.email || "—"}</td>
+                <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{b.mobile || "—"}</td>
+                <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{b.specialization || "—"}</td>
+                <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{b.experience != null ? `${b.experience} yrs` : "—"}</td>
                 <td className="px-6 py-4"><StatusPill active={active} label={active ? "Active" : "Inactive"} /></td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 relative">
@@ -303,12 +303,12 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
                       <div className="absolute right-0 top-full mt-1 z-10 min-w-[160px] rounded-md border bg-white py-1 shadow-lg" style={{ borderColor: C.border }}>
                         {["available", "break", "offline"].map((s) => (
                           <button key={s} type="button" onClick={() => { changeBarberStatus(b._id, s); setMenuId(null); }}
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 capitalize" style={{ color: C.ink }}>
+                            className="w-full px-4 py-2 text-left font-sans text-sm font-normal hover:bg-gray-50 capitalize" style={{ color: C.ink }}>
                             Set {s}
                           </button>
                         ))}
                         <button type="button" onClick={() => { removeBarber(b._id); setMenuId(null); }}
-                          className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600">
+                          className="w-full px-4 py-2 text-left font-sans text-sm font-normal hover:bg-red-50 text-red-600">
                           Remove barber
                         </button>
                       </div>
@@ -330,29 +330,29 @@ export function AddBarberModule({ salons, newBarber, setNewBarber, addBarber, bu
   return (
     <AdminPageShell>
       <div className="w-full bg-white rounded-xl border card-shadow p-8" style={{ borderColor: C.border }}>
-        <h2 className="font-serif text-2xl font-bold mb-1" style={{ color: C.ink }}>Add New Barber</h2>
-        <p className="text-sm mb-6" style={{ color: C.muted }}>Credentials will be saved and the barber can log in at /barber/login</p>
-        <div className="rounded-lg p-4 mb-6 text-sm" style={{ background: C.blueLight, border: `1px solid ${C.blue}30`, color: C.blue }}>
+        <h2 className="font-sans font-black uppercase text-4xl tracking-tight text-stone-900 mb-1">Add New Barber</h2>
+        <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mb-6">Credentials will be saved and the barber can log in at /barber/login</p>
+        <div className="rounded-lg p-4 mb-6 font-sans text-sm font-normal leading-relaxed" style={{ background: C.blueLight, border: `1px solid ${C.blue}30`, color: C.blue }}>
           After adding, they can sign in with mobile number + password below.
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider mb-2 block" style={{ color: C.muted }}>Profile Photo</label>
+            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Profile Photo</label>
             <div className="border border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50" style={{ borderColor: C.border }}
               onClick={() => photoRef.current?.click()}>
               {newBarber.photoPreview ? (
                 <img src={newBarber.photoPreview} alt="" className="h-28 w-full object-cover rounded-lg" />
               ) : (
-                <p className="text-sm" style={{ color: C.muted }}>Click to upload photo</p>
+                <p className="font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>Click to upload photo</p>
               )}
             </div>
             <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
           </div>
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-wider mb-2 block" style={{ color: C.muted }}>ID / Document</label>
+            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>ID / Document</label>
             <div className="border border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 min-h-[120px] flex items-center justify-center" style={{ borderColor: C.border }}
               onClick={() => docRef.current?.click()}>
-              <p className="text-sm" style={{ color: C.muted }}>{newBarber.documentName || "Upload ID / Aadhar"}</p>
+              <p className="font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{newBarber.documentName || "Upload ID / Aadhar"}</p>
             </div>
             <input ref={docRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={handleDocChange} />
           </div>
@@ -367,13 +367,13 @@ export function AddBarberModule({ salons, newBarber, setNewBarber, addBarber, bu
             { key: "email", label: "Email", placeholder: "barber@email.com", type: "email" },
           ].map((f) => (
             <div key={f.key}>
-              <label className="text-[10px] font-bold uppercase tracking-wider mb-2 block" style={{ color: C.muted }}>{f.label}</label>
+              <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>{f.label}</label>
               <input className="inp w-full" type={f.type} placeholder={f.placeholder}
                 value={newBarber[f.key]} onChange={(e) => setNewBarber((p) => ({ ...p, [f.key]: e.target.value }))} />
             </div>
           ))}
           <div className="sm:col-span-2">
-            <label className="text-[10px] font-bold uppercase tracking-wider mb-2 block" style={{ color: C.muted }}>Assign Salon *</label>
+            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Assign Salon *</label>
             <select className="inp w-full" value={newBarber.salon_id} onChange={(e) => setNewBarber((p) => ({ ...p, salon_id: e.target.value }))}>
               <option value="">Select approved salon…</option>
               {approved.map((s) => <option key={s._id} value={s._id}>{s.salon_name}</option>)}
@@ -382,18 +382,18 @@ export function AddBarberModule({ salons, newBarber, setNewBarber, addBarber, bu
         </div>
         <button type="button" disabled={!newBarber.name || !newBarber.mobile || !newBarber.password || busy}
           onClick={addBarber}
-          className="mt-6 w-full py-3 rounded-lg text-sm font-semibold text-white disabled:opacity-50"
+          className="mt-6 w-full py-3 rounded-lg font-sans text-xs font-extrabold uppercase tracking-wider text-white disabled:opacity-50"
           style={{ background: C.brown }}>
           {busy ? "Adding…" : "Add Barber to Platform"}
         </button>
       </div>
       {addedBarbers.length > 0 && (
         <div className="bg-white rounded-xl border p-6" style={{ borderColor: C.border }}>
-          <h3 className="font-semibold mb-4" style={{ color: C.ink }}>Added this session — login credentials</h3>
+          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-4" style={{ color: C.ink }}>Added this session — login credentials</h3>
           {addedBarbers.map((b, i) => (
-            <div key={i} className="rounded-lg p-4 mb-2 text-sm" style={{ background: C.greenLight, border: `1px solid ${C.green}30` }}>
-              <div className="font-bold">{b.name} · {b.salon}</div>
-              <div className="mt-1" style={{ color: C.muted }}>Mobile: {b.mobile} · Password: <span className="font-mono text-red-600">{b.password}</span></div>
+            <div key={i} className="rounded-lg p-4 mb-2 font-sans text-sm font-normal leading-relaxed" style={{ background: C.greenLight, border: `1px solid ${C.green}30` }}>
+              <div className="font-semibold">{b.name} · {b.salon}</div>
+              <div className="mt-1 font-sans text-sm font-normal" style={{ color: C.muted }}>Mobile: {b.mobile} · Password: <span className="font-mono text-red-600">{b.password}</span></div>
             </div>
           ))}
         </div>
@@ -442,20 +442,20 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
                   <AdminAvatar name={b.customer_id?.name || "C"} size={32} color={C.blue} bg={C.blueLight} />
-                  <span className="font-semibold" style={{ color: C.ink }}>{b.customer_id?.name || "—"}</span>
+                  <span className="font-sans text-sm font-semibold" style={{ color: C.ink }}>{b.customer_id?.name || "—"}</span>
                 </div>
               </td>
-              <td className="px-6 py-4" style={{ color: C.muted }}>{b.services?.[0]?.service_name || "—"}</td>
-              <td className="px-6 py-4" style={{ color: C.ink }}>{b.barber_id?.name || "—"}</td>
-              <td className="px-6 py-4" style={{ color: C.muted }}>{b.salon_id?.salon_name || "—"}</td>
-              <td className="px-6 py-4" style={{ color: C.muted }}>{formatJoined(b.created_at || b.createdAt)}</td>
-              <td className="px-6 py-4 font-semibold" style={{ color: C.ink }}>₹{b.total_amount || 0}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{b.services?.[0]?.service_name || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{b.barber_id?.name || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{b.salon_id?.salon_name || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{formatJoined(b.created_at || b.createdAt)}</td>
+              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>₹{b.total_amount || 0}</td>
               <td className="px-6 py-4"><StatusPill label={b.status} active={b.status === "completed"} /></td>
               <td className="px-6 py-4">
                 {b.status === "pending" && (
                   <div className="flex gap-2">
-                    <button onClick={() => changeBookingStatus(b._id, "confirmed")} className="px-2 py-1 rounded-full text-[10px] font-semibold bg-green-50 text-green-700">Confirm</button>
-                    <button onClick={() => changeBookingStatus(b._id, "cancelled")} className="px-2 py-1 rounded-full text-[10px] font-semibold bg-red-50 text-red-700">Cancel</button>
+                    <button onClick={() => changeBookingStatus(b._id, "confirmed")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Confirm</button>
+                    <button onClick={() => changeBookingStatus(b._id, "cancelled")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Cancel</button>
                   </div>
                 )}
               </td>
@@ -493,7 +493,7 @@ export function ServicesModule({ services, salons, loading, newService, setNewSe
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
       <div className="bg-white rounded-xl border p-5 card-shadow" style={{ borderColor: C.border }}>
-        <p className="text-sm font-semibold mb-3" style={{ color: C.ink }}>Quick add service</p>
+        <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-3" style={{ color: C.ink }}>Quick add service</p>
         <div className="flex flex-wrap gap-2">
           <input className="inp flex-1 min-w-[140px]" placeholder="Service name" value={newService.name} onChange={(e) => setNewService((p) => ({ ...p, name: e.target.value }))} />
           <select className="inp" value={newService.category} onChange={(e) => setNewService((p) => ({ ...p, category: e.target.value }))}>
@@ -505,7 +505,7 @@ export function ServicesModule({ services, salons, loading, newService, setNewSe
             <option value="">Salon…</option>
             {approved.map((s) => <option key={s._id} value={s._id}>{s.salon_name}</option>)}
           </select>
-          <button type="button" onClick={addService} className="px-4 py-2 rounded-md text-white text-sm font-semibold" style={{ background: C.brown }}>Add</button>
+          <button type="button" onClick={addService} className="px-4 py-2 rounded-md font-sans text-xs font-extrabold uppercase tracking-wider text-white" style={{ background: C.brown }}>Add</button>
         </div>
       </div>
       <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search services..." addLabel="+ Add Service" />
@@ -519,15 +519,15 @@ export function ServicesModule({ services, salons, loading, newService, setNewSe
         ) : (
           paged.map((s) => (
             <tr key={s._id} className="border-t" style={{ borderColor: C.border }}>
-              <td className="px-6 py-4 font-semibold" style={{ color: C.ink }}>{s.name}</td>
-              <td className="px-6 py-4" style={{ color: C.gold }}>{s.salon_id?.salon_name || "—"}</td>
-              <td className="px-6 py-4 capitalize" style={{ color: C.muted }}>{s.category}</td>
-              <td className="px-6 py-4 font-semibold" style={{ color: C.ink }}>₹{s.price}</td>
-              <td className="px-6 py-4" style={{ color: C.muted }}>{s.duration} min</td>
+              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>{s.name}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.gold }}>{s.salon_id?.salon_name || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed capitalize" style={{ color: C.muted }}>{s.category}</td>
+              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>₹{s.price}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{s.duration} min</td>
               <td className="px-6 py-4"><StatusPill active={s.is_active} label={s.is_active ? "Active" : "Inactive"} /></td>
               <td className="px-6 py-4">
                 <div className="flex gap-2">
-                  <button onClick={() => toggleService(s._id, !s.is_active)} className="px-2 py-1 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800">{s.is_active ? "Disable" : "Enable"}</button>
+                  <button onClick={() => toggleService(s._id, !s.is_active)} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-amber-50 text-amber-800">{s.is_active ? "Disable" : "Enable"}</button>
                   <button onClick={() => deleteService(s._id)} className="p-1.5 rounded-md hover:bg-red-50 text-red-600"><Trash2 size={16} /></button>
                 </div>
               </td>
@@ -577,14 +577,14 @@ export function PaymentsModule({ payments, loading }) {
               <td className="px-6 py-4">
                 <div className="flex items-center gap-2">
                   <AdminAvatar name={p.customer_id?.name || "C"} size={32} color={C.purple} bg={C.purpleLight} />
-                  <span className="font-semibold" style={{ color: C.ink }}>{p.customer_id?.name || "—"}</span>
+                  <span className="font-sans text-sm font-semibold" style={{ color: C.ink }}>{p.customer_id?.name || "—"}</span>
                 </div>
               </td>
-              <td className="px-6 py-4" style={{ color: C.gold }}>{p.salon_id?.salon_name || "—"}</td>
-              <td className="px-6 py-4 font-semibold" style={{ color: C.ink }}>₹{((p.amount || 0) / 100).toLocaleString("en-IN")}</td>
-              <td className="px-6 py-4 capitalize" style={{ color: C.muted }}>{p.payment_type || "token"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.gold }}>{p.salon_id?.salon_name || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>₹{((p.amount || 0) / 100).toLocaleString("en-IN")}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed capitalize" style={{ color: C.muted }}>{p.payment_type || "token"}</td>
               <td className="px-6 py-4"><StatusPill label={p.status} active={p.status === "captured"} /></td>
-              <td className="px-6 py-4" style={{ color: C.muted }}>{formatJoined(p.created_at || p.createdAt)}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{formatJoined(p.created_at || p.createdAt)}</td>
             </tr>
           ))
         )}
@@ -620,11 +620,11 @@ export function ReviewsModule({ reviews, loading, deleteReview }) {
       <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search reviews..." addLabel={null} />
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {loading ? (
-          <div className="col-span-full py-16 text-center text-sm" style={{ color: C.muted }}>Loading reviews…</div>
+          <div className="col-span-full py-16 text-center font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>Loading reviews…</div>
         ) : paged.length === 0 ? (
           <div className="col-span-full bg-white rounded-xl border p-14 text-center" style={{ borderColor: C.border }}>
             <Star size={32} className="mx-auto mb-4" color="#A66527" />
-            <p className="font-semibold" style={{ color: C.ink }}>No reviews yet</p>
+            <p className="font-sans text-sm font-semibold" style={{ color: C.ink }}>No reviews yet</p>
           </div>
         ) : (
           paged.map((r) => (
@@ -633,8 +633,8 @@ export function ReviewsModule({ reviews, loading, deleteReview }) {
                 <div className="flex items-center gap-3">
                   <AdminAvatar name={r.customer_id?.name || "C"} size={36} color={C.purple} bg={C.purpleLight} />
                   <div>
-                    <div className="font-semibold text-sm" style={{ color: C.ink }}>{r.customer_id?.name || "Customer"}</div>
-                    <div className="text-xs" style={{ color: C.muted }}>{r.salon_id?.salon_name || "—"}</div>
+                    <div className="font-sans text-sm font-semibold" style={{ color: C.ink }}>{r.customer_id?.name || "Customer"}</div>
+                    <div className="font-sans text-xs font-normal" style={{ color: C.muted }}>{r.salon_id?.salon_name || "—"}</div>
                   </div>
                 </div>
                 <button type="button" onClick={() => deleteReview(r._id)} className="p-1.5 rounded-md hover:bg-red-50 text-red-600"><Trash2 size={16} /></button>
@@ -644,8 +644,8 @@ export function ReviewsModule({ reviews, loading, deleteReview }) {
                   <span key={s} style={{ color: s <= (r.rating || 0) ? C.gold : "#D1C5BA" }}>★</span>
                 ))}
               </div>
-              <p className="text-sm leading-relaxed" style={{ color: C.muted }}>{r.review_text || "No comment"}</p>
-              <p className="text-xs mt-3" style={{ color: C.border }}>{formatJoined(r.created_at || r.createdAt)}</p>
+              <p className="font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{r.review_text || "No comment"}</p>
+              <p className="font-sans text-xs font-normal mt-3" style={{ color: C.border }}>{formatJoined(r.created_at || r.createdAt)}</p>
             </div>
           ))
         )}
@@ -671,16 +671,16 @@ export function LiveMonitoringModule({ barbers, loading, changeBarberStatus }) {
     <AdminPageShell>
       <div className="flex items-center gap-2 px-4 py-2 rounded-lg border w-fit bg-white" style={{ borderColor: C.border }}>
         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        <span className="text-sm font-semibold text-green-700">Live Monitoring Active</span>
-        <span className="text-xs" style={{ color: C.muted }}>{barbers.length} barbers tracked</span>
+        <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-green-700">Live Monitoring Active</span>
+        <span className="font-sans text-xs font-normal" style={{ color: C.muted }}>{barbers.length} barbers tracked</span>
       </div>
       <StatCardsRow cards={statCards} loading={loading} />
       {loading ? (
-        <p className="text-center py-12 text-sm" style={{ color: C.muted }}>Loading…</p>
+        <p className="text-center py-12 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>Loading…</p>
       ) : barbers.length === 0 ? (
         <div className="bg-white rounded-xl border p-14 text-center" style={{ borderColor: C.border }}>
           <Radio size={32} className="mx-auto mb-4" color="#A66527" />
-          <p className="font-semibold" style={{ color: C.ink }}>No barbers to monitor</p>
+          <p className="font-sans text-sm font-semibold" style={{ color: C.ink }}>No barbers to monitor</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -690,17 +690,17 @@ export function LiveMonitoringModule({ barbers, loading, changeBarberStatus }) {
                 <img src={barberImg(i)} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-3 left-3 text-white">
-                  <div className="font-semibold">{b.name}</div>
-                  <div className="text-xs opacity-80">{b.specialization || "Barber"}</div>
+                  <div className="font-sans text-sm font-semibold">{b.name}</div>
+                  <div className="font-sans text-xs font-normal opacity-80">{b.specialization || "Barber"}</div>
                 </div>
                 <div className="absolute top-3 right-3"><StatusPill label={b.status} active={b.status === "available"} /></div>
               </div>
               <div className="p-4">
-                <p className="text-xs mb-3" style={{ color: C.muted }}>Salon: <span className="font-semibold" style={{ color: C.gold }}>{b.salon_id?.salon_name || "—"}</span></p>
+                <p className="font-sans text-xs font-normal mb-3" style={{ color: C.muted }}>Salon: <span className="font-semibold" style={{ color: C.gold }}>{b.salon_id?.salon_name || "—"}</span></p>
                 <div className="flex gap-2">
                   {["available", "break", "offline"].map((s) => (
                     <button key={s} type="button" disabled={b.status === s} onClick={() => changeBarberStatus(b._id, s)}
-                      className="flex-1 py-1.5 rounded-md text-[10px] font-bold disabled:opacity-60 capitalize"
+                      className="flex-1 py-1.5 rounded-md font-sans text-[10px] font-extrabold tracking-wider disabled:opacity-60 capitalize"
                       style={{ background: b.status === s ? C.greenLight : "#F5F5F4", color: b.status === s ? C.green : C.muted, border: `1px solid ${C.border}` }}>
                       {s}
                     </button>
@@ -732,16 +732,16 @@ export function SettingsModule({ onSave }) {
   return (
     <AdminPageShell>
       <div className="max-w-2xl bg-white rounded-xl border overflow-hidden card-shadow" style={{ borderColor: C.border }}>
-        <div className="px-6 py-4 border-b font-semibold" style={{ borderColor: C.border, color: C.ink }}>System Settings</div>
+        <div className="px-6 py-4 border-b font-sans text-[11px] font-extrabold uppercase tracking-widest" style={{ borderColor: C.border, color: C.ink }}>System Settings</div>
         {fields.map((f) => (
           <div key={f.key} className="flex flex-col sm:flex-row sm:items-center gap-2 px-6 py-4 border-b" style={{ borderColor: C.border }}>
-            <label className="text-sm font-medium sm:w-44 shrink-0" style={{ color: C.ink }}>{f.label}</label>
+            <label className="font-sans text-sm font-normal leading-relaxed sm:w-44 shrink-0" style={{ color: C.ink }}>{f.label}</label>
             <input className="inp flex-1" type={f.type} placeholder={f.placeholder}
               value={values[f.key]} onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))} />
           </div>
         ))}
         <div className="p-6">
-          <button type="button" onClick={() => onSave?.()} className="w-full py-3 rounded-lg text-sm font-semibold text-white" style={{ background: C.brown }}>
+          <button type="button" onClick={() => onSave?.()} className="w-full py-3 rounded-lg font-sans text-xs font-extrabold uppercase tracking-wider text-white" style={{ background: C.brown }}>
             Save Settings
           </button>
         </div>
