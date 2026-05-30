@@ -379,60 +379,59 @@ const Footer = () => {
 
           </div>
 
-          {/* NEWSLETTER */}
-<div className="
-  p-1
+{/*  NEWSLETTER */ }
+      <div className="p-1 rounded-xl bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] flex items-center">
+        
+        {/* ✅ WRAP THE INTERNAL CONTENT IN A WORKING SUBMISSION FORM BLOCK */}
+        <form onSubmit={async (e) => {
+          e.preventDefault();
+          if (!e.target.elements.footerEmail.value.trim().includes("@")) {
+            alert("Please enter a valid email address signature.");
+            return;
+          }
+          
+          const targetEmail = e.target.elements.footerEmail.value.trim();
+          
+          try {
+            const res = await fetch("http://localhost:5000/api/review/support/ticket", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                category: "other",
+                email: targetEmail,
+                subject: "Footer Contact Request",
+                message: `User dropped their email directly via the global application footer. Please initiate manual CRM outreach setup protocols.`,
+              }),
+            });
+            const data = await res.json();
+            alert("Inquiry successfully transmitted! Our concierge will get in touch.");
+            e.target.reset();
+          } catch {
+            alert("Network transmission mismatch. Is your server API pipeline online?");
+          }
+        }} className="flex items-center w-full">
+          
+          <input
+            type="email"
+            name="footerEmail"
+            required
+            placeholder="Drop your email..."
+            className="flex-1 bg-transparent px-3 py-2.5 text-xs text-white placeholder:text-stone-500 outline-none"
+          />
+          
+          <button 
+            type="submit"
+            className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] flex items-center justify-center hover:scale-105 transition-all duration-300 cursor-pointer shrink-0 mr-1"
+          >
+            {/* Keeping your existing design Send icon markup perfectly intact */}
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            </svg>
+          </button>
 
-  rounded-xl
-
-  bg-white/[0.05]
-  backdrop-blur-xl
-
-  border border-white/[0.08]
-
-  flex items-center
-">
-            <input
-  type="email"
-  placeholder="Drop your email..."
-  className="
-    flex-1
-    bg-transparent
-
-    px-3 py-2.5
-
-    text-xs
-    text-white
-
-    placeholder:text-stone-500
-
-    outline-none
-  "
-/>
-           <button className="
-  w-10 h-10
-
-  rounded-lg
-
-  bg-gradient-to-r
-  from-[#C5A059]
-  via-[#E8C878]
-  to-[#C5A059]
-
-  text-[#2A241F]
-
-  flex items-center justify-center
-
-  hover:scale-105
-
-  transition-all duration-300
-">
-  <Send className="w-3.5 h-3.5" />
-</button>
-          </div>
-
-        </div>
-
+        </form>
+      </div>
+      </div>
       </div>
 
       {/* STATUS BAR */}

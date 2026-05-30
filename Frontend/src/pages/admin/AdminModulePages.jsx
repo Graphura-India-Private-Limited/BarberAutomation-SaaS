@@ -18,6 +18,8 @@ import {
   AdminPageShell, StatusBadge,
 } from "../../Components/admin/AdminUIKit";
 
+
+
 const formatJoined = (value) => {
   if (!value) return "—";
   const d = new Date(value);
@@ -698,7 +700,7 @@ export function LiveMonitoringModule({ barbers, loading, changeBarberStatus }) {
                 <div className="flex gap-2">
                   {["available", "break", "offline"].map((s) => (
                     <button key={s} type="button" disabled={b.status === s} onClick={() => changeBarberStatus(b._id, s)}
-                      className="flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase disabled:opacity-60 capitalize"
+                      className="flex-1 py-1.5 rounded-md text-[10px] font-bold disabled:opacity-60 capitalize"
                       style={{ background: b.status === s ? C.greenLight : "#F5F5F4", color: b.status === s ? C.green : C.muted, border: `1px solid ${C.border}` }}>
                       {s}
                     </button>

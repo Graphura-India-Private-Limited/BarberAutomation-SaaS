@@ -196,33 +196,35 @@ function App() {
         <Route path="/owner/approvals" element={<BreakApprovalDashboard />} />
         <Route path="/owner/bookings" element={<BookingManagement />} />
 
-        {/* --- SUPER ADMIN CENTRAL PANEL --- */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/requests" element={<AdminRequests initialTab="dashboard" />} />
-        <Route path="/admin/customers" element={<AdminRequests initialTab="customers" />} />
-        <Route path="/admin/barbers" element={<AdminRequests initialTab="barbers" />} />
-        <Route path="/admin/add-barber" element={<AdminRequests initialTab="addbarber" />} />
-        <Route path="/admin/appointments" element={<AdminRequests initialTab="appointments" />} />
-        <Route path="/admin/services" element={<AdminRequests initialTab="services" />} />
-        <Route path="/admin/payments" element={<AdminRequests initialTab="payments" />} />
-        <Route path="/admin/reviews" element={<AdminRequests initialTab="reviews" />} />
-        <Route path="/admin/live" element={<AdminRequests initialTab="live" />} />
-        <Route path="/admin/platform-settings" element={<AdminRequests initialTab="settings" />} />
-        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
-        <Route path="/admin/user-management" element={<AdminUserManagement />} />
-        <Route path="/admin/analytics" element={<AdminAnalytics />} />
-        <Route path="/admin/salon-management" element={<AdminRequests initialTab="salons" />} />
-        <Route path="/admin/dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
-        <Route path="/admin/tickets"   element={<AdminLayout page="tickets"><TicketsPage {...ticketState} /></AdminLayout>} />
-        <Route path="/admin/reports"   element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />
-        <Route path="/admin/settings"  element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
-        <Route path="/admin/customer-issues" element={<AdminLayout page="customer"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.CUSTOMER} /></AdminLayout>} />
-        <Route path="/admin/salon-issues"    element={<AdminLayout page="salon"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.SALON} /></AdminLayout>} />
-        <Route path="/admin/salon-view" element={<SalonViewPage />} />
+          {/* --- SUPER ADMIN CENTRAL PANEL --- */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/requests" element={<AdminRequests initialTab="dashboard" />} />
+          <Route path="/admin/customers" element={<AdminRequests initialTab="customers" />} />
+          <Route path="/admin/barbers" element={<AdminRequests initialTab="barbers" />} />
+          <Route path="/admin/add-barber" element={<AdminRequests initialTab="addbarber" />} />
+          <Route path="/admin/appointments" element={<AdminRequests initialTab="appointments" />} />
+          <Route path="/admin/services" element={<AdminRequests initialTab="services" />} />
+          <Route path="/admin/payments" element={<AdminRequests initialTab="payments" />} />
+          <Route path="/admin/reviews" element={<AdminRequests initialTab="reviews" />} />
+          <Route path="/admin/live" element={<AdminRequests initialTab="live" />} />
+          <Route path="/admin/platform-settings" element={<AdminRequests initialTab="settings" />} />
+          <Route path="/admin/onboarding" element={<AdminOnboarding />} />
+          <Route path="/admin/user-management" element={<AdminUserManagement />} />
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
+          <Route path="/admin/salon-management" element={<AdminRequests initialTab="salons" />} />
+          <Route path="/admin/dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
+          <Route path="/admin/tickets"   element={<AdminLayout page="tickets"><TicketsPage {...ticketState} /></AdminLayout>} />
+          <Route path="/admin/reports"   element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />
+          <Route path="/admin/settings"  element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
+          <Route path="/admin/customer-issues" element={<AdminLayout page="customer"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.CUSTOMER} /></AdminLayout>} />
+          <Route path="/admin/salon-issues"    element={<AdminLayout page="salon"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.SALON} /></AdminLayout>} />
+          
+          <Route path="/admin/salon-view" element={<SalonViewPage />} />
+         
 
-        {/* --- UTILITY & FALLBACK SECURITY CORE --- */}
-        <Route path="/staff-login" element={<StaffLogin />} />
-        <Route path="/owner/overview" element={<HomeOverview />} />
+          {/* --- UTILITY & FALLBACK SECURITY CORE --- */}
+          <Route path="/staff-login" element={<StaffLogin />} />
+          <Route path="/owner/overview" element={<HomeOverview />} />
         <Route path="/owner/finance" element={<FinancePage />} />
         <Route path="/owner/settings" element={<SettingsPage />} />
         <Route path="/owner/queue" element={<LiveQueue />} />
