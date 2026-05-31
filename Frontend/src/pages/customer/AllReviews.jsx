@@ -54,7 +54,7 @@ export default function AllReviews() {
         <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* Premium Hero Banner (Cleaned without image background) */}
+        {/* Premium Hero Banner */}
         <div className="relative h-[320px] sm:h-[360px] flex items-center justify-center overflow-hidden mb-6">
           <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
           
@@ -62,7 +62,7 @@ export default function AllReviews() {
           <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
             <button
               onClick={() => navigate(-1)}
-              className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-medium text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
+              className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-0.5" />
               <span>Back</span>
@@ -73,7 +73,7 @@ export default function AllReviews() {
           <div className="absolute top-6 right-4 sm:right-6 md:left-auto z-20">
             <button
               onClick={() => navigate("/write-review")}
-              className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-bold text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
+              className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
             >
               <Heart className="w-3.5 h-3.5 fill-current text-[#C5A059] group-hover:text-[#2A241F]" />
               <span>Write Review</span>
@@ -81,14 +81,25 @@ export default function AllReviews() {
           </div>
 
           <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-8">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-4">
+            {/* Kicker Tag — Rule 2 */}
+            <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full shadow-sm inline-block mb-4">
               Guest Testimonials
             </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-[#3E362E] font-serif leading-none">
-              All Our <span className="text-[#C5A059] italic normal-case">Reviews</span>
+
+            {/* Primary Hero Heading — Rule 1 */}
+            <h1 className="leading-none">
+              <span className="font-sans font-black uppercase text-4xl sm:text-5xl md:text-6xl tracking-tight text-stone-900">
+                All Our{" "}
+              </span>
+              <span className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-[#C5A059] normal-case">
+                Reviews
+              </span>
             </h1>
+
             <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-5 mb-4" />
-            <p className="text-stone-500 text-xs sm:text-sm max-w-xl mx-auto font-light leading-relaxed">
+
+            {/* Body Text — Rule 3 */}
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 max-w-xl mx-auto">
               Discover real stories and experiences shared by our esteemed guests. Authentic guest feedback beautifully driving our perfection.
             </p>
           </div>
@@ -100,21 +111,23 @@ export default function AllReviews() {
           {/* ═══ STATS STRIP ═══ */}
           <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-10">
             <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
-              <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Total Reviews</p>
-              <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.total}</p>
+              {/* Kicker — Rule 2 */}
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5">Total Reviews</p>
+              {/* Big number uses serif accent style */}
+              <p className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-[#C5A059] normal-case">{stats.total}</p>
             </div>
             <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
-              <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Avg Salon</p>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5">Avg Salon</p>
               <div className="flex items-center justify-center gap-1">
                 <Star className="w-4 h-4 sm:w-5 fill-[#C5A059] text-[#C5A059]"/>
-                <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.avgSalon || "—"}</p>
+                <p className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-[#C5A059] normal-case">{stats.avgSalon || "—"}</p>
               </div>
             </div>
             <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
-              <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Avg Stylist</p>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5">Avg Stylist</p>
               <div className="flex items-center justify-center gap-1">
                 <Star className="w-4 h-4 sm:w-5 fill-[#C5A059] text-[#C5A059]"/>
-                <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.avgBarber || "—"}</p>
+                <p className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-[#C5A059] normal-case">{stats.avgBarber || "—"}</p>
               </div>
             </div>
           </div>
@@ -129,7 +142,7 @@ export default function AllReviews() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search by name, experiences or feedback..."
-                className="w-full pl-11 pr-4 py-3.5 bg-[#FAF6F0]/60 border border-[#EADDCA] rounded-xl text-xs outline-none focus:border-[#C5A059] focus:bg-white transition-all duration-300"
+                className="w-full pl-11 pr-4 py-3.5 bg-[#FAF6F0]/60 border border-[#EADDCA] rounded-xl font-sans text-sm font-normal text-stone-600 outline-none focus:border-[#C5A059] focus:bg-white transition-all duration-300 placeholder:text-stone-400"
               />
             </div>
 
@@ -137,12 +150,13 @@ export default function AllReviews() {
             <div className="flex items-center gap-1.5 flex-wrap">
               <div className="flex items-center gap-2 mr-2">
                 <Filter className="w-3.5 h-3.5 text-[#C5A059]"/>
-                <span className="text-[10px] font-black tracking-wider uppercase text-[#3E362E]">Filter:</span>
+                {/* Kicker label — Rule 2 */}
+                <span className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#3E362E]">Filter:</span>
               </div>
               {[0, 5, 4, 3, 2, 1].map(r => (
                 <button key={r}
                   onClick={() => setRatingFilter(r)}
-                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                  className={`px-4 py-2 rounded-xl font-sans text-xs font-extrabold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                     ratingFilter === r
                       ? "bg-[#3E362E] text-white shadow-md"
                       : "bg-[#FAF6F0] text-[#3E362E] border border-[#EADDCA] hover:bg-[#C5A059]/10"
@@ -155,16 +169,23 @@ export default function AllReviews() {
 
           {/* ═══ REVIEWS GRID / CONTENT ═══ */}
           {loading ? (
-            <div className="text-center py-24 text-stone-400 font-serif italic text-lg tracking-wide">Loading premium reviews...</div>
+            /* Loading state — Rule 3 body text, italic serif accent */
+            <div className="text-center py-24">
+              <span className="font-serif italic text-lg tracking-wide text-stone-400">Loading premium reviews...</span>
+            </div>
           ) : filtered.length === 0 ? (
             <div className="bg-white/40 backdrop-blur-md rounded-[32px] p-12 text-center border border-dashed border-[#EADDCA]">
               <Star className="w-8 h-8 text-[#C5A059] mx-auto mb-4 opacity-40"/>
-              <h4 className="font-serif font-bold text-xl text-[#3E362E] mb-2">No reviews match your criteria</h4>
-              <p className="text-xs text-stone-400 font-light max-w-sm mx-auto mb-6">
+              {/* Subheading — Rule 1 line 1 style at smaller scale */}
+              <h4 className="font-sans font-black uppercase tracking-tight text-xl text-stone-900 mb-1">No Reviews Match</h4>
+              <p className="font-serif italic text-base text-[#C5A059] normal-case mb-4">your current criteria</p>
+              {/* Body — Rule 3 */}
+              <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 max-w-sm mx-auto mb-6">
                 {reviews.length === 0 ? "Be the first to share your ultimate experience with us!" : "Try modifying your search tags or rating options."}
               </p>
+              {/* Button — Rule 4 */}
               <button onClick={() => navigate("/write-review")}
-                className="bg-[#3E362E] text-white py-3.5 px-8 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] shadow-sm cursor-pointer">
+                className="bg-[#3E362E] text-white py-3.5 px-8 rounded-xl font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] shadow-sm cursor-pointer">
                 Write the First Review
               </button>
             </div>
@@ -185,12 +206,16 @@ export default function AllReviews() {
                             <Star key={k} className={`w-3.5 h-3.5 ${k < rating ? "fill-[#C5A059] text-[#C5A059]" : "text-stone-200"}`}/>
                           ))}
                         </div>
-                        <span className="text-[9px] font-bold tracking-widest uppercase text-stone-400">
+                        {/* Date — Rule 2 kicker style */}
+                        <span className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-stone-400">
                           {new Date(r.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"short" })}
                         </span>
                       </div>
 
-                      <div className="text-[#C5A059] font-serif text-4xl leading-none -mb-1 opacity-60">“</div>
+                      {/* Opening quote mark */}
+                      <div className="text-[#C5A059] font-serif text-4xl leading-none -mb-1 opacity-60">"</div>
+
+                      {/* Review text — serif italic luxury accent (Rule 1 Line 2 style) */}
                       <p className="font-serif italic text-[#3E362E] text-base leading-relaxed line-clamp-4 mb-6">
                         {r.review_text || "(No written feedback provided by customer)"}
                       </p>
@@ -198,14 +223,16 @@ export default function AllReviews() {
 
                     {/* Profile Wrapper */}
                     <div className="flex items-center gap-3 pt-4 border-t border-[#FAF6F0]">
-                      <div className="w-10 h-10 rounded-xl bg-[#3E362E] flex items-center justify-center text-[#C5A059] font-black text-sm border border-[#C5A059]/20 shadow-inner">
+                      <div className="w-10 h-10 rounded-xl bg-[#3E362E] flex items-center justify-center text-[#C5A059] font-sans font-black text-sm border border-[#C5A059]/20 shadow-inner">
                         {(r.customer_id?.name?.[0] || "?").toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
+                        {/* Customer name — serif bold */}
                         <p className="font-serif font-bold text-sm text-[#3E362E] truncate">{r.customer_id?.name || "Anonymous"}</p>
                         {r.barber_id?.name && (
-                          <p className="text-[9px] font-black tracking-widest uppercase text-stone-400 truncate mt-0.5">
-                            Stylist: <span className="text-[#C5A059] font-black">{r.barber_id.name}</span>
+                          /* Stylist tag — Rule 2 kicker */
+                          <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-stone-400 truncate mt-0.5">
+                            Stylist: <span className="text-[#C5A059]">{r.barber_id.name}</span>
                           </p>
                         )}
                       </div>
@@ -225,54 +252,70 @@ export default function AllReviews() {
           <div className="bg-white rounded-[32px] p-8 md:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA] relative animate-in fade-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}>
             
-            {/* Close Button Cross */}
+            {/* Close Button */}
             <button onClick={() => setSelectedReview(null)} className="absolute top-6 right-6 text-stone-400 hover:text-[#3E362E] transition-colors cursor-pointer">
               <X className="w-5 h-5"/>
             </button>
 
             <div className="flex items-center gap-3.5 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-[#3E362E] flex items-center justify-center text-[#C5A059] font-black text-lg border border-[#C5A059]/20">
+              <div className="w-12 h-12 rounded-xl bg-[#3E362E] flex items-center justify-center text-[#C5A059] font-sans font-black text-lg border border-[#C5A059]/20">
                 {(selectedReview.customer_id?.name?.[0] || "?").toUpperCase()}
               </div>
               <div>
+                {/* Customer name in modal — serif bold */}
                 <p className="font-serif font-bold text-lg text-[#3E362E]">{selectedReview.customer_id?.name || "Anonymous"}</p>
-                <p className="text-[9px] font-black tracking-widest uppercase text-stone-400 mt-0.5">
+                {/* Date — Rule 2 kicker */}
+                <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-stone-400 mt-0.5">
                   {new Date(selectedReview.created_at).toLocaleDateString("en-IN", { day:"numeric", month:"long", year:"numeric" })}
                 </p>
               </div>
             </div>
 
-            {/* Micro Dual-Rating Scorecard */}
+            {/* Dual-Rating Scorecard */}
             {(selectedReview.salon_rating > 0 || selectedReview.barber_rating > 0) && (
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {selectedReview.salon_rating > 0 && (
                   <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
-                    <p className="text-[9px] font-black tracking-wider uppercase text-[#C5A059] mb-1">Salon Experience</p>
-                    <p className="text-sm text-[#3E362E] font-bold">{"★".repeat(selectedReview.salon_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.salon_rating)}</span></p>
+                    {/* Label — Rule 2 */}
+                    <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Salon Experience</p>
+                    {/* Stars — body weight */}
+                    <p className="font-sans text-sm font-normal text-[#3E362E]">
+                      {"★".repeat(selectedReview.salon_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.salon_rating)}</span>
+                    </p>
                   </div>
                 )}
                 {selectedReview.barber_rating > 0 && (
                   <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
-                    <p className="text-[9px] font-black tracking-wider uppercase text-[#C5A059] mb-1">Stylist Service</p>
-                    <p className="text-sm text-[#3E362E] font-bold">{"★".repeat(selectedReview.barber_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.barber_rating)}</span></p>
+                    <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Stylist Service</p>
+                    <p className="font-sans text-sm font-normal text-[#3E362E]">
+                      {"★".repeat(selectedReview.barber_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.barber_rating)}</span>
+                    </p>
                   </div>
                 )}
               </div>
             )}
 
-            <div className="text-[#C5A059] font-serif text-5xl leading-none opacity-60 mb-1">“</div>
+            {/* Opening quote */}
+            <div className="text-[#C5A059] font-serif text-5xl leading-none opacity-60 mb-1">"</div>
+
+            {/* Review body — Rule 3 but serif italic for luxury feel */}
             <p className="font-serif italic text-base leading-relaxed text-[#3E362E] mb-6 whitespace-pre-wrap">
               {selectedReview.review_text || "No written feedback provided."}
             </p>
 
             {selectedReview.barber_id?.name && (
-              <div className="bg-[#FAF6F0] border-l-2 border-[#C5A059] px-4 py-2.5 rounded-r-xl mb-6 text-xs font-medium text-stone-500">
-                Crafted by specialist artist: <span className="text-[#3E362E] font-black">{selectedReview.barber_id.name}</span>
+              <div className="bg-[#FAF6F0] border-l-2 border-[#C5A059] px-4 py-2.5 rounded-r-xl mb-6">
+                {/* Body text — Rule 3 */}
+                <span className="font-sans text-sm font-normal leading-relaxed text-stone-600">
+                  Crafted by specialist artist:{" "}
+                  <span className="font-sans font-extrabold text-[#3E362E]">{selectedReview.barber_id.name}</span>
+                </span>
               </div>
             )}
 
+            {/* CTA Button — Rule 4 */}
             <button onClick={() => setSelectedReview(null)}
-              className="w-full bg-[#3E362E] text-white py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer">
+              className="w-full bg-[#3E362E] text-white py-3.5 rounded-xl font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer">
               Close Experience
             </button>
           </div>
