@@ -98,11 +98,26 @@ const ReviewSystem = ({ bookingData }) => {
             <div className="w-20 h-20 rounded-full bg-green-100 mx-auto mb-6 flex items-center justify-center">
               <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
-            <h2 className="text-3xl font-serif font-bold text-[#2D2926] mb-2 italic">Thank You!</h2>
-            <p className="text-[#A68942] text-[10px] uppercase tracking-[0.25em] mb-4 font-bold">Review Submitted</p>
-            <p className="text-[#8C8475] text-sm mb-6">Your feedback helps us improve. Redirecting you home...</p>
+
+            {/* Primary heading — Rule 1 */}
+            <h2 className="mb-1">
+              <span className="font-sans font-black uppercase text-3xl tracking-tight text-stone-900">Thank </span>
+              <span className="font-serif italic text-2xl text-[#C5A059] normal-case">You!</span>
+            </h2>
+
+            {/* Kicker — Rule 2 */}
+            <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-4">
+              Review Submitted
+            </p>
+
+            {/* Body — Rule 3 */}
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mb-6">
+              Your feedback helps us improve. Redirecting you home...
+            </p>
+
+            {/* Button — Rule 4 */}
             <button onClick={() => navigate("/")}
-              className="bg-[#3C3530] text-white px-8 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-[#2D2926] transition cursor-pointer">
+              className="bg-[#3C3530] text-white px-8 py-3 rounded-2xl font-sans font-extrabold text-xs tracking-wider uppercase transition hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer">
               Go Home Now
             </button>
           </div>
@@ -120,14 +135,15 @@ const ReviewSystem = ({ bookingData }) => {
         {/* ── GLOBAL NAVBAR HEADER ── */}
         <Navbar />
 
-        {/* ── EXIT BACK BUTTON CAPSULE ── */}
+        {/* ── EXIT BACK BUTTON ── */}
         <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
           <button 
             onClick={() => navigate("/")} 
-            className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white cursor-pointer select-none"
+            className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white transition-all duration-300 group cursor-pointer select-none"
           >
             <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1 text-[#C5A059]" />
-            <span>Cancel Review</span>
+            {/* Button label — Rule 4 */}
+            <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-[#3E362E]">Cancel Review</span>
           </button>
         </div>
 
@@ -135,22 +151,31 @@ const ReviewSystem = ({ bookingData }) => {
         <div className="w-full max-w-lg bg-[#FDFBF0] rounded-[2rem] shadow-xl border border-stone-200/40 relative z-10 mx-auto my-12 animate-fade-in text-left">
           <div className="p-8 md:p-12">
 
-            {/* Badge */}
+            {/* Scissor Badge */}
             <div className="flex justify-center mb-6">
               <div className="bg-[#FAF6E9] p-4 rounded-2xl border border-[#F2EDE0] shadow-sm">
                 <ScissorIcon className="w-8 h-8 text-[#A68942] stroke-[1.2px]" />
               </div>
             </div>
 
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#2D2926] text-center mb-2 italic">Review Session</h2>
-            <p className="text-[#A68942] text-center text-[10px] uppercase tracking-[0.25em] mb-10 font-bold opacity-80">
+            {/* Primary Heading — Rule 1 */}
+            <h2 className="text-center mb-2 leading-none">
+              <span className="font-sans font-black uppercase text-3xl md:text-4xl tracking-tight text-stone-900">Review </span>
+              <span className="font-serif italic text-2xl md:text-3xl text-[#C5A059] normal-case">Session</span>
+            </h2>
+
+            {/* Kicker — Rule 2 */}
+            <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center mb-10 opacity-80">
               Share your elite experience
             </p>
 
             <div className="space-y-8">
               {/* Salon Rating */}
               <div className="space-y-3">
-                <label className="text-[#8C8475] text-[9px] uppercase font-black tracking-widest block text-center">Salon Ambience</label>
+                {/* Label — Rule 2 */}
+                <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block text-center">
+                  Salon Ambience
+                </label>
                 <div className="flex justify-center gap-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button key={star}
@@ -163,12 +188,20 @@ const ReviewSystem = ({ bookingData }) => {
                     </button>
                   ))}
                 </div>
-                {salonRating > 0 && <p className="text-center text-[10px] text-[#A68942] font-bold">{salonRating} / 5</p>}
+                {/* Rating count — Rule 2 */}
+                {salonRating > 0 && (
+                  <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">
+                    {salonRating} / 5
+                  </p>
+                )}
               </div>
 
               {/* Barber Rating */}
               <div className="space-y-3">
-                <label className="text-[#8C8475] text-[9px] uppercase font-black tracking-widest block text-center">Stylist: {barberName}</label>
+                {/* Label — Rule 2 */}
+                <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block text-center">
+                  Stylist: {barberName}
+                </label>
                 <div className="flex justify-center gap-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button key={star}
@@ -181,40 +214,50 @@ const ReviewSystem = ({ bookingData }) => {
                     </button>
                   ))}
                 </div>
-                {barberRating > 0 && <p className="text-center text-[10px] text-[#A68942] font-bold">{barberRating} / 5</p>}
+                {/* Rating count — Rule 2 */}
+                {barberRating > 0 && (
+                  <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">
+                    {barberRating} / 5
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Textarea Input Container */}
+            {/* Textarea */}
             <div className="mt-10 mb-4">
               <textarea
                 value={reviewText}
                 onChange={(e) => { setReviewText(e.target.value); setError(""); }}
                 placeholder="Your feedback matters..."
                 maxLength={500}
-                className="w-full bg-[#FAF6E9] border border-[#E5E0D0] rounded-2xl p-5 text-[#2D2926] focus:border-[#A68942] focus:ring-0 outline-none transition-all h-28 resize-none placeholder-[#BDB7AB] text-sm shadow-inner"
+                className="w-full bg-[#FAF6E9] border border-[#E5E0D0] rounded-2xl p-5 font-sans text-sm font-normal leading-relaxed text-stone-600 focus:border-[#A68942] focus:ring-0 outline-none transition-all h-28 resize-none placeholder:text-stone-400 shadow-inner"
               />
-              <p className="text-right text-[9px] text-[#BDB7AB] mt-1">{reviewText.length}/500</p>
+              {/* Character count — Rule 2 */}
+              <p className="text-right font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 mt-1">
+                {reviewText.length}/500
+              </p>
             </div>
 
             {/* Error Message */}
             {error && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                <p className="text-red-600 text-xs font-semibold">{error}</p>
+                {/* Error text — Rule 3 */}
+                <p className="font-sans text-sm font-normal leading-relaxed text-red-600">{error}</p>
               </div>
             )}
 
-            {/* Action Trigger Button */}
+            {/* Submit Button — Rule 4 */}
             <button
               type="button"
               onClick={handleSubmit}
               disabled={loading || !token}
-              className="w-full bg-[#3C3530] hover:bg-[#2D2926] text-white font-bold py-5 rounded-2xl transition-all shadow-xl uppercase tracking-widest text-[10px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+              className="w-full bg-[#3C3530] hover:bg-[#C5A059] hover:text-[#2A241F] text-white font-sans font-extrabold text-xs tracking-wider uppercase py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
               {loading ? "Submitting..." : "Submit Review"}
             </button>
 
-            <p className="text-center text-[#8C8475] text-[8px] mt-8 uppercase tracking-[0.3em] opacity-60">
+            {/* Footer note — Rule 2 */}
+            <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 text-center mt-8 opacity-60">
               Professional Grooming Standards
             </p>
           </div>
