@@ -31,10 +31,16 @@ export default function QueuePage() {
   const queue = Array.isArray(queueContext.queue)
     ? queueContext.queue
     : [];
+  // console.log("QUEUE CONTEXT =", queueContext);
+  // console.log("QUEUE DATA =", queue);
 
-  const setQueue =
-    queueContext.setQueue ||
-    (() => console.log("setQueue missing"));
+  // const setQueue =
+  //   queueContext.setQueue ||
+  //   (() => console.log("setQueue missing"));
+
+  const addToQueue = queueContext.addToQueue;
+  const removeFromQueue = queueContext.removeFromQueue;
+  const updateStatus = queueContext.updateStatus;
 
   const [showAdd, setShowAdd] = useState(false);
   const [sideOpen, setSideOpen] = useState(false);
@@ -54,13 +60,15 @@ export default function QueuePage() {
     salonName: "The Royal Cuts",
   };
 
-  const visibleQueue = isOwner
-    ? queue
-    : queue.filter(
-        (q) =>
-          q.barber?.trim().toLowerCase() ===
-          currentBarberName?.trim().toLowerCase()
-      );
+  // const visibleQueue = isOwner
+  //   ? queue
+  //   : queue.filter(
+  //     (q) =>
+  //       q.barber?.trim().toLowerCase() ===
+  //       currentBarberName?.trim().toLowerCase()
+  //   );
+
+  const visibleQueue = queue;
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -95,10 +103,12 @@ export default function QueuePage() {
     };
 
     // IMPORTANT FIX
-    setQueue((prevQueue = []) => [
-      ...prevQueue,
-      newEntry,
-    ]);
+    // setQueue((prevQueue = []) => [
+    //   ...prevQueue,
+    //   newEntry,
+    // ]);
+
+    addToQueue(newEntry);
 
     setNewCustomer({
       customer: "",
@@ -110,20 +120,22 @@ export default function QueuePage() {
 
   /* ───────── DELETE ───────── */
   const handleDeleteCustomer = (id) => {
-    setQueue((prevQueue) =>
-      prevQueue.filter((item) => item.id !== id)
-    );
+    // setQueue((prevQueue) =>
+    //   prevQueue.filter((item) => item.id !== id)
+    // );
+    removeFromQueue(id);
   };
 
   /* ───────── COMPLETE ───────── */
   const handleComplete = (id) => {
-    setQueue((prevQueue) =>
-      prevQueue.map((item) =>
-        item.id === id
-          ? { ...item, status: "Completed" }
-          : item
-      )
-    );
+    // setQueue((prevQueue) =>
+    //   prevQueue.map((item) =>
+    //     item.id === id
+    //       ? { ...item, status: "Completed" }
+    //       : item
+    //   )
+    // );
+    updateStatus(id, "done");
   };
 
   /* ───────── START ───────── */
@@ -306,11 +318,10 @@ export default function QueuePage() {
                   {/* RIGHT */}
                   <div className="flex flex-wrap items-center gap-3">
                     <span
-                      className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        q.status === "Completed"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-[#FAF6F0] text-[#8B5A2B]"
-                      }`}
+                      className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${q.status === "done" ?  "Completed" : q.status}
+                        ? "bg-green-100 text-green-600"
+                        : "bg-[#FAF6F0] text-[#8B5A2B]"
+                        }`}
                     >
                       {q.status || "Waiting"}
                     </span>
