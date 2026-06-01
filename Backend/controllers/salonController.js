@@ -18,6 +18,19 @@ exports.registerSalon = async (req, res) => {
       message: "Salon submitted for approval"
     });
   } catch (err) {
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern || {})[0] || 'mobile';
+      if (field === 'mobile') {
+        return res.status(400).json({
+          success: false,
+          message: "A salon with this mobile number is already registered. Please use a unique mobile number."
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        message: `A salon with this ${field} is already registered.`
+      });
+    }
     res.status(500).json({ success: false, message: err.message });
   }
 };
