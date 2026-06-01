@@ -7,8 +7,6 @@ import {
 import { StatCard, RecentTickets } from '../../Components/DashboardWidgets.jsx';
 import { getStats, TICKET_STATUS } from '../../utils/tickets.jsx';
 import { StatusBadge } from '../../Components/TicketBadges.jsx';
-import { useSubscriptions } from '../../contexts/AppContext.jsx';
-
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -16,7 +14,6 @@ const getToken = () => localStorage.getItem("token");
 
 export function DashboardPage({ tickets, onSelectTicket }) {
   const stats = getStats(tickets);
-  const { subscriptions } = useSubscriptions();
 
   /* ── Newsletter Subscribers State ── */
   const [subscribers, setSubscribers] = useState([]);
@@ -230,40 +227,6 @@ export function DashboardPage({ tickets, onSelectTicket }) {
               </span>
             </li>
           </ul>
-        </div>
-      </div>
-
-      {/* ── FOOTER SUBSCRIPTIONS SUMMARY ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card p-6 bg-white shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">Footer Subscriptions</h3>
-              <p className="text-[11px] text-stone-400 font-medium mt-1">Emails submitted from the home page footer.</p>
-            </div>
-            <span className="text-sm font-black text-stone-900 bg-stone-100 px-3 py-1 rounded-full border border-stone-200">
-              {subscriptions.length}
-            </span>
-          </div>
-          <div className="text-sm text-stone-500">Latest subscription emails are available here for admin review.</div>
-        </div>
-
-        <div className="card p-6 bg-white shadow-sm">
-          <h3 className="text-md font-black font-serif text-stone-900 tracking-tight mb-4">Recent Footer Emails</h3>
-          {subscriptions.length === 0 ? (
-            <p className="text-sm text-stone-500">No footer emails have been submitted yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {subscriptions.slice(-5).reverse().map((sub) => (
-                <li key={sub.id} className="flex items-center justify-between gap-3 rounded-xl border border-stone-200/60 bg-stone-50 px-4 py-3">
-                  <span className="truncate text-sm text-stone-700">{sub.email}</span>
-                  <span className="text-[11px] uppercase tracking-[0.18em] text-stone-400">
-                    {new Date(sub.createdAt).toLocaleDateString()}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </div>
 

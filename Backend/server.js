@@ -22,12 +22,11 @@ app.use("/api/owner",    require("./routes/ownerRoutes"));
 app.use("/api/booking",  require("./routes/bookingRoutes"));
 app.use("/api/queue",    require("./routes/queueRoutes"));
 app.use("/api/payment",  require("./routes/razorpayRoutes"));
-app.use("/api/admin",    require("./routes/adminRoutes"));
+app.use("/api/admin",    adminRoutes);
 app.use("/api/services", require("./routes/serviceRoutes"));
 app.use("/api/reminder", require("./routes/reminderRoutes"));
 app.use("/api/noshow",   require("./routes/noshowRoutes"));
-app.use("/api/breaks", breakRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/api/breaks",   breakRoutes);
 app.use("/api/review",   require("./routes/reviewRoutes"));
 
 

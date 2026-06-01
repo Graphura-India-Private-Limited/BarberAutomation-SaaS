@@ -42,8 +42,8 @@ router.get("/reviews", protect, adminOnly, adminController.getAllReviews);
 router.delete("/review/:id", protect, adminOnly, adminController.deleteReview);
 
 /* ── NEWSLETTER SUBSCRIBERS ── */
-router.get("/newsletter-subscribers", protect, adminOnly, adminController.getNewsletterSubscribers);
-router.delete("/newsletter-subscribers/:id", protect, adminOnly, adminController.deleteNewsletterSubscriber);
+router.get("/newsletter-subscribers", protect, adminController.getNewsletterSubscribers);
+router.delete("/newsletter-subscribers/:id", protect, adminController.deleteNewsletterSubscriber);
 
 /* ── CREATE ADMIN ── */
 router.post("/create", adminController.createAdmin);
