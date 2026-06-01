@@ -7,6 +7,7 @@ const Barber = require("../models/Barber");
 const Review = require("../models/Review");
 const Service = require("../models/Service");
 const Admin = require("../models/Admin");
+const Newsletter = require("../models/Newsletter");
 
 // @desc    Get global platform metrics
 // @route   GET /api/admin/global-metrics
@@ -415,3 +416,33 @@ exports.createAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+/* ══ NEWSLETTER SUBSCRIBERS ══ */
+
+// @desc    Get all newsletter subscribers
+// @route   GET /api/admin/newsletter-subscribers
+// @access  Private (Admin Only)
+exports.getNewsletterSubscribers = async (req, res) => {
+  try {
+    const subscribers = await Newsletter.find().sort({ subscribedAt: -1 });
+    res.json({ success: true, subscribers });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Delete a newsletter subscriber
+// @route   DELETE /api/admin/newsletter-subscribers/:id
+// @access  Private (Admin Only)
+exports.deleteNewsletterSubscriber = async (req, res) => {
+  try {
+    const subscriber = await Newsletter.findByIdAndDelete(req.params.id);
+    if (!subscriber) {
+      return res.status(404).json({ success: false, message: "Subscriber not found" });
+    }
+    res.json({ success: true, message: "Subscriber deleted successfully!" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+

@@ -50,4 +50,7 @@ router.post("/admin/login/mobile", authController.loginAdminMobile);
 router.post("/admin/verify-mpin", protect, authController.verifyMpin);
 router.post("/admin/create", authController.createAdmin);
 
+/* ── Newsletter Subscribe ── */
+router.post("/subscribe", authController.subscribeNewsletter);
+
 module.exports = router;

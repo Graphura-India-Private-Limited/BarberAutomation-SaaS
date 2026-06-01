@@ -41,6 +41,10 @@ router.get("/payments", protect, adminOnly, adminController.getAllPayments);
 router.get("/reviews", protect, adminOnly, adminController.getAllReviews);
 router.delete("/review/:id", protect, adminOnly, adminController.deleteReview);
 
+/* ── NEWSLETTER SUBSCRIBERS ── */
+router.get("/newsletter-subscribers", protect, adminOnly, adminController.getNewsletterSubscribers);
+router.delete("/newsletter-subscribers/:id", protect, adminOnly, adminController.deleteNewsletterSubscriber);
+
 /* ── CREATE ADMIN ── */
 router.post("/create", adminController.createAdmin);
 

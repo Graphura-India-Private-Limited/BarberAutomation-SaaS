@@ -5,6 +5,7 @@ const Barber = require("../models/Barber");
 const Admin = require("../models/Admin");
 const Salon = require("../models/Salon");
 const OtpStore = require("../models/OtpStore");
+const Newsletter = require("../models/Newsletter");
 
 // Helper: Generate JWT Token
 const genToken = (id, role = "customer") =>
@@ -549,3 +550,32 @@ exports.createAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Subscribe to Newsletter
+// @route   POST /api/auth/subscribe
+// @access  Public
+exports.subscribeNewsletter = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+    
+    // Simple email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+
+    const existing = await Newsletter.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ success: false, message: "This email is already subscribed" });
+    }
+
+    await Newsletter.create({ email });
+    res.status(201).json({ success: true, message: "Subscribed successfully!" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+

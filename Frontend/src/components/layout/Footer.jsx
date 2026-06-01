@@ -13,8 +13,11 @@ import {
   Award
 } from "lucide-react";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const Footer = () => {
   const navigate = useNavigate();
+<<<<<<< Updated upstream
   const { addSubscriber } = useSubscriptions();
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterMessage, setNewsletterMessage] = useState("");
@@ -34,6 +37,44 @@ const Footer = () => {
     setNewsletterEmail("");
     setNewsletterMessage("Subscribed! Check admin dashboard for the email.");
     window.setTimeout(() => setNewsletterMessage(""), 4000);
+=======
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState(null); // null | { type: 'success' | 'error', msg: string }
+
+  const handleSubscribe = async () => {
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setStatus({ type: "error", msg: "Please enter your email." });
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmed)) {
+      setStatus({ type: "error", msg: "Enter a valid email address." });
+      return;
+    }
+    setSubmitting(true);
+    setStatus(null);
+    try {
+      const res = await fetch(`${API}/auth/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStatus({ type: "success", msg: "🎉 You're subscribed!" });
+        setEmail("");
+      } else {
+        setStatus({ type: "error", msg: data.message || "Something went wrong." });
+      }
+    } catch {
+      setStatus({ type: "error", msg: "Network error. Please try again." });
+    } finally {
+      setSubmitting(false);
+      setTimeout(() => setStatus(null), 4000);
+    }
+>>>>>>> Stashed changes
   };
 
   const SERVICE_LINKS = [
@@ -401,6 +442,7 @@ const Footer = () => {
           </div>
 
           {/* NEWSLETTER */}
+<<<<<<< Updated upstream
           <form onSubmit={handleNewsletterSubmit} className="p-1 rounded-xl bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <input
@@ -421,6 +463,92 @@ const Footer = () => {
               <p className="text-[11px] text-stone-200 font-medium">{newsletterMessage}</p>
             )}
           </form>
+=======
+<div className="
+  p-1
+
+  rounded-xl
+
+  bg-white/[0.05]
+  backdrop-blur-xl
+
+  border border-white/[0.08]
+
+  flex items-center
+  transition-all duration-300
+  focus-within:border-[#C5A059]/50
+  focus-within:bg-white/[0.08]
+">
+            <input
+  type="email"
+  placeholder="Drop your email..."
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  onKeyDown={(e) => e.key === "Enter" && !submitting && handleSubscribe()}
+  disabled={submitting}
+  className="
+    flex-1
+    bg-transparent
+
+    px-3 py-2.5
+
+    text-xs
+    text-white
+
+    placeholder:text-stone-500
+
+    outline-none
+    disabled:opacity-60
+  "
+/>
+           <button
+  onClick={handleSubscribe}
+  disabled={submitting}
+  className="
+  w-10 h-10
+
+  rounded-lg
+
+  bg-gradient-to-r
+  from-[#C5A059]
+  via-[#E8C878]
+  to-[#C5A059]
+
+  text-[#2A241F]
+
+  flex items-center justify-center
+
+  hover:scale-105
+
+  transition-all duration-300
+  disabled:opacity-60
+  disabled:cursor-not-allowed
+"
+>
+  {submitting ? (
+    <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="40" strokeDashoffset="10" />
+    </svg>
+  ) : (
+    <Send className="w-3.5 h-3.5" />
+  )}
+</button>
+          </div>
+          {status && (
+            <div className={`
+              mt-2 px-3 py-2 rounded-lg text-[11px] font-semibold
+              transition-all duration-300
+              ${status.type === "success"
+                ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25"
+                : "bg-red-500/15 text-red-400 border border-red-500/25"
+              }
+            `}>
+              {status.msg}
+            </div>
+          )}
+
+
+>>>>>>> Stashed changes
         </div>
 
       </div>
