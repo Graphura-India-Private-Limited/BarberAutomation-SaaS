@@ -708,20 +708,53 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
       </AdminDataTable>
     </AdminPageShell>
   );
+
 }
 
-/* ── SERVICES ── */
-export function ServicesModule({ services, salons, loading, newService, setNewService, addService, toggleService, deleteService }) {
+/*----SERVICES----- */
+
+export function ServicesModule({ 
+  services = [], 
+  salons = [], 
+  loading, 
+  newService, 
+  setNewService, 
+  addService, 
+  toggleService, 
+  deleteService 
+}) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  
+  // ── ✅ ACTIONS AND DROPDOWN DRAWER STATES ──
+  const [showAddDrawer, setShowAddDrawer] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState("all");
+
   const active = services.filter((s) => s.is_active).length;
 
+  // ── ✅ DYNAMIC OPTION POOL FOR PREMIUM DROPDOWN OVERLAY ──
+  const serviceDropdownOptions = [
+    { value: "all", label: "All Categories" },
+    { value: "men", label: "Men's Segment" },
+    { value: "women", label: "Women's Segment" },
+    { value: "addon", label: "Addon Extras" }
+  ];
+
+  // ── ✅ COMPREHENSIVE FILTER SYSTEM ENGINE ──
   const filtered = services.filter((s) => {
+    // 1. Intercept Category Selection State Mismatches
+    if (categoryFilter !== "all" && s.category?.toLowerCase() !== categoryFilter.toLowerCase()) {
+      return false;
+    }
+    // 2. Evaluate Text Query Inputs
     if (!search) return true;
     const q = search.toLowerCase();
-    return [s.name, s.category, s.salon_id?.salon_name].filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+    return [s.name, s.category, s.salon_id?.salon_name]
+      .filter(Boolean)
+      .some((v) => String(v).toLowerCase().includes(q));
   });
 
+  // Ensure pagination functions re-evaluate data states safely on row changes
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
   const approved = salons.filter((s) => s.status === "approved");
 
@@ -732,36 +765,60 @@ export function ServicesModule({ services, salons, loading, newService, setNewSe
     { label: "Salons", value: approved.length, sub: "With services", subColor: C.purple, icon: Store, iconBg: C.purpleLight, iconColor: C.purple },
   ];
 
+  const handleAddServiceWrapper = async () => {
+    await addService();
+    setShowAddDrawer(false); 
+  };
+
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <div className="bg-white rounded-xl border p-5 card-shadow" style={{ borderColor: C.border }}>
-        <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-3" style={{ color: C.ink }}>Quick add service</p>
-        <div className="flex flex-wrap gap-2">
-          <input className="inp flex-1 min-w-[140px]" placeholder="Service name" value={newService.name} onChange={(e) => setNewService((p) => ({ ...p, name: e.target.value }))} />
-          <select className="inp" value={newService.category} onChange={(e) => setNewService((p) => ({ ...p, category: e.target.value }))}>
-            <option value="men">Men</option><option value="women">Women</option><option value="addon">Addon</option>
-          </select>
-          <input className="inp w-24" type="number" placeholder="₹" value={newService.price} onChange={(e) => setNewService((p) => ({ ...p, price: e.target.value }))} />
-          <input className="inp w-24" type="number" placeholder="Min" value={newService.duration} onChange={(e) => setNewService((p) => ({ ...p, duration: e.target.value }))} />
-          <select className="inp" value={newService.salon_id} onChange={(e) => setNewService((p) => ({ ...p, salon_id: e.target.value }))}>
-            <option value="">Salon…</option>
-            {approved.map((s) => <option key={s._id} value={s._id}>{s.salon_name}</option>)}
-          </select>
-          <button type="button" onClick={addService} className="px-4 py-2 rounded-md font-sans text-xs font-extrabold uppercase tracking-wider text-white" style={{ background: C.brown }}>Add</button>
+      
+      {/* QUICK ADD EXTENSION PANEL ACCORDION DRAWER */}
+      {showAddDrawer && (
+        <div className="bg-white rounded-xl border p-5 card-shadow mb-6 animate-fadeIn text-left" style={{ borderColor: C.border }}>
+          <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-3" style={{ color: C.ink }}>Quick add service</p>
+          <div className="flex flex-wrap gap-2">
+            <input className="inp flex-1 min-w-[140px]" placeholder="Service name" value={newService.name} onChange={(e) => setNewService((p) => ({ ...p, name: e.target.value }))} />
+            <select className="inp" value={newService.category} onChange={(e) => setNewService((p) => ({ ...p, category: e.target.value }))}>
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+              <option value="addon">Addon</option>
+            </select>
+            <input className="inp w-24" type="number" placeholder="₹" value={newService.price} onChange={(e) => setNewService((p) => ({ ...p, price: e.target.value }))} />
+            <input className="inp w-24" type="number" placeholder="Min" value={newService.duration} onChange={(e) => setNewService((p) => ({ ...p, duration: e.target.value }))} />
+            <select className="inp" value={newService.salon_id} onChange={(e) => setNewService((p) => ({ ...p, salon_id: e.target.value }))}>
+              <option value="">Salon…</option>
+              {approved.map((s) => <option key={s._id} value={s._id}>{s.salon_name}</option>)}
+            </select>
+            <button type="button" onClick={handleAddServiceWrapper} className="px-4 py-2 rounded-md font-sans text-xs font-extrabold uppercase tracking-wider text-white border-none cursor-pointer hover:opacity-90 transition-opacity" style={{ background: C.brown }}>Add</button>
+          </div>
         </div>
-      </div>
-      <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search services..." addLabel="+ Add Service" />
+      )}
+
+      {/* GLOBAL MANAGEMENT ACTION TOOLBAR INTERFACE CONTROL */}
+      <ActionToolbar 
+        search={search} 
+        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
+        placeholder="Search services..." 
+        addLabel={showAddDrawer ? "✕ Close Panel" : "+ Add Service"} 
+        onAdd={() => setShowAddDrawer(!showAddDrawer)} 
+        filterValue={categoryFilter}
+        onFilterChange={(cat) => { setCategoryFilter(cat); setPage(1); }}
+        filterOptions={serviceDropdownOptions} // ✅ FIXED: WIRES DOWN THE MOUNT OPTIONS
+      />
+
+      {/* CORE ADMIN SERVICES GRID DATA LAYOUT */}
       <AdminDataTable
         columns={["SERVICE", "SALON", "CATEGORY", "PRICE", "DURATION", "STATUS", "ACTIONS"]}
         loading={loading}
         footer={<TablePagination total={total} pageSafe={pageSafe} totalPages={totalPages} onPrev={() => setPage((p) => Math.max(1, p - 1))} onNext={() => setPage((p) => Math.min(totalPages, p + 1))} />}
       >
         {!loading && paged.length === 0 ? (
-          <TableEmptyRow colSpan={7} icon={Scissors} title="No services yet" subtitle="Add services for approved salons" />
+          <TableEmptyRow colSpan={7} icon={Scissors} title="No services yet" subtitle="No services match the active filters" />
         ) : (
           paged.map((s) => (
-            <tr key={s._id} className="border-t" style={{ borderColor: C.border }}>
+            <tr key={s._id} className="border-t text-left" style={{ borderColor: C.border }}>
               <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>{s.name}</td>
               <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.gold }}>{s.salon_id?.salon_name || "—"}</td>
               <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed capitalize" style={{ color: C.muted }}>{s.category}</td>
@@ -770,8 +827,8 @@ export function ServicesModule({ services, salons, loading, newService, setNewSe
               <td className="px-6 py-4"><StatusPill active={s.is_active} label={s.is_active ? "Active" : "Inactive"} /></td>
               <td className="px-6 py-4">
                 <div className="flex gap-2">
-                  <button onClick={() => toggleService(s._id, !s.is_active)} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-amber-50 text-amber-800">{s.is_active ? "Disable" : "Enable"}</button>
-                  <button onClick={() => deleteService(s._id)} className="p-1.5 rounded-md hover:bg-red-50 text-red-600"><Trash2 size={16} /></button>
+                  <button onClick={() => toggleService(s._id, !s.is_active)} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-amber-50 text-amber-800 border-none cursor-pointer hover:bg-amber-100 transition-colors">{s.is_active ? "Disable" : "Enable"}</button>
+                  <button onClick={() => deleteService(s._id)} className="p-1.5 rounded-md hover:bg-red-50 text-red-600 border-none bg-transparent cursor-pointer transition-colors"><Trash2 size={16} /></button>
                 </div>
               </td>
             </tr>
@@ -786,12 +843,32 @@ export function ServicesModule({ services, salons, loading, newService, setNewSe
 export function PaymentsModule({ payments, loading }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const captured = payments.filter((p) => p.status === "captured" || p.status === "SUCCESS").reduce((a, b) => a + (b.amount || 0), 0);
+  
+  // ── ✅ STEP 1: ADD LOCAL PAYMENT STATUS FILTER STATE ──
+  const [statusFilter, setStatusFilter] = useState("all");
 
+  const captured = payments.filter((p) => p.status === "captured").reduce((a, b) => a + (b.amount || 0), 0);
+
+  // ── ✅ STEP 2: DEFINE PREMIUM OPTIONS MATCHING PAYMENT DATABASE SCHEMAS ──
+  const paymentOptions = [
+    { value: "all", label: "All Statuses" },
+    { value: "captured", label: "Captured" },
+    { value: "pending", label: "Pending" },
+    { value: "refunded", label: "Refunded" }
+  ];
+
+  // ── ✅ STEP 3: UPDATE FILTER ENGINE TO INTERCEPT SELECTED STATUS OPTIONS ──
   const filtered = payments.filter((p) => {
+    // 1. Validate custom dropdown choice selection
+    if (statusFilter !== "all" && p.status?.toLowerCase() !== statusFilter.toLowerCase()) {
+      return false;
+    }
+    // 2. Validate standard text search field inputs
     if (!search) return true;
     const q = search.toLowerCase();
-    return [p.customer_id?.name, p.salon_id?.salon_name, p.status].filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+    return [p.customer_id?.name, p.salon_id?.salon_name, p.status]
+      .filter(Boolean)
+      .some((v) => String(v).toLowerCase().includes(q));
   });
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
@@ -806,7 +883,20 @@ export function PaymentsModule({ payments, loading }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search payments..." addLabel={null} />
+      
+      {/* ── ✅ STEP 4: PASS CONFIGURATIONS DIRECTLY TO THE TOOLBAR COMPONENT ── */}
+      <ActionToolbar 
+        search={search} 
+        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
+        placeholder="Search payments..." 
+        addLabel={null} 
+        
+        // Dynamic alignment wires:
+        filterValue={statusFilter}
+        onFilterChange={(status) => { setStatusFilter(status); setPage(1); }}
+        filterOptions={paymentOptions}
+      />
+
       <AdminDataTable
         columns={["CUSTOMER", "SALON", "AMOUNT", "TYPE", "STATUS", "DATE"]}
         loading={loading}
@@ -840,12 +930,38 @@ export function PaymentsModule({ payments, loading }) {
 export function ReviewsModule({ reviews, loading, deleteReview }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  
+  // ── ✅ STEP 1: ADD LOCAL RATING FILTER STATE ──
+  const [ratingFilter, setRatingFilter] = useState("all");
+
   const avg = reviews.length ? (reviews.reduce((a, r) => a + (r.rating || 0), 0) / reviews.length).toFixed(1) : "0";
 
+  // ── ✅ STEP 2: DEFINE PORTRAIT RATING CHOICES ──
+  const reviewDropdownOptions = [
+    { value: "all", label: "All Ratings" },
+    { value: "5", label: "5 Stars Only" },
+    { value: "4", label: "4 Stars & Above" },
+    { value: "3", label: "3 Stars & Above" },
+    { value: "2", label: "Critical (2★ & Below)" }
+  ];
+
+  // ── ✅ STEP 3: INTERCEPT SELECTION IN THE FILTER STREAM ──
   const filtered = reviews.filter((r) => {
+    // 1. Process Star Rating Dropdown Selections
+    if (ratingFilter !== "all") {
+      const actualRating = r.rating || 0;
+      if (ratingFilter === "5" && actualRating !== 5) return false;
+      if (ratingFilter === "4" && actualRating < 4) return false;
+      if (ratingFilter === "3" && actualRating < 3) return false;
+      if (ratingFilter === "2" && actualRating > 2) return false;
+    }
+
+    // 2. Process Standard Text Input Queries
     if (!search) return true;
     const q = search.toLowerCase();
-    return [r.customer_id?.name, r.salon_id?.salon_name, r.review_text].filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+    return [r.customer_id?.name, r.salon_id?.salon_name, r.review_text]
+      .filter(Boolean)
+      .some((v) => String(v).toLowerCase().includes(q));
   });
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
@@ -860,27 +976,40 @@ export function ReviewsModule({ reviews, loading, deleteReview }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search reviews..." addLabel={null} />
+      
+      {/* ── ✅ STEP 4: PASS CONFIGURATIONS TO WIRED TOOLBAR PROPS ── */}
+      <ActionToolbar 
+        search={search} 
+        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
+        placeholder="Search reviews..." 
+        addLabel={null} 
+        
+        // Dynamic Wires:
+        filterValue={ratingFilter}
+        onFilterChange={(rating) => { setRatingFilter(rating); setPage(1); }}
+        filterOptions={reviewDropdownOptions}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {loading ? (
           <div className="col-span-full py-16 text-center font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>Loading reviews…</div>
         ) : paged.length === 0 ? (
           <div className="col-span-full bg-white rounded-xl border p-14 text-center" style={{ borderColor: C.border }}>
             <Star size={32} className="mx-auto mb-4" color="#A66527" />
-            <p className="font-sans text-sm font-semibold" style={{ color: C.ink }}>No reviews yet</p>
+            <p className="font-sans text-sm font-semibold" style={{ color: C.ink }}>No reviews match the active filters</p>
           </div>
         ) : (
           paged.map((r) => (
-            <div key={r._id} className="bg-white rounded-xl border p-5 card-shadow" style={{ borderColor: C.border }}>
+            <div key={r._id} className="bg-white rounded-xl border p-5 card-shadow text-left" style={{ borderColor: C.border }}>
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
                   <AdminAvatar name={r.customer_id?.name || "C"} size={36} color={C.purple} bg={C.purpleLight} />
                   <div>
                     <div className="font-sans text-sm font-semibold" style={{ color: C.ink }}>{r.customer_id?.name || "Customer"}</div>
-                    <div className="font-sans text-xs font-normal" style={{ color: C.muted }}>{r.salon_id?.salon_name || "—"}</div>
+                    <div className="font-sans text-xs font-normal" style={{ color: C.gold }}>{r.salon_id?.salon_name || "—"}</div>
                   </div>
                 </div>
-                <button type="button" onClick={() => deleteReview(r._id)} className="p-1.5 rounded-md hover:bg-red-50 text-red-600"><Trash2 size={16} /></button>
+                <button type="button" onClick={() => deleteReview(r._id)} className="p-1.5 rounded-md hover:bg-red-50 text-red-600 border-none bg-transparent cursor-pointer transition-colors"><Trash2 size={16} /></button>
               </div>
               <div className="flex gap-0.5 mb-2">
                 {[1, 2, 3, 4, 5].map((s) => (
@@ -888,7 +1017,7 @@ export function ReviewsModule({ reviews, loading, deleteReview }) {
                 ))}
               </div>
               <p className="font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{r.review_text || "No comment"}</p>
-              <p className="font-sans text-xs font-normal mt-3" style={{ color: C.border }}>{formatJoined(r.created_at || r.createdAt)}</p>
+              <p className="font-sans text-xs font-normal mt-3" style={{ color: C.muted }}>{formatJoined(r.created_at || r.createdAt)}</p>
             </div>
           ))
         )}
