@@ -7,9 +7,9 @@ const ProfileField = ({ label, value, icon: Icon }) => (
       <Icon size={18} className="stroke-[2.5px]" />
     </div>
     <div className="min-w-0 flex-1">
-      <label className="block text-[10px] font-black uppercase tracking-widest text-[#A37B58] leading-none mb-1.5">{label}</label>
-      <p className="text-sm font-extrabold text-stone-900 truncate leading-tight">{value}</p>
-      <span className="inline-flex items-center gap-1 text-[9px] text-stone-400 font-black uppercase tracking-widest mt-1">
+      <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] leading-none mb-1.5 font-sans">{label}</label>
+      <p className="text-sm font-extrabold text-stone-900 truncate leading-tight font-sans">{value}</p>
+      <span className="inline-flex items-center gap-1 text-[9px] text-stone-400 font-black uppercase tracking-widest mt-1 font-sans">
         <ShieldCheck size={10} className="text-stone-400 stroke-[2.5px]" /> Locked by Management
       </span>
     </div>
@@ -31,13 +31,92 @@ function BarberProfile() {
   const [sideOpen, setSideOpen] = useState(false);
   const salonInfo = { salonName: "Master Barber Lounge", initials: "AS" };
 
-  const handleSave = (e) => {
+  // ── ✅ INITIALIZATION HOOK: HYDRATE FROM LOCALSTORAGE FALLBACK OR SERVER ROUTES ──
+  useEffect(() => {
+    const fetchProfileMetrics = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API}/auth/barber/profile`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
+        const data = await response.json();
+        
+        // 1. Try Loading from Database Metrics First
+        if (data.success && data.barber) {
+          // If server is active but has dummy mock properties, double-check local storage state caches
+          const cachedExperience = localStorage.getItem("barber_experience_cache");
+          const cachedMobile = localStorage.getItem("barber_mobile_cache");
+          const cachedSpec = localStorage.getItem("barber_specialization_cache");
+
+          setProfile({
+            name: data.barber.name || "Arjun Sharma",
+            mobile: cachedMobile || data.barber.mobile_number || "9876543210",
+            assignedSalon: data.barber.salon_id?.salon_name || "Elite Cuts & Spa - Downtown",
+            experience: cachedExperience ? Number(cachedExperience) : (data.barber.experience_years || 5), 
+            specialization: cachedSpec || data.barber.specialization || "Haircut & Beard",
+          });
+        }
+      } catch (err) {
+        console.warn("API Offline, fallback to local storage cache state synchronization strategy.");
+        
+        // 2. Offline Fallback Pipeline Strategy
+        const cachedExperience = localStorage.getItem("barber_experience_cache");
+        const cachedMobile = localStorage.getItem("barber_mobile_cache");
+        const cachedSpec = localStorage.getItem("barber_specialization_cache");
+
+        setProfile((prev) => ({
+          ...prev,
+          mobile: cachedMobile || prev.mobile,
+          experience: cachedExperience ? Number(cachedExperience) : prev.experience,
+          specialization: cachedSpec || prev.specialization
+        }));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileMetrics();
+  }, []);
+
+  // ── ✅ SAVE HANDLER: COMMIT SYNC TO DATABASE AND LOCALSTORAGE SIMULTANEOUSLY ──
+  const handleSave = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      alert("Professional profile details updated successfully!");
-    }, 1000);
+    if (profile.mobile.length !== 10) return;
+    
+    setSaving(true);
+
+    // 🌟 LOCAL STORAGE STATE SNAPSHOT CACHE LOCK
+    localStorage.setItem("barber_experience_cache", profile.experience);
+    localStorage.setItem("barber_mobile_cache", profile.mobile);
+    localStorage.setItem("barber_specialization_cache", profile.specialization);
+
+    try {
+      const response = await fetch(`${API}/auth/barber/update-profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          mobile_number: profile.mobile,
+          experience_years: Number(profile.experience), 
+          specialization: profile.specialization,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert("Professional profile details synchronized successfully!");
+      } else {
+        // If the server route responded but code logic failed, fallback still shields the client UI state
+        alert("Local cache locked! Note: Server dropped remote state save request updates.");
+      }
+    } catch (err) {
+      console.error("Network payload submission error:", err);
+      alert("Profile data cached locally on this machine! (Server transmission channel offline)");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -65,7 +144,7 @@ function BarberProfile() {
       <main className="max-w-5xl mx-auto w-full px-6 py-10 flex-1">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          {/* 👤 LEFT COLUMN */}
+          {/* 👤 LEFT BIOMETRIC COLUMN */}
           <div className="md:col-span-1 space-y-6">
             <div className="relative rounded-[2.5rem] bg-white border border-stone-200/60 p-6 shadow-sm flex flex-col items-center justify-center overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-24 bg-[#3E362E]" />
@@ -75,9 +154,9 @@ function BarberProfile() {
               </div>
 
               <div className="text-center mt-4 relative z-10 w-full">
-                <h3 className="text-xl font-extrabold text-stone-900 tracking-tight">{profile.name}</h3>
-                <p className="text-[10px] text-[#A37B58] font-black uppercase tracking-widest mt-1">Master Barber</p>
-                <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 bg-stone-50 border border-stone-200 text-stone-400 rounded-lg text-[9px] font-black uppercase tracking-wider">
+                <h3 className="text-xl font-extrabold text-stone-900 tracking-tight font-sans">{profile.name}</h3>
+                <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-1 font-sans">Master Barber</p>
+                <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 bg-stone-50 border border-stone-200 text-stone-400 rounded-lg text-[9px] font-black uppercase tracking-wider font-sans">
                   Member since Oct 2024
                 </div>
               </div>
@@ -88,18 +167,21 @@ function BarberProfile() {
             </div>
           </div>
           
-          {/* 📑 RIGHT COLUMN */}
+          {/* 📑 RIGHT OPERATIONS COLUMN */}
           <div className="md:col-span-2 bg-white border border-stone-200/60 rounded-[2.5rem] p-6 md:p-8 shadow-sm text-left flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2.5 mb-8 border-b border-stone-50 pb-4">
-                <Award className="text-[#A37B58]" size={20} />
-                <h2 className="text-xl font-black uppercase tracking-tight text-stone-900">Professional Stats</h2>
+                <Award className="text-[#C5A059]" size={20} />
+                <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                  <span className="font-bold uppercase">Professional</span>
+                  <span className="italic text-[#C5A059] normal-case font-medium">Stats</span>
+                </h2>
               </div>
 
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 pl-0.5 flex items-center gap-1">
-                    <Phone size={10} className="text-[#A37B58]" /> Contact Mobile Number
+                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-0.5 flex items-center gap-1 font-sans">
+                    <Phone size={10} className="text-[#C5A059]" /> Contact Mobile Number
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A37B58] font-black text-sm">+91</span>
@@ -139,7 +221,7 @@ function BarberProfile() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-stone-100">
+                <div className="pt-4 border-t border-stone-100 font-sans">
                   <button 
                     type="submit"
                     disabled={loading || profile.mobile.length !== 10}
@@ -158,4 +240,4 @@ function BarberProfile() {
   );
 }
 
-export default BarberProfile;
+export default BarberProfile; 

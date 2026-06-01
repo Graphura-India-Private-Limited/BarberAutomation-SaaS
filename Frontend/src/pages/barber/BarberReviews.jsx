@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { 
   Star, MessageSquare, Award, ThumbsUp, Filter, Calendar, 
-  Heart, ShieldCheck, Menu, Bell // <--- Menu और Bell यहाँ इम्पोर्ट किए गए
+  Heart, ShieldCheck, Menu, Bell 
 } from "lucide-react";
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
-// Mock Data
 const MOCK_REVIEW_STATS = {
   averageRating: 4.9,
   totalReviews: 124,
@@ -17,16 +16,79 @@ const MOCK_REVIEW_STATS = {
 };
 
 const MOCK_REVIEWS_LIST = [
-  { id: "REV-801", client: "Mayur K.", rating: 5, date: "Today", service: "Classic Haircut + Beard Styling", text: "Best haircut experience in town! Sameer has insane precision with hair fades.", helpfulCount: 12, verified: true },
+  { 
+    id: "REV-801", 
+    client: "Mayur K.", 
+    rating: 5, 
+    date: "Today", 
+    service: "Classic Haircut + Beard Styling", 
+    text: "Best haircut experience in town! Sameer has insane precision with hair fades.", 
+    helpfulCount: 12, 
+    verified: true 
+  },
+  { 
+    id: "REV-794", 
+    client: "Rohan M.", 
+    rating: 5, 
+    date: "Yesterday", 
+    service: "Skin Fade Expert + Luxury Hot Towel Shave", 
+    text: "Absolute masterclass profile. The razor lining is clean and the hot towel massage is incredibly relaxing.", 
+    helpfulCount: 8, 
+    verified: true 
+  },
+  { 
+    id: "REV-789", 
+    client: "Arvinder Singh", 
+    rating: 4, 
+    date: "2 days ago", 
+    service: "Premium Executive Grooming", 
+    text: "Excellent service and grooming routine. Spacing was great and the staff is highly professional. Will book again.", 
+    helpfulCount: 4, 
+    verified: true 
+  },
+  { 
+    id: "REV-772", 
+    client: "Vikramaditya R.", 
+    rating: 5, 
+    date: "4 days ago", 
+    service: "Complete Grooming + Monthly Skin Detox", 
+    text: "Pure luxury experience. The attention to detail on my beard trim matches upscale premium standards. Worth every single rupee.", 
+    helpfulCount: 15, 
+    verified: true 
+  },
+  { 
+    id: "REV-756", 
+    client: "Kabir J.", 
+    rating: 4, 
+    date: "1 week ago", 
+    service: "Classic Haircut", 
+    text: "Great haircut and crisp styling. Took slightly longer than expected but the precision and finish look absolutely stellar.", 
+    helpfulCount: 2, 
+    verified: false 
+  }
 ];
 
 export default function BarberReviews() {
-  const [reviews] = useState(MOCK_REVIEWS_LIST);
+  // ✅ FIX: Reviews must sit in local state to mutate helpful numbers dynamically
+  const [reviews, setReviews] = useState(MOCK_REVIEWS_LIST);
   const [selectedFilter, setSelectedFilter] = useState("all");
   
-  // परिभाषित किए गए स्टेट और ऑब्जेक्ट
+  // Track liked review elements locally to prevent double voting spam
+  const [clickedHelpful, setClickedHelpful] = useState({});
   const [sideOpen, setSideOpen] = useState(false);
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
+
+  // ── ✅ NEW INTERACTIVE FUNCTIONALITY ENGINE ──
+  const handleHelpfulClick = (id) => {
+    if (clickedHelpful[id]) return; // Safeguard configuration block
+
+    setReviews(prevReviews => 
+      prevReviews.map(rev => 
+        rev.id === id ? { ...rev, helpfulCount: rev.helpfulCount + 1 } : rev
+      )
+    );
+    setClickedHelpful(prev => ({ ...prev, [id]: true }));
+  };
 
   const filteredReviews = reviews.filter(rev => {
     if (selectedFilter === "five") return rev.rating === 5;
@@ -35,10 +97,16 @@ export default function BarberReviews() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col justify-between">
-      
+    /* ✅ FIX: Removed 'justify-between' structure and enforced 'h-auto overflow-y-auto' layout blueprint so you can see all elements clearly when scrolling down */
+    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col h-auto overflow-y-auto pb-12">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .font-serif { font-family: 'Playfair Display', serif !important; }
+      `}</style>
+
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
             <Menu className="w-5 h-5" />
@@ -56,17 +124,19 @@ export default function BarberReviews() {
         </div>
       </header>
         
-      <div>
+      <div className="w-full flex-grow">
         {/* ── MAIN WORKSPACE CONTENT CANVAS ── */}
         <main className="max-w-6xl mx-auto w-full px-5 py-10 text-left">
           
           {/* Header Description Title Blocks */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
-                Client <span className="text-[#C5A059]">Reviews</span>
-              </h1>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+              {/* Rule 1: Clean Section Header Configuration layout split alignment */}
+             <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+  Client <span className="text-[#C5A059]">Reviews</span>
+</h1>
+              {/* Rule 2: Minor tag headings trackers formatting */}
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2">
                 Verified Customer Feedback & Quality Satisfaction Matrix
               </p>
             </div>
@@ -83,7 +153,7 @@ export default function BarberReviews() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
             
             {/* Total Big Score Widget Box */}
-            <div className="col-span-12 md:col-span-4 card p-6 bg-white flex flex-col items-center justify-center text-center">
+            <div className="col-span-12 md:col-span-4 card p-6 bg-white flex flex-col items-center justify-center text-center rounded-2xl border border-stone-200/60 shadow-3xs">
               <h3 className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-1">Quality Index</h3>
               <div className="text-5xl font-black font-serif text-stone-900 tracking-tight flex items-baseline gap-1">
                 {MOCK_REVIEW_STATS.averageRating} <span className="text-xl text-stone-400 font-sans font-medium">/ 5</span>
@@ -97,7 +167,7 @@ export default function BarberReviews() {
             </div>
 
             {/* Density Progress Line Allocation Share */}
-            <div className="col-span-12 md:col-span-8 card p-6 bg-white flex flex-col justify-center space-y-3.5">
+            <div className="col-span-12 md:col-span-8 card p-6 bg-white flex flex-col justify-center space-y-3.5 rounded-2xl border border-stone-200/60 shadow-3xs">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-stone-400 border-b pb-2 border-stone-50">Density Distribution</h4>
               
               {[
@@ -191,8 +261,8 @@ export default function BarberReviews() {
                     </div>
                   </div>
 
-                  {/* Testimonial Quote Text Entry Block */}
-                  <p className="text-sm font-medium text-stone-600 leading-relaxed text-left pt-1 pl-0.5">
+                  {/* Rule 3: Testimonial Quote Text Entry Descriptor Block */}
+                  <p className="text-sm font-normal leading-relaxed text-stone-600 text-left pt-1 pl-0.5">
                     "{rev.text}"
                   </p>
 
@@ -203,8 +273,16 @@ export default function BarberReviews() {
                       <span>Stylist Core Score Impact</span>
                     </div>
 
-                    <button type="button" className="flex items-center gap-1 hover:text-stone-900 transition-colors cursor-pointer">
-                      <ThumbsUp size={11} /> Helpful ({rev.helpfulCount})
+                    {/* Rule 4: Primary dynamic action link dispatch button */}
+                    <button 
+                      type="button" 
+                      onClick={() => handleHelpfulClick(rev.id)}
+                      className={`flex items-center gap-1.5 transition-all duration-200 font-sans text-xs font-extrabold uppercase tracking-wider bg-transparent border-none outline-none select-none ${
+                        clickedHelpful[rev.id] ? "text-emerald-600 scale-[1.02]" : "text-stone-400 hover:text-stone-900 cursor-pointer"
+                      }`}
+                    >
+                      <ThumbsUp size={11} className={clickedHelpful[rev.id] ? "text-emerald-600 fill-emerald-100" : ""} /> 
+                      <span>{clickedHelpful[rev.id] ? "Voted Helpful" : "Helpful"} ({rev.helpfulCount})</span>
                     </button>
                   </div>
 

@@ -51,8 +51,8 @@ export default function QueuePage() {
 
   const isOwner = user?.role === "owner";
 
-  const currentBarberName =
-    user?.name || user?.username || "Barber Master";
+ const currentBarberName =
+  user?.name || user?.username || user?.email || "";
 
   const profile = {
     name: user?.name || "Barber",
@@ -60,15 +60,14 @@ export default function QueuePage() {
     salonName: "The Royal Cuts",
   };
 
-  // const visibleQueue = isOwner
-  //   ? queue
-  //   : queue.filter(
-  //     (q) =>
-  //       q.barber?.trim().toLowerCase() ===
-  //       currentBarberName?.trim().toLowerCase()
-  //   );
-
-  const visibleQueue = queue;
+const visibleQueue = isOwner
+  ? queue
+  : queue.filter(
+      (q) =>
+        !q.barber ||
+        q.barber?.trim().toLowerCase() ===
+          currentBarberName?.trim().toLowerCase()
+    );
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -192,9 +191,10 @@ export default function QueuePage() {
         {/* TITLE */}
         <div className="w-full mb-10 border-b border-[#E6D5C3]/30 pb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
           <div className="space-y-1">
-            <h2 className="font-serif text-5xl font-black text-[#4A3E3D] uppercase tracking-tight">
-              My Queue
-            </h2>
+            {/* HEADER */}
+        <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
+          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">My <span className="text-[#C5A059]">Queue</span></h1>
+        </div>
 
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#8B5A2B] animate-pulse"></span>
