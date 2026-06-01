@@ -136,12 +136,11 @@ export default function CustomerDetails() {
               </button>
             </div>
 
-            {/* Right Column: Service Summary Card */}
+          {/* Right Column: Service Summary Card */}
             {service && (
               <div className="md:sticky md:top-24">
-                <div className="bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-[24px] border border-white/60 shadow-[0_20px_50px_rgba(197,160,89,0.05)]">
-                  <ServiceSummary service={service} barber={barber} />
-                </div>
+                {/* ── ✅ FIXED: STRIPPED REPETITIVE INNER WRAPPER PADDING TO ALIGN CARDS PERFECTLY ── */}
+                <ServiceSummary service={service} barber={barber} />
               </div>
             )}
           </div>
