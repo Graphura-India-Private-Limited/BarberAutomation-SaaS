@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -18,12 +19,12 @@ import {
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
 
-/* ══ COLORS (From Image) ══ */
+/* ══ COLORS ══ */
 const C = {
   bg: "#FAF6F0",
   sidebar: "#FFFFFF",
   card: "#FFFFFF",
-  ink: "#1C1917", // dark gray/black
+  ink: "#1C1917",
   muted: "#78716C",
   border: "#E7E5E4",
   gold: "#C5A059",
@@ -371,17 +372,6 @@ export function AdminRequests({ initialTab = "dashboard" }) {
     navigate("/admin/login");
   };
 
-  /* Chart Data */
-  const chartData = [
-    { name: '17 May', bookings: 0 },
-    { name: '18 May', bookings: 0 },
-    { name: '19 May', bookings: 0 },
-    { name: '20 May', bookings: 0 },
-    { name: '21 May', bookings: 0 },
-    { name: '22 May', bookings: 0 },
-    { name: '23 May', bookings: 0 },
-  ];
-
   return (
     <div className="admin-root flex h-screen overflow-hidden font-sans" style={{ background: C.bg, color: C.ink }}>
       <AdminGlobalStyles />
@@ -393,36 +383,35 @@ export function AdminRequests({ initialTab = "dashboard" }) {
             <Scissors size={18} color={C.gold} />
           </div>
           <div>
-            <div className="font-serif text-xl font-bold tracking-tight leading-none" style={{ color: C.ink }}>Barber Pro</div>
+            <div style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 22, fontWeight: 900, letterSpacing: "-0.3px", lineHeight: 1, color: C.ink }}>Barber Pro</div>
             <div className="text-[9px] font-bold tracking-[0.2em] mt-1" style={{ color: C.gold }}>ADMIN CONSOLE</div>
           </div>
         </div>
 
+        {/* ── NAV: no dividers ── */}
         <nav className="flex-1 px-4 py-2 flex flex-col gap-1 min-h-0">
-          {NAV.map((n, i) => {
+          {NAV.map((n) => {
             const Icon = n.icon;
             const isActive = tab === n.k;
             return (
-              <React.Fragment key={n.k}>
-                {(i === 5 || i === 8 || i === 10) && <div className="h-px my-3" style={{ background: "#6B4C2A" }} />}
-                <button
-                  onClick={() => setTab(n.k)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all relative"
-                  style={{
-                    background: isActive ? C.goldLight : "transparent",
-                    color: isActive ? C.gold : C.muted,
-                    borderLeft: isActive ? `3px solid ${C.gold}` : "3px solid transparent",
-                  }}
-                >
-                  <Icon size={18} />
-                  {n.label}
-                  {n.k === "appointments" && pendingBookings > 0 && (
-                    <span className="ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: C.purpleLight, color: C.purple }}>
-                      {pendingBookings}
-                    </span>
-                  )}
-                </button>
-              </React.Fragment>
+              <button
+                key={n.k}
+                onClick={() => setTab(n.k)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all relative"
+                style={{
+                  background: isActive ? C.goldLight : "transparent",
+                  color: isActive ? C.gold : C.muted,
+                  borderLeft: isActive ? `3px solid ${C.gold}` : "3px solid transparent",
+                }}
+              >
+                <Icon size={18} />
+                {n.label}
+                {n.k === "appointments" && pendingBookings > 0 && (
+                  <span className="ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: C.purpleLight, color: C.purple }}>
+                    {pendingBookings}
+                  </span>
+                )}
+              </button>
             );
           })}
         </nav>
@@ -442,12 +431,13 @@ export function AdminRequests({ initialTab = "dashboard" }) {
       {/* ════ MAIN ════ */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
         <div className="w-full px-6 lg:px-8">
+
           {/* HEADER */}
           <header className="pt-12 pb-6 flex items-end justify-between shrink-0">
             <div>
-              <h1 className="font-serif text-[42px] font-bold leading-none mb-2" style={{ color: C.ink }}>{NAV.find(n => n.k === tab)?.label || "Dashboard"}</h1>
+              <h1 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 56, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.5px", color: C.ink, marginBottom: 8 }}>{NAV.find(n => n.k === tab)?.label || "Dashboard"}</h1>
               {tab === "dashboard" && (
-                <p className="text-[15px] font-medium" style={{ color: C.muted }}>Welcome back, Admin!</p>
+                <p style={{ fontFamily: "Segoe UI, system-ui, sans-serif", fontSize: 17, fontWeight: 500, color: C.muted }}>Welcome back, Admin!</p>
               )}
               {tab !== "dashboard" && (
                 <p className="text-[13px] font-medium mt-1" style={{ color: C.muted }}>
@@ -487,6 +477,8 @@ export function AdminRequests({ initialTab = "dashboard" }) {
           <main className="pt-8 pb-12" key={tab}>
             {tab === "dashboard" && (
               <div className="space-y-6 animate-fade-in">
+
+                {/* ── STAT CARDS: now with colored subtext ── */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                   {[
                     { label: "Total Customers", value: loading ? "—" : stats?.customers ?? customers.length, sub: "Registered users", subColor: C.gold, icon: Users, iconBg: C.goldLight, iconColor: C.gold },
@@ -500,7 +492,9 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                         <p className="text-[13px] font-medium" style={{ color: C.muted }}>{card.label}</p>
                         <div className="flex items-center justify-between mt-3">
                           <div>
-                            <div className="text-2xl font-bold font-serif" style={{ color: C.ink }}>{card.value}</div>
+                            <div style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 30, fontWeight: 900, lineHeight: 1, color: C.ink }}>{card.value}</div>
+                            {/* ── colored subtext below value ── */}
+                            <div className="text-[12px] font-medium mt-1" style={{ color: card.subColor }}>{card.sub}</div>
                           </div>
                           <div className="p-3 rounded-lg" style={{ background: card.iconBg }}>
                             <Icon size={22} color={card.iconColor} />
@@ -511,53 +505,22 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                   })}
                 </div>
 
-                {/* MAIN GRID LAYOUT */}
-                <div className="grid grid-cols-4 gap-6">
+                {/* ── DASHBOARD PANELS: 2-column grid, no chart ── */}
+                <div className="grid grid-cols-2 gap-4">
 
-                  {/* 1. Booking Overview */}
-                  <div className="col-span-2 row-span-2 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
-                    <div className="flex items-center justify-between mb-8">
-                      <h2 className="font-serif text-xl font-bold" style={{ color: C.ink }}>Booking Overview</h2>
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px] font-medium cursor-pointer" style={{ borderColor: C.border }}>
-                        This Week <ChevronDown size={14} />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-h-[300px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E7E5E4" />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: C.muted }} dy={10} />
-                          <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: C.muted }} dx={-10} />
-                          <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} />
-                          <Line type="monotone" dataKey="bookings" stroke={C.gold} strokeWidth={3} dot={{ r: 4, fill: C.gold, strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="flex justify-center mt-4 pt-2">
-                      <div className="flex items-center gap-2 text-[12px] font-medium" style={{ color: C.ink }}>
-                        <span className="w-3 h-3 rounded-sm" style={{ background: C.gold }}></span>
-                        Bookings
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. Recent Bookings */}
-                  <div className="col-span-1 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
+                  {/* 1. Recent Bookings */}
+                  <div className="bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-serif text-[17px] font-bold" style={{ color: C.ink }}>Recent Bookings</h3>
-                      <button onClick={() => setTab("appointments")} className="text-[11px] font-bold" style={{ color: C.orange }}>View All</button>
+                      <h3 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 20, fontWeight: 900, color: C.ink }}>Recent Bookings</h3>
+                      <button onClick={() => setTab("appointments")} className="text-[11px] font-bold" style={{ color: C.orange }}>View All →</button>
                     </div>
                     {bookings.length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.goldLight }}>
-                          <Calendar size={28} color={C.muted} />
-                        </div>
-                        <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No bookings yet</div>
-                        <div className="text-[11px] mt-1" style={{ color: C.muted }}>New bookings will appear here</div>
+                      <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                        <div className="text-[13px] font-semibold" style={{ color: C.muted }}>No bookings yet</div>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {bookings.slice(0, 3).map(b => (
+                        {bookings.slice(0, 4).map(b => (
                           <div key={b._id} className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
                               <Avatar name={b.customer_id?.name || "C"} size={36} color={C.blue} bg={C.blueLight} />
@@ -576,23 +539,19 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                     )}
                   </div>
 
-                  {/* 3. Barber Status */}
-                  <div className="col-span-1 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
+                  {/* 2. Barber Status */}
+                  <div className="bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-serif text-[17px] font-bold" style={{ color: C.ink }}>Barber Status</h3>
-                      <button onClick={() => setTab("live")} className="text-[11px] font-bold" style={{ color: C.orange }}>Live View</button>
+                      <h3 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 20, fontWeight: 900, color: C.ink }}>Barber Status</h3>
+                      <button onClick={() => setTab("live")} className="text-[11px] font-bold" style={{ color: C.orange }}>Live View →</button>
                     </div>
                     {barbers.length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.greenLight }}>
-                          <Users size={28} color={C.green} />
-                        </div>
-                        <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No barbers added yet</div>
-                        <div className="text-[11px] mt-1" style={{ color: C.muted }}>Add barbers to get started</div>
+                      <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                        <div className="text-[13px] font-semibold" style={{ color: C.muted }}>No barbers added yet</div>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {barbers.slice(0, 3).map((b, i) => (
+                        {barbers.slice(0, 4).map((b) => (
                           <div key={b._id} className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-500 overflow-hidden">
@@ -610,23 +569,19 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                     )}
                   </div>
 
-                  {/* 4. Pending Salon Requests */}
-                  <div className="col-span-1 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
+                  {/* 3. Pending Salon Requests */}
+                  <div className="bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-serif text-[17px] font-bold" style={{ color: C.ink }}>Pending Salon Requests</h3>
-                      <button onClick={() => setTab("salons")} className="text-[11px] font-bold" style={{ color: C.orange }}>View All</button>
+                      <h3 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 20, fontWeight: 900, color: C.ink }}>Pending Salon Requests</h3>
+                      <button onClick={() => setTab("salons")} className="text-[11px] font-bold" style={{ color: C.orange }}>View All →</button>
                     </div>
                     {salons.filter(s => s.status === "pending").length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.goldLight }}>
-                          <FileText size={28} color={C.gold} />
-                        </div>
-                        <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No pending requests</div>
-                        <div className="text-[11px] mt-1" style={{ color: C.muted }}>All caught up!</div>
+                      <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                        <div className="text-[13px] font-semibold" style={{ color: C.muted }}>No pending requests — all caught up!</div>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {salons.filter(s => s.status === "pending").slice(0, 2).map(s => (
+                        {salons.filter(s => s.status === "pending").slice(0, 3).map(s => (
                           <div key={s._id} className="flex justify-between items-center">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 bg-gray-200 rounded-lg"></div>
@@ -642,21 +597,17 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                     )}
                   </div>
 
-                  {/* 5. Barber Credentials */}
-                  <div className="col-span-1 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
+                  {/* 4. Barber Credentials */}
+                  <div className="bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-serif text-[17px] font-bold" style={{ color: C.ink }}>Barber Credentials (This Session)</h3>
+                      <h3 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 20, fontWeight: 900, color: C.ink }}>Barber Credentials (This Session)</h3>
                     </div>
                     {addedBarbers.length === 0 ? (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center min-h-[200px]">
-                        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: C.purpleLight }}>
-                          <ShieldCheck size={28} color={C.purple} />
-                        </div>
-                        <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No barbers added this session</div>
-                        <div className="text-[11px] mt-1" style={{ color: C.muted }}>Credentials will appear here</div>
+                      <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                        <div className="text-[13px] font-semibold" style={{ color: C.muted }}>No barbers added this session</div>
                       </div>
                     ) : (
-                      <div className="space-y-3 overflow-y-auto max-h-[120px]">
+                      <div className="space-y-3 overflow-y-auto max-h-[160px]">
                         {addedBarbers.map((b, i) => (
                           <div key={i} className="text-[12px] bg-gray-50 p-2 rounded-lg border">
                             <div className="font-bold">{b.name}</div>
@@ -669,77 +620,6 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                       </div>
                     )}
                   </div>
-
-                  {/* 6. Quick Actions */}
-                  <div className="col-span-3 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
-                    <h3 className="font-serif text-xl font-bold mb-6" style={{ color: C.ink }}>Quick Actions</h3>
-                    <div className="flex items-center gap-4 flex-1">
-                      <div onClick={() => setTab("addbarber")} className="flex-1 flex flex-col items-center justify-center p-4 rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition-all bg-[#FAFAFA] h-full">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: C.orangeLight }}>
-                          <UserPlus size={20} color={C.orange} />
-                        </div>
-                        <div className="text-[13px] font-bold" style={{ color: C.ink }}>Add Barber</div>
-                        <div className="text-[10px] text-center mt-1" style={{ color: C.muted }}>Add new barber</div>
-                      </div>
-
-                      <div onClick={() => setTab("salons")} className="flex-1 flex flex-col items-center justify-center p-4 rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition-all bg-[#FAFAFA] h-full">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: C.purpleLight }}>
-                          <Store size={20} color={C.purple} />
-                        </div>
-                        <div className="text-[13px] font-bold" style={{ color: C.ink }}>Add Salon</div>
-                        <div className="text-[10px] text-center mt-1" style={{ color: C.muted }}>Register new salon</div>
-                      </div>
-
-                      <div onClick={() => setTab("appointments")} className="flex-1 flex flex-col items-center justify-center p-4 rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition-all bg-[#FAFAFA] h-full">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: C.blueLight }}>
-                          <Calendar size={20} color={C.blue} />
-                        </div>
-                        <div className="text-[13px] font-bold" style={{ color: C.ink }}>Appointments</div>
-                        <div className="text-[10px] text-center mt-1" style={{ color: C.muted }}>Manage bookings</div>
-                      </div>
-
-                      <div onClick={() => setTab("payments")} className="flex-1 flex flex-col items-center justify-center p-4 rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition-all bg-[#FAFAFA] h-full">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: C.greenLight }}>
-                          <IndianRupee size={20} color={C.green} />
-                        </div>
-                        <div className="text-[13px] font-bold" style={{ color: C.ink }}>Payments</div>
-                        <div className="text-[10px] text-center mt-1" style={{ color: C.muted }}>Track transactions</div>
-                      </div>
-
-                      <div onClick={() => setTab("dashboard")} className="flex-1 flex flex-col items-center justify-center p-4 rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition-all bg-[#FAFAFA] h-full">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style={{ background: C.goldLight }}>
-                          <BarChart size={20} color={C.gold} />
-                        </div>
-                        <div className="text-[13px] font-bold" style={{ color: C.ink }}>Reports</div>
-                        <div className="text-[10px] text-center mt-1" style={{ color: C.muted }}>Analytics & insights</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 7. Revenue Overview */}
-                  <div className="col-span-1 bg-white rounded-2xl border card-shadow p-6 flex flex-col" style={{ borderColor: C.border }}>
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-serif text-[17px] font-bold" style={{ color: C.ink }}>Revenue Overview</h3>
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-lg border text-[11px] font-medium cursor-pointer" style={{ borderColor: C.border }}>
-                        This Month <ChevronDown size={14} />
-                      </div>
-                    </div>
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: C.bg }}>
-                          <IndianRupee size={18} color={C.muted} />
-                        </div>
-                        <div>
-                          <div className="text-[13px] font-semibold" style={{ color: C.ink }}>No revenue data yet</div>
-                          <div className="text-[11px] mt-1" style={{ color: C.muted }}>Revenue stats will appear here</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-                <div className="text-center text-[12px] pb-6 pt-4" style={{ color: C.muted }}>
 
                 </div>
               </div>
@@ -833,5 +713,4 @@ export function AdminRequests({ initialTab = "dashboard" }) {
 }
 
 export default AdminRequests;
-
 
