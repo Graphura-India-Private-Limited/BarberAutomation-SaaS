@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TicketFilters } from '../../components/admin/TicketFilters.jsx';
 import { TicketTable } from '../../components/admin/TicketTable.jsx';
@@ -34,32 +33,11 @@ export function TicketsPage({
   return (
     <div style={{ padding: "32px 32px 60px", display: "flex", flexDirection: "column", gap: 24 }}>
 
-      {/* ── PAGE HERO — matches AdminOnboarding header style ── */}
+      {/* ── ✅ FIXED: CLEANED HERO TOP BAR (REMOVED INNER DUPED HEADERS) ── */}
       <div style={{
-        display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+        display: "flex", alignItems: "center", justifyContent: "flex-end", // Push the status count badge cleanly to the right side
         paddingBottom: 20, borderBottom: `1px solid ${C.border}`,
       }}>
-        <div>
-          <h1 style={{
-            fontSize: 42, fontWeight: 700, color: C.ink,
-            fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 6,
-          }}>
-            Support Tickets
-          </h1>
-          <p style={{
-            fontSize: 28, fontStyle: "italic", color: C.gold,
-            fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 8,
-          }}>
-            {typeFilter ? `${typeFilter} Segment Pipeline` : "Escalation Workspace"}
-          </p>
-          <p style={{
-            fontSize: 10, fontWeight: 700, color: C.gold,
-            textTransform: "uppercase", letterSpacing: "0.18em",
-          }}>
-            {typeFilter ? `${typeFilter} segment pipeline` : "All Central Escalation Workspace Logs"}
-          </p>
-        </div>
-
         {/* Records badge */}
         <div style={{
           display: "flex", alignItems: "center", gap: 8,
@@ -67,10 +45,7 @@ export function TicketsPage({
           padding: "8px 16px", borderRadius: 10,
           boxShadow: "0 1px 4px rgba(0,0,0,.04)",
         }}>
-          <Inbox size={14} color={C.gold} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            {displayTickets.length} Records Loaded
-          </span>
+  
         </div>
       </div>
 
