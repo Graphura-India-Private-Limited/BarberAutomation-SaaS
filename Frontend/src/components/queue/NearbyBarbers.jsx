@@ -53,17 +53,27 @@ const NearbyBarbers = () => {
 
 
   const fetchNearbySalons = async (lat, lng) => {
+    const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
     try {
-      // Demo Data
-      setTimeout(() => {
+      const r = await fetch(`${API}/salon`);
+      const d = await r.json();
+      if (d.success && d.salons && d.salons.length > 0) {
+        setSalons(d.salons.map((s, idx) => ({
+          id: s._id,
+          name: s.salon_name,
+          distance: `${(idx + 1) * 0.8} km`,
+          rating: s.rating || 4.5 + (idx % 5) * 0.1,
+          image: (s.images && s.images[0]) || "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=500"
+        })));
+      } else {
         const demoData = [
-          { id: "1", name: "The Royal Groom", distance: "0.8 km", rating: 4.9, image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=500" },
-          { id: "2", name: "Vintage Scissors", distance: "1.5 km", rating: 4.7, image: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=500" },
-          { id: "3", name: "Urban Edge Barber", distance: "2.3 km", rating: 4.5, image: "https://img.magnific.com/free-photo/handsome-man-barber-shop-styling-hair_1303-20978.jpg?semt=ais_hybrid&w=740&q=80" },
+          { id: "demo-s1", name: "The Royal Groom", distance: "0.8 km", rating: 4.9, image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=500" },
+          { id: "demo-s2", name: "Vintage Scissors", distance: "1.5 km", rating: 4.7, image: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=500" },
+          { id: "demo-s3", name: "Urban Edge Barber", distance: "2.3 km", rating: 4.5, image: "https://img.magnific.com/free-photo/handsome-man-barber-shop-styling-hair_1303-20978.jpg?semt=ais_hybrid&w=740&q=80" },
         ];
         setSalons(demoData);
-        setLoading(false);
-      }, 1200);
+      }
+      setLoading(false);
     } catch (err) {
       setError("Failed to fetch shops");
       setLoading(false);

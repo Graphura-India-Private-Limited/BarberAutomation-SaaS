@@ -7,7 +7,7 @@ exports.registerSalon = async (req, res) => {
   try {
     const salon = await Salon.create({
       ...req.body,
-      status: "pending",
+      status: req.body.status || "pending",
       rejection_reason: "",
       submitted_at: new Date()
     });

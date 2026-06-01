@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   Users, UserPlus, UserSquare, UserX, Calendar, CalendarDays, Scissors,
   CreditCard, Star, Radio, Store, Eye, MoreHorizontal, Trash2,
-  IndianRupee, CheckCircle, Clock, Search, Filter, ChevronDown, Plus,
+  IndianRupee, CheckCircle, Clock, Search, Filter, ChevronDown, Plus, X,
 } from "lucide-react";
 import {
   ADMIN_C as C,
@@ -118,11 +118,35 @@ export function CustomersModule({ customers, loading, customerSearch, setCustome
 
 /* ── SALON MANAGEMENT ── */
 export function SalonsModule({
-  salons, customers, bookings, stats, loading, pendingBookings, revenueDisplay, updateSalonStatus,
+  salons, customers, bookings, stats, loading, pendingBookings, revenueDisplay, updateSalonStatus, addSalon,
 }) {
   const [salonTab, setSalonTab] = useState("requests");
   const [salonSearch, setSalonSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showCityFilter, setShowCityFilter] = useState(false);
+  const [selectedCity, setSelectedCity] = useState("all");
+  const [adding, setAdding] = useState(false);
+  const [newSalon, setNewSalon] = useState({
+    salon_name: "",
+    owner_name: "",
+    email: "",
+    mobile: "",
+    address: "",
+    status: "approved",
+    opening_time: "09:00",
+    closing_time: "21:00",
+    basic_pricing: "",
+    support_number: "",
+    salary_model: "commission",
+    commission_percent: "10",
+    gstin: "",
+    license_number: "",
+    about: "",
+    images: []
+  });
+
+  const cities = ["all", ...new Set(salons.map((s) => s.salon_city || s.city || s.address?.split(",").pop()?.trim()).filter(Boolean))];
 
   const filtered = salons
     .filter((s) =>
@@ -130,9 +154,14 @@ export function SalonsModule({
         salonTab === "approved" ? s.status === "approved" : s.status === "rejected"
     )
     .filter((s) => {
+      if (selectedCity === "all") return true;
+      const city = (s.salon_city || s.city || s.address?.split(",").pop()?.trim() || "").toLowerCase();
+      return city.includes(selectedCity.toLowerCase());
+    })
+    .filter((s) => {
       if (!salonSearch) return true;
       const q = salonSearch.toLowerCase();
-      return [s.salon_name, s.owner_name, s.email, s.phone].filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+      return [s.salon_name, s.owner_name, s.email, s.owner_email, s.phone, s.mobile].filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
     });
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
@@ -178,14 +207,228 @@ export function SalonsModule({
             <input value={salonSearch} onChange={(e) => { setSalonSearch(e.target.value); setPage(1); }}
               placeholder="Search salon..." className="bg-transparent outline-none font-sans text-sm font-normal w-full" />
           </div>
-          <button type="button" className="flex items-center gap-2 rounded-md border bg-white px-4 py-2 font-sans text-xs font-extrabold uppercase tracking-wider whitespace-nowrap" style={{ borderColor: C.border, color: C.ink }}>
-            <Filter size={16} color={C.brown} /> Filters <ChevronDown size={14} color={C.muted} />
+          <button type="button" onClick={() => setShowCityFilter(!showCityFilter)} className="flex items-center gap-2 rounded-md border bg-white px-4 py-2 font-sans text-xs font-extrabold uppercase tracking-wider whitespace-nowrap" style={{ borderColor: C.border, color: C.ink }}>
+            <Filter size={16} color={C.brown} /> Filters <ChevronDown size={14} color={C.muted} className={`transition-transform ${showCityFilter ? 'rotate-180' : ''}`} />
           </button>
-          <button type="button" className="flex items-center gap-2 rounded-md px-4 py-2 font-sans text-xs font-extrabold uppercase tracking-wider text-white whitespace-nowrap" style={{ background: C.brown }}>
+          <button type="button" onClick={() => setShowAddModal(true)} className="flex items-center gap-2 rounded-md px-4 py-2 font-sans text-xs font-extrabold uppercase tracking-wider text-white whitespace-nowrap" style={{ background: C.brown }}>
             <Plus size={16} /> Add Salon
           </button>
         </div>
       </div>
+
+      {showCityFilter && (
+        <div className="flex items-center gap-3 p-4 bg-white rounded-xl border animate-fade-in" style={{ borderColor: C.border }}>
+          <span className="text-xs font-bold uppercase tracking-wider text-stone-600">Filter by City:</span>
+          <div className="flex flex-wrap gap-2">
+            {cities.map((city) => (
+              <button
+                key={city}
+                type="button"
+                onClick={() => { setSelectedCity(city); setPage(1); }}
+                className="px-3 py-1 rounded-full text-xs font-medium capitalize border transition-all"
+                style={{
+                  background: selectedCity === city ? C.goldLight : "#fff",
+                  color: selectedCity === city ? C.gold : C.muted,
+                  borderColor: selectedCity === city ? C.gold : C.border,
+                }}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs select-none">
+          <div className="bg-white rounded-2xl border shadow-2xl p-6 w-full max-w-2xl mx-4 text-left animate-fade-in flex flex-col max-h-[90vh]" style={{ borderColor: C.border }}>
+            <div className="flex justify-between items-center pb-4 border-b mb-4 shrink-0" style={{ borderColor: C.border }}>
+              <div>
+                <h3 className="font-sans text-xl font-bold uppercase tracking-wide" style={{ color: C.ink }}>Add New Salon</h3>
+                <p className="text-[11px] font-medium mt-0.5" style={{ color: C.muted }}>Provide basic, legal, and operational details for onboarding.</p>
+              </div>
+              <button type="button" onClick={() => setShowAddModal(false)} className="p-1.5 rounded-full hover:bg-stone-100 transition-colors" style={{ color: C.muted }}>
+                <X size={18} />
+              </button>
+            </div>
+            
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!newSalon.salon_name || !newSalon.owner_name || !newSalon.mobile) {
+                alert("Please fill in all required fields.");
+                return;
+              }
+              setAdding(true);
+              const success = await addSalon({
+                ...newSalon,
+                basic_pricing: newSalon.basic_pricing ? Number(newSalon.basic_pricing) : 0,
+                commission_percent: newSalon.commission_percent ? Number(newSalon.commission_percent) : 10
+              });
+              setAdding(false);
+              if (success) {
+                setShowAddModal(false);
+                setNewSalon({
+                  salon_name: "",
+                  owner_name: "",
+                  email: "",
+                  mobile: "",
+                  address: "",
+                  status: "approved",
+                  opening_time: "09:00",
+                  closing_time: "21:00",
+                  basic_pricing: "",
+                  support_number: "",
+                  salary_model: "commission",
+                  commission_percent: "10",
+                  gstin: "",
+                  license_number: "",
+                  about: "",
+                  images: []
+                });
+              }
+            }} className="space-y-5 overflow-y-auto flex-1 pr-2">
+              
+              {/* SECTION 1: REQUIRED CONTACT DETAILS */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b" style={{ color: C.gold, borderColor: `${C.gold}30` }}>1. Core Contact Info (Required)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Salon Name *</label>
+                    <input className="inp" required placeholder="e.g. Royal Cuts Studio" value={newSalon.salon_name} onChange={(e) => setNewSalon({ ...newSalon, salon_name: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Owner Name *</label>
+                    <input className="inp" required placeholder="e.g. Karan Shah" value={newSalon.owner_name} onChange={(e) => setNewSalon({ ...newSalon, owner_name: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Mobile / Phone *</label>
+                    <input className="inp" type="tel" required placeholder="10 digit number" value={newSalon.mobile} onChange={(e) => setNewSalon({ ...newSalon, mobile: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Owner Email</label>
+                    <input className="inp" type="email" placeholder="e.g. owner@email.com" value={newSalon.email} onChange={(e) => setNewSalon({ ...newSalon, email: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: BUSINESS CONFIGURATION */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b" style={{ color: C.gold, borderColor: `${C.gold}30` }}>2. Operational & Pricing Settings (Optional)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Starting / Basic Price (₹)</label>
+                    <input className="inp" type="number" placeholder="e.g. 150" value={newSalon.basic_pricing} onChange={(e) => setNewSalon({ ...newSalon, basic_pricing: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Support Hotline</label>
+                    <input className="inp" type="tel" placeholder="e.g. 9898765432" value={newSalon.support_number} onChange={(e) => setNewSalon({ ...newSalon, support_number: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Salary Model</label>
+                    <select className="inp" value={newSalon.salary_model} onChange={(e) => setNewSalon({ ...newSalon, salary_model: e.target.value })}>
+                      <option value="commission">Commission Based</option>
+                      <option value="salary">Fixed Salary</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Commission (%)</label>
+                    <input className="inp" type="number" placeholder="e.g. 10" value={newSalon.commission_percent} onChange={(e) => setNewSalon({ ...newSalon, commission_percent: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Opening Time</label>
+                    <input className="inp" type="time" value={newSalon.opening_time} onChange={(e) => setNewSalon({ ...newSalon, opening_time: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Closing Time</label>
+                    <input className="inp" type="time" value={newSalon.closing_time} onChange={(e) => setNewSalon({ ...newSalon, closing_time: e.target.value })} />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Address</label>
+                    <input className="inp" placeholder="e.g. CG Road, Near Stadium, Ahmedabad" value={newSalon.address} onChange={(e) => setNewSalon({ ...newSalon, address: e.target.value })} />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>About / Description</label>
+                    <textarea className="inp min-h-[60px] resize-y" placeholder="Describe the studio aesthetics, specialization..." value={newSalon.about} onChange={(e) => setNewSalon({ ...newSalon, about: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: LEGAL COMPLIANCE */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b" style={{ color: C.gold, borderColor: `${C.gold}30` }}>3. Legal & Tax Identification (Optional)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>GSTIN / Tax ID</label>
+                    <input className="inp" placeholder="e.g. 24AAAAB1234C1Z1" value={newSalon.gstin} onChange={(e) => setNewSalon({ ...newSalon, gstin: e.target.value.toUpperCase() })} />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Business Registration / License</label>
+                    <input className="inp" placeholder="e.g. LIC-2026-98765" value={newSalon.license_number} onChange={(e) => setNewSalon({ ...newSalon, license_number: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: STUDIO PHOTO */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b" style={{ color: C.gold, borderColor: `${C.gold}30` }}>4. Studio Image (Optional)</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Upload Salon Photo</label>
+                    <div className="border border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-stone-50 transition-colors" style={{ borderColor: C.border }}
+                      onClick={() => document.getElementById("salon-photo-input")?.click()}>
+                      <p className="text-xs" style={{ color: C.muted }}>Click to browse image file</p>
+                    </div>
+                    <input id="salon-photo-input" type="file" accept="image/*" className="hidden" onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setNewSalon((prev) => ({ ...prev, images: [ev.target.result] }));
+                      };
+                      reader.readAsDataURL(file);
+                    }} />
+                  </div>
+                  <div>
+                    {newSalon.images && newSalon.images.length > 0 ? (
+                      <div className="relative rounded-lg overflow-hidden border card-shadow h-24 w-full" style={{ borderColor: C.border }}>
+                        <img src={newSalon.images[0]} alt="" className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => setNewSalon((prev) => ({ ...prev, images: [] }))}
+                          className="absolute top-1.5 right-1.5 p-1 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-md transition-colors">
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="border rounded-lg bg-stone-50/50 h-24 w-full flex items-center justify-center text-xs border-dashed" style={{ borderColor: C.border, color: C.muted }}>
+                        No Image selected
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 5: STATUS */}
+              <div className="space-y-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-extrabold uppercase tracking-wider mb-1" style={{ color: C.muted }}>Onboarding Status *</label>
+                    <select className="inp" value={newSalon.status} onChange={(e) => setNewSalon({ ...newSalon, status: e.target.value })}>
+                      <option value="approved">Approved & Live</option>
+                      <option value="pending">Pending Approval</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 shrink-0">
+                <button type="submit" disabled={adding} className="w-full py-3.5 rounded-lg text-white font-sans text-xs font-extrabold uppercase tracking-widest disabled:opacity-50 shadow-md" style={{ background: C.brown }}>
+                  {adding ? "Onboarding Salon..." : "Complete & Register Studio"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <AdminDataTable
         columns={["SALON NAME", "OWNER NAME", "EMAIL", "PHONE", "STATUS", "REQUESTED ON", "ACTIONS"]}
         loading={loading}
@@ -200,7 +443,7 @@ export function SalonsModule({
               <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>{s.salon_name || "—"}</td>
               <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>{s.owner_name || "—"}</td>
               <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{s.owner_email || s.email || "—"}</td>
-              <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{s.phone || "—"}</td>
+              <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.ink }}>{s.mobile || s.phone || "—"}</td>
               <td className="px-6 py-4"><StatusBadge label={s.status || "unknown"} color={salonStatusColor(s.status)} /></td>
               <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{formatJoined(s.requested_on || s.createdAt || s.created_at)}</td>
               <td className="px-6 py-4">
@@ -543,7 +786,7 @@ export function ServicesModule({ services, salons, loading, newService, setNewSe
 export function PaymentsModule({ payments, loading }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const captured = payments.filter((p) => p.status === "captured").reduce((a, b) => a + (b.amount || 0), 0);
+  const captured = payments.filter((p) => p.status === "captured" || p.status === "SUCCESS").reduce((a, b) => a + (b.amount || 0), 0);
 
   const filtered = payments.filter((p) => {
     if (!search) return true;
@@ -554,9 +797,9 @@ export function PaymentsModule({ payments, loading }) {
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
 
   const statCards = [
-    { label: "Collected", value: `₹${(captured / 100).toLocaleString("en-IN")}`, sub: "Captured payments", subColor: C.green, icon: IndianRupee, iconBg: C.greenLight, iconColor: C.green },
-    { label: "Pending", value: payments.filter((p) => p.status === "pending").length, sub: "Awaiting", subColor: C.orange, icon: CreditCard, iconBg: C.orangeLight, iconColor: C.orange },
-    { label: "Refunded", value: payments.filter((p) => p.status === "refunded").length, sub: "Returned", subColor: C.red, icon: UserX, iconBg: C.redLight, iconColor: C.red },
+    { label: "Collected", value: `₹${captured.toLocaleString("en-IN")}`, sub: "Captured payments", subColor: C.green, icon: IndianRupee, iconBg: C.greenLight, iconColor: C.green },
+    { label: "Pending", value: payments.filter((p) => p.status === "pending" || p.status === "PENDING").length, sub: "Awaiting", subColor: C.orange, icon: CreditCard, iconBg: C.orangeLight, iconColor: C.orange },
+    { label: "Refunded", value: payments.filter((p) => p.status === "refunded" || p.status === "REFUNDED").length, sub: "Returned", subColor: C.red, icon: UserX, iconBg: C.redLight, iconColor: C.red },
     { label: "Total", value: payments.length, sub: "All transactions", subColor: C.gold, icon: CreditCard, iconBg: C.goldLight, iconColor: C.gold },
   ];
 
@@ -581,9 +824,9 @@ export function PaymentsModule({ payments, loading }) {
                 </div>
               </td>
               <td className="px-6 py-4 font-sans text-sm font-normal" style={{ color: C.gold }}>{p.salon_id?.salon_name || "—"}</td>
-              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>₹{((p.amount || 0) / 100).toLocaleString("en-IN")}</td>
+              <td className="px-6 py-4 font-sans text-sm font-semibold" style={{ color: C.ink }}>₹{(p.amount || 0).toLocaleString("en-IN")}</td>
               <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed capitalize" style={{ color: C.muted }}>{p.payment_type || "token"}</td>
-              <td className="px-6 py-4"><StatusPill label={p.status} active={p.status === "captured"} /></td>
+              <td className="px-6 py-4"><StatusPill label={p.status} active={p.status === "captured" || p.status === "SUCCESS"} /></td>
               <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{formatJoined(p.created_at || p.createdAt)}</td>
             </tr>
           ))

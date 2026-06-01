@@ -147,6 +147,35 @@ export function AdminRequests({ initialTab = "dashboard" }) {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [addedBarbers, setAddedBarbers] = useState([]);
+  const [showBellDropdown, setShowBellDropdown] = useState(false);
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false);
+
+  const addSalon = async (salonData) => {
+    try {
+      const r = await fetch(`${API}/salon/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...salonData,
+          opening_time: "09:00",
+          closing_time: "21:00",
+          commission_percent: 10,
+        }),
+      });
+      const d = await r.json();
+      if (d.success) {
+        pop("Salon added successfully!");
+        fetchAll(); // Refresh the list of salons and stats immediately
+        return true;
+      } else {
+        pop(d.message || "Failed to add salon", "error");
+        return false;
+      }
+    } catch {
+      pop("Server error", "error");
+      return false;
+    }
+  };
 
   const [newBarber, setNewBarber] = useState({
     name: "", mobile: "", password: "", specialization: "", experience: "", salon_id: "",
@@ -361,11 +390,11 @@ export function AdminRequests({ initialTab = "dashboard" }) {
   };
 
   const pendingBookings = bookings.filter(b => b.status === "pending").length;
-  const totalRevenue = payments.filter(p => p.status === "captured").reduce((a, b) => a + (b.amount || 0), 0);
+  const totalRevenue = payments.filter(p => p.status === "captured" || p.status === "SUCCESS").reduce((a, b) => a + (b.amount || 0), 0);
 
   const revenueDisplay = loading
     ? "—"
-    : `₹${(((stats?.revenue || totalRevenue) / 100) || 0).toLocaleString("en-IN")}`;
+    : `₹${((stats?.revenue || totalRevenue) || 0).toLocaleString("en-IN")}`;
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -433,7 +462,7 @@ export function AdminRequests({ initialTab = "dashboard" }) {
         <div className="w-full px-6 lg:px-8">
 
           {/* HEADER */}
-          <header className="pt-12 pb-6 flex items-end justify-between shrink-0">
+          <header className="pt-12 pb-6 flex items-end justify-between shrink-0 relative z-30">
             <div>
               <h1 style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 56, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.5px", color: C.ink, marginBottom: 8 }}>{NAV.find(n => n.k === tab)?.label || "Dashboard"}</h1>
               {tab === "dashboard" && (
@@ -458,16 +487,97 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                 <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
                 Refresh
               </button>
-              <div className="relative cursor-pointer w-10 h-10 rounded-full flex items-center justify-center bg-white border" style={{ borderColor: C.border }}>
+              <div 
+                onClick={() => { setShowBellDropdown(!showBellDropdown); setShowAdminDropdown(false); }}
+                className="relative cursor-pointer w-10 h-10 rounded-full flex items-center justify-center bg-white border hover:bg-gray-50 transition-all select-none" 
+                style={{ borderColor: C.border }}
+              >
                 <Bell size={18} color={C.muted} />
                 <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[#C5A059] text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white">3</span>
+                {showBellDropdown && (
+                  <div 
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute right-0 top-12 z-50 w-80 bg-white rounded-xl border shadow-xl p-4 text-left animate-fade-in"
+                    style={{ borderColor: C.border }}
+                  >
+                    <div className="flex items-center justify-between pb-3 border-b mb-3" style={{ borderColor: C.border }}>
+                      <h4 className="font-sans text-sm font-extrabold uppercase tracking-wider" style={{ color: C.ink }}>Notifications</h4>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FAF6F0] text-[#C5A059] border border-[#EADBCE]">3 New</span>
+                    </div>
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {[
+                        { title: "New Salon Request", desc: "Style Hub has submitted an onboarding application.", time: "10 mins ago", type: "salon", tab: "salons" },
+                        { title: "Slot Confirmed", desc: "Rohit Patel's haircut is confirmed at Royal Cuts.", time: "45 mins ago", type: "booking", tab: "appointments" },
+                        { title: "Barber Status Alert", desc: "Barber Amit set status to 'busy' for active slot.", time: "1 hour ago", type: "barber", tab: "live" },
+                      ].map((item, idx) => (
+                        <div 
+                          key={idx}
+                          onClick={() => { setTab(item.tab); setShowBellDropdown(false); }}
+                          className="p-2.5 rounded-lg hover:bg-orange-50/40 border border-transparent hover:border-[#EADBCE] transition-all cursor-pointer text-left"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold" style={{ color: C.ink }}>{item.title}</span>
+                            <span className="text-[9px]" style={{ color: C.muted }}>{item.time}</span>
+                          </div>
+                          <p className="text-[11px] mt-1 leading-normal" style={{ color: C.muted }}>{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-3 cursor-pointer pl-4 border-l" style={{ borderColor: C.border }}>
+              <div 
+                onClick={() => { setShowAdminDropdown(!showAdminDropdown); setShowBellDropdown(false); }}
+                className="flex items-center gap-3 cursor-pointer pl-4 border-l select-none relative hover:opacity-80 transition-all" 
+                style={{ borderColor: C.border }}
+              >
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#D1BFA5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#FFFFFF", flexShrink: 0 }}>AD</div>
                 <div className="flex items-center gap-1">
                   <span className="text-[13px] font-semibold" style={{ color: C.ink }}>Admin</span>
-                  <ChevronDown size={14} color={C.muted} />
+                  <ChevronDown size={14} color={C.muted} className={`transition-transform duration-200 ${showAdminDropdown ? "rotate-180" : ""}`} />
                 </div>
+                {showAdminDropdown && (
+                  <div 
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute right-0 top-12 z-50 w-56 bg-white rounded-xl border shadow-xl p-4 text-left animate-fade-in"
+                    style={{ borderColor: C.border }}
+                  >
+                    <div className="pb-3 border-b mb-3" style={{ borderColor: C.border }}>
+                      <div className="text-xs font-bold" style={{ color: C.ink }}>Super Admin</div>
+                      <div className="text-[10px] truncate" style={{ color: C.muted }}>admin@barberpro.com</div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <button 
+                        type="button"
+                        onClick={() => { setTab("settings"); setShowAdminDropdown(false); }}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                        style={{ color: C.ink }}
+                      >
+                        <Settings size={13} color={C.muted} />
+                        Platform Settings
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => { setTab("dashboard"); setShowAdminDropdown(false); }}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                        style={{ color: C.ink }}
+                      >
+                        <LayoutDashboard size={13} color={C.muted} />
+                        View Dashboard
+                      </button>
+                      <div className="h-px my-1.5 bg-stone-200/50" />
+                      <button 
+                        type="button"
+                        onClick={handleSignOut}
+                        className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-bold hover:bg-red-50 flex items-center gap-2 transition-colors"
+                        style={{ color: C.red }}
+                      >
+                        <LogOut size={13} />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </header>
@@ -635,6 +745,7 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                 pendingBookings={pendingBookings}
                 revenueDisplay={revenueDisplay}
                 updateSalonStatus={updateSalonStatus}
+                addSalon={addSalon}
               />
             )}
             {tab === "customers" && (
