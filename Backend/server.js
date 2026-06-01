@@ -29,6 +29,8 @@ app.use("/api/noshow",   require("./routes/noshowRoutes"));
 app.use("/api/breaks", breakRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/review",   require("./routes/reviewRoutes"));
+app.use("/api/newsletter", require("./routes/newsletterRoutes"));
+
 
 
 app.get("/", (req, res) => res.json({ message:"Graphura Barber SaaS API v2.0", database:"MongoDB", status:"running" }));
@@ -38,4 +40,11 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server on http://localhost:${PORT}`);
+  try {
+    require("./utils/cronJobs").initCron();
+  } catch (err) {
+    console.error("Failed to start cron engine:", err.message);
+  }
+});

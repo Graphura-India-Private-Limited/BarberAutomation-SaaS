@@ -172,13 +172,26 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// @desc    Update customer profile
-// @route   PUT /api/auth/profile
-// @access  Private (Customer)
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
-    const customer = await Customer.findByIdAndUpdate(req.user.id, { name, email }, { new: true });
+    const { 
+      name, email, profile_picture, membership_tier, membership_renewal_date,
+      total_visits, marketing_emails, monthly_reminders, new_services_alerts, newsletter_opt_in
+    } = req.body;
+    
+    const updates = {};
+    if (name !== undefined) updates.name = name;
+    if (email !== undefined) updates.email = email;
+    if (profile_picture !== undefined) updates.profile_picture = profile_picture;
+    if (membership_tier !== undefined) updates.membership_tier = membership_tier;
+    if (membership_renewal_date !== undefined) updates.membership_renewal_date = membership_renewal_date;
+    if (total_visits !== undefined) updates.total_visits = Number(total_visits);
+    if (marketing_emails !== undefined) updates.marketing_emails = marketing_emails;
+    if (monthly_reminders !== undefined) updates.monthly_reminders = monthly_reminders;
+    if (new_services_alerts !== undefined) updates.new_services_alerts = new_services_alerts;
+    if (newsletter_opt_in !== undefined) updates.newsletter_opt_in = newsletter_opt_in;
+
+    const customer = await Customer.findByIdAndUpdate(req.user.id, updates, { new: true });
     res.json({ success: true, user: customer });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
