@@ -62,33 +62,41 @@ export default function AllReviews() {
           <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
             <button
               onClick={() => navigate(-1)}
-              className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-medium text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
+              className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-sans font-extrabold text-[11px] uppercase tracking-widest transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-0.5" />
-              <span>Back</span>
+              Back
             </button>
           </div>
 
-          {/* WRITE REVIEW BUTTON (Top Right) */}
-          <div className="absolute top-6 right-4 sm:right-6 md:left-auto z-20">
+          {/* WRITE REVIEW BUTTON */}
+          <div className="absolute top-6 right-4 sm:right-6 z-20">
             <button
               onClick={() => navigate("/write-review")}
-              className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-bold text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
+              className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-sans font-extrabold text-[11px] uppercase tracking-widest transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
             >
               <Heart className="w-3.5 h-3.5 fill-current text-[#C5A059] group-hover:text-[#2A241F]" />
-              <span>Write Review</span>
+              Write Review
             </button>
           </div>
 
           <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-8">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-4">
+            {/* Kicker tag */}
+            <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full shadow-sm inline-block mb-4">
               Guest Testimonials
             </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-[#3E362E] font-serif leading-none">
-              All Our <span className="text-[#C5A059] italic normal-case">Reviews</span>
+            {/* Primary header — two-line split */}
+            <h1 className="leading-none">
+              <span className="block font-sans font-black uppercase tracking-tight text-4xl sm:text-5xl md:text-6xl text-stone-900">
+                All Our
+              </span>
+              <span className="block font-serif italic text-3xl sm:text-4xl md:text-5xl text-[#C5A059] normal-case mt-1">
+                Reviews
+              </span>
             </h1>
             <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-5 mb-4" />
-            <p className="text-stone-500 text-xs sm:text-sm max-w-xl mx-auto font-light leading-relaxed">
+            {/* Body text */}
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 max-w-xl mx-auto">
               Discover real stories and experiences shared by our esteemed guests. Authentic guest feedback beautifully driving our perfection.
             </p>
           </div>
@@ -100,8 +108,8 @@ export default function AllReviews() {
           {/* ═══ STATS STRIP ═══ */}
           <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-10">
             <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
-              <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Total Reviews</p>
-              <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-[#3E362E]">{stats.total}</p>
+              <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1.5">Total Reviews</p>
+              <p className="font-serif text-3xl sm:text-4xl md:text-5xl font-black text-stone-900">{stats.total}</p>
             </div>
             <div className="bg-white/90 backdrop-blur-md rounded-[24px] p-5 md:p-6 text-center border border-white/60 shadow-[0_10px_30px_rgba(0,0,0,0.01)]">
               <p className="text-[9px] sm:text-[10px] font-black tracking-[0.25em] uppercase text-[#C5A059] mb-1.5">Avg Salon</p>

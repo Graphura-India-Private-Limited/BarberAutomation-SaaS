@@ -420,11 +420,15 @@ export default function HomePage() {
             </div>
 
             <div>
-              <span className="text-[11px] font-black uppercase tracking-[0.35em] text-[#C5A059]">About Us</span>
+              <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">About Us</span>
 
-              <h2 className="mt-4 text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight bg-gradient-to-r from-[#C5A059] via-[#FFE6A7] to-[#C5A059] bg-clip-text text-transparent leading-tight">
-                We Are The Art Of{" "}
-                <span className="italic font-serif">Grooming</span>
+              <h2 className="mt-4 leading-none">
+                <span className="block font-sans font-black uppercase tracking-tight text-3xl md:text-4xl lg:text-5xl text-white">
+                  We Are The Art Of
+                </span>
+                <span className="block font-serif italic text-2xl md:text-3xl lg:text-4xl text-[#C5A059] normal-case mt-1">
+                  Grooming
+                </span>
               </h2>
 
               <div className="w-20 h-[3px] bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] rounded-full mt-4 shadow-[0_0_20px_rgba(197,160,89,0.7)]" />
@@ -487,9 +491,14 @@ export default function HomePage() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
-            <span className="text-[12px] sm:text-[14px] font-black uppercase tracking-[0.35em] text-[#C5A059]">What We Offer</span>
-            <h2 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-tight bg-gradient-to-r from-[#3E362E] via-[#C5A059] to-[#3E362E] bg-clip-text text-transparent">
-              Our Services
+            <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">What We Offer</span>
+            <h2 className="mt-4 leading-none">
+              <span className="block font-sans font-black uppercase tracking-tight text-3xl sm:text-5xl lg:text-6xl text-stone-900">
+                Our
+              </span>
+              <span className="block font-serif italic text-2xl sm:text-4xl lg:text-5xl text-[#C5A059] normal-case mt-1">
+                Services
+              </span>
             </h2>
             <div className="w-20 h-[3px] rounded-full mx-auto mt-5 bg-gradient-to-r from-[#C5A059] to-[#E8C878] shadow-[0_0_20px_rgba(197,160,89,0.45)]" />
           </div>
@@ -548,9 +557,14 @@ export default function HomePage() {
 
         <div className="relative z-10 mx-auto max-w-7xl px-6">
           <div className="text-center mb-16">
-            <span className="text-[12px] sm:text-[14px] font-black uppercase tracking-[0.35em] text-[#C5A059]">Simple Process</span>
-            <h2 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight bg-gradient-to-r from-[#C5A059] via-[#FFE6A7] to-[#C5A059] bg-clip-text text-transparent">
-              How It Works
+            <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Simple Process</span>
+            <h2 className="mt-4 leading-none">
+              <span className="block font-sans font-black uppercase tracking-tight text-3xl sm:text-5xl lg:text-6xl text-white">
+                How It
+              </span>
+              <span className="block font-serif italic text-2xl sm:text-4xl lg:text-5xl text-[#C5A059] normal-case mt-1">
+                Works
+              </span>
             </h2>
             <div className="w-20 h-[3px] rounded-full mx-auto mt-5 bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] shadow-[0_0_20px_rgba(197,160,89,0.6)]" />
           </div>
@@ -609,8 +623,11 @@ export default function HomePage() {
         <section className="bg-[#F9F5EF] py-20">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-14">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Find Us</span>
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">Nearby Salons</h2>
+              <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Find Us</span>
+              <h2 className="mt-4 leading-none">
+                <span className="block font-sans font-black uppercase tracking-tight text-3xl md:text-5xl text-stone-900">Nearby</span>
+                <span className="block font-serif italic text-2xl md:text-4xl text-[#C5A059] normal-case mt-1">Salons</span>
+              </h2>
               <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
             </div>
             <div className="grid gap-6 md:grid-cols-3">
@@ -661,9 +678,14 @@ export default function HomePage() {
         <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')] pointer-events-none" />
 
         <div className="relative z-20 text-center mb-14 px-4">
-          <span className="text-[12px] sm:text-[14px] font-black uppercase tracking-[0.35em] text-[#C5A059]">WHAT Clients SAYS</span>
-          <h2 className="mt-4 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight bg-gradient-to-r from-[#C5A059] via-[#FFE6A7] to-[#C5A059] bg-clip-text text-transparent leading-tight">
-            Customer Reviews
+          <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">What Clients Say</span>
+          <h2 className="mt-4 leading-none">
+            <span className="block font-sans font-black uppercase tracking-tight text-3xl sm:text-5xl lg:text-6xl text-white">
+              Customer
+            </span>
+            <span className="block font-serif italic text-2xl sm:text-4xl lg:text-5xl text-[#C5A059] normal-case mt-1">
+              Reviews
+            </span>
           </h2>
           <div className="w-20 h-[3px] bg-gradient-to-r from-[#C5A059] to-[#FFE6A7] mx-auto mt-5 rounded-full shadow-[0_0_20px_rgba(197,160,89,0.7)]" />
         </div>
@@ -773,18 +795,20 @@ export default function HomePage() {
           <div className="relative overflow-hidden rounded-[40px] border border-[#E6D7BC] bg-white/60 backdrop-blur-2xl shadow-[0_20px_60px_rgba(62,54,46,0.08)] px-6 sm:px-10 lg:px-16 py-14 lg:py-16 text-center">
             <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent rotate-12 hover:left-[120%] transition-all duration-1000 pointer-events-none" />
 
-            <span className="relative z-10 text-[12px] font-black uppercase tracking-[0.35em] text-[#C5A059]">Luxury Experience</span>
+            <span className="relative z-10 font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Luxury Experience</span>
 
-            <h2 className="relative z-10 mt-5 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-tight text-[#3E362E]">
-              Ready For Your{" "}
-              <span className="italic font-serif bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] bg-clip-text text-transparent">
+            <h2 className="relative z-10 mt-5 leading-none">
+              <span className="block font-sans font-black uppercase tracking-tight text-3xl sm:text-5xl lg:text-6xl text-stone-900">
+                Ready For Your
+              </span>
+              <span className="block font-serif italic text-2xl sm:text-4xl lg:text-5xl text-[#C5A059] normal-case mt-1">
                 Transformation?
               </span>
             </h2>
 
             <div className="w-20 h-[3px] rounded-full mx-auto mt-6 bg-gradient-to-r from-[#C5A059] to-[#E8C878] shadow-[0_0_20px_rgba(197,160,89,0.4)]" />
 
-            <p className="relative z-10 mt-7 text-stone-600 text-base sm:text-lg italic font-serif leading-relaxed max-w-2xl mx-auto">
+            <p className="relative z-10 mt-7 font-sans text-sm font-normal leading-relaxed text-stone-600 max-w-2xl mx-auto">
               Book your appointment today and experience the premium BarberPro grooming journey crafted for confidence and style.
             </p>
 
