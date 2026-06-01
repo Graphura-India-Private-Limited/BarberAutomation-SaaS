@@ -93,6 +93,7 @@ const ReviewSystem = ({ bookingData }) => {
     return (
       <div className="min-h-screen w-full flex flex-col justify-between font-sans relative bg-[#FAF7F2]">
         <Navbar />
+        <div className="w-full flex-grow pt-24"></div>
         <div className="flex-grow flex items-center justify-center p-4">
           <div className="bg-white rounded-[2rem] shadow-2xl p-12 text-center max-w-md border border-stone-200/40 w-full">
             <div className="w-20 h-20 rounded-full bg-green-100 mx-auto mb-6 flex items-center justify-center">
