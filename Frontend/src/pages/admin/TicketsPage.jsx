@@ -1,11 +1,110 @@
 
+// import React from 'react';
+// import { TicketFilters } from '../../Components/TicketFilters.jsx';
+// import { TicketTable } from '../../Components/TicketTable.jsx';
+// import { TicketDetailModal } from '../../Components/TicketDetailModal.jsx';
+// import { Inbox, Layers, Filter } from 'lucide-react';
+
+// const GOLD = "#C5A059";
+
+// export function TicketsPage({
+//   filteredTickets,
+//   filterStatus, setFilterStatus,
+//   filterType, setFilterType,
+//   filterPriority, setFilterPriority,
+//   searchQuery, setSearchQuery,
+//   selectedTicket, setSelectedTicket,
+//   resolveTicket, escalateTicket, closeTicket, reopenTicket,
+//   assignTicket, addNote,
+//   typeFilter,
+// }) {
+  
+//   const displayTickets = typeFilter
+//     ? filteredTickets.filter(t => t.type === typeFilter)
+//     : filteredTickets;
+
+//   return (
+//     <div className="p-6 space-y-8 text-stone-800 animate-in fade-in duration-300">
+      
+      
+//       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-5 border-stone-200/60 text-left">
+//         <div>
+//           <h1 className="font-sans font-black uppercase text-4xl sm:text-5xl tracking-tight text-stone-900">
+//             Support Tickets
+//           </h1>
+//           <p className="font-serif italic text-3xl sm:text-4xl text-[#C5A059] normal-case mt-1">
+//             {typeFilter ? `${typeFilter} Segment Pipeline` : "Escalation Workspace"}
+//           </p>
+//           <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2">
+//             {typeFilter ? `${typeFilter} Segment Pipeline` : "All Central Escalation Workspace Logs"}
+//           </p>
+//         </div>
+        
+//         <div className="flex items-center gap-2 bg-white border border-stone-200 px-3.5 py-2 rounded-xl shadow-2xs">
+//           <Inbox size={14} style={{ color: GOLD }} />
+//           <span className="font-sans text-xs font-extrabold uppercase tracking-wider text-stone-500">
+//             {displayTickets.length} Records Loaded
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* ── UTILITY FILTER ENGINE CARD ── */}
+//       <div className="card bg-white p-2 shadow-xs border border-stone-200/80">
+//         <TicketFilters
+//           filterStatus={filterStatus}     setFilterStatus={setFilterStatus}
+//           filterType={filterType}         setFilterType={setFilterType}
+//           filterPriority={filterPriority} setFilterPriority={setFilterPriority}
+//           searchQuery={searchQuery}       setSearchQuery={setSearchQuery}
+//           total={displayTickets.length}
+//         />
+//       </div>
+
+//       {/* ── METADATA DATA TABLE CONTAINER ── */}
+//       <div className="card bg-white overflow-hidden shadow-sm border border-stone-200/80">
+//         <div className="px-6 py-4 border-b border-stone-100 bg-stone-50/40 flex items-center gap-2 text-left">
+//           <Layers size={14} style={{ color: GOLD }} />
+//           <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">
+//             Active Workspace Stream Ledger
+//           </h3>
+//         </div>
+        
+//         <div className="divide-y divide-stone-50">
+//           <TicketTable tickets={displayTickets} onSelect={setSelectedTicket} />
+//         </div>
+//       </div>
+
+//       {/* ── MODAL SIDE OVERLAY DATA CANVAS ── */}
+//       <TicketDetailModal
+//         ticket={selectedTicket}
+//         isOpen={!!selectedTicket}
+//         onClose={() => setSelectedTicket(null)}
+//         onResolve={resolveTicket}
+//         onEscalate={escalateTicket}
+//         onCloseTicket={closeTicket}
+//         onReopen={reopenTicket}
+//         onAssign={assignTicket}
+//         onAddNote={addNote}
+//       />
+//     </div>
+//   );
+// }
+
 import React from 'react';
 import { TicketFilters } from '../../Components/TicketFilters.jsx';
 import { TicketTable } from '../../Components/TicketTable.jsx';
 import { TicketDetailModal } from '../../Components/TicketDetailModal.jsx';
-import { Inbox, Layers, Filter } from 'lucide-react';
+import { Inbox, Layers } from 'lucide-react';
 
-const GOLD = "#C5A059";
+// ══ COLORS — identical to AdminOnboarding palette ══
+const C = {
+  bg: "#FAF6F0",
+  card: "#FFFFFF",
+  ink: "#1C1917",
+  muted: "#78716C",
+  border: "#E7E5E4",
+  gold: "#C5A059",
+  goldLight: "#FDF9F3",
+}
 
 export function TicketsPage({
   filteredTickets,
@@ -18,38 +117,60 @@ export function TicketsPage({
   assignTicket, addNote,
   typeFilter,
 }) {
-  
   const displayTickets = typeFilter
     ? filteredTickets.filter(t => t.type === typeFilter)
     : filteredTickets;
 
   return (
-    <div className="p-6 space-y-8 text-stone-800 animate-in fade-in duration-300">
-      
-      
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-5 border-stone-200/60 text-left">
+    <div style={{ padding: "32px 32px 60px", display: "flex", flexDirection: "column", gap: 24 }}>
+
+      {/* ── PAGE HERO — matches AdminOnboarding header style ── */}
+      <div style={{
+        display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+        paddingBottom: 20, borderBottom: `1px solid ${C.border}`,
+      }}>
         <div>
-          <h1 className="font-sans font-black uppercase text-4xl sm:text-5xl tracking-tight text-stone-900">
+          <h1 style={{
+            fontSize: 42, fontWeight: 700, color: C.ink,
+            fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 6,
+          }}>
             Support Tickets
           </h1>
-          <p className="font-serif italic text-3xl sm:text-4xl text-[#C5A059] normal-case mt-1">
+          <p style={{
+            fontSize: 28, fontStyle: "italic", color: C.gold,
+            fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 8,
+          }}>
             {typeFilter ? `${typeFilter} Segment Pipeline` : "Escalation Workspace"}
           </p>
-          <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2">
-            {typeFilter ? `${typeFilter} Segment Pipeline` : "All Central Escalation Workspace Logs"}
+          <p style={{
+            fontSize: 10, fontWeight: 700, color: C.gold,
+            textTransform: "uppercase", letterSpacing: "0.18em",
+          }}>
+            {typeFilter ? `${typeFilter} segment pipeline` : "All Central Escalation Workspace Logs"}
           </p>
         </div>
-        
-        <div className="flex items-center gap-2 bg-white border border-stone-200 px-3.5 py-2 rounded-xl shadow-2xs">
-          <Inbox size={14} style={{ color: GOLD }} />
-          <span className="font-sans text-xs font-extrabold uppercase tracking-wider text-stone-500">
+
+        {/* Records badge */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8,
+          background: C.card, border: `1px solid ${C.border}`,
+          padding: "8px 16px", borderRadius: 10,
+          boxShadow: "0 1px 4px rgba(0,0,0,.04)",
+        }}>
+          <Inbox size={14} color={C.gold} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
             {displayTickets.length} Records Loaded
           </span>
         </div>
       </div>
 
-      {/* ── UTILITY FILTER ENGINE CARD ── */}
-      <div className="card bg-white p-2 shadow-xs border border-stone-200/80">
+      {/* ── FILTERS CARD ── */}
+      <div style={{
+        background: C.card, borderRadius: 16,
+        border: `1px solid ${C.border}`,
+        boxShadow: "0 1px 4px rgba(0,0,0,.04)",
+        overflow: "hidden",
+      }}>
         <TicketFilters
           filterStatus={filterStatus}     setFilterStatus={setFilterStatus}
           filterType={filterType}         setFilterType={setFilterType}
@@ -59,21 +180,31 @@ export function TicketsPage({
         />
       </div>
 
-      {/* ── METADATA DATA TABLE CONTAINER ── */}
-      <div className="card bg-white overflow-hidden shadow-sm border border-stone-200/80">
-        <div className="px-6 py-4 border-b border-stone-100 bg-stone-50/40 flex items-center gap-2 text-left">
-          <Layers size={14} style={{ color: GOLD }} />
-          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">
+      {/* ── TICKET TABLE CARD ── */}
+      <div style={{
+        background: C.card, borderRadius: 16,
+        border: `1px solid ${C.border}`,
+        overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,.04)",
+      }}>
+        {/* Table header label */}
+        <div style={{
+          padding: "12px 20px", borderBottom: `1px solid ${C.border}`,
+          background: "#FAFAF8",
+          display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <Layers size={14} color={C.gold} />
+          <span style={{
+            fontSize: 10, fontWeight: 700, color: C.gold,
+            textTransform: "uppercase", letterSpacing: "0.18em",
+          }}>
             Active Workspace Stream Ledger
-          </h3>
+          </span>
         </div>
-        
-        <div className="divide-y divide-stone-50">
-          <TicketTable tickets={displayTickets} onSelect={setSelectedTicket} />
-        </div>
+
+        <TicketTable tickets={displayTickets} onSelect={setSelectedTicket} />
       </div>
 
-      {/* ── MODAL SIDE OVERLAY DATA CANVAS ── */}
+      {/* ── DETAIL MODAL ── */}
       <TicketDetailModal
         ticket={selectedTicket}
         isOpen={!!selectedTicket}
