@@ -106,6 +106,7 @@ function PrivacyPolicy() {
   return (
     <>
       <Navbar />
+      <div className="w-full flex-grow pt-24"></div>
 
       {/* ORIGINAL LIGHT BACKGROUND */}
       <div className="min-h-screen bg-[#FAF6F0] overflow-hidden relative selection:bg-[#C5A059] selection:text-white">

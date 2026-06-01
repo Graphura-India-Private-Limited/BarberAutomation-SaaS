@@ -99,6 +99,7 @@ function TermsPage() {
   return (
     <>
       <Navbar />
+      <div className="w-full flex-grow pt-24"></div>
 
       <div className="min-h-screen bg-[#FAF6F0] overflow-hidden relative selection:bg-[#C5A059] selection:text-white">
         

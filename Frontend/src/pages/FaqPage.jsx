@@ -41,6 +41,7 @@ function FaqPage() {
   return (
     <>
       <Navbar />
+      <div className="w-full flex-grow pt-24"></div>
 
       <section className="relative py-16 sm:py-20 md:py-28 overflow-hidden bg-[#FAF6F0] selection:bg-[#C5A059] selection:text-white">
         
