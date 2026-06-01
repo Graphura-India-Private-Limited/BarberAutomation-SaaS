@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Ticket, Users, HeadphonesIcon, AlertTriangle, 
-  CheckCircle, Clock, TrendingUp, XCircle, ChevronRight, Activity
+  CheckCircle, Clock, TrendingUp, XCircle, ChevronRight, Activity,
+  Mail, Search, RefreshCw, Trash2
 } from 'lucide-react';
 import { StatCard, RecentTickets } from '../../Components/DashboardWidgets.jsx';
 import { getStats, TICKET_STATUS } from '../../utils/tickets.jsx';
@@ -9,6 +10,7 @@ import { StatusBadge } from '../../Components/TicketBadges.jsx';
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export function DashboardPage({ tickets, onSelectTicket }) {
   const stats = getStats(tickets);
@@ -165,6 +167,169 @@ export function DashboardPage({ tickets, onSelectTicket }) {
       {/* ── RECENT TICKETS ENTRY LEDGER LIST ── */}
       <div className="pt-2">
         <RecentTickets tickets={tickets} onSelect={onSelectTicket} />
+      </div>
+
+      {/* ── NEWSLETTER SUBSCRIBERS LIST ── */}
+      <div className="pt-2">
+        <NewsletterSubscribersCard />
+      </div>
+    </div>
+  );
+}
+
+function NewsletterSubscribersCard() {
+  const [subscribers, setSubscribers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const fetchSubscribers = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetch(`${API}/newsletter/subscribers`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubscribers(data.subscribers || []);
+      } else {
+        setError(true);
+      }
+    } catch (err) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to remove this subscriber?")) return;
+    try {
+      const res = await fetch(`${API}/newsletter/subscriber/${id}`, {
+        method: "DELETE"
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubscribers(prev => prev.filter(sub => sub._id !== id));
+      } else {
+        alert(data.message || "Failed to delete subscriber");
+      }
+    } catch (err) {
+      alert("Failed to delete subscriber. Please check your network connection.");
+    }
+  };
+
+  useEffect(() => {
+    fetchSubscribers();
+  }, []);
+
+  const filteredSubscribers = subscribers.filter(sub => 
+    sub.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#E8DDD0] shadow-sm overflow-hidden text-left">
+      <div className="px-5 py-4 border-b border-[#E8DDD0] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#FAF6F0] border border-[#E8DDD0] flex items-center justify-center text-[#B58B67] shrink-0">
+            <Mail size={18} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-[#3D3126]">Newsletter Subscribers</h3>
+              <span className="font-mono text-xs text-[#8A7A6A] bg-[#FAF6F0] px-2 py-0.5 rounded border border-[#E8DDD0] font-black">
+                {subscribers.length}
+              </span>
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-0.5">
+              Emails collected from the home page footer
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="relative flex items-center">
+            <Search size={14} className="absolute left-3 text-[#8A7A6A]" />
+            <input
+              type="text"
+              placeholder="Search email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-1.5 text-xs bg-white border border-[#E8DDD0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#B58B67] text-[#3D3126] w-48 font-sans"
+            />
+          </div>
+          <button
+            onClick={fetchSubscribers}
+            className="p-1.5 rounded-xl border border-[#E8DDD0] hover:bg-[#FAF6F0] text-[#8A7A6A] transition-colors"
+            title="Refresh list"
+            disabled={loading}
+          >
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+          </button>
+        </div>
+      </div>
+
+      <div className="min-h-[160px] flex flex-col justify-center">
+        {loading ? (
+          <div className="py-8 text-center text-xs text-[#8A7A6A]">
+            <div className="w-6 h-6 border-2 border-[#B58B67] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+            Loading subscribers...
+          </div>
+        ) : error ? (
+          <div className="py-10 text-center flex flex-col items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 mb-2">
+              <AlertTriangle size={18} />
+            </div>
+            <p className="text-xs font-semibold text-stone-600">Network error. Could not load subscribers.</p>
+            <button
+              onClick={fetchSubscribers}
+              className="text-xs font-bold text-[#B58B67] hover:underline mt-1.5"
+            >
+              Try again
+            </button>
+          </div>
+        ) : filteredSubscribers.length === 0 ? (
+          <div className="py-10 text-center text-[#8A7A6A] text-xs">
+            <Mail size={24} className="mx-auto mb-2 opacity-30" />
+            {searchQuery ? "No matching subscribers found." : "No subscribers yet."}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-[#FAF6F0]/60 border-b border-[#E8DDD0] text-[10px] font-black uppercase tracking-wider text-[#8A7A6A]">
+                  <th className="px-5 py-3">Email Address</th>
+                  <th className="px-5 py-3">Subscribed On</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F0E8DF]">
+                {filteredSubscribers.map(sub => (
+                  <tr key={sub._id} className="hover:bg-[#FAF6F0]/40 transition-colors">
+                    <td className="px-5 py-3.5 font-medium text-[#3D3126] font-mono">{sub.email}</td>
+                    <td className="px-5 py-3.5 text-[#8A7A6A] font-sans">
+                      {new Date(sub.created_at).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </td>
+                    <td className="px-5 py-3.5 text-right">
+                      <button
+                        onClick={() => handleDelete(sub._id)}
+                        className="p-1.5 rounded-lg text-[#8A7A6A] hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                        title="Delete subscriber"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

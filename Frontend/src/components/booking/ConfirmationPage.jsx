@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 export default function ConfirmationPage({ bookingData = {}, onReset }) {
   // Keeps the generated booking ID stable across component re-renders
-  const [bookingId] = useState(() => "BKG-" + Math.floor(100000 + Math.random() * 900000));
+  const [bookingId] = useState(() => bookingData._id || bookingData.bookingId || "BKG-" + Math.floor(100000 + Math.random() * 900000));
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center max-w-xl mx-auto">

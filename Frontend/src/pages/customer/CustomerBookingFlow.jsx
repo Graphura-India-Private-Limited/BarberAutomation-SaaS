@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Home } from 'lucide-react';
 import SlotSelection from '../../components/booking/SlotSelection';
 import BookingForm from '../../components/booking/BookingForm';
@@ -8,16 +8,64 @@ import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
 const GOLD = "#C5A059";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function Wrapper() {
-  const [bookingData, setBookingData] = useState({
-    service: 'Haircut & Styling',
-    price: 500,
-    barber: 'Rahul',
-    date: null,
-    time: null,
-  });
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract query parameters if redirecting from dummy catalog
+  const queryParams = new URLSearchParams(location.search);
+  const querySvcId = queryParams.get("svcId");
+  const queryPrice = queryParams.get("price");
+
+  // Extract router state if navigating from Men's/Women's/Addon services
+  const { service, barber, customer } = location.state || {};
+
+  // Setup initial booking data state
+  const [bookingData, setBookingData] = useState(() => {
+    let serviceName = "Classic Haircut & Beard Styling";
+    let price = 500;
+    let serviceId = null;
+    let barberName = "Barber Ajay";
+    let barberId = null;
+
+    if (service) {
+      serviceName = service.name || serviceName;
+      price = service.price || price;
+      serviceId = service._id || service.id || null;
+    } else if (querySvcId) {
+      serviceId = querySvcId;
+      const dummyMap = {
+        s1: "Classic Haircut",
+        s2: "Taper Fade & Trim",
+        s3: "Beard Sculpting & Oil",
+        s4: "Luxury Hot Stone Shave",
+        s5: "Charcoal Face Mask",
+        s6: "Organic Hair Color",
+        s7: "Royal Head Massage",
+        s8: "Deep Conditioning Shampoo"
+      };
+      serviceName = dummyMap[querySvcId] || "Premium Grooming Service";
+      price = queryPrice ? parseInt(queryPrice, 10) : price;
+    }
+
+    if (barber) {
+      barberName = barber.name || barberName;
+      barberId = barber._id || barber.id || null;
+    }
+
+    return {
+      service: serviceName,
+      price: price,
+      service_id: serviceId,
+      barber: barberName,
+      barber_id: barberId,
+      date: null,
+      time: null,
+    };
+  });
+
   const [currentStep, setCurrentStep] = useState(3); 
 
   useEffect(() => {
@@ -29,11 +77,135 @@ export default function Wrapper() {
     setCurrentStep(4);
   };
 
-  const handleBookingConfirmed = (updatedDetails) => {
+  const handleBookingConfirmed = async (updatedDetails) => {
+    let finalBookingData = { ...bookingData };
     if (updatedDetails) {
-      setBookingData((prev) => ({ ...prev, ...updatedDetails }));
+      finalBookingData = { ...finalBookingData, ...updatedDetails };
+      setBookingData(finalBookingData);
     }
-    setCurrentStep(5);
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.log("No authorization token found. Proceeding with dummy confirmation.");
+      setCurrentStep(5);
+      return;
+    }
+
+    try {
+      // 1. Fetch approved salons from backend
+      const salonsRes = await fetch(`${API}/salon`);
+      const salonsData = await salonsRes.json();
+      if (!salonsData.success || !salonsData.salons || salonsData.salons.length === 0) {
+        throw new Error("No approved salons found in system.");
+      }
+      
+      const salon = salonsData.salons[0];
+      const salonId = salon._id;
+
+      // 2. Fetch services for this salon from backend
+      const servicesRes = await fetch(`${API}/service/${salonId}`);
+      const servicesData = await servicesRes.json();
+      let matchedServiceId = null;
+      let matchedPrice = finalBookingData.price || 200;
+
+      if (servicesData.success && servicesData.services && servicesData.services.length > 0) {
+        const match = servicesData.services.find(
+          s => s.name.toLowerCase().includes(finalBookingData.service.toLowerCase()) || 
+               finalBookingData.service.toLowerCase().includes(s.name.toLowerCase())
+        );
+        if (match) {
+          matchedServiceId = match._id;
+          matchedPrice = match.price;
+        } else {
+          matchedServiceId = servicesData.services[0]._id;
+          matchedPrice = servicesData.services[0].price;
+        }
+      }
+
+      // 3. Fetch barbers for this salon from backend
+      const barbersRes = await fetch(`${API}/barber/salon/${salonId}`);
+      const barbersData = await barbersRes.json();
+      let matchedBarberId = null;
+
+      if (barbersData.success && barbersData.barbers && barbersData.barbers.length > 0) {
+        const match = barbersData.barbers.find(
+          b => b.name.toLowerCase().includes(finalBookingData.barber.toLowerCase()) || 
+               finalBookingData.barber.toLowerCase().includes(b.name.toLowerCase())
+        );
+        if (match) {
+          matchedBarberId = match._id;
+        } else {
+          matchedBarberId = barbersData.barbers[0]._id;
+        }
+      }
+
+      if (!matchedServiceId) {
+        throw new Error("Could not map to a valid service in DB.");
+      }
+
+      // 4. Construct formatted slot time
+      let formattedSlot = null;
+      if (finalBookingData.date && finalBookingData.time) {
+        let bookingDateObj = new Date();
+        if (finalBookingData.date === "Tomorrow") {
+          bookingDateObj.setDate(bookingDateObj.getDate() + 1);
+        } else if (finalBookingData.date === "Day After") {
+          bookingDateObj.setDate(bookingDateObj.getDate() + 2);
+        }
+        
+        let dateStr = bookingDateObj.toISOString().split("T")[0];
+        let timeStr = finalBookingData.time; // e.g. "10:00 AM" or "2:30 PM"
+        
+        let [timePart, modifier] = timeStr.split(" ");
+        let [hours, minutes] = timePart.split(":");
+        if (hours === "12") hours = "00";
+        if (modifier === "PM") hours = parseInt(hours, 10) + 12;
+        hours = String(hours).padStart(2, "0");
+        
+        formattedSlot = `${dateStr}T${hours}:${minutes}:00.000Z`;
+      } else {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        formattedSlot = `${tomorrow.toISOString().split("T")[0]}T11:00:00.000Z`;
+      }
+
+      // 5. Post booking payload to backend
+      const payload = {
+        salon_id: salonId,
+        barber_id: matchedBarberId,
+        booking_type: "slot",
+        services: [{ service_id: matchedServiceId, member_name: "Self" }],
+        slot_time: formattedSlot
+      };
+
+      console.log("Submitting online booking payload:", payload);
+      const bookingRes = await fetch(`${API}/booking`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const bookingResult = await bookingRes.json();
+      if (bookingResult.success && bookingResult.booking) {
+        console.log("Booking successfully recorded in database:", bookingResult.booking);
+        // Inject DB-created booking values to state for confirmation page
+        setBookingData(prev => ({
+          ...prev,
+          _id: bookingResult.booking._id,
+          bookingId: bookingResult.booking._id,
+          price: matchedPrice
+        }));
+      } else {
+        console.warn("Failed backend response. Proceeding with local state fallback.", bookingResult.message);
+      }
+    } catch (err) {
+      console.error("Booking API pipeline error. Falling back to local offline mode.", err.message);
+    } finally {
+      setCurrentStep(5);
+    }
   };
 
   const handleResetFlow = () => {

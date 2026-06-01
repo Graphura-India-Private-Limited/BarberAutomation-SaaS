@@ -393,19 +393,18 @@ const Footer = () => {
           const targetEmail = e.target.elements.footerEmail.value.trim();
           
           try {
-            const res = await fetch("http://localhost:5000/api/review/support/ticket", {
+            const res = await fetch("http://localhost:5000/api/newsletter/subscribe", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                category: "other",
-                email: targetEmail,
-                subject: "Footer Contact Request",
-                message: `User dropped their email directly via the global application footer. Please initiate manual CRM outreach setup protocols.`,
-              }),
+              body: JSON.stringify({ email: targetEmail }),
             });
             const data = await res.json();
-            alert("Inquiry successfully transmitted! Our concierge will get in touch.");
-            e.target.reset();
+            if (res.ok && data.success) {
+              alert(data.message || "Successfully subscribed to our newsletter!");
+              e.target.reset();
+            } else {
+              alert(data.message || "Subscription failed. Please try again.");
+            }
           } catch {
             alert("Network transmission mismatch. Is your server API pipeline online?");
           }
