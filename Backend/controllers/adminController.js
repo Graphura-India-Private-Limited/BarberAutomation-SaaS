@@ -131,7 +131,7 @@ exports.getAdminStats = async (req, res) => {
       Customer.countDocuments(),
       Salon.countDocuments({ status: "approved" }),
       Booking.countDocuments(),
-      Payment.aggregate([{ $match: { status: "captured" } }, { $group: { _id: null, total: { $sum: "$amount" } } }]),
+      Payment.aggregate([{ $match: { status: "SUCCESS" } }, { $group: { _id: null, total: { $sum: "$amount" } } }]),
     ]);
     res.json({ success: true, stats: { customers, salons, bookings, revenue: payments[0]?.total || 0 } });
   } catch (err) {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { 
-  DollarSign, TrendingUp, Award, Calendar, ArrowUpRight, 
-  Wallet, Sparkles, CheckCircle2, ArrowRight, Download, Menu, Bell 
+import {
+  DollarSign, TrendingUp, Award, Calendar, ArrowUpRight,
+  Wallet, Sparkles, CheckCircle2, ArrowRight, Download, Menu, Bell
 } from "lucide-react";
 
 
@@ -25,13 +25,13 @@ const MOCK_DAILY_COMMISSIONS = [
 export default function BarberEarnings() {
   const [payouts] = useState(MOCK_PAYOUT_HISTORY);
   const [dailyCuts] = useState(MOCK_DAILY_COMMISSIONS);
-  
+
   const [sideOpen, setSideOpen] = useState(false);
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col justify-between">
-   
+
       <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
@@ -49,11 +49,11 @@ export default function BarberEarnings() {
           </div>
         </div>
       </header>
-      
+
       <div>
         {/* ── MAIN ANALYTICAL DATA CANVAS ── */}
         <main className="max-w-6xl mx-auto w-full px-5 py-10 text-left">
-          
+
           {/* Section Dynamic Header Info */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
             <div>
@@ -76,7 +76,7 @@ export default function BarberEarnings() {
 
           {/* ── PREMIUM DYNAMIC VISUAL HIGHLIGHT CARD GRID ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            
+
             {/* Cell 1: Today's Earned Payout Allocation */}
             <div className="bg-white border border-stone-200/80 rounded-2xl p-5 flex items-center gap-4 shadow-3xs">
               <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
@@ -129,7 +129,7 @@ export default function BarberEarnings() {
 
           {/* ── SECONDARY MATRIX DATAGRID SPLIT ── */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             {/* LEFT COMPONENT COLUMN: Today's Shift Transactional Item Logs */}
             <div className="col-span-12 lg:col-span-7 card p-6 bg-white shadow-3xs">
               <div className="flex justify-between items-center mb-5 border-b pb-3 border-stone-50">
@@ -170,7 +170,30 @@ export default function BarberEarnings() {
                     <h3 className="text-sm font-black uppercase tracking-wider text-stone-900">Settlement Ledger</h3>
                     <p className="text-[10px] font-medium text-stone-400 mt-0.5">Verified banking release timelines archive</p>
                   </div>
-                  <Download size={14} className="text-stone-400 hover:text-stone-900 transition-colors cursor-pointer" />
+                  {/* <Download size={14} className="text-stone-400 hover:text-stone-900 transition-colors cursor-pointer" /> */}
+                  <button
+                    onClick={() => {
+                      const data = JSON.stringify(payouts, null, 2);
+
+                      const blob = new Blob([data], {
+                        type: "application/json",
+                      });
+
+                      const url = URL.createObjectURL(blob);
+
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = "payout-history.json";
+                      a.click();
+
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    <Download
+                      size={14}
+                      className="text-stone-400 hover:text-stone-900 transition-colors cursor-pointer"
+                    />
+                  </button>
                 </div>
 
                 <div className="space-y-3">
@@ -192,7 +215,14 @@ export default function BarberEarnings() {
                 </div>
               </div>
 
-              <button type="button" className="w-full mt-6 bg-stone-50 hover:bg-stone-900 text-stone-500 hover:text-white border border-stone-200/80 rounded-xl text-[10px] font-black uppercase tracking-widest py-3.5 transition-all duration-300 shadow-3xs cursor-pointer flex items-center justify-center gap-1.5">
+              {/* <button type="button" className="w-full mt-6 bg-stone-50 hover:bg-stone-900 text-stone-500 hover:text-white border border-stone-200/80 rounded-xl text-[10px] font-black uppercase tracking-widest py-3.5 transition-all duration-300 shadow-3xs cursor-pointer flex items-center justify-center gap-1.5">
+                Query Payout Audits <ArrowRight size={12} />
+              </button> */}
+              <button
+                type="button"
+                onClick={() => alert("Payout Audit Loaded")}
+                className="w-full mt-6 bg-stone-50 hover:bg-stone-900 text-stone-500 hover:text-white border border-stone-200/80 rounded-xl text-[10px] font-black uppercase tracking-widest py-3.5 transition-all duration-300 shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+              >
                 Query Payout Audits <ArrowRight size={12} />
               </button>
             </div>
@@ -203,7 +233,7 @@ export default function BarberEarnings() {
       </div>
 
       {/* ── ✅ BRAND FOOTER: Custom dark-wood theme module attaches at viewport bottom edge ── */}
-      
+
 
     </div>
   );

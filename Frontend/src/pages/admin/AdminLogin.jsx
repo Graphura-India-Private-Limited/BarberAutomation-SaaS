@@ -62,9 +62,6 @@ export default function AdminLogin() {
       <div className="w-full h-screen bg-white flex">
 
         {/* ── LEFT: Admin Hero ── */}
-        {/* <div className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 40%, #16213e 70%, #0f3460 100%)" }}
-        > */}
         <div
           className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden"
           style={{
@@ -75,9 +72,6 @@ export default function AdminLogin() {
           }}
         >
           <div className="absolute inset-0 bg-black/60" />
-          {/* <div className="absolute inset-0 opacity-10"
-            style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #C5A059 0%, transparent 50%), radial-gradient(circle at 80% 20%, #8B6B3E 0%, transparent 40%)" }}
-          /> */}
           <div
             className="absolute inset-0 opacity-20"
             style={{
@@ -91,21 +85,21 @@ export default function AdminLogin() {
             <div className="flex items-center gap-3">
               <Shield size={26} color={GOLD} strokeWidth={2} />
               <div>
-                <div className="text-white font-bold tracking-[0.25em] text-sm uppercase">Admin Station</div>
-                <div className="text-white/60 text-[10px] tracking-[0.35em] uppercase mt-0.5">— Secure Access —</div>
+                <div className="font-sans font-black uppercase tracking-widest text-sm text-white">Admin Station</div>
+                <div className="font-sans text-[10px] font-extrabold uppercase tracking-widest text-white/60 mt-0.5">— Secure Access —</div>
               </div>
             </div>
           </div>
 
           {/* Headline */}
           <div className="relative z-10 px-10 pb-8 flex-1 flex flex-col justify-center">
-            <h1 className="text-7xl font-serif font-bold leading-none">
-              <span style={{ color: GOLD }}>ADMIN</span>
+            <h1 className="leading-none">
+              <span className="font-sans font-black uppercase text-5xl tracking-tight" style={{ color: GOLD }}>ADMIN</span>
               <br />
-              <span className="text-white">PORTAL</span>
+              <span className="font-serif italic text-4xl text-white normal-case mt-1 block"style={{ color: "white" }}>Portal</span>
             </h1>
             <div className="w-16 h-1 mt-5" style={{ background: GOLD }} />
-            <p className="text-white/80 text-base mt-5 leading-relaxed max-w-xs italic">
+            <p className="font-sans text-sm font-normal leading-relaxed text-white/80 mt-5 max-w-xs">
               Manage requests, users, and analytics through a secure control center.
             </p>
           </div>
@@ -120,8 +114,8 @@ export default function AdminLogin() {
                 >
                   <Icon size={22} color={GOLD} strokeWidth={1.5} />
                 </div>
-                <span className="text-[9px] font-bold tracking-wider text-white uppercase leading-snug">{title}</span>
-                <span className="text-[9px] text-white/60 leading-snug">{sub}</span>
+                <span className="font-sans text-[9px] font-extrabold uppercase tracking-widest text-white leading-snug">{title}</span>
+                <span className="font-sans text-[9px] font-normal text-white/60 leading-snug">{sub}</span>
               </div>
             ))}
           </div>
@@ -140,10 +134,10 @@ export default function AdminLogin() {
 
             {/* Title */}
             <div className="text-center mb-4">
-              <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                Admin Login
-              </h2>
-              <p className="text-gray-400 text-xs mt-1">Sign in to access the admin dashboard</p>
+             <h2 className="font-sans font-black uppercase text-4xl tracking-tight text-stone-900">
+            Admin <span className="font-serif italic text-3xl text-[#C5A059] normal-case">Login</span>
+           </h2>
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mt-1">Sign in to access the admin dashboard</p>
             </div>
 
             {/* Demo credentials */}
@@ -152,16 +146,16 @@ export default function AdminLogin() {
               style={{ background: "#FEF9EE", border: `1px solid ${GOLD}40` }}
             >
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: GOLD }}>
+                <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-1" style={{ color: GOLD }}>
                   Demo Credentials
                 </p>
-                <p className="text-sm font-semibold text-gray-700">
+                <p className="font-sans text-sm font-normal text-stone-600">
                   {DEMO.mobile} &nbsp;|&nbsp; {DEMO.password}
                 </p>
               </div>
               <button
                 onClick={fillDemo}
-                className="text-[10px] font-bold uppercase tracking-wide px-3 py-1.5 rounded-lg text-white transition shrink-0"
+                className="font-sans text-xs font-extrabold uppercase tracking-wider px-3 py-1.5 rounded-lg text-white transition shrink-0"
                 style={{ background: BROWN }}
                 onMouseEnter={e => (e.currentTarget.style.background = BROWN_HOVER)}
                 onMouseLeave={e => (e.currentTarget.style.background = BROWN)}
@@ -173,12 +167,12 @@ export default function AdminLogin() {
             <form onSubmit={handleLogin} className="space-y-3">
               {/* Mobile */}
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-widest mb-2 text-gray-600">
+                <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest block mb-2 text-[#C5A059]">
                   Mobile Number
                 </label>
                 <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
-                  <div className="flex items-center gap-1 px-4 py-3.5 border-r bg-gray-50 text-sm font-semibold text-gray-700 shrink-0" style={{ borderColor: "#E5E7EB" }}>
-                    <span>+91</span>
+                  <div className="flex items-center gap-1 px-4 py-3.5 border-r bg-gray-50 shrink-0" style={{ borderColor: "#E5E7EB" }}>
+                    <span className="font-sans text-sm font-normal text-stone-600">+91</span>
                     <ChevronDown size={13} className="text-gray-400" />
                   </div>
                   <input
@@ -188,7 +182,7 @@ export default function AdminLogin() {
                     placeholder="98765 43210"
                     value={mobile}
                     onChange={e => { setMobile(e.target.value.replace(/\D/g, "")); setError(""); }}
-                    className="flex-1 px-4 py-3.5 text-sm outline-none bg-white text-gray-800"
+                    className="flex-1 px-4 py-3.5 font-sans text-sm font-normal outline-none bg-white text-stone-900"
                   />
                 </div>
               </div>
@@ -196,14 +190,14 @@ export default function AdminLogin() {
               {/* Password */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-gray-600">Password</label>
-                 <button
-    type="button"
-    onClick={() => navigate("/forgot-password")}
-    className="text-[11px] font-black uppercase tracking-widest text-[#C5A059] hover:text-[#3E362E] hover:underline bg-transparent border-none cursor-pointer select-none transition-colors duration-200"
-  >
-    Forgot Password?
-  </button>
+                  <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Password</label>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/forgot-password")}
+                    className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] hover:text-[#3E362E] hover:underline bg-transparent border-none cursor-pointer select-none transition-colors duration-200"
+                  >
+                    Forgot Password?
+                  </button>
                 </div>
                 <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
                   <div className="flex items-center px-4 border-r bg-gray-50" style={{ borderColor: "#E5E7EB" }}>
@@ -215,7 +209,7 @@ export default function AdminLogin() {
                     placeholder="••••••••"
                     value={password}
                     onChange={e => { setPassword(e.target.value); setError(""); }}
-                    className="flex-1 px-4 py-3.5 text-sm outline-none bg-white text-gray-800"
+                    className="flex-1 px-4 py-3.5 font-sans text-sm font-normal outline-none bg-white text-stone-900"
                   />
                   <button
                     type="button"
@@ -227,14 +221,14 @@ export default function AdminLogin() {
                 </div>
               </div>
 
-              {error && <p className="text-red-500 text-xs font-medium text-center">{error}</p>}
-              {success && <p className="text-green-600 text-xs font-medium text-center">{success}</p>}
+              {error && <p className="font-sans text-sm font-normal text-red-500 text-center">{error}</p>}
+              {success && <p className="font-sans text-sm font-normal text-green-600 text-center">{success}</p>}
 
               {/* Access Dashboard button */}
               <button
                 type="submit"
                 disabled={loading || mobile.length !== 10 || !password}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-sans text-xs font-extrabold uppercase tracking-wider transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: BROWN }}
                 onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = BROWN_HOVER; }}
                 onMouseLeave={e => { e.currentTarget.style.background = BROWN; }}
@@ -246,26 +240,26 @@ export default function AdminLogin() {
             {/* Divider */}
             <div className="flex items-center gap-3 my-3">
               <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400 uppercase tracking-widest">Need help?</span>
+              <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-600">Need help?</span>
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
-            {/* Help */ }
-           <p className="text-center text-xs text-gray-400 mt-3">
-             Need help?{" "}
-             <Link 
-               to="/support" 
-               className="font-semibold hover:underline cursor-pointer transition-all" 
-               style={{ color: GOLD }}
-             >
-               Contact Support
-             </Link>
-           </p>
+            {/* Help */}
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 text-center mt-3">
+              Need help?{" "}
+              <Link
+                to="/support"
+                className="font-sans text-xs font-extrabold uppercase tracking-wider hover:underline cursor-pointer transition-all"
+                style={{ color: GOLD }}
+              >
+                Contact Support
+              </Link>
+            </p>
 
             {/* Security note */}
             <div className="flex items-center justify-center gap-1.5 mt-3">
               <Shield size={12} className="text-gray-300" />
-              <p className="text-[10px] text-gray-300 text-center">
+              <p className="font-sans text-[10px] font-normal text-gray-300 text-center">
                 Secured with super-level authentication • Admins only
               </p>
             </div>

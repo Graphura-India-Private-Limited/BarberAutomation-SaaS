@@ -1,6 +1,6 @@
 
 import { StatusBadge, PriorityBadge, TypeBadge } from './TicketBadges.jsx'
-import { formatDistanceToNow } from '../utils/date.jsx'
+import { formatDistanceToNow } from '../../utils/date.jsx'
 import { User, Clock } from 'lucide-react'
 
 export function TicketTable({ tickets, onSelect }) {

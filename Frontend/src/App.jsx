@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
 
 /* ── Pages ── */
-import HomePage           from "./pages/HomePage";
+import HomePage           from "./pages/public/HomePage";
 import Login              from "./pages/auth/Login";
 import Signup             from "./pages/auth/Signup";
 import CustomerProfile     from "./pages/auth/CustomerProfile";
@@ -27,6 +27,7 @@ import BarberEarnings      from "./pages/barber/BarberEarnings";
 import BarberReviews       from "./pages/barber/BarberReviews";
 import BarberServices      from "./pages/barber/BarberServices";
 import BarberLayout from "./components/layout/BarberLayout";
+import AdminLayout from "./components/layout/AdminLayout";
 import SmartQueue          from "./pages/customer/SmartQueue";
 import OwnerLogin          from "./pages/owner/OwnerLogin";
 import SalonRegistration   from "./pages/owner/SalonRegistration";
@@ -41,7 +42,6 @@ import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import AnalyticsDashboard    from "./pages/owner/AnalyticsDashboard";
 import AdminLogin          from "./pages/admin/AdminLogin";
 import AdminOnboarding     from "./pages/admin/AdminOnboarding";
-import { Sidebar, Header } from "./Components/AppLayout";
 import { DashboardPage }  from "./pages/admin/DashboardPage";
 import { TicketsPage }    from "./pages/admin/TicketsPage";
 import { ReportsPage }    from "./pages/admin/ReportsPage";
@@ -66,9 +66,9 @@ import BookingManagement   from "./pages/owner/BookingManagement";
 import SalonManagement     from "./pages/admin/SalonManagement";
 import CustomerManagement   from "./pages/customer/CustomerManagement";
 import AllReviews          from "./pages/customer/AllReviews";
-import FaqPage             from "./pages/FaqPage";
-import TermsPage           from "./pages/TermsPage";
-import PrivacyPolicy       from "./pages/PrivacyPolicy";
+import FaqPage             from "./pages/public/FaqPage";
+import TermsPage           from "./pages/public/TermsPage";
+import PrivacyPolicy       from "./pages/public/PrivacyPolicy";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ContactSupport      from "./pages/customer/ContactSupport";
 
@@ -79,22 +79,6 @@ import NearbyBarbers       from "./components/queue/NearbyBarbers";
 import NoShowDelayPage     from "./components/queue/NoShowDelayPage";
 import MembershipSection   from "./components/membership/MembershipSection";
 import LiveQueue           from "./pages/owner/LiveQueue";
-
-function AdminLayout({ page, children }) {
-  const navigate = useNavigate();
-  const pageMap = { dashboard: '/admin/dashboard', tickets: '/admin/tickets', customer: '/admin/customer-issues', salon: '/admin/salon-issues', reports: '/admin/reports', settings: '/admin/settings' };
-  return (
-    <div className="flex min-h-screen bg-orange-50">
-      <div className="hidden lg:flex shrink-0">
-        <Sidebar activePage={page} setActivePage={(p) => navigate(pageMap[p])} />
-      </div>
-      <div className="flex-1 flex flex-col">
-        <Header activePage={page} unreadCount={0} onBellClick={() => navigate('/admin/tickets')} />
-        <main className="flex-1 overflow-auto">{children}</main>
-      </div>
-    </div>
-  );
-}
 
 const demoBooking = { status: "completed", barberName: "Rahul" };
 
@@ -150,7 +134,7 @@ function App() {
         <Route path="/customer/services/addon" element={<AddonServices />} />
         <Route path="/customer/services/addons" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
-        <Route path="/customer/Select-look" element={<SelectLook />} />
+        <Route path="/customer/look" element={<SelectLook />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
         <Route path="/customer/booking" element={<CustomerBookingFlow />} />
         <Route path="/customer/history" element={<BookingHistory />} />

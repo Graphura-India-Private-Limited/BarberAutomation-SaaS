@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import MembershipSection from "../components/membership/MembershipSection";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
+import MembershipSection from "../../components/membership/MembershipSection";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 import {
   Scissors, CalendarDays, Sparkles, User, Palette,
   Star, Menu, X, ChevronDown, MapPin, Clock, Phone,
@@ -639,12 +639,20 @@ export default function HomePage() {
       const name = isReal
         ? item.customer_id?.name || "Anonymous"
         : item.name;
+        const dummyImages = [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80", // Premium Female Portrait
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80", // Premium Male Portrait 1
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80", // Premium Female Portrait 2
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80", // Premium Male Portrait 2
+      ];
 
       const text = isReal
         ? item.review_text || "(No written feedback)"
         : item.review_text || item.text;
-
-      const avatar = item.avatar;
+        console.log("Review Item Data:", item);
+const avatar = isReal 
+  ? (item.customer_id?.avatar || item.avatar || dummyImages[idx % dummyImages.length]) 
+  : (item.avatar || dummyImages[idx % dummyImages.length]);
 
       return (
         <div
@@ -686,9 +694,9 @@ export default function HomePage() {
           {/* Shine Effect */}
           <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-[120%] transition-all duration-1000 rotate-12 pointer-events-none" />
 
-          {/* Avatar */}
+        {/* Avatar */}
           <div className="relative z-10 mt-1">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#C5A059] p-1 bg-black/20 shadow-[0_0_30px_rgba(197,160,89,0.5)]">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#C5A059] p-1 bg-[#1A1613] shadow-[0_0_30px_rgba(197,160,89,0.4)] flex items-center justify-center">
               {avatar ? (
                 <img
                   src={avatar}
@@ -696,8 +704,22 @@ export default function HomePage() {
                   className="w-full h-full object-cover rounded-full"
                 />
               ) : (
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-[#C5A059] via-[#E8C878] to-[#C5A059] flex items-center justify-center text-white text-2xl font-black">
-                  {(name[0] || "?").toUpperCase()}
+                /* ── ✅ FIXED: GORGEOUS, LUXURY VECTOR ICON SILHOUETTE INSTEAD OF THE LETTER 'A' ── */
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-[#2A241F] to-[#1A1613] flex items-center justify-center text-[#FFE6A7]/30 transition-colors group-hover:text-[#FFE6A7]/50">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    strokeWidth={1.5} 
+                    stroke="currentColor" 
+                    className="w-10 h-10 transition-transform duration-500 group-hover:scale-110"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" 
+                    />
+                  </svg>
                 </div>
               )}
             </div>

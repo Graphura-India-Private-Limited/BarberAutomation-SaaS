@@ -1,7 +1,7 @@
 
 
 import { Search, X } from 'lucide-react'
-import { TICKET_STATUS, TICKET_PRIORITY, TICKET_TYPE } from '../utils/tickets.jsx'
+import { TICKET_STATUS, TICKET_PRIORITY, TICKET_TYPE } from '../../utils/tickets.jsx'
 
 export function TicketFilters({
   filterStatus, setFilterStatus,

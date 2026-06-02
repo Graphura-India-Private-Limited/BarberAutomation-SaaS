@@ -78,7 +78,16 @@ export function QueueProvider({ children }) {
     setQueue(q => q.filter(item => item.id !== id));
 
   return (
-    <QueueContext.Provider value={{ queue, updateStatus, addToQueue, removeFromQueue }}>
+    // <QueueContext.Provider value={{ queue, updateStatus, addToQueue, removeFromQueue }}>
+    <QueueContext.Provider
+      value={{
+        queue,
+        setQueue,
+        updateStatus,
+        addToQueue,
+        removeFromQueue
+      }}
+    >
       {children}
     </QueueContext.Provider>
   );

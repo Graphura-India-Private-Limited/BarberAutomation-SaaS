@@ -18,7 +18,7 @@ export default function AdminAnalytics() {
       } catch (err) {
         console.error("Error loading platform insights:", err);
       } finally {
-        setLoading(false);
+        setLoading(false); 
       }
     };
     
@@ -38,7 +38,7 @@ export default function AdminAnalytics() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3" style={{ background: "#FAF6F0" }}>
         <div className="w-10 h-10 border-4 border-amber-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-bold text-stone-400 uppercase tracking-widest animate-pulse">Syncing Telemetry System...</p>
+        <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 animate-pulse">Syncing Telemetry System...</p>
       </div>
     );
   }
@@ -65,23 +65,23 @@ export default function AdminAnalytics() {
         }
       `}</style>
 
-      {/* ── STICKY TOP PLATFORM HEADER (Unified Espresso Theme) ── */}
+      {/* ── STICKY TOP PLATFORM HEADER ── */}
       <header className="w-full border-b border-[#3E362E] bg-[#251F1B] sticky top-0 z-40 px-6 py-4 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D97706] to-[#F59E0B] flex items-center justify-center shadow-md">
             <Scissors size={20} className="text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <h4 className="text-white font-extrabold tracking-[0.2em] text-xs uppercase">Barber Pro</h4>
-            <p className="text-[#C5A059] text-[9px] font-black tracking-[0.3em] uppercase mt-0.5">Admin Management</p>
+            <h4 className="font-sans font-black uppercase tracking-widest text-xs text-white">Barber Pro</h4>
+            <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Admin Management</p>
           </div>
         </div>
         <div className="flex items-center gap-6">
           <div className="hidden sm:flex flex-col text-right">
-            <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">System Clock</span>
-            <span className="text-xs font-extrabold text-[#FFE6A7] mt-0.5">{time} IST</span>
+            <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400">System Clock</span>
+            <span className="font-sans text-xs font-extrabold text-[#FFE6A7] mt-0.5">{time} IST</span>
           </div>
-          <button onClick={handleLogout} className="flex items-center gap-2 border border-stone-700 hover:border-stone-500 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-stone-200 text-xs font-bold uppercase tracking-widest transition-all duration-200 cursor-pointer">
+          <button onClick={handleLogout} className="flex items-center gap-2 border border-stone-700 hover:border-stone-500 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl text-stone-200 font-sans text-xs font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer">
             <LogOut size={14} /> Exit
           </button>
         </div>
@@ -93,13 +93,13 @@ export default function AdminAnalytics() {
         {/* Context Dashboard Banner */}
         <header className="mb-8 rounded-3xl p-8 card relative overflow-hidden bg-white">
           <div className="relative z-10">
-            <p className="text-amber-700 font-bold tracking-[0.2em] text-xs uppercase mb-1.5">
+            <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5">
               Real-time SaaS operational telemetry & insights
             </p>
-            <h1 className="text-3xl lg:text-4xl font-black font-serif tracking-tight text-stone-900 leading-none">
-              Platform <span className="text-amber-600 italic">Analytics</span>
-            </h1>
-            <p className="text-stone-500 font-medium mt-3 text-sm">Review global system utilization, identify scaling constraints, and monitor ecosystem growth tracks.</p>
+            <h1 className="font-sans font-black uppercase text-4xl sm:text-5xl tracking-tight text-stone-900 leading-none">
+                 Platform <span className="font-serif italic text-3xl sm:text-4xl text-[#C5A059] normal-case">Analytics</span>
+              </h1>
+            <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mt-3">Review global system utilization, identify scaling constraints, and monitor ecosystem growth tracks.</p>
           </div>
           <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-5 transform rotate-6 pointer-events-none hidden sm:block">
             <TrendingUp className="w-28 h-28 text-amber-700" strokeWidth={1} />
@@ -110,8 +110,8 @@ export default function AdminAnalytics() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <motion.div whileHover={{ y: -3 }} className="p-6 rounded-3xl card bg-white flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase text-stone-400 tracking-wider mb-2">Total Active Members</p>
-              <h3 className="text-4xl font-black text-stone-900 font-serif leading-none tabular-nums">{metrics?.totalUsers || 0}</h3>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 mb-2">Total Active Members</p>
+              <h3 className="font-sans font-black text-4xl text-stone-900 leading-none tabular-nums">{metrics?.totalUsers || 0}</h3>
             </div>
             <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100/70 text-amber-700">
               <Users size={22} />
@@ -120,8 +120,8 @@ export default function AdminAnalytics() {
 
           <motion.div whileHover={{ y: -3 }} className="p-6 rounded-3xl card bg-white flex items-center justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase text-stone-400 tracking-wider mb-2">Registered Salons</p>
-              <h3 className="text-4xl font-black text-stone-900 font-serif leading-none tabular-nums">{metrics?.totalSalons || 0}</h3>
+              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 mb-2">Registered Salons</p>
+              <h3 className="font-sans font-black text-4xl text-stone-900 leading-none tabular-nums">{metrics?.totalSalons || 0}</h3>
             </div>
             <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center border border-orange-100/70 text-orange-700">
               <Store size={22} />
@@ -136,15 +136,15 @@ export default function AdminAnalytics() {
           <div className="p-6 rounded-3xl card bg-white md:col-span-1">
             <div className="flex items-center gap-2 mb-6 border-b border-stone-50 pb-3">
               <Clock size={16} className="text-amber-700" />
-              <h4 className="text-xs font-black uppercase text-stone-400 tracking-wider">Peak Usage Hours</h4>
+              <h4 className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400">Peak Usage Hours</h4>
             </div>
             <div className="space-y-4">
               {metrics?.peakHours && metrics.peakHours.length > 0 ? (
                 metrics.peakHours.map((item, idx) => (
                   <div key={idx} className="space-y-2">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-stone-800 font-mono">{item.hourString}</span>
-                      <span className="text-amber-700">{item.bookingsCount} orders</span>
+                    <div className="flex justify-between">
+                      <span className="font-mono text-sm text-stone-800">{item.hourString}</span>
+                      <span className="font-mono text-sm text-amber-700">{item.bookingsCount} orders</span>
                     </div>
                     <div className="w-full bg-stone-50 h-2 rounded-full overflow-hidden border border-stone-200/40">
                       <div 
@@ -155,7 +155,7 @@ export default function AdminAnalytics() {
                   </div>
                 ))
               ) : (
-                <p className="text-xs font-semibold text-stone-400 py-4 italic">No aggregate system booking history found yet.</p>
+                <p className="font-sans text-sm font-normal leading-relaxed text-stone-400 py-4 italic">No aggregate system booking history found yet.</p>
               )}
             </div>
           </div>
@@ -164,32 +164,32 @@ export default function AdminAnalytics() {
           <div className="p-6 rounded-3xl card bg-white md:col-span-2">
             <div className="flex items-center gap-2 mb-6 border-b border-stone-50 pb-3">
               <Award size={16} className="text-amber-700" />
-              <h4 className="text-xs font-black uppercase text-stone-400 tracking-wider">High-Performing Salons</h4>
+              <h4 className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400">High-Performing Salons</h4>
             </div>
             <div className="divide-y divide-stone-100">
               {metrics?.highPerformingSalons && metrics.highPerformingSalons.length > 0 ? (
                 metrics.highPerformingSalons.map((salon, idx) => (
-                  <div key={salon._id} className="flex items-center justify-between py-4.5 first:pt-0 last:pb-0 transition-colors duration-200 hover:bg-stone-50/40 px-2 rounded-xl">
+                  <div key={salon._id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 transition-colors duration-200 hover:bg-stone-50/40 px-2 rounded-xl">
                     <div className="flex items-center gap-4 min-w-0">
-                      <span className={`w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center shrink-0 border ${
+                      <span className={`w-8 h-8 rounded-xl font-sans font-black text-xs flex items-center justify-center shrink-0 border ${
                         idx === 0 ? "bg-amber-50 text-amber-700 border-amber-200" : idx === 1 ? "bg-stone-50 text-stone-600 border-stone-200" : "bg-orange-50 text-orange-700 border-orange-100"
                       }`}>
                         #{idx + 1}
                       </span>
                       <div className="min-w-0">
-                        <p className="font-extrabold text-stone-900 text-base truncate">{salon.salonName}</p>
-                        <p className="text-xs text-stone-400 font-medium font-sans mt-0.5">Owner: {salon.ownerName || "Merchant Partner"}</p>
+                        <p className="font-sans text-sm font-extrabold text-stone-900 truncate">{salon.salonName}</p>
+                        <p className="font-sans text-sm font-normal leading-relaxed text-stone-400 mt-0.5">Owner: {salon.ownerName || "Merchant Partner"}</p>
                       </div>
                     </div>
                     <div className="shrink-0 ml-3">
-                      <span className="inline-flex items-center px-3 py-1.5 rounded-xl bg-stone-900 text-white font-mono text-xs font-bold uppercase tracking-wider">
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-xl bg-stone-900 text-white font-sans text-xs font-extrabold uppercase tracking-wider">
                         {salon.totalBookings} checkouts
                       </span>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-xs font-semibold text-stone-400 py-4 italic">No salon stores recorded processing booking records yet.</p>
+                <p className="font-sans text-sm font-normal leading-relaxed text-stone-400 py-4 italic">No salon stores recorded processing booking records yet.</p>
               )}
             </div>
           </div>
@@ -197,10 +197,10 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Product Expansion Map Footer */}
-        <footer className="text-center bg-[#FEF9EE] p-4.5 rounded-2xl border border-[#EADBCE]">
-          <p className="text-xs font-bold text-stone-500 leading-relaxed">
+        <footer className="text-center bg-[#FEF9EE] p-4 rounded-2xl border border-[#EADBCE]">
+          <p className="font-sans text-sm font-normal leading-relaxed text-stone-600">
             <Lightbulb size={14} className="inline mr-1.5 text-amber-600 mb-0.5" /> 
-            <span className="text-stone-900">Future Extension Blueprint:</span> Ready to interface monetized premium tiers using your <span className="text-amber-700">"Sponsored/Promoted Salons Slot"</span> feature hook variables!
+            <span className="font-sans font-black uppercase text-stone-900 text-xs tracking-tight">Future Extension Blueprint:</span> Ready to interface monetized premium tiers using your <span className="text-[#C5A059] font-extrabold">"Sponsored/Promoted Salons Slot"</span> feature hook variables!
           </p>
         </footer>
 

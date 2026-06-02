@@ -120,7 +120,20 @@ export const StatCardsRow = ({ cards, loading }) => (
   </div>
 );
 
-export const ActionToolbar = ({ search, onSearchChange, placeholder, addLabel, onAdd, showFilters = true }) => (
+export const ActionToolbar = ({ 
+  search, 
+  onSearchChange, 
+  placeholder, 
+  addLabel, 
+  onAdd, 
+  showFilters = true, 
+  filterValue, 
+  onFilterChange,
+  // ── ✅ FIXED: ACCEPT DYNAMIC ARR FROM PARENT PAGE WITH SAFE DEFAULT COPIES ──
+  filterOptions = [
+    { value: "all", label: "All Categories" } // Fallback safe layout parameter
+  ]
+}) => (
   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
     <div className="flex items-center gap-2 rounded-md border bg-white px-3 py-2 w-full sm:max-w-md" style={{ borderColor: ADMIN_C.border }}>
       <Search size={16} color={ADMIN_C.brown} />
@@ -131,17 +144,76 @@ export const ActionToolbar = ({ search, onSearchChange, placeholder, addLabel, o
         className="bg-transparent outline-none text-sm w-full"
       />
     </div>
-    {showFilters && (
-      <button
-        type="button"
-        className="flex items-center gap-2 rounded-md border bg-white px-4 py-2 text-sm font-semibold whitespace-nowrap"
-        style={{ borderColor: ADMIN_C.border, color: ADMIN_C.ink }}
-      >
-        <Filter size={16} color={ADMIN_C.brown} />
-        Filters
-        <ChevronDown size={14} color={ADMIN_C.muted} />
-      </button>
-    )}
+
+    {showFilters && (() => {
+      const [isOpen, setIsOpen] = React.useState(false);
+
+      // ── ✅ FIXED: MAP LABELS USING THE INCOMING ARRAY INSTEAD OF STATIC CATEGORIES ──
+      const activeLabel = filterOptions.find(c => c.value === filterValue)?.label || "Filters";
+
+      return (
+        <div className="relative font-sans">
+          {/* ── 👑 THE MAIN DROPDOWN TRIGGER BUTTON ── */}
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border font-sans text-xs font-bold uppercase tracking-wider text-stone-700 shadow-3xs hover:border-stone-400 hover:text-stone-900 transition-all cursor-pointer outline-none select-none min-w-[160px] justify-between"
+            style={{ borderColor: ADMIN_C.border }}
+          >
+            <div className="flex items-center gap-2">
+              <Filter size={14} color={ADMIN_C.brown} className="stroke-[2.5px]" />
+              <span>{activeLabel}</span>
+            </div>
+            <ChevronDown 
+              size={13} 
+              color={ADMIN_C.muted} 
+              className={`transition-transform duration-300 ${isOpen ? "rotate-180 text-stone-800" : ""}`} 
+            />
+          </button>
+
+          {/* ── 👑 FLOATING POPUP OVERLAY MENU ── */}
+          {isOpen && (
+            <>
+              {/* Backdrop Invisible Shield */}
+              <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setIsOpen(false)} />
+              
+              <div 
+                className="absolute right-0 mt-2 w-52 bg-white border rounded-2xl shadow-xl z-50 p-1.5 flex flex-col text-left animate-fadeIn font-sans"
+                style={{ borderColor: ADMIN_C.border }}
+              >
+                <p className="text-[9px] font-black uppercase tracking-widest text-stone-400 px-3 py-2 border-b border-stone-50 mb-1">
+                  Select View Segment
+                </p>
+                
+                {/* ── ✅ FIXED: DYNAMIC MAP ARRAY ITERATOR ENGINE ── */}
+                {filterOptions.map((cat) => {
+                  const isActive = filterValue === cat.value;
+                  return (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => {
+                        onFilterChange(cat.value);
+                        setIsOpen(false); // Snap shut on choice select
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold tracking-wide transition-all border-none outline-none cursor-pointer font-sans flex items-center justify-between ${
+                        isActive 
+                          ? "text-white shadow-xs" 
+                          : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+                      }`}
+                      style={{ backgroundColor: isActive ? ADMIN_C.brown : "" }}
+                    >
+                      <span>{cat.label}</span>
+                      {isActive && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      );
+    })()}
     {addLabel && (
       <button
         type="button"

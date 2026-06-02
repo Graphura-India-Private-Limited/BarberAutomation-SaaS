@@ -1,8 +1,6 @@
-
-
 import { useState } from 'react'
 import { Settings, Bell, Users, Shield, Globe, X, Check, UserPlus } from 'lucide-react'
-import { Button, Modal } from '../../Components/UIComponents.jsx'
+import { Button, Modal } from '../../components/admin/UIComponents.jsx'
 
 const DEFAULT_AGENTS = ['Rahul Verma', 'Sneha Kapoor', 'Arjun Singh', 'Pooja Nair']
 
@@ -52,7 +50,7 @@ export function AdminSettings() {
     <div className="p-6 space-y-6 relative">
 
       {saveToast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg font-sans text-xs font-extrabold uppercase tracking-wider">
           <Check size={16} /> Settings saved successfully
         </div>
       )}
@@ -60,30 +58,30 @@ export function AdminSettings() {
       <Modal isOpen={showInviteModal} onClose={() => { setShowInviteModal(false); setInviteError('') }} title="Invite New Agent" size="sm">
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-medium text-[#8A7A6A] block mb-1">Full Name</label>
+            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block mb-1">Full Name</label>
             <input
               value={inviteName}
               onChange={e => setInviteName(e.target.value)}
               placeholder="e.g. Kiran Desai"
-              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 text-sm text-[#3D3126] focus:outline-none focus:ring-2 focus:ring-[#B58B67]"
+              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 font-sans text-sm font-normal text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#B58B67] placeholder:text-stone-400"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-[#8A7A6A] block mb-1">Work Email</label>
+            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block mb-1">Work Email</label>
             <input
               value={inviteEmail}
               onChange={e => setInviteEmail(e.target.value)}
               placeholder="e.g. kiran@platform.in"
               type="email"
-              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 text-sm text-[#3D3126] focus:outline-none focus:ring-2 focus:ring-[#B58B67]"
+              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 font-sans text-sm font-normal text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#B58B67] placeholder:text-stone-400"
             />
           </div>
-          {inviteError && <p className="text-xs text-red-600">{inviteError}</p>}
+          {inviteError && <p className="font-sans text-sm font-normal leading-relaxed text-red-600">{inviteError}</p>}
           <div className="flex gap-2 pt-1">
-            <Button variant="primary" onClick={handleInvite} className="flex-1">
+            <Button variant="primary" onClick={handleInvite} className="flex-1 font-sans text-xs font-extrabold uppercase tracking-wider">
               <UserPlus size={14} /> Send Invite
             </Button>
-            <Button variant="ghost" onClick={() => { setShowInviteModal(false); setInviteError('') }}>
+            <Button variant="ghost" onClick={() => { setShowInviteModal(false); setInviteError('') }} className="font-sans text-xs font-extrabold uppercase tracking-wider">
               Cancel
             </Button>
           </div>
@@ -103,15 +101,15 @@ export function AdminSettings() {
           {agents.map(agent => (
             <div key={agent} className="flex items-center justify-between p-3 bg-[#FAF6F0] rounded-xl border border-[#E8DDD0]">
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-[#E8DDD0] flex items-center justify-center text-sm font-bold text-[#9E7452]">
+                <div className="w-7 h-7 rounded-full bg-[#E8DDD0] flex items-center justify-center font-sans font-black text-xs text-[#9E7452]">
                   {agent[0]}
                 </div>
-                <span className="text-sm text-[#3D3126]">{agent}</span>
+                <span className="font-sans text-sm font-normal leading-relaxed text-stone-700">{agent}</span>
               </div>
-              <span className="text-xs text-[#B58B67] font-medium border border-[#E8DDD0] px-2 py-0.5 rounded-full bg-white">Agent</span>
+              <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] border border-[#E8DDD0] px-2 py-0.5 rounded-full bg-white">Agent</span>
             </div>
           ))}
-          <Button variant="outline" size="sm" onClick={() => setShowInviteModal(true)}>
+          <Button variant="outline" size="sm" onClick={() => setShowInviteModal(true)} className="font-sans text-xs font-extrabold uppercase tracking-wider">
             <UserPlus size={14} /> Invite Agent
           </Button>
         </div>
@@ -128,26 +126,26 @@ export function AdminSettings() {
       <Section icon={Globe} title="General" desc="Platform name, timezone, and locale settings.">
         <div className="space-y-3">
           <div>
-            <label className="text-xs font-medium text-[#8A7A6A] block mb-1">Platform Name</label>
+            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block mb-1">Platform Name</label>
             <input
               value={platformName}
               onChange={e => setPlatformName(e.target.value)}
-              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 text-sm text-[#3D3126] focus:outline-none focus:ring-2 focus:ring-[#B58B67]"
+              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 font-sans text-sm font-normal text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#B58B67]"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-[#8A7A6A] block mb-1">Timezone</label>
+            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block mb-1">Timezone</label>
             <select
               value={timezone}
               onChange={e => setTimezone(e.target.value)}
-              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 text-sm text-[#3D3126] focus:outline-none focus:ring-2 focus:ring-[#B58B67]"
+              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 font-sans text-sm font-normal text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#B58B67]"
             >
               <option>Asia/Kolkata (IST +5:30)</option>
               <option>UTC</option>
               <option>America/New_York</option>
             </select>
           </div>
-          <Button variant="primary" size="sm" onClick={handleSave}>
+          <Button variant="primary" size="sm" onClick={handleSave} className="font-sans text-xs font-extrabold uppercase tracking-wider">
             <Check size={14} /> Save Settings
           </Button>
         </div>
@@ -164,8 +162,8 @@ function Section({ icon: Icon, title, desc, children }) {
           <Icon size={18} className="text-[#B58B67]" />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-[#3D3126] mb-1">{title}</h3>
-          <p className="text-sm text-[#8A7A6A] mb-4">{desc}</p>
+          <h3 className="font-sans font-black uppercase text-base tracking-tight text-stone-900 mb-1">{title}</h3>
+          <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mb-4">{desc}</p>
           {children}
         </div>
       </div>
@@ -176,7 +174,7 @@ function Section({ icon: Icon, title, desc, children }) {
 function Toggle({ label, checked, onChange }) {
   return (
     <label className="flex items-center justify-between cursor-pointer">
-      <span className="text-sm text-[#8A7A6A]">{label}</span>
+      <span className="font-sans text-sm font-normal leading-relaxed text-stone-600">{label}</span>
       <button
         role="switch"
         aria-checked={checked}

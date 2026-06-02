@@ -55,10 +55,10 @@ const demoSalons = [
 ];
 
 const services = [
-  { name: "Classic Haircut", duration: "30 min", price: "Rs. 249" },
-  { name: "Beard Trim & Shape", duration: "20 min", price: "Rs. 149" },
-  { name: "Hair Spa", duration: "45 min", price: "Rs. 599" },
-  { name: "Premium Grooming", duration: "60 min", price: "Rs. 899" },
+  { name: "Classic Haircut", duration: "30 min", price: 249 },
+  { name: "Beard Trim & Shape", duration: "20 min", price: 149 },
+  { name: "Hair Spa", duration: "45 min", price: 599 },
+  { name: "Premium Grooming", duration: "60 min", price: 899 },
 ];
 
 export default function SalonDetailPage() {
@@ -149,14 +149,19 @@ export default function SalonDetailPage() {
       <div className="mt-8 flex flex-wrap items-center gap-4">
 
         <button
-          onClick={() => navigate(`/book/${salon.id}`)}
+          onClick={() => navigate("/customer/services")}
           className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] text-[11px] font-black uppercase tracking-[0.25em] shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-105 transition-all duration-300"
         >
           Book Appointment
         </button>
 
         <button
-          onClick={() => navigate(`/salon/${salon.id}/services`)}
+          onClick={() => {
+            const element = document.getElementById("popular-services");
+            if (element) {
+              element.scrollIntoView({ behavior: "smooth" });
+            }
+          }}
           className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl text-white text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all duration-300"
         >
           Explore Services
@@ -178,7 +183,7 @@ export default function SalonDetailPage() {
           </div>
 
           {/* Core Menu Panel List */}
-          <div className="rounded-2xl border border-stone-200/60 bg-white p-6 shadow-xs text-left">
+          <div id="popular-services" className="rounded-2xl border border-stone-200/60 bg-white p-6 shadow-xs text-left">
             <div className="mb-5 flex items-center gap-3 border-b border-stone-100 pb-4">
               <Scissors className="text-[#A37B58]" size={20} />
               <h2 className="text-xl font-black uppercase tracking-tight text-stone-900">Popular Menu Services</h2>
@@ -196,11 +201,11 @@ export default function SalonDetailPage() {
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-6">
                     <span className="font-black text-stone-900 font-mono text-sm">
-                      {service.price}
+                      Rs. {service.price}
                     </span>
                     <button
                       type="button"
-                      onClick={() => navigate("/customer/barber")}
+                      onClick={() => navigate("/customer/barber", { state: { service } })}
                       className="rounded-xl bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-[10px] uppercase tracking-widest px-5 py-3 transition shadow-xs cursor-pointer"
                     >
                       Book
