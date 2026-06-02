@@ -221,7 +221,7 @@ export default function HomePage() {
 
       <Navbar />
 
-      {/* ── HERO ── */}
+    {/* ── HERO ── */}
       <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[550px] md:min-h-[650px] flex items-center">
         <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none">
           <div className="absolute inset-0 bg-black/10 md:bg-transparent pointer-events-none" />
@@ -235,7 +235,8 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/30 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        <div className="mx-auto max-w-7xl w-full px-6 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center relative z-10">
+        {/* ── ✅ FIXED: ADJUSTED TOP PADDING TO MOVE THE PACKET GRID LOGIC DOWN CLEANLY ── */}
+        <div className="mx-auto max-w-7xl w-full px-6 pt-28 pb-16 md:pt-40 md:pb-24 grid md:grid-cols-2 gap-12 items-center relative z-10">
           <div className="space-y-6 max-w-xl fade-up">
             <h1 className="text-4xl sm:text-5xl md:text-5xl font-black text-stone-900 tracking-wide uppercase leading-[1.15] font-serif">
               Premium Services <br />
@@ -297,7 +298,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
               <button
                 onClick={() => navigate("/customer/services")}
-                className="gap-3 sm:gap-4 flex items-center justify-center px-8 py-3.5 bg-[#bb8d65] hover:bg-[#916b4a] text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                className="gap-3 sm:gap-4 flex items-center justify-center px-8 py-3.5 bg-[#bb8d65] hover:bg-[#916b4a] text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none"
               >
                 <svg className="w-4 h-4 text-white/90" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -324,7 +325,7 @@ export default function HomePage() {
                 alt="Rahul Sharma - Senior Stylist"
                 className="w-14 h-14 rounded-xl object-cover border border-stone-200 shadow-sm"
               />
-              <div>
+              <div className="text-left">
                 <p className="text-[9px] font-black text-[#C5A059] uppercase tracking-[0.2em] leading-none mb-1">Senior Stylist</p>
                 <h4 className="text-lg font-bold text-stone-900 tracking-tight">Rahul Sharma</h4>
                 <p className="text-xs text-stone-500 mt-0.5">Specialist in Men's Grooming</p>
@@ -333,7 +334,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       {/* ── STATS BAR ── */}
       <section className="relative w-full bg-[#FAF7F2] pb-12 pt-4 px-6 z-20">
         <div className="mx-auto max-w-7xl bg-white/60 backdrop-blur-md border border-stone-200/40 rounded-3xl p-6 md:p-8 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center">
