@@ -26,7 +26,7 @@ export function DashboardPage({ tickets, onSelectTicket }) {
     setSubLoading(true);
     setSubError(null);
     try {
-      const res  = await fetch(`${API}/admin/newsletter-subscribers`, {
+      const res  = await fetch(`${API}/newsletter/subscribers`, {
         headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       });
       const data = await res.json();
@@ -44,7 +44,7 @@ export function DashboardPage({ tickets, onSelectTicket }) {
   const handleDeleteSubscriber = async (id) => {
     setDeletingId(id);
     try {
-      const res  = await fetch(`${API}/admin/newsletter-subscribers/${id}`, {
+      const res  = await fetch(`${API}/newsletter/subscriber/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       });
@@ -321,7 +321,7 @@ export function DashboardPage({ tickets, onSelectTicket }) {
                       </div>
                       <div className="min-w-0 text-left">
                         <p className="text-[13px] font-semibold text-stone-800 truncate">{sub.email}</p>
-                        <p className="text-[10px] text-stone-400 font-medium mt-0.5">{formatDate(sub.subscribedAt)}</p>
+                        <p className="text-[10px] text-stone-400 font-medium mt-0.5">{formatDate(sub.created_at || sub.subscribedAt)}</p>
                       </div>
                     </div>
                     <button
