@@ -1,268 +1,482 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { ArrowLeft, Sparkles, Users, Clock } from "lucide-react";
-import SearchFilterHeader from "../../components/booking/SearchFilterHeader";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
-export default function BarberSelection() {
-  const location = useLocation();
-  const navigate = useNavigate();
+/* ─── DATA ─────────────────────────────────────────────────── */
+const BARBERS = [
+  {
+    id: 1,
+    name: "John Mercer",
+    role: "Senior Stylist",
+    experience: "5 yrs",
+    rating: 4.8,
+    reviews: 312,
+    status: "Available",
+    distance: 2,
+    specialties: ["Executive Cut", "Beard Sculpt", "Skin Fade"],
+    img: "https://i.pinimg.com/1200x/8d/21/29/8d2129c8a618f113eb8aa2bc596b1658.jpg",
+    aiWait: { queue: 0, pace: "15 mins/cut", wait: "Ready Now" },
+  },
+  {
+    id: 2,
+    name: "Mike Donovan",
+    role: "Colour Specialist",
+    experience: "3 yrs",
+    rating: 4.5,
+    reviews: 198,
+    status: "Busy",
+    distance: 5,
+    specialties: ["Grey Blending", "Highlights", "Toning"],
+    img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400",
+    aiWait: { queue: 3, pace: "25 mins/cut", wait: "~75 mins" },
+  },
+  {
+    id: 3,
+    name: "Alex Rivera",
+    role: "Master Barber",
+    experience: "6 yrs",
+    rating: 4.9,
+    reviews: 487,
+    status: "Available",
+    distance: 1,
+    specialties: ["Royal Shave", "Scalp Ritual", "Razor Art"],
+    img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400",
+    aiWait: { queue: 1, pace: "12 mins/cut", wait: "~12 mins" },
+  },
+];
 
-  const selectedService = location.state?.service;
-  // ── ✅ FIXED: CAPTURE THE GENDER TRACKING TOKEN PASSED FROM PREVIOUS MEN/WOMEN PANELS ──
-  const gender = location.state?.gender || 'men'; 
+/* ─── HELPERS ───────────────────────────────────────────────── */
+function Stars({ rating }) {
+  return (
+    <div style={{ display: "flex", gap: 2 }}>
+      {[1, 2, 3, 4, 5].map((s) => (
+        <svg key={s} width="11" height="11" viewBox="0 0 12 12" fill="none">
+          <polygon
+            points="6,1 7.5,4.5 11,4.5 8.5,7 9.5,11 6,8.5 2.5,11 3.5,7 1,4.5 4.5,4.5"
+            fill={s <= Math.round(rating) ? "#C5A059" : "none"}
+            stroke={s <= Math.round(rating) ? "#C5A059" : "#C5A05966"}
+            strokeWidth="0.8"
+          />
+        </svg>
+      ))}
+    </div>
+  );
+}
 
-  const [selectedBarber, setSelectedBarber] = useState(null);
-
-  const [filters, setFilters] = useState({
-    search: "",
-    cost: "",
-    distance: "",
-    rating: ""
-  });
-
-  const barbers = [
-    {
-      id: 1,
-      name: "John",
-      experience: "5 yrs",
-      rating: 4.8,
-      status: "Available",
-      distance: 2,
-      img: "https://i.pinimg.com/1200x/8d/21/29/8d2129c8a618f113eb8aa2bc596b1658.jpg",
-      aiWaitTime: { queueLength: 0, past7DaysAvg: "15 mins/cut", estimatedWait: "0 mins" }
-    },
-    {
-      id: 2,
-      name: "Mike",
-      experience: "3 yrs",
-      rating: 4.5,
-      status: "Busy",
-      distance: 5,
-      img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400",
-      aiWaitTime: { queueLength: 3, past7DaysAvg: "25 mins/cut", estimatedWait: "75 mins" }
-    },
-    {
-      id: 3,
-      name: "Alex",
-      experience: "6 yrs",
-      rating: 4.9,
-      status: "Available",
-      distance: 1,
-      img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400",
-      aiWaitTime: { queueLength: 1, past7DaysAvg: "12 mins/cut", estimatedWait: "12 mins" }
-    }
-  ];
-
-  // 🔥 FILTER LOGIC
-  const filteredBarbers = barbers.filter((b) => {
-    return (
-      b.name.toLowerCase().includes(filters.search.toLowerCase()) &&
-      (filters.rating === "" || b.rating >= Number(filters.rating)) &&
-      (filters.distance === "" || b.distance <= Number(filters.distance))
-    );
-  });
-
-  // 🔥 SELECT BARBER HANDLER
-  const handleBarberSelect = (barber) => {
-    setSelectedBarber(barber);
-  };
-
-  // 🔥 AUTO ASSIGN
-  const handleAutoAssign = () => {
-    const availableBarber = filteredBarbers.find(
-      (b) => b.status === "Available"
-    );
-
-    if (availableBarber) {
-      setSelectedBarber(availableBarber);
-    } else {
-      alert("No barbers available with current filters");
-    }
-  };
+/* ─── BARBER CARD ───────────────────────────────────────────── */
+function BarberCard({ b, isSelected, onSelect, index, visible }) {
+  const [hovered, setHovered] = useState(false);
+  const isBusy = b.status === "Busy";
+  const active = isSelected || hovered;
 
   return (
-    <>
-      <Navbar />
-      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white relative overflow-hidden flex flex-col">
-        
-        {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
-        <div className="absolute top-20 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
-        <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
+    <div
+      onMouseEnter={() => !isBusy && setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={() => !isBusy && onSelect(b)}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(28px)",
+        transition: `opacity 0.5s ease ${index * 100}ms, transform 0.5s ease ${index * 100}ms, box-shadow 0.3s ease, border-color 0.3s ease`,
+        background: "#fff",
+        borderRadius: 20,
+        overflow: "hidden",
+        border: isSelected ? "2px solid #C5A059" : `1.5px solid ${hovered && !isBusy ? "#C5A05966" : "#EAE0D0"}`,
+        boxShadow: isSelected
+          ? "0 20px 48px rgba(197,160,89,0.14)"
+          : hovered && !isBusy
+          ? "0 16px 40px rgba(44,36,30,0.09)"
+          : "0 2px 12px rgba(44,36,30,0.03)",
+        cursor: isBusy ? "not-allowed" : "pointer",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+      }}
+    >
+      {/* selected ribbon */}
+      {isSelected && (
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(to right, #C5A059, #E8D5A3, #C5A059)", zIndex: 10 }} />
+      )}
 
-        {/* Premium Hero Banner Aura */}
-        <div className="relative h-[280px] sm:h-[320px] flex items-center justify-center overflow-hidden mb-6">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
-          
-          {/* RETURN BACK BUTTON (Top Left) */}
-         <div className="absolute top-24 left-4 sm:left-6 md:left-8 z-50">
-            <button
-              onClick={() => navigate(-1)}
-              className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-medium text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-0.5" />
-              <span>Back</span>
-            </button>
+      {/* image */}
+      <div style={{ position: "relative", height: 240, overflow: "hidden", background: "#EDE8E0" }}>
+        <img
+          src={b.img}
+          alt={b.name}
+          loading="lazy"
+          style={{
+            width: "100%", height: "100%", objectFit: "cover",
+            filter: isBusy ? "grayscale(40%) brightness(0.9)" : "none",
+            transform: active && !isBusy ? "scale(1.06)" : "scale(1)",
+            transition: "transform 0.6s ease, filter 0.3s",
+          }}
+        />
+        {/* gradient */}
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(20,14,8,0.5) 100%)" }} />
+
+        {/* status badge */}
+        <span style={{
+          position: "absolute", top: 14, right: 14,
+          background: isBusy ? "rgba(251,191,36,0.15)" : "rgba(16,185,129,0.12)",
+          border: `1px solid ${isBusy ? "rgba(251,191,36,0.4)" : "rgba(16,185,129,0.35)"}`,
+          color: isBusy ? "#B45309" : "#065F46",
+          fontSize: 10, fontFamily: "'Montserrat',sans-serif", fontWeight: 700,
+          letterSpacing: "0.08em", textTransform: "uppercase",
+          padding: "4px 11px", borderRadius: 20, backdropFilter: "blur(8px)",
+        }}>
+          {b.status}
+        </span>
+
+        {/* name overlay */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "16px 20px 14px" }}>
+          <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#C5A059", fontWeight: 600, margin: "0 0 2px" }}>{b.role}</p>
+          <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 24, fontWeight: 400, color: "#fff", margin: 0, lineHeight: 1.1 }}>{b.name}</h3>
+        </div>
+      </div>
+
+      {/* body */}
+      <div style={{ padding: "18px 20px 20px", flex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
+
+        {/* rating + meta */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Stars rating={b.rating} />
+            <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 12, fontWeight: 700, color: "#2C241E" }}>{b.rating}</span>
+            <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, color: "#AAA" }}>({b.reviews})</span>
           </div>
-
-          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-6">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-4">
-              Step 02 — Appointment Allocation
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#3E362E] font-serif leading-none">
-              Select Your <span className="text-[#C5A059] italic normal-case">Stylist</span>
-            </h1>
-            <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-5" />
+          <div style={{ display: "flex", gap: 12 }}>
+            {[`${b.experience}`, `${b.distance} km`].map((v, i) => (
+              <span key={i} style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, color: "#888" }}>{v}</span>
+            ))}
           </div>
         </div>
 
-        {/* Main Content Layout */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
-          
-          {/* Selected Service Card Box */}
-          <div className="mb-8 flex justify-center">
-            {selectedService ? (
-              <div className="bg-white/90 backdrop-blur-md rounded-2xl p-3 border border-[#EADDCA] shadow-[0_8px_25px_rgba(0,0,0,0.02)] flex items-center gap-4 max-w-md w-full">
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0">
-                  <img src={selectedService.img || "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=150"} alt={selectedService.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0 text-left">
-                  <span className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-0.5">Selected Ritual</span>
-                  <h4 className="font-serif font-bold text-sm text-[#3E362E] truncate">{selectedService.name}</h4>
-                  <p className="text-[#C5A059] font-serif font-bold text-xs mt-0.5">₹{selectedService.price}</p>
-                </div>
+        {/* specialties */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {b.specialties.map((sp) => (
+            <span key={sp} style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 500, letterSpacing: "0.05em", color: "#8A6A10", background: "#FFF3DC", border: "1px solid #E8C84B60", borderRadius: 20, padding: "3px 10px" }}>
+              {sp}
+            </span>
+          ))}
+        </div>
+
+        {/* AI wait panel */}
+        <div style={{ background: "#FAF6F0", border: "1px solid #EAE0D0", borderRadius: 12, padding: "12px 14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, paddingBottom: 8, borderBottom: "1px solid #EAE0D0" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C5A059" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#2C241E" }}>AI Wait Engine</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {[
+              { label: "Queue", val: `${b.aiWait.queue} guests` },
+              { label: "Avg pace", val: b.aiWait.pace },
+            ].map((row) => (
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, color: "#AAA" }}>{row.label}</span>
+                <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 600, color: "#2C241E" }}>{row.val}</span>
               </div>
-            ) : (
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-4 max-w-md w-full text-center">
-                <p className="text-xs text-red-600 font-bold">No ritual selected. Please go back to services.</p>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 6, borderTop: "1px dashed #DDD4C4", marginTop: 2 }}>
+              <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 700, color: "#2C241E" }}>Est. wait</span>
+              <span style={{
+                fontFamily: "'Cormorant Garamond',serif", fontSize: 15, fontWeight: 700,
+                color: isBusy ? "#B45309" : "#065F46",
+                background: isBusy ? "#FFF8EC" : "#ECFDF5",
+                padding: "2px 10px", borderRadius: 6,
+              }}>
+                {b.aiWait.wait}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA */}
+        {isBusy ? (
+          <button disabled style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#F5F0EA", color: "#C0B8B0", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "not-allowed" }}>
+            Fully Booked Today
+          </button>
+        ) : (
+          <button
+            onClick={(e) => { e.stopPropagation(); onSelect(b); }}
+            style={{
+              width: "100%", padding: "12px 0", borderRadius: 10,
+              border: isSelected ? "none" : "1.5px solid #2C241E",
+              background: isSelected ? "#C5A059" : "transparent",
+              color: isSelected ? "#fff" : "#2C241E",
+              fontFamily: "'Montserrat',sans-serif", fontWeight: 700,
+              fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase",
+              cursor: "pointer", transition: "all 0.25s ease",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            }}
+            onMouseEnter={(e) => { if (!isSelected) { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; } }}
+            onMouseLeave={(e) => { if (!isSelected) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2C241E"; } }}
+          >
+            {isSelected ? "✓  Artist Selected" : "Request Artist →"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── MAIN PAGE ─────────────────────────────────────────────── */
+export default function BarberSelection() {
+  const location  = useLocation();
+  const navigate  = useNavigate();
+
+  const selectedService = location.state?.service;
+  const gender          = location.state?.gender || "men";
+
+  const [selectedBarber, setSelectedBarber] = useState(null);
+  const [searchQuery,    setSearchQuery]     = useState("");
+  const [minRating,      setMinRating]       = useState(0);
+  const [maxDistance,    setMaxDistance]     = useState(20);
+  const [showAll,        setShowAll]         = useState(true);
+  const [visibleCards,   setVisibleCards]    = useState(new Set());
+  const cardRefs = useRef({});
+
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  useEffect(() => {
+    setVisibleCards(new Set());
+    const observers = [];
+    const t = setTimeout(() => {
+      Object.entries(cardRefs.current).forEach(([id, el]) => {
+        if (!el) return;
+        const obs = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) { setVisibleCards((p) => new Set([...p, id])); obs.disconnect(); }
+        }, { threshold: 0.08 });
+        obs.observe(el);
+        observers.push(obs);
+      });
+    }, 60);
+    return () => { clearTimeout(t); observers.forEach((o) => o.disconnect()); };
+  }, [searchQuery, minRating, maxDistance, showAll]);
+
+  const filtered = BARBERS.filter((b) => {
+    const q = searchQuery.toLowerCase();
+    const matchSearch = b.name.toLowerCase().includes(q) || b.role.toLowerCase().includes(q) || b.specialties.some((s) => s.toLowerCase().includes(q));
+    const matchRating = b.rating >= minRating;
+    const matchDist   = b.distance <= maxDistance;
+    const matchAvail  = showAll || b.status === "Available";
+    return matchSearch && matchRating && matchDist && matchAvail;
+  });
+
+  const handleAutoAssign = () => {
+    const best = filtered.find((b) => b.status === "Available");
+    if (best) setSelectedBarber(best);
+  };
+
+  const hasFilters = searchQuery || minRating > 0 || maxDistance < 20 || !showAll;
+  const clearFilters = () => { setSearchQuery(""); setMinRating(0); setMaxDistance(20); setShowAll(true); };
+
+  return (
+    <>
+    <Navbar />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap');
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        ::selection { background: #C5A059; color: #fff; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #FAF6F0; }
+        ::-webkit-scrollbar-thumb { background: #C5A059; border-radius: 3px; }
+      `}</style>
+
+      <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
+
+        {/* ── BACK BUTTON ── */}
+        <div style={{ position: "fixed", top: 88, left: 20, zIndex: 9999 }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "center", color: "#2C241E" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
+          >←</button>
+        </div>
+
+        {/* ── HERO ── */}
+        <div style={{ position: "relative", height: 420, overflow: "hidden", marginTop: 72 }}>
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.32)" }} />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.78))" }} />
+
+          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px" }}>
+            {/* step badge */}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(197,160,89,0.45)", borderRadius: 40, padding: "5px 18px", marginBottom: 20, background: "rgba(0,0,0,0.25)" }}>
+              <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.28em", textTransform: "uppercase", color: "#C5A059" }}>Step 02 — Appointment Allocation</span>
+            </div>
+
+            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, color: "#fff", fontSize: "clamp(38px,5.5vw,66px)", lineHeight: 1.05, margin: "0 0 10px", letterSpacing: "0.04em" }}>
+              Select Your{" "}
+              <em style={{ fontStyle: "italic", color: "#C5A059", fontWeight: 400 }}>Stylist</em>
+            </h1>
+            <div style={{ width: 56, height: 1, background: "linear-gradient(to right, transparent, #C5A059, transparent)", margin: "14px auto 18px" }} />
+            <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,0.55)", maxWidth: 400, lineHeight: 1.8 }}>
+              Our curated professionals are ready to craft your perfect experience.
+            </p>
+          </div>
+
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 80, background: "linear-gradient(to bottom, transparent, #FAF6F0)", zIndex: 6 }} />
+        </div>
+
+        {/* ── MAIN ── */}
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 32px 100px" }}>
+
+          {/* ── SERVICE CONTEXT STRIP ── */}
+          {selectedService && (
+            <div style={{ background: "#fff", border: "1px solid #EAE0D0", borderRadius: 16, padding: "14px 20px", marginBottom: 28, display: "flex", alignItems: "center", gap: 16, maxWidth: 560 }}>
+              <div style={{ width: 52, height: 52, borderRadius: 10, overflow: "hidden", background: "#EDE8E0", flexShrink: 0 }}>
+                <img src={selectedService.img || "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=150"} alt={selectedService.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               </div>
-            )}
-          </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#AAA", margin: "0 0 3px" }}>Selected Ritual</p>
+                <h4 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 18, fontWeight: 600, color: "#2C241E", margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{selectedService.name}</h4>
+                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, fontWeight: 700, color: "#C5A059", margin: 0 }}>₹{selectedService.price?.toLocaleString()}</p>
+              </div>
+              <div style={{ width: 1, height: 40, background: "#EAE0D0" }} />
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, color: "#AAA", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 3px" }}>Duration</p>
+                <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 16, fontWeight: 600, color: "#2C241E", margin: 0 }}>{selectedService.duration || "—"}</p>
+              </div>
+            </div>
+          )}
 
-          {/* Search & Filter Component Wrapper */}
-          <div className="mb-8 bg-white/80 backdrop-blur-xl p-4 rounded-3xl border border-white/60 shadow-sm">
-            <SearchFilterHeader onFiltersChange={setFilters} />
-          </div>
+          {/* ── LAYOUT ── */}
+          <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
 
-          {/* Quick Actions Bar */}
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-stone-400 font-light">Showing {filteredBarbers.length} bespoke professionals.</p>
-            <button onClick={handleAutoAssign} className="bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black text-[10px] tracking-[0.2em] uppercase px-6 py-3.5 rounded-xl transition-all duration-300 shadow-sm cursor-pointer select-none border-none">
-              Auto Assign Best Stylist
-            </button>
-          </div>
+            {/* ── SIDEBAR ── */}
+            <aside style={{ width: 240, flexShrink: 0, position: "sticky", top: 90 }}>
+              <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0", overflow: "hidden" }}>
+                <div style={{ padding: "15px 20px 12px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2C241E" }}>⚙ Filters</span>
+                  {hasFilters && <button onClick={clearFilters} style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, color: "#C5A059", background: "#FFF8EC", border: "1px solid #E8C84B50", borderRadius: 20, padding: "3px 10px", cursor: "pointer" }}>Clear</button>}
+                </div>
 
-          {/* Stylists Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {filteredBarbers.map((b) => {
-              const isSelected = selectedBarber?.id === b.id;
-              const isBusy = b.status === "Busy";
+                {/* search */}
+                <div style={{ padding: "14px 16px", borderBottom: "1px solid #F0E8DA" }}>
+                  <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#B0A090", margin: "0 0 8px" }}>Search</p>
+                  <div style={{ position: "relative" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C5A059" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Name or specialty…"
+                      style={{ width: "100%", padding: "8px 10px 8px 30px", borderRadius: 8, border: "1px solid #DDD4C4", background: "#FAFAF8", fontFamily: "'Montserrat',sans-serif", fontSize: 12, color: "#2C241E", outline: "none" }}
+                    />
+                  </div>
+                </div>
 
-              return (
-                <div 
-                  key={b.id} 
-                  onClick={() => !isBusy && handleBarberSelect(b)}
-                  className={`group bg-white/90 backdrop-blur-md rounded-[28px] overflow-hidden border transition-all duration-500 flex flex-col justify-between ${
-                    isSelected ? 'border-[#C5A059] shadow-[0_22px_45px_rgba(197,160,89,0.12)] ring-1 ring-[#C5A059]' : 'border-[#EADDCA] shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-[0_25px_50px_rgba(62,54,46,0.08)] hover:-translate-y-1.5'
-                  } ${isBusy ? 'cursor-not-allowed opacity-85' : 'cursor-pointer'}`}
-                >
-                  <div className="h-60 overflow-hidden relative bg-stone-100">
-                    <img src={b.img} alt={b.name} loading="lazy" className={`w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700 ${isBusy ? 'grayscale-[0.5]' : ''}`} />
-                    <div className="absolute top-4 right-4 z-10">
-                      <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm ${isBusy ? 'bg-[#FAF6F0] text-amber-700 border-[#EADDCA]' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
-                        {b.status}
+                {/* availability */}
+                <div style={{ padding: "14px 16px", borderBottom: "1px solid #F0E8DA" }}>
+                  <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#B0A090", margin: "0 0 8px" }}>Availability</p>
+                  {[{ id: true, label: "All Stylists" }, { id: false, label: "Available Only" }].map((opt) => (
+                    <div key={String(opt.id)} onClick={() => setShowAll(opt.id)} style={{ display: "flex", alignItems: "center", gap: 9, padding: "5px 0", cursor: "pointer" }}>
+                      <span style={{ width: 16, height: 16, borderRadius: "50%", border: `2px solid ${showAll === opt.id ? "#C5A059" : "#CCC"}`, background: showAll === opt.id ? "#C5A059" : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}>
+                        {showAll === opt.id && <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#fff" }} />}
                       </span>
+                      <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 12, color: showAll === opt.id ? "#2C241E" : "#666", fontWeight: showAll === opt.id ? 600 : 400 }}>{opt.label}</span>
                     </div>
-                  </div>
-
-                  <div className="p-6 flex-grow flex flex-col justify-between bg-gradient-to-b from-white to-[#FAF6F0]/20">
-                    <div className="text-center mb-6">
-                      <h3 className="font-serif font-bold text-2xl text-[#3E362E] mb-1 group-hover:text-[#C5A059] transition-colors">{b.name}</h3>
-                      <div className="flex items-center justify-center gap-1 mb-3">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#C5A059" stroke="#C5A059"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        <span className="text-xs font-bold text-[#3E362E]">{b.rating} Verified Rating</span>
-                      </div>
-                      <div className="flex justify-center gap-4 text-xs font-light text-stone-400">
-                        <span>{b.experience}</span>
-                        <span>•</span>
-                        <span>{b.distance} km away</span>
-                      </div>
-
-                      {/* AI WAIT TIME ENGINE */}
-                      <div className="mt-5 bg-[#FAF6F0] border border-[#EADDCA] rounded-2xl p-4 text-left">
-                        <div className="flex items-center gap-2 mb-3 border-b border-[#EADDCA]/60 pb-2">
-                          <Sparkles className="w-3.5 h-3.5 text-[#C5A059]" />
-                          <span className="text-[9px] font-black tracking-[0.15em] uppercase text-[#3E362E]">AI Wait Time Engine</span>
-                        </div>
-                        <div className="space-y-2 text-xs">
-                          <div className="flex justify-between text-stone-500">
-                            <span className="flex items-center gap-1.5"><Users className="w-3 h-3" /> Queue Length:</span>
-                            <span className="font-bold text-[#3E362E]">{b.aiWaitTime.queueLength} Guests</span>
-                          </div>
-                          <div className="flex justify-between text-stone-500">
-                            <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> Pace Metric:</span>
-                            <span className="font-medium text-[#3E362E]">{b.aiWaitTime.past7DaysAvg}</span>
-                          </div>
-                          <div className="flex justify-between items-center pt-2 border-t border-dashed border-[#EADDCA] mt-1">
-                            <span className="font-bold text-[#3E362E]">Est. Intermission:</span>
-                            <span className={`font-serif font-bold px-2 py-0.5 rounded text-sm ${isBusy ? 'text-amber-700 bg-amber-50' : 'text-emerald-700 bg-emerald-50'}`}>
-                              {b.aiWaitTime.estimatedWait}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {!isBusy ? (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleBarberSelect(b); }}
-                        className={`w-full py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer select-none border-none ${
-                          isSelected ? 'bg-[#C5A059] text-white border border-[#C5A059]' : 'bg-white text-[#3E362E] border border-[#3E362E] hover:bg-[#3E362E] hover:text-white'
-                        }`}
-                      >
-                        {isSelected ? "Artist Selected" : "Request Artist"}
-                      </button>
-                    ) : (
-                      <button disabled className="w-full bg-stone-100 text-stone-400 py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase cursor-not-allowed select-none border-none">
-                        Fully Booked Today
-                      </button>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              );
-            })}
+
+                {/* min rating */}
+                <div style={{ padding: "14px 16px", borderBottom: "1px solid #F0E8DA" }}>
+                  <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#B0A090", margin: "0 0 8px" }}>Min Rating</p>
+                  {[5, 4, 3, 0].map((r) => (
+                    <button key={r} onClick={() => setMinRating(r)} style={{ display: "flex", alignItems: "center", gap: 6, width: "100%", padding: "6px 8px", marginBottom: 2, borderRadius: 8, border: "none", background: minRating === r ? "linear-gradient(135deg,#FFF3DC,#FAEAC5)" : "transparent", cursor: "pointer", textAlign: "left", transition: "background 0.2s" }}
+                      onMouseEnter={(e) => { if (minRating !== r) e.currentTarget.style.background = "#FAF6F0"; }}
+                      onMouseLeave={(e) => { if (minRating !== r) e.currentTarget.style.background = "transparent"; }}
+                    >
+                      {r === 0
+                        ? <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 12, color: "#666" }}>Any</span>
+                        : <><Stars rating={r} /><span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, color: "#888" }}>& up</span></>
+                      }
+                    </button>
+                  ))}
+                </div>
+
+                {/* max distance */}
+                <div style={{ padding: "14px 16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#B0A090", margin: 0 }}>Max Distance</p>
+                    <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 12, fontWeight: 700, color: "#C5A059" }}>{maxDistance} km</span>
+                  </div>
+                  <input type="range" min="1" max="20" step="1" value={maxDistance} onChange={(e) => setMaxDistance(Number(e.target.value))} style={{ width: "100%", accentColor: "#C5A059" }} />
+                </div>
+              </div>
+            </aside>
+
+            {/* ── CARDS AREA ── */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* top bar */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
+                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: "#888", margin: 0 }}>
+                  Showing <strong style={{ color: "#2C241E" }}>{filtered.length}</strong> of {BARBERS.length} stylists
+                  {hasFilters && <button onClick={clearFilters} style={{ marginLeft: 10, fontSize: 11, color: "#C5A059", background: "none", border: "none", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", textDecoration: "underline", padding: 0 }}>Clear all</button>}
+                </p>
+                <button
+                  onClick={handleAutoAssign}
+                  style={{ display: "flex", alignItems: "center", gap: 8, background: "#2C241E", color: "#F5EFE0", border: "none", borderRadius: 10, padding: "10px 20px", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  Auto-Assign Best
+                </button>
+              </div>
+
+              {/* grid */}
+              {filtered.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
+                  <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
+                  <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 20, color: "#8A7060", margin: "0 0 8px" }}>No stylists found</p>
+                  <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: "#AAA", margin: "0 0 24px" }}>Try adjusting your filter criteria.</p>
+                  <button onClick={clearFilters} style={{ padding: "10px 28px", background: "#2C241E", color: "#fff", border: "none", borderRadius: 8, fontSize: 11, fontFamily: "'Montserrat',sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Clear Filters</button>
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 24 }}>
+                  {filtered.map((b, i) => (
+                    <div key={b.id} ref={(el) => (cardRefs.current[b.id] = el)}>
+                      <BarberCard
+                        b={b}
+                        index={i}
+                        visible={visibleCards.has(String(b.id))}
+                        isSelected={selectedBarber?.id === b.id}
+                        onSelect={setSelectedBarber}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* CONTINUE CTA */}
+              {selectedBarber && (
+                <div style={{ marginTop: 40, padding: "24px 28px", background: "#fff", border: "1px solid #EAE0D0", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+                  <div>
+                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#AAA", margin: "0 0 4px" }}>Selected Artist</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <img src={selectedBarber.img} alt={selectedBarber.name} style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A059" }} />
+                      <div>
+                        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 20, fontWeight: 600, color: "#2C241E", margin: 0 }}>{selectedBarber.name}</p>
+                        <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, color: "#AAA", margin: 0 }}>{selectedBarber.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate("/customer/look", { state: { service: selectedService, barber: selectedBarber, gender } })}
+                    style={{ background: "#C5A059", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s", display: "flex", alignItems: "center", gap: 8 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "#2C241E"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "#C5A059"; }}
+                  >
+                    Choose Your Look →
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-
-          {/* Empty Fallback State */}
-          {filteredBarbers.length === 0 && (
-            <div className="text-center py-20 bg-white/40 backdrop-blur-md rounded-[32px] border border-dashed border-[#EADDCA] px-4">
-              <h4 className="text-sm font-bold uppercase tracking-wider text-[#3E362E] mb-1">No stylists found</h4>
-              <p className="text-xs text-stone-400 font-light max-w-xs mx-auto">Try lowering your rating filter or expanding your distance range.</p>
-            </div>
-          )}
-
-          {/* 🔘 CONTINUE BUTTON */}
-          {selectedBarber && (
-            <div className="mt-12 text-center">
-              <button
-                className="bg-[#C5A059] hover:bg-[#3E362E] text-white font-black text-xs tracking-[0.2em] uppercase px-10 py-5 rounded-xl transition-all duration-300 shadow-md cursor-pointer border-none"
-                onClick={() =>
-                  // ── ✅ FIXED: PASSED GENDER PARAMETER THROUGH & CHANGED ROUTE FROM /select-look TO /look TO MATCH APP.JSX ──
-                  navigate("/customer/look", {  
-                    state: {
-                      service: selectedService,
-                      barber: selectedBarber,
-                      gender: gender 
-                    }
-                  })
-                }
-              >
-                Select Your Desired Look →
-              </button>
-            </div>
-          )}
         </div>
       </div>
       <Footer />
