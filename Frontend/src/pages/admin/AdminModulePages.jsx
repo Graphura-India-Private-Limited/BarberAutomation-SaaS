@@ -93,7 +93,14 @@ export function CustomersModule({ customers, loading, customerSearch, setCustome
                 <td className="px-6 py-4"><StatusPill active={active} /></td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 relative">
-                    <button type="button" className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}><Eye size={18} /></button>
+                    {/* <button type="button" className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}><Eye size={18} /></button> */}
+                    <button
+                      type="button"
+                      onClick={() => console.log(b)}
+                      className="p-2 rounded-md hover:bg-gray-50"
+                    >
+                      <Eye size={18} />
+                    </button>
                     <button type="button" onClick={() => setMenuOpenId(menuOpenId === customer._id ? null : customer._id)} className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}>
                       <MoreHorizontal size={18} />
                     </button>
