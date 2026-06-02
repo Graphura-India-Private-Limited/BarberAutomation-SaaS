@@ -21,9 +21,9 @@ const heroImages = [
 
 const CATEGORIES = [
   { id: "all", label: "All Services", icon: "✦" },
-  { id: "styling", label: "Haircuts", icon: "✂️" },
+  { id: "styling", label: "Haircuts", icon: "✂" },
   { id: "beard", label: "Beard Grooming", icon: "🧔" },
-  { id: "spa", label: "Spa & Massage", icon: "♨️" },
+  { id: "spa", label: "Spa & Massage", icon: "♨" },
   { id: "color", label: "Hair Colour", icon: "◈" },
 ];
 
@@ -67,7 +67,7 @@ function StarRating({ rating, count }) {
 
 function Highlight({ text, query }) {
   if (!query.trim()) return <>{text}</>;
-  const re = new RegExp((`${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`), "gi");
+  const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
   const parts = text.split(re);
   return (
     <>
@@ -142,7 +142,7 @@ export default function MenServices() {
       <Navbar />
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond','Georgia',serif", color: "#2C241E" }}>
 
-        {/* FLOATING BACK BUTTON */}
+        {/* FLOATING BACK BUTTON — fixed, same as WomenServices */}
         <div style={{ position: "fixed", top: "90px", left: "20px", zIndex: 9999 }}>
           <button
             onClick={() => navigate("/")}
@@ -156,11 +156,12 @@ export default function MenServices() {
 
         {/* HERO */}
         <div style={{ position: "relative", height: 540, overflow: "hidden", marginTop: 72 }}>
+          {/* Slideshow images */}
           {heroImages.map((img, idx) => (
-            /* ── ✅ FIXED: BACKGROUNDIMAGE URL CORRECTION ── */
-            <div key={idx} style={{ position: "absolute", inset: 0, backgroundImage: `url(${img})`, backgroundSize: "cover", backgroundPosition: "center", opacity: idx === slideIndex ? 1 : 0, transition: "opacity 1.2s ease", filter: "brightness(0.38)" }} />
+            <div key={idx} style={{ position: "absolute", inset: 0, backgroundImage: `url('${img}')`, backgroundSize: "cover", backgroundPosition: "center", opacity: idx === slideIndex ? 1 : 0, transition: "opacity 1.2s ease", filter: "brightness(0.38)" }} />
           ))}
 
+          {/* Overlay — correctly inside hero */}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.75))", zIndex: 2 }} />
 
           {/* Dot indicators */}
@@ -172,7 +173,9 @@ export default function MenServices() {
           </div>
 
           {/* Hero content */}
-          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyindex: "center", textAlign: "center", padding: "0 24px" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px" }}>
+
+            {/* Decorative badge — same style as WomenServices */}
             <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(197,160,89,0.5)", borderRadius: 40, padding: "6px 20px", marginBottom: 20, background: "rgba(0,0,0,0.2)" }}>
               <span style={{ width: 18, height: 1, background: "#C5A059", display: "inline-block" }} />
               <span style={{ color: "#C5A059", fontSize: 10, letterSpacing: "0.22em", fontFamily: "'Montserrat',sans-serif", fontWeight: 600, textTransform: "uppercase" }}>Gentleman's Craft</span>
@@ -183,6 +186,7 @@ export default function MenServices() {
               MEN'S <em style={{ fontStyle: "italic", color: "#C5A059", fontWeight: 400 }}>Grooming</em>
             </h1>
 
+            {/* Decorative divider line */}
             <div style={{ width: 60, height: 1, background: "linear-gradient(to right,transparent,#C5A059,transparent)", margin: "0 auto 16px" }} />
 
             <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, fontWeight: 300, maxWidth: 440, lineHeight: 1.75, fontFamily: "'Montserrat',sans-serif", marginBottom: 28 }}>
@@ -206,12 +210,12 @@ export default function MenServices() {
                 style={{ width: "100%", boxSizing: "border-box", padding: "15px 48px 15px 48px", borderRadius: 50, border: searchFocused ? "2px solid #C5A059" : "2px solid rgba(255,255,255,0.28)", background: searchFocused ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.13)", backdropFilter: "blur(12px)", color: searchFocused ? "#2C241E" : "#fff", fontSize: 14, fontFamily: "'Montserrat',sans-serif", outline: "none", transition: "all 0.25s ease", letterSpacing: "0.02em" }}
               />
               {searchQuery && (
-                <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "rgba(0,0,0,0.2)", border: "none", borderRadius: "50%", width: 22, height: 22, display: "flex", alignItems: "center", justifyindex: "center", cursor: "pointer", fontSize: 11, color: searchFocused ? "#666" : "#fff", zIndex: 2 }}>✕</button>
+                <button onClick={() => setSearchQuery("")} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "rgba(0,0,0,0.2)", border: "none", borderRadius: "50%", width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 11, color: searchFocused ? "#666" : "#fff", zIndex: 2 }}>✕</button>
               )}
             </div>
 
             {/* Quick pills */}
-            <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap", justifyindex: "center" }}>
+            <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap", justifyContent: "center" }}>
               {["Haircut", "Beard", "Shave", "Facial", "Spa"].map((q) => (
                 <button key={q} onClick={() => setSearchQuery(q)}
                   style={{ background: searchQuery === q ? "rgba(197,160,89,0.45)" : "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.28)", color: "rgba(255,255,255,0.85)", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontFamily: "'Montserrat',sans-serif", cursor: "pointer", transition: "all 0.2s", backdropFilter: "blur(6px)" }}
@@ -223,9 +227,10 @@ export default function MenServices() {
             </div>
           </div>
         </div>
+        {/* END HERO */}
 
         {/* RESULTS BAR */}
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "16px 32px 0", display: "flex", alignItems: "center", justifyindex: "space-between", flexWrap: "wrap", gap: 10 }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "16px 32px 0", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
           <p style={{ fontSize: 13, color: "#888", fontFamily: "'Montserrat',sans-serif", margin: 0 }}>
             {searchQuery.trim() && <><strong style={{ color: "#2C241E" }}>"{searchQuery}"</strong> — </>}
             Showing <strong style={{ color: "#2C241E" }}>{filtered.length}</strong> of {services.length} services
@@ -245,8 +250,8 @@ export default function MenServices() {
           {/* SIDEBAR */}
           <aside style={{ width: 248, flexShrink: 0, position: "sticky", top: 90 }}>
             <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0", overflow: "hidden" }}>
-              <div style={{ padding: "16px 20px 13px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyindex: "space-between" }}>
-                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif", color: "#2C241E" }}>⚙️ Filters</span>
+              <div style={{ padding: "16px 20px 13px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif", color: "#2C241E" }}>⚙ Filters</span>
                 {hasActive && <button onClick={clearAll} style={{ fontSize: 10, color: "#C5A059", background: "#FFF8EC", border: "1px solid #E8C84B50", borderRadius: 20, padding: "3px 10px", cursor: "pointer", fontFamily: "'Montserrat',sans-serif" }}>Clear all</button>}
               </div>
 
@@ -255,7 +260,7 @@ export default function MenServices() {
                 <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#B0A090", fontFamily: "'Montserrat',sans-serif", margin: "0 0 9px" }}>Category</p>
                 {CATEGORIES.map((cat) => (
                   <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                    style={{ display: "flex", alignItems: "center", justifyindex: "space-between", width: "100%", padding: "7px 10px", marginBottom: 2, borderRadius: 8, border: "none", cursor: "pointer", textAlign: "left", background: activeCategory === cat.id ? "linear-gradient(135deg,#FFF3DC,#FAEAC5)" : "transparent", transition: "background 0.2s" }}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", padding: "7px 10px", marginBottom: 2, borderRadius: 8, border: "none", cursor: "pointer", textAlign: "left", background: activeCategory === cat.id ? "linear-gradient(135deg,#FFF3DC,#FAEAC5)" : "transparent", transition: "background 0.2s" }}
                     onMouseEnter={(e) => { if (activeCategory !== cat.id) e.currentTarget.style.background = "#FAF6F0"; }}
                     onMouseLeave={(e) => { if (activeCategory !== cat.id) e.currentTarget.style.background = "transparent"; }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontFamily: "'Montserrat',sans-serif", color: activeCategory === cat.id ? "#8A6A10" : "#555", fontWeight: activeCategory === cat.id ? 600 : 400 }}>
@@ -271,8 +276,7 @@ export default function MenServices() {
                 <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#B0A090", fontFamily: "'Montserrat',sans-serif", margin: "0 0 9px" }}>Price Range</p>
                 {PRICE_RANGES.map((r) => (
                   <div key={r.id} onClick={() => setSelectedPrice(r.id)} style={{ display: "flex", alignItems: "center", gap: 9, padding: "6px 0", cursor: "pointer" }}>
-            
-                    <span style={{ width: 16, height: 16, borderRadius: "50%", border: `2px solid ${selectedPrice === r.id ? "#C5A059" : "#CCC"}`, background: selectedPrice === r.id ? "#C5A059" : "transparent", flexShrink: 0, transition: "all 0.2s", display: "flex", alignItems: "center", justifyindex: "center" }}>
+                    <span style={{ width: 16, height: 16, borderRadius: "50%", border: `2px solid ${selectedPrice === r.id ? "#C5A059" : "#CCC"}`, background: selectedPrice === r.id ? "#C5A059" : "transparent", flexShrink: 0, transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       {selectedPrice === r.id && <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#fff" }} />}
                     </span>
                     <span style={{ fontSize: 13, fontFamily: "'Montserrat',sans-serif", color: selectedPrice === r.id ? "#2C241E" : "#666", fontWeight: selectedPrice === r.id ? 600 : 400 }}>{r.label}</span>
@@ -324,7 +328,6 @@ export default function MenServices() {
                   const visible  = visibleCards.has(String(s.id));
                   return (
                     <div key={s.id} ref={(el) => (cardRefs.current[s.id] = el)}
-                      /* ── ✅ FIXED: INCORRECT DELAY TRANSITION EVALUATION STRING ── */
                       style={{ background: "#fff", borderRadius: 16, overflow: "hidden", border: "1px solid #EAE0D0", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(22px)", transition: `opacity 0.42s ease ${i * 65}ms, transform 0.42s ease ${i * 65}ms, box-shadow 0.28s ease` }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(44,36,30,0.11)"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
@@ -333,10 +336,9 @@ export default function MenServices() {
                           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.07)")}
                           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")} />
                         {tagStyle && (
-                          /* ── ✅ FIXED: CLOSED BADGE STRING DECLARATIONS ACCURATELY ── */
                           <span style={{ position: "absolute", top: 12, left: 12, background: tagStyle.bg, color: tagStyle.text, border: `1px solid ${tagStyle.border}`, borderRadius: 20, padding: "3px 10px", fontSize: 10, fontFamily: "'Montserrat',sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>{s.tag}</span>
                         )}
-                        <span style={{ position: "absolute", bottom: 10, right: 10, background: "rgba(0,0,0,0.52)", backdropFilter: "blur(6px)", color: "#fff", borderRadius: 20, padding: "3px 10px", fontSize: 11, fontFamily: "'Montserrat',sans-serif" }}>⏱️ {s.duration}</span>
+                        <span style={{ position: "absolute", bottom: 10, right: 10, background: "rgba(0,0,0,0.52)", backdropFilter: "blur(6px)", color: "#fff", borderRadius: 20, padding: "3px 10px", fontSize: 11, fontFamily: "'Montserrat',sans-serif" }}>⏱ {s.duration}</span>
                       </div>
                       <div style={{ padding: "16px 18px 18px" }}>
                         <h3 style={{ fontSize: 20, fontWeight: 400, margin: "0 0 4px", lineHeight: 1.25, fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
@@ -346,35 +348,35 @@ export default function MenServices() {
                           <Highlight text={s.desc} query={searchQuery} />
                         </p>
                         <StarRating rating={s.rating} count={s.reviews} />
-                        <div style={{ marginTop: 14, display: "flex", alignItems: "center", justifyindex: "space-between", borderTop: "1px solid #F0E8DA", paddingTop: 12 }}>
+                        <div style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid #F0E8DA", paddingTop: 12 }}>
                           <span style={{ fontSize: 22, fontWeight: 700, fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>₹{s.price.toLocaleString()}</span>
-                       <button
-                           onClick={() => navigate("/customer/barber", { // ── ✅ FIXED HERE TOO ──
-                              state: {
-                                service: s,
-                                gender: 'men',
-                                barber: null
-                              }
-                            })}
-                            style={{ 
-                              background: "#2C241E", 
-                              color: "#F5EFE0", 
-                              border: "none", 
-                              borderRadius: 8, 
-                              padding: "9px 16px", 
-                              fontSize: 11, 
-                              fontFamily: "'Montserrat',sans-serif", 
-                              fontWeight: 600, 
-                              letterSpacing: "0.1em", 
-                              textTransform: "uppercase", 
-                              cursor: "pointer", 
-                              transition: "background 0.2s,color 0.2s" 
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
-                          >
-                            Book Now →
-                          </button>
+<button 
+  onClick={() => navigate("/customer/barber", { 
+    state: { 
+      service: s,            
+      gender: 'men', 
+      barber: null           
+    } 
+  })}
+  style={{ 
+    background: "#2C241E", 
+    color: "#F5EFE0", 
+    border: "none", 
+    borderRadius: 8, 
+    padding: "9px 16px", 
+    fontSize: 11, 
+    fontFamily: "'Montserrat',sans-serif", 
+    fontWeight: 600, 
+    letterSpacing: "0.1em", 
+    textTransform: "uppercase", 
+    cursor: "pointer", 
+    transition: "background 0.2s,color 0.2s" 
+  }}
+  onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+  onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
+>
+  Book Now →
+</button>
                         </div>
                       </div>
                     </div>

@@ -113,6 +113,12 @@ const BARBER_TESTIMONIALS = [
     salon_rating: 5,
   },
 ];
+    const heroImages = [
+  "https://i.pinimg.com/1200x/35/e1/16/35e116f3d65f94e0525f4810f94b5fc7.jpg",
+  "https://i.pinimg.com/736x/d3/94/0b/d3940b17db908e6eb6aadb81b8c9723f.jpg",
+  "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=1600&q=80",
+  "https://i.pinimg.com/1200x/02/24/d1/0224d143df59cb973f200f66f02713bb.jpg"
+];
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -196,13 +202,21 @@ export default function HomePage() {
   const handleNext = () => setCurrentIdx((prev) => (prev >= maxIdx ? 0 : prev + 1));
 
   const slidePercentage =
-  window.innerWidth >= 1280
-    ? 25
-    : window.innerWidth >= 1024
-    ? 33.5
-    : window.innerWidth >= 640
-    ? 50
-    : 90;
+  visibleCount === 4 ? 25
+  : visibleCount === 3 ? 33.5
+  : visibleCount === 2 ? 50
+  : 90;
+
+
+const [currentSlide, setCurrentSlide] = useState(0);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+  }, 4000);
+
+  return () => clearInterval(interval);
+}, []); 
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans overflow-x-hidden">
@@ -223,17 +237,26 @@ export default function HomePage() {
 
     {/* ── HERO ── */}
       <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[550px] md:min-h-[650px] flex items-center">
-        <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none">
-          <div className="absolute inset-0 bg-black/10 md:bg-transparent pointer-events-none" />
-          <img
-            src="/hero-interior.png"
-            alt="Barber Pro Salon"
-            className="w-full h-full object-cover object-center md:object-[80%_center]"
-            onError={(e) => { e.target.src = "https://i.pinimg.com/1200x/35/e1/16/35e116f3d65f94e0525f4810f94b5fc7.jpg"; }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2] via-[#FAF7F2]/70 to-transparent w-full md:w-[20%] pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/30 via-transparent to-transparent pointer-events-none" />
-        </div>
+     <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none">
+  <div className="absolute inset-0 bg-black/10 md:bg-transparent pointer-events-none" />
+
+  {/* Slides */}
+  {heroImages.map((img, index) => (
+    <img
+      key={index}
+      src={img}
+      alt={`Hero ${index + 1}`}
+      className={`absolute inset-0 w-full h-full object-cover object-center md:object-[80%_center]
+      transition-opacity duration-1000 ${
+        index === currentSlide ? "opacity-100" : "opacity-0"
+      }`}
+    />
+  ))}
+
+  {/* Overlays */}
+  <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2] via-[#FAF7F2]/70 to-transparent w-full md:w-[20%] pointer-events-none" />
+  <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/30 via-transparent to-transparent pointer-events-none" />
+</div>
 
         {/* ── ✅ FIXED: ADJUSTED TOP PADDING TO MOVE THE PACKET GRID LOGIC DOWN CLEANLY ── */}
         <div className="mx-auto max-w-7xl w-full px-6 pt-28 pb-16 md:pt-40 md:pb-24 grid md:grid-cols-2 gap-12 items-center relative z-10">

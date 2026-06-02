@@ -46,7 +46,7 @@ const BARBER_LOOKS_DATABASE = {
     { id: "ws9", name: "Moroccan Oil Therapy Spa", img: "https://i.pinimg.com/1200x/bb/0d/ff/bb0dff7adbd80c5ae3322f070bc562ed.jpg" },
     { id: "ws10", name: "Premium Bridal Hair Spa", img: "https://i.pinimg.com/736x/e3/75/d1/e375d1620704dd730c3d6fe887811b36.jpg" }
   ],
-  keratin_smoothing: [
+    keratin_smoothing: [
     { id: "wk1", name: "Keratin Smoothing Treatment", img: "https://i.pinimg.com/1200x/2f/b8/72/2fb8722cd56fc94c01424fa12785641e.jpg" },
     { id: "wk2", name: "Luxury Keratin Rejuvenation", img: "https://i.pinimg.com/1200x/3e/56/86/3e56867afc33e00ee0ca9d5ae850fc0c.jpg" },
     { id: "wk3", name: "Premium Brazilian Blowout", img: "https://i.pinimg.com/1200x/86/55/da/8655da48743eeb8a7d6418ffdc8104ca.jpg" },
@@ -92,7 +92,6 @@ const BARBER_LOOKS_DATABASE = {
     { id: "df3", name: "Luxury Grooming Session", img: "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=600" }
   ]
 }; 
-
 export default function SelectLook() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -102,33 +101,31 @@ export default function SelectLook() {
   const gender = location.state?.gender || 'men'; 
   const [selectedLook, setSelectedLook] = useState(null);
 
-const getServiceCategory = () => {
+  const getServiceCategory = () => {
     if (!selectedService) return "default";
 
-    // Normalize values to lowercase to prevent string-matching bugs
-    const name = selectedService.name?.toLowerCase() || "";
-    const cat = selectedService.category?.toLowerCase() || "";
-
-    // ── 👩 CHECK WOMEN'S ROUTE EXPLICITLY FIRST ──
-    if (gender === 'women') {
-      if (name.includes("keratin") || cat === "treatment") return "keratin_smoothing";
-      if (cat === "color") return "color";
-      if (name.includes("highlights") || name.includes("balayage") || cat === "color-highlights") return "highlights_balayage";
-      if (cat === "spa" || name.includes("spa")) return "spa";
-      
-      // If it's a woman's cut or styling service, map to the women's styling database key
-      return "styling"; 
+    // Men logic
+    if (gender === 'men') {
+      const name = selectedService.name?.toLowerCase() || "";
+      if (name.includes("fade")) return "skin_fade";
+      if (name.includes("beard")) return "beard";
+      if (name.includes("shave")) return "hot_towel_shave";
+      if (name.includes("scalp revitalize")) return "scalp_revitalize";
+      return "haircut";
     }
 
-    // ── 👨 CHECK MEN'S ROUTE EXPLICITLY SECOND ──
-    if (gender === 'men') {
-      if (name.includes("fade") || cat === "fade") return "skin_fade";
-      if (name.includes("beard") || cat === "beard") return "beard";
-      if (name.includes("shave")) return "hot_towel_shave";
-      if (name.includes("scalp") || name.includes("massage") || cat === "spa") return "scalp_revitalize";
+    // Women logic
+    if (gender === 'women') {
+      const cat = selectedService.category?.toLowerCase() || "";
+      const name = selectedService.name?.toLowerCase() || ""; 
+      if (cat === "haircut") return "styling";
+      if (cat === "styling") return "styling";
+      if (cat === "color") return "color";
+      if (cat === "spa") return "spa";
+     
+      if (name.includes("keratin")) return "keratin_smoothing";
       
-      // Default fallback for any other men's hair service
-      return "haircut";
+      return "styling"; 
     }
 
     return "default";
@@ -144,19 +141,19 @@ const getServiceCategory = () => {
         service: selectedService,
         barber: selectedBarber,
         look: selectedLook,
-        gender: gender
+        gender: gender // हे पुढच्या पानासाठी पाठवणे गरजेचे आहे
       }
     });
   };
 
+  
   return (
     <>
       <Navbar />
 
       <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white pt-20 pb-36">
         
-        
-        {/* Header */}
+        {/* Header*/}
         <div className="bg-white/80 backdrop-blur-md border-b border-[#EADDCA] sticky top-0 z-40 px-4 py-4 shadow-sm">
           <div className="max-w-7xl mx-auto flex items-center gap-4">
             <button onClick={() => navigate(-1)} className="p-2 hover:bg-[#FAF6F0] rounded-full transition-colors group cursor-pointer border-none bg-transparent">
