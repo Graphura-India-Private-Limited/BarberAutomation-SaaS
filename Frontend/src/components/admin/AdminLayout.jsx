@@ -35,7 +35,7 @@ const NAV_ITEMS = [
   { icon: Settings,        label: 'Settings',        page: 'settings' },
 ]
 
-export function Header({ activePage, unreadCount = 0, onBellClick, onRefresh, loading }) {
+export function Header({ activePage, unreadCount = 0, onBellClick, onAdminClick, onRefresh, loading }) {
   const { title, subtitle } = PAGE_TITLES[activePage] || PAGE_TITLES.dashboard
 
   return (
@@ -75,6 +75,7 @@ export function Header({ activePage, unreadCount = 0, onBellClick, onRefresh, lo
 
           {/* Bell */}
           <button
+            type="button"
             onClick={onBellClick}
             style={{
               position: "relative", width: 40, height: 40, borderRadius: "50%",
@@ -97,10 +98,15 @@ export function Header({ activePage, unreadCount = 0, onBellClick, onRefresh, lo
           </button>
 
           {/* Admin avatar */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 10,
-            paddingLeft: 16, borderLeft: `1px solid ${C.border}`, cursor: "pointer",
-          }}>
+          <button
+            type="button"
+            onClick={onAdminClick}
+            style={{
+              display: "flex", alignItems: "center", gap: 10,
+              paddingLeft: 16, borderLeft: `1px solid ${C.border}`, cursor: "pointer",
+              background: "transparent", border: "none", color: "inherit",
+            }}
+          >
             <div style={{
               width: 36, height: 36, borderRadius: "50%",
               background: "#D1BFA5", display: "flex", alignItems: "center",
@@ -112,7 +118,7 @@ export function Header({ activePage, unreadCount = 0, onBellClick, onRefresh, lo
               <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>Admin</span>
               <ChevronDown size={13} color={C.muted} />
             </div>
-          </div>
+          </button>
         </div>
       </div>
 

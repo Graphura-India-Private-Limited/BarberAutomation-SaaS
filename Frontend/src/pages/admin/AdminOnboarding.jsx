@@ -136,6 +136,7 @@ export default function AdminOnboarding() {
   const navigate  = useNavigate();
   const photoRef  = useRef();
   const docRef    = useRef();
+  const adminMenuRef = useRef(null);
 
   const [tab,        setTab]       = useState("dashboard");
   const [salons,     setSalons]    = useState([]);
@@ -154,6 +155,7 @@ export default function AdminOnboarding() {
   const [reason,     setReason]    = useState("");
   const [busy,       setBusy]      = useState(false);
   const [addedBarbers, setAddedBarbers] = useState([]);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   const [newBarber, setNewBarber] = useState({
     name:"", mobile:"", password:"", specialization:"", experience:"", salon_id:"",
@@ -162,6 +164,17 @@ export default function AdminOnboarding() {
   const [newService, setNewService] = useState({ name:"", category:"men", price:"", duration:"30", salon_id:"" });
 
   useEffect(() => { fetchAll(); }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (adminMenuRef.current && !adminMenuRef.current.contains(event.target)) {
+        setAdminMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const h = () => ({ Authorization:`Bearer ${getToken()}`, "Content-Type":"application/json" });
 
@@ -494,23 +507,76 @@ export default function AdminOnboarding() {
               <span style={{ fontSize: 13, fontWeight: 500, color: C.muted }}>
                 {new Date().toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}
               </span>
-              <button
+              <button type="button"
                 onClick={fetchAll}
                 style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", borderRadius:99, fontSize:13, fontWeight:500, background: C.bg2, border:`1px solid ${C.border}`, color: C.ink, cursor:"pointer", fontFamily:"inherit" }}
               >
                 <RefreshCw size={13} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} />
                 Refresh
               </button>
-              <div style={{ position:"relative", cursor:"pointer", width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", border:`1px solid ${C.border}` }}>
+              <button
+                type="button"
+                onClick={() => setTab("appointments")}
+                style={{ position:"relative", cursor:"pointer", width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", border:`1px solid ${C.border}` }}
+              >
                 <Bell size={17} color={C.muted} />
-                <span style={{ position:"absolute", top:-1, right:-1, minWidth:17, height:17, padding:"0 3px", borderRadius:99, background: C.gold, color:"#fff", fontSize:10, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 0 2px #fff" }}>3</span>
-              </div>
-              <div style={{ display:"flex", alignItems:"center", gap:10, paddingLeft:16, borderLeft:`1px solid ${C.border}`, cursor:"pointer" }}>
-                <div style={{ width:36, height:36, borderRadius:"50%", background:"#D1BFA5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:700, color:"#fff" }}>AD</div>
-                <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                  <span style={{ fontSize:13, fontWeight:600, color:C.ink }}>Admin</span>
-                  <ChevronDown size={13} color={C.muted} />
+                {pendingBookings > 0 && (
+                  <span style={{ position:"absolute", top:-1, right:-1, minWidth:17, height:17, padding:"0 3px", borderRadius:99, background: C.gold, color:"#fff", fontSize:10, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 0 2px #fff" }}>
+                    {pendingBookings}
+                  </span>
+                )}
+              </button>
+              <div ref={adminMenuRef} style={{ position: "relative" }}>
+                <button
+                  type="button"
+                  onClick={() => setAdminMenuOpen((prev) => !prev)}
+                  style={{ display:"flex", alignItems:"center", gap:10, paddingLeft:16, borderLeft:`1px solid ${C.border}`, cursor:"pointer", background:"transparent", border:"none", color:"inherit" }}
+                >
+                  <div style={{ width:36, height:36, borderRadius:"50%", background:"#D1BFA5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:700, color:"#fff" }}>AD</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                    <span style={{ fontSize:13, fontWeight:600, color:C.ink }}>Admin</span>
+                    <ChevronDown size={13} color={C.muted} />
+                  </div>
+                </button>
+
+                {adminMenuOpen && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 8px)",
+                      right: 0,
+                      minWidth: 170,
+                      background: "#fff",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 10,
+                      boxShadow: "0 12px 28px rgba(0,0,0,.12)",
+                      overflow: "hidden",
+                      zIndex: 30,
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => { setTab("dashboard"); setAdminMenuOpen(false); }}
+                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", cursor: "pointer", fontSize: 13, color: C.ink, fontFamily: "inherit" }}
+                    >
+                      Profile
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setTab("settings"); setAdminMenuOpen(false); }}
+                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", borderTop: `1px solid ${C.border}`, cursor: "pointer", fontSize: 13, color: C.ink, fontFamily: "inherit" }}
+                    >
+                      Settings
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { localStorage.clear(); navigate("/login"); }}
+                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", borderTop: `1px solid ${C.border}`, cursor: "pointer", fontSize: 13, color: C.red, fontFamily: "inherit", fontWeight: 600 }}
+                    >
+                      Logout
+                    </button>
                 </div>
+                )}
               </div>
             </div>
           </header>
@@ -587,8 +653,8 @@ export default function AdminOnboarding() {
                           </div>
                         </div>
                         <div style={{ display:"flex", gap:6 }}>
-                          <button className="action-btn" onClick={()=>updateSalonStatus(s._id,"approved")} style={btnStyle(`${C.green}15`, C.green, `1px solid ${C.green}30`)}>Approve</button>
-                          <button className="action-btn" onClick={()=>setModal({type:"reject",salon:s})} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Reject</button>
+                          <button type="button" className="action-btn" onClick={()=>updateSalonStatus(s._id,"approved")} style={btnStyle(`${C.green}15`, C.green, `1px solid ${C.green}30`)}>Approve</button>
+                          <button type="button" className="action-btn" onClick={()=>setModal({type:"reject",salon:s})} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Reject</button>
                         </div>
                       </div>
                     ))}
@@ -673,7 +739,7 @@ export default function AdminOnboarding() {
                             </div>
                           )}
                           {salonTab==="approved" && (
-                            <button className="action-btn" onClick={()=>updateSalonStatus(s._id,"rejected","Suspended by admin")} style={{ ...btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`), width:"100%", justifyContent:"center" }}>Suspend</button>
+                            <button type="button" className="action-btn" onClick={()=>updateSalonStatus(s._id,"rejected","Suspended by admin")} style={{ ...btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`), width:"100%", justifyContent:"center" }}>Suspend</button>
                           )}
                         </div>
                       </div>
@@ -846,7 +912,7 @@ export default function AdminOnboarding() {
                     </div>
                   </div>
 
-                  <button className="action-btn" disabled={!newBarber.name||!newBarber.mobile||!newBarber.password||busy}
+                  <button type="button" className="action-btn" disabled={!newBarber.name||!newBarber.mobile||!newBarber.password||busy}
                     onClick={addBarber}
                     style={{ marginTop:22, width:"100%", padding:13, background:`linear-gradient(135deg,${C.gold},${C.goldD})`, color:"#fff", fontSize:13, fontWeight:700, justifyContent:"center", borderRadius:10, border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center" }}>
                     {busy?"Adding Barber...":"Add Barber to Platform"}
@@ -1113,8 +1179,8 @@ export default function AdminOnboarding() {
             <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:6 }}>Rejection Reason</label>
             <textarea className="inp" value={reason} onChange={e=>setReason(e.target.value)} placeholder="Provide reason..." style={{ ...inputStyle, height:80, resize:"none", lineHeight:1.6 }}/>
             <div style={{ display:"flex", gap:8, marginTop:14 }}>
-              <button onClick={()=>{ setModal(null); setReason(""); }} style={{ flex:1, padding:10, border:`1px solid ${C.border}`, borderRadius:8, color:C.muted, fontSize:13, background:"#fff", cursor:"pointer", fontFamily:"inherit" }}>Cancel</button>
-              <button className="action-btn" disabled={!reason.trim()||busy} onClick={()=>updateSalonStatus(modal.salon._id,"rejected",reason)}
+              <button type="button" onClick={()=>{ setModal(null); setReason(""); }} style={{ flex:1, padding:10, border:`1px solid ${C.border}`, borderRadius:8, color:C.muted, fontSize:13, background:"#fff", cursor:"pointer", fontFamily:"inherit" }}>Cancel</button>
+              <button type="button" className="action-btn" disabled={!reason.trim()||busy} onClick={()=>updateSalonStatus(modal.salon._id,"rejected",reason)}
                 style={{ flex:2, padding:10, background:reason.trim()?C.red:"#FCA5A5", color:"#fff", borderRadius:8, fontSize:13, fontWeight:700, border:"none", cursor:"pointer", fontFamily:"inherit" }}>
                 {busy?"Processing...":"Confirm Rejection"}
               </button>
