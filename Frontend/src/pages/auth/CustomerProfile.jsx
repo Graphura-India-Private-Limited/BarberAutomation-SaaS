@@ -485,33 +485,35 @@ export default function CustomerProfile() {
     return matchesSearch && matchesCategory;
   });
 
-  return (
+ return (
     <>
-      <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-[#3D3126] transition-colors duration-300">
+      <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-[#1C1917] transition-colors duration-300">
         
         {/* ── CENTRAL LAYOUT GRID ENGINE ── */}
         <div className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row min-h-screen">
           
-          {/* ── LEFT SIDEBAR (EXACT WARM MATCH TO SCREENSHOT SIDEBAR) ── */}
-          <aside className="w-full lg:w-64 shrink-0 bg-[#FFFDF9] text-[#3D3126] flex flex-col min-h-screen border-r border-[#EADBCE] p-5 justify-between shadow-2xs">
+          {/* ── LEFT SIDEBAR (TYPOGRAPHY & WEIGHT ALIGNED TO 2ND SCREENSHOT) ── */}
+          <aside className="w-full lg:w-64 shrink-0 bg-[#FFFFFF] text-[#1C1917] flex flex-col min-h-screen border-r border-[#E7E5E4] p-5 justify-between shadow-2xs">
             <div className="space-y-6">
               
               {/* Brand Header */}
-              <div className="px-3 py-3 border-b border-[#EADBCE]">
+              <div className="px-1 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#B58B67] flex items-center justify-center text-white shrink-0 shadow-sm animate-pulse">
-                    <Scissors size={18} />
+                  <div className="w-8 h-8 rounded-lg bg-[#FDF9F3] flex items-center justify-center text-[#C5A059] shrink-0 border border-[#E7E5E4]">
+                    <Scissors size={16} />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-black tracking-[0.2em] text-[#3D3126] uppercase font-serif">BARBER PRO</p>
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#B58B67] mt-0.5">CLIENT CONSOLE</p>
+                    {/* ── ✅ FIXED: BRAND TEXT STYLE ALIGNED TO GEORGIA SERIF WEIGHT ── */}
+                    <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[#78716C] leading-none">Client Console</p>
+                    <p className="text-[15px] font-bold text-[#1C1917] tracking-tight font-serif mt-1 leading-tight">Barber Pro</p>
                   </div>
                 </div>
               </div>
 
-              {/* Navigation Links with Golden-Cream States */}
-              <nav className="space-y-1.5 text-left px-1">
-                <p className="px-3 text-[10px] font-black text-[#8A7A6A] uppercase tracking-widest mb-2">Navigation</p>
+              {/* Navigation Links with Clean Typography Styles */}
+              <nav className="space-y-0.5 text-left px-1">
+                {/* ── ✅ FIXED: SECTION LABEL STYLE MATCHED EXACTLY ── */}
+                <p className="px-3 text-[9px] font-bold text-[#78716C] uppercase tracking-[0.18em] mb-2.5">Navigation</p>
                 {[
                   { id: "overview", label: "Dashboard Hub", icon: Sparkles },
                   { id: "history", label: "Appointments Registry", icon: Calendar },
@@ -522,21 +524,25 @@ export default function CustomerProfile() {
                 ].map(item => {
                   const isActive = activeTab === item.id;
                   return (
-                    <button
-                      key={item.id}
-                      onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl text-xs transition-all duration-300 group cursor-pointer ${
-                        isActive
-                          ? 'bg-[#FEF9EE] text-[#9E7452] font-black border-l-4 border-[#B58B67] shadow-3xs'
-                          : 'text-[#8A7A6A] hover:bg-[#FAF6F0] hover:text-[#3D3126]'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <item.icon size={16} className={`shrink-0 ${isActive ? 'text-[#B58B67]' : 'text-[#8A7A6A]'}`} />
-                        <span>{item.label}</span>
+                  <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`w-full flex items-center justify-between gap-[10px] px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200 group cursor-pointer border-none outline-none ${
+              isActive
+                ? 'bg-[#FDF9F3] text-[#C5A059] font-semibold border-l-3 border-[#C5A059]'
+                : 'text-[#78716C] hover:bg-[#FAF6F0] hover:text-[#1C1917] font-medium'
+            }`}
+          >
+                      <div className="flex items-center gap-[10px]">
+                        <item.icon 
+                          size={16} 
+                          strokeWidth={isActive ? 2.5 : 2} 
+                          className={`shrink-0 transition-colors ${isActive ? 'text-[#C5A059]' : 'text-[#78716C] group-hover:text-[#1C1917]'}`} 
+                        />
+                        <span className="flex-1">{item.label}</span>
                       </div>
                       {item.count > 0 && (
-                        <span className="w-4.5 h-4.5 rounded-full bg-[#B58B67] text-white text-[9px] font-black flex items-center justify-center shrink-0">
+                        <span className="min-w-[17px] h-[17px] px-1 rounded-full bg-[#C5A059] text-white text-[10px] font-bold flex items-center justify-center shrink-0 shadow-xs">
                           {item.count}
                         </span>
                       )}
@@ -547,18 +553,19 @@ export default function CustomerProfile() {
             </div>
 
             {/* Sidebar Footer Details */}
-            <div className="pt-4 border-t border-[#EADBCE] space-y-2">
+            <div className="pt-4 border-t border-[#E7E5E4] space-y-1">
               <button
                 onClick={() => window.location.href = "/customer/booking"}
-                className="w-full bg-[#B58B67] hover:bg-[#9E7452] text-white rounded-xl py-3 text-[10px] font-black tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs hover:scale-102"
+                className="w-full bg-[#C5A059] hover:opacity-95 text-white rounded-lg py-2.5 text-[11px] font-bold tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border-none outline-none font-sans"
               >
-                <Scissors size={12} /> Book Appointment
+                <Scissors size={13} strokeWidth={2.5} /> Book Appointment
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/60 rounded-xl py-3 text-[10px] font-black tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full bg-transparent hover:bg-[#FEF2F2] text-[#DC2626] rounded-lg py-2.5 text-[13px] font-medium transition-all duration-200 flex items-center justify-center gap-[10px] cursor-pointer border-none outline-none font-sans pl-3  text-left group"
               >
-                <LogOut size={12} /> Sign Out Console
+                <LogOut size={16} className="text-[#DC2626] shrink-0" /> 
+                <span>Sign Out Console</span>
               </button>
             </div>
           </aside>

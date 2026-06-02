@@ -46,6 +46,12 @@ const BARBER_LOOKS_DATABASE = {
     { id: "ws9", name: "Moroccan Oil Therapy Spa", img: "https://i.pinimg.com/1200x/bb/0d/ff/bb0dff7adbd80c5ae3322f070bc562ed.jpg" },
     { id: "ws10", name: "Premium Bridal Hair Spa", img: "https://i.pinimg.com/736x/e3/75/d1/e375d1620704dd730c3d6fe887811b36.jpg" }
   ],
+  keratin_smoothing: [
+    { id: "wk1", name: "Keratin Smoothing Treatment", img: "https://i.pinimg.com/1200x/2f/b8/72/2fb8722cd56fc94c01424fa12785641e.jpg" },
+    { id: "wk2", name: "Luxury Keratin Rejuvenation", img: "https://i.pinimg.com/1200x/3e/56/86/3e56867afc33e00ee0ca9d5ae850fc0c.jpg" },
+    { id: "wk3", name: "Premium Brazilian Blowout", img: "https://i.pinimg.com/1200x/86/55/da/8655da48743eeb8a7d6418ffdc8104ca.jpg" },
+    { id: "wk4", name: "Silky Smooth Keratin Finish", img: "https://i.pinimg.com/1200x/79/1b/d4/791bd40e7756ad08631dbb79b6600e95.jpg" }
+  ],
 
   // --- 👨 MEN SECTIONS ---
   haircut: [
@@ -75,6 +81,11 @@ const BARBER_LOOKS_DATABASE = {
     { id: "bd6", name: "Classic Hot Towel Beard Shave", img: "https://i.pinimg.com/1200x/67/a3/74/67a374a79533ce703f034ce17b02c804.jpg" },
     { id: "bd7", name: "Luxury Foam & Towel Shave", img: "https://i.pinimg.com/1200x/83/17/75/831775720cb642376ee34c64ada61202.jpg" }
   ],
+  scalp_revitalize:  [
+    { id: "sr1", name: "Scalp Revitalize Therapy", img: "https://i.pinimg.com/736x/7e/ce/a3/7ecea3ac6a931c1c172f8b96a5c8b4a0.jpg" },
+    { id: "sr2", name: "Premium Scalp Detox", img: "https://i.pinimg.com/1200x/bb/0d/ff/bb0dff7adbd80c5ae3322f070bc562ed.jpg" },
+    { id: "sr3", name: "Luxury Hair & Scalp Rejuvenation", img: "https://i.pinimg.com/1200x/3e/e4/36/3ee4366fbe905d991236d88793e799c8.jpg" },
+  ],
   default: [
     { id: "df1", name: "Signature Salon Ritual", img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600" },
     { id: "df2", name: "Premium Hair Spa Experience", img: "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600" },
@@ -88,51 +99,38 @@ export default function SelectLook() {
 
   const selectedService = location.state?.service;
   const selectedBarber = location.state?.barber;
+  const gender = location.state?.gender || 'men'; 
   const [selectedLook, setSelectedLook] = useState(null);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (!selectedBarber) {
-      navigate(-1);
-    }
-  }, [selectedBarber, navigate]);
-
-  const getServiceCategory = () => {
+const getServiceCategory = () => {
     if (!selectedService) return "default";
-    
-    if (selectedService.subCategory && BARBER_LOOKS_DATABASE[selectedService.subCategory]) {
-      return selectedService.subCategory;
+
+    // Normalize values to lowercase to prevent string-matching bugs
+    const name = selectedService.name?.toLowerCase() || "";
+    const cat = selectedService.category?.toLowerCase() || "";
+
+    // ── 👩 CHECK WOMEN'S ROUTE EXPLICITLY FIRST ──
+    if (gender === 'women') {
+      if (name.includes("keratin") || cat === "treatment") return "keratin_smoothing";
+      if (cat === "color") return "color";
+      if (name.includes("highlights") || name.includes("balayage") || cat === "color-highlights") return "highlights_balayage";
+      if (cat === "spa" || name.includes("spa")) return "spa";
+      
+      // If it's a woman's cut or styling service, map to the women's styling database key
+      return "styling"; 
     }
 
-    const serviceName = selectedService.name?.toLowerCase() || "";
-
-    if (serviceName.includes("highlights") || serviceName.includes("balayage") || serviceName.includes("हायलाइट्स")) {
-      return "highlights_balayage";
-    }
-
-    if (serviceName.includes("hot towel") || serviceName.includes("shave")) {
-      return "hot_towel_shave";
-    }
-
-    if (serviceName.includes("skin fade") || serviceName.includes("fade")) {
-      return "skin_fade";
-    }
-
-    if (selectedService.category === "hair") {
+    // ── 👨 CHECK MEN'S ROUTE EXPLICITLY SECOND ──
+    if (gender === 'men') {
+      if (name.includes("fade") || cat === "fade") return "skin_fade";
+      if (name.includes("beard") || cat === "beard") return "beard";
+      if (name.includes("shave")) return "hot_towel_shave";
+      if (name.includes("scalp") || name.includes("massage") || cat === "spa") return "scalp_revitalize";
+      
+      // Default fallback for any other men's hair service
       return "haircut";
     }
 
-    if (selectedService.category && BARBER_LOOKS_DATABASE[selectedService.category]) {
-      return selectedService.category;
-    }
-
-    if (serviceName.includes("haircut") || serviceName.includes("hair") || serviceName.includes("कट")) {
-      return "haircut";
-    } 
-    if (serviceName.includes("beard") || serviceName.includes("दाढी")) {
-      return "beard";
-    }
-    
     return "default";
   };
 
@@ -145,7 +143,8 @@ export default function SelectLook() {
       state: {
         service: selectedService,
         barber: selectedBarber,
-        look: selectedLook
+        look: selectedLook,
+        gender: gender
       }
     });
   };
@@ -156,10 +155,10 @@ export default function SelectLook() {
 
       <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white pb-36">
         
-        {/* Header / Sub-navigation */}
+        {/* Header */}
         <div className="bg-white/80 backdrop-blur-md border-b border-[#EADDCA] sticky top-0 z-40 px-4 py-4 shadow-sm">
           <div className="max-w-7xl mx-auto flex items-center gap-4">
-            <button onClick={() => navigate(-1)} className="p-2 hover:bg-[#FAF6F0] rounded-full transition-colors group cursor-pointer">
+            <button onClick={() => navigate(-1)} className="p-2 hover:bg-[#FAF6F0] rounded-full transition-colors group cursor-pointer border-none bg-transparent">
               <ArrowLeft className="w-5 h-5 text-[#3E362E] group-hover:text-[#C5A059] transition-colors" />
             </button>
             <span className="font-serif font-bold text-lg">Back to Stylists</span>
@@ -172,15 +171,15 @@ export default function SelectLook() {
           <div className="bg-white rounded-[32px] p-6 md:p-8 border border-[#EADDCA] shadow-sm mb-16">
             
             <div className="mb-8 flex flex-col gap-3">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#C5A059] flex items-center gap-1 mb-1">
-                  <Sparkles className="w-3 h-3 fill-[#C5A059]" /> Portfolio Catalogue — {selectedBarber?.name}
+              <div className="text-left">
+                <span className="text-[10px] text-left font-black uppercase tracking-[0.2em] text-[#C5A059] flex items-center gap-1 mb-1">
+                  <Sparkles className="w-3 h-3 fill-[#C5A059] text-[#C5A059]" /> Portfolio Catalogue — {selectedBarber?.name || "Stylist"}
                 </span>
                 <h2 className="font-serif font-black text-3xl md:text-4xl text-[#3E362E] uppercase tracking-tight">
                   Select Your Custom <span className="text-[#C5A059] italic normal-case">Desired Look</span>
                 </h2>
                 <p className="text-xs text-stone-400 font-light mt-1">
-                 Click on your favorite look below. Our expert stylist {selectedBarber?.name} will craft this exact look perfectly for you.
+                  Click on your favorite look below. Our expert stylist {selectedBarber?.name || "chosen"} will craft this exact look perfectly for you.
                 </p>
               </div>
               
@@ -210,7 +209,7 @@ export default function SelectLook() {
                         alt={look.name} 
                         className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover/look:scale-105"
                       />
-                      {/* Gradient overlay gets slightly darker on select */}
+                      {/* ── ✅ FIXED: ATTACHED ESCAPED STRING BACKTICKS ACCURATELY AROUND ABSOLUTE ELEMENT OVERLAYS ── */}
                       <div className={`absolute inset-0 transition-colors duration-300 ${isLookSelected ? 'bg-black/40' : 'bg-gradient-to-t from-black/90 via-black/30 to-transparent'}`} />
                       
                       {isLookSelected && (
@@ -219,7 +218,7 @@ export default function SelectLook() {
                         </div>
                       )}
 
-                      <div className="absolute bottom-5 left-5 right-5 text-white z-10">
+                      <div className="absolute bottom-5 left-5 right-5 text-white text-left z-10">
                         <p className="text-[9px] font-black uppercase tracking-widest text-[#EADDCA] mb-0.5">Style Template</p>
                         <h4 className="font-serif font-bold text-lg leading-tight transition-colors duration-300 group-hover/look:text-[#EADDCA]">{look.name}</h4>
                       </div>
@@ -234,7 +233,7 @@ export default function SelectLook() {
         {/* 🔘 Premium Sticky Bottom Action Bar */}
         <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-[#EADDCA] py-5 px-6 z-50 shadow-[0_-10px_30px_rgba(62,54,46,0.06)] transition-all duration-300">
           <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div>
+            <div className="text-left">
               {selectedLook ? (
                 <>
                   <p className="text-[10px] text-stone-400 uppercase tracking-widest font-black">Selected Style</p>
@@ -244,7 +243,7 @@ export default function SelectLook() {
                 </>
               ) : (
                 <p className="text-sm text-stone-500 font-light italic">
-                 Please select a look from the catalog above to proceed...
+                  Please select a look from the catalog above to proceed...
                 </p>
               )}
             </div>
@@ -252,7 +251,7 @@ export default function SelectLook() {
             <button
               onClick={handleContinue}
               disabled={!selectedLook}
-              className={`w-full sm:w-auto font-black text-[11px] tracking-[0.25em] uppercase px-10 py-4 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 ${
+              className={`w-full sm:w-auto font-black text-[11px] tracking-[0.25em] uppercase px-10 py-4 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 border-none ${
                 selectedLook 
                   ? "bg-[#3E362E] text-white hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer hover:scale-[1.03]" 
                   : "bg-stone-200 text-stone-400 cursor-not-allowed opacity-60"

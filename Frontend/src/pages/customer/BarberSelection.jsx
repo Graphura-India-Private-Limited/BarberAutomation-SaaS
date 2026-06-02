@@ -10,6 +10,8 @@ export default function BarberSelection() {
   const navigate = useNavigate();
 
   const selectedService = location.state?.service;
+  // ── ✅ FIXED: CAPTURE THE GENDER TRACKING TOKEN PASSED FROM PREVIOUS MEN/WOMEN PANELS ──
+  const gender = location.state?.gender || 'men'; 
 
   const [selectedBarber, setSelectedBarber] = useState(null);
 
@@ -126,7 +128,7 @@ export default function BarberSelection() {
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0">
                   <img src={selectedService.img || "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=150"} alt={selectedService.name} className="w-full h-full object-cover" />
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 text-left">
                   <span className="text-[9px] font-black uppercase tracking-wider text-stone-400 block mb-0.5">Selected Ritual</span>
                   <h4 className="font-serif font-bold text-sm text-[#3E362E] truncate">{selectedService.name}</h4>
                   <p className="text-[#C5A059] font-serif font-bold text-xs mt-0.5">₹{selectedService.price}</p>
@@ -147,7 +149,7 @@ export default function BarberSelection() {
           {/* Quick Actions Bar */}
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
             <p className="text-xs text-stone-400 font-light">Showing {filteredBarbers.length} bespoke professionals.</p>
-            <button onClick={handleAutoAssign} className="bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black text-[10px] tracking-[0.2em] uppercase px-6 py-3.5 rounded-xl transition-all duration-300 shadow-sm cursor-pointer select-none">
+            <button onClick={handleAutoAssign} className="bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black text-[10px] tracking-[0.2em] uppercase px-6 py-3.5 rounded-xl transition-all duration-300 shadow-sm cursor-pointer select-none border-none">
               Auto Assign Best Stylist
             </button>
           </div>
@@ -216,14 +218,14 @@ export default function BarberSelection() {
                     {!isBusy ? (
                       <button
                         onClick={(e) => { e.stopPropagation(); handleBarberSelect(b); }}
-                        className={`w-full py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer select-none ${
+                        className={`w-full py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer select-none border-none ${
                           isSelected ? 'bg-[#C5A059] text-white border border-[#C5A059]' : 'bg-white text-[#3E362E] border border-[#3E362E] hover:bg-[#3E362E] hover:text-white'
                         }`}
                       >
                         {isSelected ? "Artist Selected" : "Request Artist"}
                       </button>
                     ) : (
-                      <button disabled className="w-full bg-stone-100 text-stone-400 py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase cursor-not-allowed select-none">
+                      <button disabled className="w-full bg-stone-100 text-stone-400 py-3.5 rounded-xl font-black text-[10px] tracking-[0.2em] uppercase cursor-not-allowed select-none border-none">
                         Fully Booked Today
                       </button>
                     )}
@@ -241,16 +243,18 @@ export default function BarberSelection() {
             </div>
           )}
 
-          {/* 🔘 CONTINUE BUTTON: आता हा युझरला डायरेक्ट डिटेल्स ऐवजी 'लुक सिलेक्शन' पेजवर घेऊन जाईल */}
+          {/* 🔘 CONTINUE BUTTON */}
           {selectedBarber && (
             <div className="mt-12 text-center">
               <button
-                className="bg-[#C5A059] hover:bg-[#3E362E] text-white font-black text-xs tracking-[0.2em] uppercase px-10 py-5 rounded-xl transition-all duration-300 shadow-md cursor-pointer"
+                className="bg-[#C5A059] hover:bg-[#3E362E] text-white font-black text-xs tracking-[0.2em] uppercase px-10 py-5 rounded-xl transition-all duration-300 shadow-md cursor-pointer border-none"
                 onClick={() =>
-                  navigate("/customer/select-look", {  // 👈 इथे तुमच्या लुक पेजचा अचूक पाथ (Route) टाका
+                  // ── ✅ FIXED: PASSED GENDER PARAMETER THROUGH & CHANGED ROUTE FROM /select-look TO /look TO MATCH APP.JSX ──
+                  navigate("/customer/look", {  
                     state: {
                       service: selectedService,
-                      barber: selectedBarber
+                      barber: selectedBarber,
+                      gender: gender 
                     }
                   })
                 }

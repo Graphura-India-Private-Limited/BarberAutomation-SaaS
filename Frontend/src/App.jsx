@@ -134,7 +134,7 @@ function App() {
         <Route path="/customer/services/addon" element={<AddonServices />} />
         <Route path="/customer/services/addons" element={<AddonServices />} />
         <Route path="/customer/barber" element={<BarberSelection />} />
-        <Route path="/customer/Select-look" element={<SelectLook />} />
+        <Route path="/customer/look" element={<SelectLook />} />
         <Route path="/customer/details" element={<CustomerDetails />} />
         <Route path="/customer/booking" element={<CustomerBookingFlow />} />
         <Route path="/customer/history" element={<BookingHistory />} />
