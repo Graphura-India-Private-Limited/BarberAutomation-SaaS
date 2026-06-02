@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Scissors, LogOut, Users, Store, ShieldAlert, ChevronDown, UserCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/layout/Footer";
 
 export default function AdminUserManagement() {
   const navigate = useNavigate();
@@ -286,9 +287,11 @@ export default function AdminUserManagement() {
               )}
             </motion.div>
           </AnimatePresence>
+          
         </div>
 
       </main>
+      <Footer />
     </div>
   );
 }

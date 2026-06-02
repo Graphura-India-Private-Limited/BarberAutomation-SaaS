@@ -97,7 +97,7 @@ export default function BarberSelection() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
           
           {/* RETURN BACK BUTTON (Top Left) */}
-          <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
+         <div className="absolute top-24 left-4 sm:left-6 md:left-8 z-50">
             <button
               onClick={() => navigate(-1)}
               className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-medium text-xs tracking-wide transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"

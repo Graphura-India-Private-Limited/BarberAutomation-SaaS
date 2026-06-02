@@ -69,7 +69,7 @@ const Navbar = () => {
     { label: "Services", hasDropdown: true, icon: Sparkles },
     { label: "Studios", path: "/barbers", icon: Users },
     { label: "About", section: "about", icon: Info },
-    { label: "Contact", section: "contact", icon: Phone },
+    { label: "Contact", path: "/support", icon: Phone },
   ];
 
   // SERVICE LINKS
@@ -146,10 +146,16 @@ const Navbar = () => {
           <div className="hidden lg:flex items-center gap-8">
             {NAV_ITEMS.map((item) =>
               item.hasDropdown ? (
-                <div key={item.label} className="relative" ref={dropRef}>
+                /* ── ✅ FIXED: ATTACHED ONMOUSEENTER/LEAVE LISTENERS TO THE MAIN PARENT WRAPPER ── */
+                <div 
+                  key={item.label} 
+                  className="relative py-2" // Added baseline layout padding to anchor mouse transition movements safely
+                  ref={dropRef}
+                  onMouseEnter={() => setDropOpen(true)}
+                  onMouseLeave={() => setDropOpen(false)}
+                >
                   <button
-                    onClick={() => setDropOpen((p) => !p)}
-                    className={`flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest transition-colors cursor-pointer ${
+                    className={`flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest transition-colors cursor-pointer border-none bg-transparent outline-none ${
                       dropOpen ? "text-[#C5A059]" : "text-stone-300 hover:text-[#C5A059]"
                     }`}
                   >
@@ -163,13 +169,14 @@ const Navbar = () => {
 
                   {/* SUBMENU SERVICES OVERLAY POPUP */}
                   {dropOpen && (
-                    <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 rounded-3xl bg-[#2A241F]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.45)] overflow-hidden z-50 animate-fade-in">
+                    /* ── ✅ FIXED: ADJUSTED TOP POSITIONS TO SEAMLESSLY FLUSH WITH THE py-2 GAP HOVER WINDOW ── */
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-72 rounded-3xl bg-[#2A241F]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.45)] overflow-hidden z-50 animate-fade-in">
                       <div className="p-2 space-y-0.5">
                         {SERVICE_LINKS.map((svc) => (
                           <button
                             key={svc.path}
                             onClick={() => handleNav(svc.path)}
-                            className="w-full flex items-center gap-3.5 p-3 rounded-xl hover:bg-[#2A241F] transition-all group text-left"
+                            className="w-full flex items-center gap-3.5 p-3 rounded-xl hover:bg-[#2A241F] transition-all group text-left border-none outline-none"
                           >
                             <div className="w-9 h-9 rounded-lg bg-[#3E362E] border border-stone-700/50 flex items-center justify-center text-[#C5A059] group-hover:bg-[#C5A059] group-hover:text-white transition-all">
                               <svc.icon className="w-4 h-4" />
@@ -201,7 +208,7 @@ const Navbar = () => {
                       handleNav(item.path);
                     }
                   }}
-                  className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-stone-300 hover:text-[#C5A059] transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-stone-300 hover:text-[#C5A059] transition-colors cursor-pointer border-none bg-transparent outline-none"
                 >
                   {item.label}
                 </button>
@@ -221,7 +228,7 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => handleNav("/customer/services")}
-             className="hidden sm:block rounded-xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] hover:scale-105 px-7 py-3 text-[10px] font-black uppercase tracking-[0.25em] text-[#2A241F] shadow-[0_0_25px_rgba(197,160,89,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98]">
+             className="hidden sm:block rounded-xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] hover:scale-105 px-7 py-3 text-[10px] font-black uppercase tracking-[0.25em] text-[#2A241F] shadow-[0_0_25px_rgba(197,160,89,0.35)] transition-all duration-300 cursor-pointer active:scale-[0.98] border-none">
               Book Now
             </button>
 
@@ -229,7 +236,7 @@ const Navbar = () => {
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className="lg:hidden text-stone-300 hover:text-white transition-colors"
+              className="lg:hidden text-stone-300 hover:text-white transition-colors border-none bg-transparent"
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -251,7 +258,7 @@ const Navbar = () => {
                     setDropOpen(!dropOpen);
                   }
                 }}
-                className="block w-full text-left text-xs font-black uppercase tracking-widest text-stone-300 hover:text-[#C5A059] py-3 border-b border-stone-800/40 last:border-0"
+                className="block w-full text-left text-xs font-black uppercase tracking-widest text-stone-300 hover:text-[#C5A059] py-3 border-b border-stone-800/40 last:border-0 bg-transparent border-none outline-none"
               >
                 {item.label}
               </button>

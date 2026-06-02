@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Scissors, LogOut, TrendingUp, Users, Store, Clock, Award, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/layout/Footer";
 
 export default function AdminAnalytics() {
   const navigate = useNavigate();
@@ -205,6 +206,7 @@ export default function AdminAnalytics() {
         </footer>
 
       </main>
+      <Footer />
     </div>
   );
 }

@@ -53,12 +53,14 @@ export default function FinancePage() {
             </div>
           </main>
         </div>
+        
 
         {/* ✅ Render footer at bottom for restricted layout */}
         <Footer />
       </div>
     );
-  }
+  } 
+
 
   const isOwner = currentUser?.role === "owner";
   const activeFinance = financeData || { todayRevenue: 0, weekRevenue: 0, monthRevenue: 0, barberBreakdown: [], topServices: [] };

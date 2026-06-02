@@ -153,7 +153,8 @@ const getServiceCategory = () => {
     <>
       <Navbar />
 
-      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white pb-36">
+      <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white pt-20 pb-36">
+        
         
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-md border-b border-[#EADDCA] sticky top-0 z-40 px-4 py-4 shadow-sm">

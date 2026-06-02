@@ -238,40 +238,43 @@ const MembershipSection = () => {
       <div className="text-center mt-5 text-stone-400 text-[9px] uppercase tracking-[0.35em]">
         * All memberships require a minimum 3-month commitment.
       </div>
-
-      {/* ════════════════ CONFIRMATION MODAL ════════════════ */}
+{/* ════════════════ CONFIRMATION MODAL ════════════════ */}
       <AnimatePresence>
         {showConfirm && selectedPlan && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
+            /* ── ✅ FIXED: ELEVATED Z-INDEX LAYER TO FLOOD ABOVE NAVBAR AND CHANGED ITEMS ALIGNMENT FOR HIGH SCROLLABILITY ── */
+            className="fixed inset-0 bg-black/75 z-[10000] flex justify-center items-start overflow-y-auto p-4 md:p-10 backdrop-blur-sm pt-28 md:pt-36"
             onClick={() => setShowConfirm(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-[2rem] shadow-2xl max-w-md w-full p-8 border border-[#EADDCA] relative"
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              /* ── ✅ FIXED: ATTACHED EXTENDED VERTICAL MARGINS AND SECURED SPACING ── */
+              className="bg-white rounded-[2rem] shadow-2xl max-w-md w-full p-8 border border-[#EADDCA] relative my-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close */}
-              <button onClick={() => setShowConfirm(false)}
-                className="absolute top-5 right-5 text-stone-400 hover:text-stone-700 transition">
+              {/* Close Button */}
+              <button 
+                onClick={() => setShowConfirm(false)}
+                className="absolute top-6 right-6 text-stone-400 hover:text-stone-700 transition cursor-pointer p-1 rounded-full hover:bg-stone-100"
+              >
                 <X className="w-5 h-5" />
               </button>
 
               {/* Plan icon */}
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#C5A059] text-white mb-4">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#C5A059] text-white mb-4 shadow-md">
                 {selectedPlan.icon}
               </div>
 
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059] mb-2">Confirm Plan</p>
-              <h3 className="text-3xl font-bold text-[#3E362E] font-serif italic mb-2">{selectedPlan.name}</h3>
-              <p className="text-stone-500 text-sm mb-6">{selectedPlan.description}</p>
+              <h3 className="text-3xl font-bold text-[#3E362E] font-serif italic mb-2 text-left">{selectedPlan.name}</h3>
+              <p className="text-stone-500 text-sm mb-6 text-left">{selectedPlan.description}</p>
 
-              <div className="bg-[#FDFBF7] border border-[#EADDCA] rounded-2xl p-5 mb-6">
+              <div className="bg-[#FDFBF7] border border-[#EADDCA] rounded-2xl p-5 mb-6 text-left">
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-4xl font-black text-[#3E362E]">₹{selectedPlan.price}</span>
                   <span className="text-xs font-bold uppercase tracking-widest text-stone-400">/month</span>
@@ -281,7 +284,7 @@ const MembershipSection = () => {
                 </p>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-left">
                 <p className="text-[11px] text-amber-800 leading-relaxed">
                   <strong>Note:</strong> Online payment for memberships is launching soon.
                   Submit your interest and our team will contact you within 24 hours
@@ -291,16 +294,22 @@ const MembershipSection = () => {
 
               {/* Action buttons */}
               <div className="space-y-3">
-                <button onClick={confirmInterest}
-                  className="w-full py-4 bg-[#3E362E] text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#C5A059] transition flex items-center justify-center gap-2 shadow-lg">
+                <button 
+                  onClick={confirmInterest}
+                  className="w-full py-4 bg-[#3E362E] text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#C5A059] transition flex items-center justify-center gap-2 shadow-lg cursor-pointer border-none"
+                >
                   <CheckCircle className="w-4 h-4" /> Submit Interest
                 </button>
-                <button onClick={contactWhatsApp}
-                  className="w-full py-4 bg-green-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-green-700 transition flex items-center justify-center gap-2">
+                <button 
+                  onClick={contactWhatsApp}
+                  className="w-full py-4 bg-green-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-green-700 transition flex items-center justify-center gap-2 cursor-pointer border-none"
+                >
                   <MessageCircle className="w-4 h-4" /> Contact on WhatsApp
                 </button>
-                <button onClick={() => setShowConfirm(false)}
-                  className="w-full py-3 text-stone-500 text-[10px] font-bold uppercase tracking-widest hover:text-[#C5A059] transition">
+                <button 
+                  onClick={() => setShowConfirm(false)}
+                  className="w-full py-3 text-stone-500 text-[10px] font-bold uppercase tracking-widest hover:text-[#C5A059] transition cursor-pointer border-none bg-transparent"
+                >
                   Maybe Later
                 </button>
               </div>
@@ -316,15 +325,16 @@ const MembershipSection = () => {
             initial={{ opacity: 0, y: 50, x: "-50%" }}
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: 50, x: "-50%" }}
-            className={`fixed bottom-6 left-1/2 z-[200] px-6 py-4 rounded-2xl shadow-2xl font-bold text-sm max-w-md ${
+            /* ── ✅ FIXED: ELEVATED TOAST HIGHER THAN MODAL LEVEL INDEX FOR ABSOLUTE VISIBILITY ── */
+            className={`fixed bottom-6 left-1/2 z-[20000] px-6 py-4 rounded-2xl shadow-2xl font-bold text-sm max-w-md ${
               toast.type === "info"
                 ? "bg-blue-600 text-white"
                 : toast.type === "error"
                 ? "bg-red-600 text-white"
-                : "bg-[#3E362E] text-white border border-[#C5A059]/30 hover:shadow-[0_0_35px_rgba(197,160,89,0.18)]"
+                : "bg-[#3E362E] text-white border border-[#C5A059]/30 shadow-[0_10px_30px_rgba(197,160,89,0.15)]"
             }`}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 text-left">
               {toast.type === "info" ? (
                 <LogIn className="w-5 h-5 flex-shrink-0" />
               ) : toast.type === "error" ? (
