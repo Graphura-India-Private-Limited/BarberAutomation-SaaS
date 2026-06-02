@@ -4,7 +4,7 @@ import {
   CheckCircle, Clock, TrendingUp, XCircle, ChevronRight, Activity,
   Mail, Search, RefreshCw, Trash2
 } from 'lucide-react';
-import { StatCard, RecentTickets } from '../../Components/DashboardWidgets.jsx';
+import { StatCard, RecentTickets } from '../../components/admin/DashboardWidgets.jsx';
 import { getStats, TICKET_STATUS } from '../../utils/tickets.jsx';
 
 const GOLD = "#C5A059";

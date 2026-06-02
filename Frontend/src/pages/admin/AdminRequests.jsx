@@ -10,7 +10,7 @@ import {
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
-import { AdminGlobalStyles } from "../../Components/admin/AdminUIKit";
+import { AdminGlobalStyles } from "../../components/admin/AdminUIKit";
 import {
   CustomersModule, SalonsModule, BarbersModule, AddBarberModule, AppointmentsModule,
   ServicesModule, PaymentsModule, ReviewsModule, LiveMonitoringModule, SettingsModule,

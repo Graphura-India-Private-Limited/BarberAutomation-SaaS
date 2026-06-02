@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import MembershipSection from "../components/membership/MembershipSection";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
+import MembershipSection from "../../components/membership/MembershipSection";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
 import {
   Scissors, CalendarDays, Sparkles, User, Palette,
   Star, Menu, X, ChevronDown, MapPin, Clock, Phone,

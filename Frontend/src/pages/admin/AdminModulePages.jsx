@@ -16,7 +16,7 @@ import {
   usePagination,
   PAGE_SIZE,
   AdminPageShell, StatusBadge,
-} from "../../Components/admin/AdminUIKit";
+} from "../../components/admin/AdminUIKit";
 
 
 

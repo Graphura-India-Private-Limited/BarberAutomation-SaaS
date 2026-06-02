@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Modal, Button, Select } from './UIComponents.jsx'
 import { StatusBadge, PriorityBadge, TypeBadge } from './TicketBadges.jsx'
-import { formatDateTime } from '../utils/date.jsx'
-import { TICKET_STATUS, mockAgents } from '../utils/tickets.jsx'
+import { formatDateTime } from '../../utils/date.jsx'
+import { TICKET_STATUS, mockAgents } from '../../utils/tickets.jsx'
 import { User, Mail, Phone, Tag, Clock, MessageSquare, CheckCircle, AlertTriangle, XCircle, RefreshCw } from 'lucide-react'
 
 export function TicketDetailModal({ ticket, isOpen, onClose, onResolve, onEscalate, onCloseTicket, onReopen, onAssign, onAddNote }) {

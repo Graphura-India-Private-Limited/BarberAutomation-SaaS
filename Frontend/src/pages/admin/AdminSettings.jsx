@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Settings, Bell, Users, Shield, Globe, X, Check, UserPlus } from 'lucide-react'
-import { Button, Modal } from '../../Components/UIComponents.jsx'
+import { Button, Modal } from '../../components/admin/UIComponents.jsx'
 
 const DEFAULT_AGENTS = ['Rahul Verma', 'Sneha Kapoor', 'Arjun Singh', 'Pooja Nair']
 

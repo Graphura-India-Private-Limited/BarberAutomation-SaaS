@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { TicketFilters } from '../../Components/TicketFilters.jsx';
-import { TicketTable } from '../../Components/TicketTable.jsx';
-import { TicketDetailModal } from '../../Components/TicketDetailModal.jsx';
+import { TicketFilters } from '../../components/admin/TicketFilters.jsx';
+import { TicketTable } from '../../components/admin/TicketTable.jsx';
+import { TicketDetailModal } from '../../components/admin/TicketDetailModal.jsx';
 import { Inbox, Layers } from 'lucide-react';
 
 // ══ COLORS — identical to AdminOnboarding palette ══
