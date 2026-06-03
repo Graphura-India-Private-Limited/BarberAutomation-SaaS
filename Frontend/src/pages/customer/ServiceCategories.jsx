@@ -78,7 +78,6 @@ function CategoryCard({ cat, index, navigate }) {
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(32px)",
-        transition: `opacity 0.55s ease ${index * 120}ms, transform 0.55s ease ${index * 120}ms`,
         background: "#fff",
         borderRadius: 24,
         overflow: "hidden",
