@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Imported router redirection hook
+import { useNavigate } from "react-router-dom"; 
+import Navbar from "../../components/layout/Navbar";
+
 import {
   Users,
   Search,
@@ -80,50 +82,28 @@ export default function CustomerManagement() {
     "bg-white/80 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-5 md:p-6 shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_15px_30px_rgba(62,54,46,0.04)] transition-all duration-300 text-left";
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] font-sans text-[#3E362E] antialiased flex flex-col pb-24 relative overflow-hidden">
+    <>
+    <Navbar />
+ <div className="min-h-screen bg-[#FAF6F0] font-sans ... pt-24 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
       
       {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
       <div className="absolute top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
       <div className="absolute bottom-1/4 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
-
-      {/* ✂️ BARBER PRO GLOBAL EXECUTIVE HEADER BAR */}
-      <header className="bg-[#3E362E] border-b border-[#2A241F] px-6 md:px-8 py-4 flex items-center justify-between z-30 shadow-md mb-12">
-        <div className="flex items-center gap-5">
-          
-          {/* ── ✅ THE CHIP INJECTION: EXPEDITED REAR-FACING BACK NAVIGATION CONTROL BUTTON ── */}
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 hover:opacity-85 group text-white bg-white/10 px-3.5 py-2.5 rounded-xl border border-white/10 cursor-pointer select-none"
-          >
-            <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5 text-[#C5A059]" />
-            <span>Exit</span>
-          </button>
-
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#C5A059]/20 border border-[#C5A059]/40 flex items-center justify-center">
-              <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
-            </div>
-            <div className="text-left">
-              <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
-                BARBER <span className="text-white">PRO</span>
-              </h1>
-              <p className="text-[9px] text-stone-400 font-bold tracking-[0.3em] uppercase mt-1 leading-none">
-                Customer Intelligence
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="text-right hidden sm:block">
-          <div className="text-[10px] text-stone-400 uppercase font-black tracking-widest leading-none">CRM Registry</div>
-          <div className="text-xs text-white font-black mt-1 bg-white/10 px-3 py-1 rounded-md border border-white/5 inline-block">
-            Analytics Desk
-          </div>
-        </div>
-      </header>
+<div className="absolute top-6 left-6 z-[9999]"> {/* z-50 ऐवजी हे वापरून पहा */}
+<div className="fixed top-20 left-4 z-[60]"> 
+  
+  <button
+    onClick={() => navigate("/")}
+    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#3E362E] bg-white border border-[#EADDCA] px-4 py-2.5 rounded-xl shadow-lg grid-cols-1 md:grid-cols-2 xl:grid-cols-4"
+  >
+    <ArrowLeft size={12} className="text-[#C5A059]" />
+  </button>
+</div>
+</div>
+      
 
       {/* SUB-HEADER UTILITIES SECTION */}
-      <div className="max-w-7xl mx-auto w-full px-4 md:px-8 flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center mb-8 text-left z-10 relative">
+      <div className="max-w-7xl mx-auto w-full px-4 md:px-8 flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center mb-8 text-left z-10 relative ">
         <div>
           <span className="text-[9px] font-black uppercase tracking-[0.3em] text-[#C5A059] bg-[#C5A059]/10 px-2.5 py-1 rounded-md inline-block mb-1.5">
             Core Database Panel
@@ -304,10 +284,9 @@ export default function CustomerManagement() {
               ))}
           </div>
         </div>
-
-      </div>
-      
-      <Footer />
+      </div>   
     </div>
+          <Footer />
+    </>
   );
 }

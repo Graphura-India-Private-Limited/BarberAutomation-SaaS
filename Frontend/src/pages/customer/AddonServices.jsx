@@ -5,7 +5,7 @@ import Footer from "../../components/layout/Footer";
 
 /* ─── DATA ─────────────────────────────────────────────────── */
 const HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1519415943484-9fa1873496d4?w=1600&q=80",
+  "https://i.pinimg.com/1200x/c9/19/5b/c9195b3d76fedee86ae1031791d732cb.jpg",
   "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1600&q=80",
   "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?w=1600&q=80",
   "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1600&q=80",
@@ -58,7 +58,7 @@ const SERVICES = [
     rating: 4,
     reviews: 61,
     tag: null,
-    img: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=800",
+    img: "https://i.pinimg.com/736x/28/74/2e/28742e65243fd1b4edb58f71f49a7816.jpg",
   },
   {
     id: 5,
@@ -82,7 +82,7 @@ const SERVICES = [
     rating: 5,
     reviews: 42,
     tag: "Premium",
-    img: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=800",
+    img: "https://i.pinimg.com/736x/7b/1d/65/7b1d6536e7bc57c9c400d9c434a747fb.jpg",
   },
 ];
 
