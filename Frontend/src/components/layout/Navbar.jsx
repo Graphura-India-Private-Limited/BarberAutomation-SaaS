@@ -171,7 +171,7 @@ const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
                           <button
                             key={svc.path}
                             onClick={() => handleNav(svc.path)}
-                            className="w-full flex items-center gap-3.5 p-3 rounded-xl hover:bg-[#2A241F] transition-all group text-left border-none outline-none"
+                            className="w-full flex items-center gap-3.5 p-3 rounded-xl hover:bg-[#4A3728] transition-all group text-left border-none outline-none"
                           >
                             <div className="w-9 h-9 rounded-lg bg-[#3E362E] border border-stone-700/50 flex items-center justify-center text-[#C5A059] group-hover:bg-[#C5A059] group-hover:text-[#1E1A17] transition-all">
                               <svc.icon className="w-4 h-4" />
