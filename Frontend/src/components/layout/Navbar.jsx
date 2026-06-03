@@ -34,7 +34,8 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen]       = useState(false);
-  const [dropOpen, setDropOpen]       = useState(false);
+const [dropOpen, setDropOpen] = useState(false); // Desktop
+const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
   const [profileOpen, setProfileOpen] = useState(false);
   const [scrolled, setScrolled]       = useState(false);
   const [isLoggedIn, setIsLoggedIn]   = useState(false);
@@ -164,7 +165,7 @@ const Navbar = () => {
                   </button>
 
                   {dropOpen && (
-                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-72 rounded-3xl bg-[#1E1A17]/98 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden z-50 animate-fade-in">
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 w-72 rounded-3xl bg-[#2B2118] backdrop-blur-2xl border border-[#C5A059]/20 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden z-50 animate-fade-in">
                       <div className="p-2 space-y-0.5">
                         {SERVICE_LINKS.map((svc) => (
                           <button
@@ -338,8 +339,8 @@ const Navbar = () => {
       <div key={item.label}>
         <button
           onClick={() => {
-            if (item.hasDropdown) {
-              setDropOpen(!dropOpen);
+           if (item.hasDropdown) {
+  setMobileServicesOpen(!mobileServicesOpen);
             } else if (item.section) {
               handleSectionNav(item.section);
             } else if (item.path) {
@@ -359,19 +360,19 @@ const Navbar = () => {
           )}
         </button>
 
-        {item.hasDropdown && dropOpen && (
+       {item.hasDropdown && mobileServicesOpen && (
           <div className="bg-[#1E1A17]/50 py-1 px-2 mb-2 rounded-xl border border-stone-800/30">
             {SERVICE_LINKS.map((svc) => (
-              <button
-                key={svc.path}
-                onClick={() => handleNav(svc.path)}
-                className="w-full flex items-center gap-3 p-3 hover:bg-[#2A241F] rounded-lg transition-all text-left"
-              >
-                <svc.icon className="w-3.5 h-3.5 text-[#C5A059]" />
-                <span className="text-[10px] font-bold text-white uppercase tracking-wider">
-                  {svc.label}
-                </span>
-              </button>
+              <Link
+  to={svc.path}
+  onClick={() => setMenuOpen(false)}
+  className="w-full flex items-center gap-3 p-3 hover:bg-[#2A241F] rounded-lg transition-all text-left"
+>
+  <svc.icon className="w-3.5 h-3.5 text-[#C5A059]" />
+  <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+    {svc.label}
+  </span>
+</Link>
             ))}
           </div>
         )}
@@ -433,5 +434,3 @@ const Navbar = () => {
 );
  };
    export default Navbar;
-
-
