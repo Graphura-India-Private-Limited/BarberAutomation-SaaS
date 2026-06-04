@@ -28,7 +28,10 @@ const NAV_ITEMS = [
 ];
 
 const FEATURES = [
-  { title: "Signature Cuts",  Icon: Scissors, image: "https://i.pinimg.com/736x/82/c5/3d/82c53d8a1ea142d096daec6430eca0db.jpg", description: "Precision tailoring for the modern gentleman.",          path: "/customer/services/men" },
+ 
+ 
+   
+ { title: "Signature Cuts",  Icon: Scissors, image: "https://i.pinimg.com/736x/82/c5/3d/82c53d8a1ea142d096daec6430eca0db.jpg", description: "Precision tailoring for the modern gentleman.",          path: "/customer/look" },
   { title: "Luxury Styling",  Icon: Sparkles, image: "https://i.pinimg.com/736x/ab/00/ea/ab00ead61169995482cc7703115efda2.jpg", description: "Couture hair transformations for feminine silhouette.",  path: "/customer/services/women" },
   { title: "Beard Sculpture", Icon: User,     image: "https://i.pinimg.com/736x/70/66/7f/70667fddecd13bde2bac687c3a7fa5cd.jpg", description: "Architectural grooming for the masculine profile.",      path: "/customer/services/men" },
   { title: "Color Artistry",  Icon: Palette,  image: "https://i.pinimg.com/736x/96/36/06/9636062d461545f11d4e7c5c510b2481.jpg", description: "Bespoke color palettes for every hair texture.",         path: "/customer/services/women" },
@@ -493,7 +496,17 @@ useEffect(() => {
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                onClick={() => navigate(f.path)}
+                
+              onClick={() => {
+    if (f.title === "Signature Cuts") {
+      navigate("/customer/look", {
+      state: { gender: "women", service: { name: "Haircut & Styling", category: "women" }, barber: null }});
+      } else if (f.title === "Color Artistry") {
+         navigate("/customer/look", {state: { gender: "women", service: { name: "Color Artistry", category: "color" }, barber: null }});
+     } else {
+         navigate(f.path);
+         }
+        }}
                 className="group relative h-[360px] rounded-[30px] overflow-hidden border border-[#EADDCA] bg-white/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_rgba(197,160,89,0.18)] hover:border-[#C5A059]/50 cursor-pointer"
               >
                 <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent rotate-12 group-hover:left-[120%] transition-all duration-1000 z-20 pointer-events-none" />
