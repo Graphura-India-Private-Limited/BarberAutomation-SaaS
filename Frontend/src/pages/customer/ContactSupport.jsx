@@ -65,7 +65,7 @@ export default function ContactSupport() {
         {/* ── EXIT BACK NAVIGATION CAPSULE CHIP ── */}
         <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
           <button 
-            onClick={() => navigate("/")} 
+            onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")} 
             className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADBCE] shadow-md hover:bg-white cursor-pointer select-none"
           >
             <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1 text-[#C5A059]" />
@@ -167,7 +167,7 @@ export default function ContactSupport() {
                   <div className="pt-4">
                     <button
                       type="button"
-                      onClick={() => navigate("/")}
+                      onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
                       className="bg-[#3E362E] hover:bg-stone-900 text-white font-sans text-[10px] font-black uppercase tracking-widest px-8 py-3.5 rounded-xl transition-all shadow-xs cursor-pointer"
                     >
                       Back to Dashboard Overview

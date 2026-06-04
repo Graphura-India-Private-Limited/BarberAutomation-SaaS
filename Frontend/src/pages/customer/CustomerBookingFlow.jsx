@@ -217,12 +217,14 @@ export default function Wrapper() {
       time: null,
     });
     setCurrentStep(1);
-    navigate("/");
+    const token = localStorage.getItem("token");
+    navigate(token ? "/dashboard" : "/");
   };
 
   const handleHeaderBackAction = () => {
+    const token = localStorage.getItem("token");
     if (currentStep === 3) {
-      navigate("/");
+      navigate(token ? "/dashboard" : "/");
     } else if (currentStep === 4) {
       setCurrentStep(3);
     } else if (currentStep === 5) {

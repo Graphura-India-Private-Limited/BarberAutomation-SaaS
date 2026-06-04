@@ -329,7 +329,7 @@ export default function SmartQueue() {
     
     {/* ── ✅ THE CHIP INJECTION: PREMIUM RETRO GRADE EXIT TOGGLE BUTTON ── */}
     <button
-      onClick={() => navigate("/")}
+      onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
       className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 hover:opacity-85 group text-stone-800 bg-white px-3.5 py-2 rounded-xl border border-[#EADBCE] shadow-3xs cursor-pointer select-none mr-2"
     >
       <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5 text-[#C5A059]" />

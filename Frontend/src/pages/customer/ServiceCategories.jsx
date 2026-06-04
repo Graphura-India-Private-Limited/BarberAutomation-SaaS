@@ -204,7 +204,7 @@ export default function ServiceCategories() {
         {/* ── BACK BUTTON ── */}
         <div style={{ position: "fixed", top: 88, left: 20, zIndex: 9999 }}>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
             style={{
               width: 44, height: 44, borderRadius: "50%",
               border: "none",
