@@ -48,6 +48,8 @@ export default function BarberLogin() {
         localStorage.setItem("barberId",   data.barber?._id || "");
         localStorage.setItem("barberName", data.barber?.name || "");
         localStorage.setItem("salonId",    data.barber?.salon_id?._id || "");
+        localStorage.setItem("name",       data.barber?.name || "Barber");
+        localStorage.setItem("email",      data.barber?.email || "");
         setSuccess("Login successful! Redirecting to dashboard...");
         setTimeout(() => navigate("/barber/dashboard"), 1200);
       } else {

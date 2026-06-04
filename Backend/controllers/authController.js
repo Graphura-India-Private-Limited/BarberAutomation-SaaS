@@ -352,6 +352,9 @@ exports.loginOwner = async (req, res) => {
 // @access  Private (Owner)
 exports.getOwnerProfile = async (req, res) => {
   try {
+    if (req.user?.role !== "owner") {
+      return res.status(403).json({ success: false, message: "Owner access only" });
+    }
     const salon = await Salon.findById(req.user.id);
     if (!salon) return res.status(404).json({ success: false, message: "Not found" });
     res.json({ success: true, salon });

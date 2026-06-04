@@ -65,6 +65,8 @@ export default function OTPLogin() {
         localStorage.setItem("token",  data.token);
         localStorage.setItem("userId", data.user?._id || "");
         localStorage.setItem("role",   "customer");
+        localStorage.setItem("name",   data.user?.name || "Customer");
+        localStorage.setItem("email",  data.user?.email || "");
         navigate("/customerprofile");
       } else {
         setError(data.message || "Invalid OTP");

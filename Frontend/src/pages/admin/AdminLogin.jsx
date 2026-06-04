@@ -43,6 +43,8 @@ export default function AdminLogin() {
       if (data.success) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", "admin");
+        localStorage.setItem("name", "System Admin");
+        localStorage.setItem("email", "admin@barberpro.com");
         setSuccess("Access granted! Redirecting...");
         setTimeout(() => navigate("/admin/requests"), 1000);
       } else {

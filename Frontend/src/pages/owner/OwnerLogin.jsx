@@ -48,6 +48,8 @@ export default function OwnerLogin() {
         localStorage.setItem("role",      "owner");
         localStorage.setItem("salonId",   data.salon?._id || "");
         localStorage.setItem("salonName", data.salon?.salon_name || "");
+        localStorage.setItem("name",      data.salon?.owner_name || "Owner");
+        localStorage.setItem("email",     data.salon?.email || "");
         setSuccess("Welcome back! Redirecting to dashboard...");
         setTimeout(() => navigate("/owner/dashboard"), 1200);
       } else {

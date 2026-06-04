@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
-import Navbar from "../../components/layout/Navbar";
-import Footer from "../../components/layout/Footer";
+import Navbar from "../layout/Navbar";
+import Footer from "../layout/Footer";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const ScissorIcon = ({ className }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="6" cy="6" r="3" stroke="currentColor"/>
-    <circle cx="6" cy="18" r="3" stroke="currentColor"/>
-    <line x1="20" y1="4" x2="8.12" y2="15.88" stroke="currentColor"/>
-    <line x1="14.47" y1="14.48" x2="20" y2="20" stroke="currentColor"/>
-    <line x1="8.12" y1="8.12" x2="12" y2="12" stroke="currentColor"/>
+    <circle cx="6" cy="6" r="3" stroke="currentColor" />
+    <circle cx="6" cy="18" r="3" stroke="currentColor" />
+    <line x1="20" y1="4" x2="8.12" y2="15.88" stroke="currentColor" />
+    <line x1="14.47" y1="14.48" x2="20" y2="20" stroke="currentColor" />
+    <line x1="8.12" y1="8.12" x2="12" y2="12" stroke="currentColor" />
   </svg>
 );
 
@@ -21,18 +21,18 @@ const ReviewSystem = ({ bookingData }) => {
   const [searchParams] = useSearchParams();
 
   /* ── State ── */
-  const [salonRating,   setSalonRating]   = useState(0);
-  const [barberRating,  setBarberRating]  = useState(0);
-  const [salonHover,    setSalonHover]    = useState(0);
-  const [barberHover,   setBarberHover]   = useState(0);
-  const [reviewText,    setReviewText]    = useState("");
-  const [loading,       setLoading]       = useState(false);
-  const [submitted,     setSubmitted]     = useState(false);
-  const [error,         setError]         = useState("");
+  const [salonRating, setSalonRating] = useState(0);
+  const [barberRating, setBarberRating] = useState(0);
+  const [salonHover, setSalonHover] = useState(0);
+  const [barberHover, setBarberHover] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   /* ── Pull context from URL query params OR booking prop OR localStorage ── */
-  const salonId   = searchParams.get("salonId")   || bookingData?.salonId   || localStorage.getItem("lastSalonId")   || null;
-  const barberId  = searchParams.get("barberId")  || bookingData?.barberId  || localStorage.getItem("lastBarberId")  || null;
+  const salonId = searchParams.get("salonId") || bookingData?.salonId || localStorage.getItem("lastSalonId") || null;
+  const barberId = searchParams.get("barberId") || bookingData?.barberId || localStorage.getItem("lastBarberId") || null;
   const bookingId = searchParams.get("bookingId") || bookingData?.bookingId || null;
   const barberName = searchParams.get("barberName") || bookingData?.barberName || "Your Barber";
 
@@ -131,15 +131,15 @@ const ReviewSystem = ({ bookingData }) => {
   /* ── FORM ── */
   return (
     <div className="min-h-screen w-full bg-[#FAF7F2] font-sans text-stone-800 antialiased flex flex-col justify-between relative overflow-x-hidden">
-      
+
       <div>
         {/* ── GLOBAL NAVBAR HEADER ── */}
         <Navbar />
 
         {/* ── EXIT BACK BUTTON ── */}
         <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
-          <button 
-            onClick={() => navigate("/")} 
+          <button
+            onClick={() => navigate("/")}
             className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white transition-all duration-300 group cursor-pointer select-none"
           >
             <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1 text-[#C5A059]" />
@@ -269,7 +269,8 @@ const ReviewSystem = ({ bookingData }) => {
       <Footer />
 
       {/* Embedded Fade-In Keyframe Logic */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
       `}} />

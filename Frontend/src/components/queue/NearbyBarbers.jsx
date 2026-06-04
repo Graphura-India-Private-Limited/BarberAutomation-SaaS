@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Icons from "lucide-react";
-import Footer from "../../components/layout/Footer";
-import Navbar from "../../components/layout/Navbar";
+import Footer from "../layout/Footer";
+import Navbar from "../layout/Navbar";
 
 const NearbyBarbers = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const NearbyBarbers = () => {
   const Navigation = Icons.Navigation;
   const Star = Icons.Star;
   const Scissors = Icons.Scissors;
-  const ArrowLeft = Icons.ArrowLeft; 
+  const ArrowLeft = Icons.ArrowLeft;
 
 
   const handleGetLocation = () => {
@@ -37,7 +37,7 @@ const NearbyBarbers = () => {
         setLocation(coords);
         fetchNearbySalons(coords.lat, coords.lng);
       },
-  
+
       (err) => {
         console.error(err);
         setError("Location access denied. Please search manually.");
@@ -84,20 +84,20 @@ const NearbyBarbers = () => {
     <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-stone-800 antialiased overflow-x-hidden justify-between">
 
       <Navbar />
-    {/* ── FLOATING BACK BUTTON ── */}
-<div className="fixed top-24 left-5 z-[999]">
-  <button
-    type="button"
-    onClick={() => navigate(-1)}
-    className="group flex items-center gap-2 backdrop-blur-xl border border-[#C5A059]/20 hover:border-[#C5A059]/50 px-4 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:scale-105 active:scale-[0.98]"
-  >
-    <ArrowLeft
-      size={14}
-      className="text-[#C5A059] transition-transform duration-300 group-hover:-translate-x-1"
-    />
+      {/* ── FLOATING BACK BUTTON ── */}
+      <div className="fixed top-24 left-5 z-[999]">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="group flex items-center gap-2 backdrop-blur-xl border border-[#C5A059]/20 hover:border-[#C5A059]/50 px-4 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:scale-105 active:scale-[0.98]"
+        >
+          <ArrowLeft
+            size={14}
+            className="text-[#C5A059] transition-transform duration-300 group-hover:-translate-x-1"
+          />
 
-  </button>
-</div>
+        </button>
+      </div>
 
 
       {/* 🗺️ DISCOVERY MAP CONTENT VIEW CANVAS */}
