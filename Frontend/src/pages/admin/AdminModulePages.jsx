@@ -93,7 +93,14 @@ export function CustomersModule({ customers, loading, customerSearch, setCustome
                 <td className="px-6 py-4"><StatusPill active={active} /></td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 relative">
-                    <button type="button" className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}><Eye size={18} /></button>
+                    {/* <button type="button" className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}><Eye size={18} /></button> */}
+                    <button
+                      type="button"
+                      onClick={() => console.log(b)}
+                      className="p-2 rounded-md hover:bg-gray-50"
+                    >
+                      <Eye size={18} />
+                    </button>
                     <button type="button" onClick={() => setMenuOpenId(menuOpenId === customer._id ? null : customer._id)} className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}>
                       <MoreHorizontal size={18} />
                     </button>
@@ -251,7 +258,7 @@ export function SalonsModule({
                 <X size={18} />
               </button>
             </div>
-            
+
             <form onSubmit={async (e) => {
               e.preventDefault();
               if (!newSalon.salon_name || !newSalon.owner_name || !newSalon.mobile) {
@@ -287,7 +294,7 @@ export function SalonsModule({
                 });
               }
             }} className="space-y-5 overflow-y-auto flex-1 pr-2">
-              
+
               {/* SECTION 1: REQUIRED CONTACT DETAILS */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b" style={{ color: C.gold, borderColor: `${C.gold}30` }}>1. Core Contact Info (Required)</h4>
@@ -472,12 +479,46 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [menuId, setMenuId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // const filtered = barbers.filter((b) => {
+  //   if (!search) return true;
+  //   const q = search.toLowerCase();
+  //   return [b.name, b.email, b.mobile, b.specialization, b.salon_id?.salon_name]
+  //     .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+  // });
 
   const filtered = barbers.filter((b) => {
+
+    if (statusFilter !== "all") {
+
+      if (statusFilter === "active" && !barberActive(b))
+        return false;
+
+      if (statusFilter === "inactive" && barberActive(b))
+        return false;
+
+      if (
+        ["available", "busy", "offline"].includes(statusFilter) &&
+        b.status !== statusFilter
+      ) {
+        return false;
+      }
+    }
+
     if (!search) return true;
+
     const q = search.toLowerCase();
-    return [b.name, b.email, b.mobile, b.specialization, b.salon_id?.salon_name]
-      .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+
+    return [
+      b.name,
+      b.email,
+      b.mobile,
+      b.specialization,
+      b.salon_id?.salon_name
+    ]
+      .filter(Boolean)
+      .some((v) => String(v).toLowerCase().includes(q));
   });
 
   const activeCount = barbers.filter((b) => barberActive(b)).length;
@@ -486,6 +527,15 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
   const newMonth = barbers.filter((b) => isThisMonth(b.createdAt || b.created_at)).length;
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
+
+  const barberFilterOptions = [
+    { value: "all", label: "All Barbers" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+    { value: "available", label: "Available" },
+    { value: "busy", label: "Busy" },
+    { value: "offline", label: "Offline" }
+  ];
 
   const statCards = [
     { label: "Total Barbers", value: barbers.length, sub: "All barbers", subColor: C.gold, icon: UserSquare, iconBg: C.goldLight, iconColor: C.gold },
@@ -497,12 +547,29 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <ActionToolbar
+      {/* <ActionToolbar
         search={search}
         onSearchChange={(v) => { setSearch(v); setPage(1); }}
         placeholder="Search barbers..."
         addLabel="Add Barber"
         onAdd={() => onSetTab("addbarber")}
+      /> */}
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => {
+          setSearch(v);
+          setPage(1);
+        }}
+        placeholder="Search barbers..."
+        addLabel="Add Barber"
+        onAdd={() => onSetTab("addbarber")}
+
+        filterValue={statusFilter}
+        onFilterChange={(value) => {
+          setStatusFilter(value);
+          setPage(1);
+        }}
+        filterOptions={barberFilterOptions}
       />
       <AdminDataTable
         columns={["BARBER NAME", "EMAIL", "PHONE", "SPECIALTY", "EXPERIENCE", "STATUS", "ACTIONS"]}
@@ -649,14 +716,46 @@ export function AddBarberModule({ salons, newBarber, setNewBarber, addBarber, bu
 export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
   const pending = bookings.filter((b) => b.status === "pending").length;
+
+  const appointmentFilterOptions = [
+    { value: "all", label: "All Appointments" },
+    { value: "pending", label: "Pending" },
+    { value: "confirmed", label: "Confirmed" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" }
+  ];
   const completed = bookings.filter((b) => b.status === "completed").length;
 
+  // const filtered = bookings.filter((b) => {
+  //   if (!search) return true;
+  //   const q = search.toLowerCase();
+  //   return [b.customer_id?.name, b.barber_id?.name, b.salon_id?.salon_name, b.services?.[0]?.service_name]
+  //     .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+  // });
+
   const filtered = bookings.filter((b) => {
+
+    if (
+      statusFilter !== "all" &&
+      b.status?.toLowerCase() !== statusFilter.toLowerCase()
+    ) {
+      return false;
+    }
+
     if (!search) return true;
+
     const q = search.toLowerCase();
-    return [b.customer_id?.name, b.barber_id?.name, b.salon_id?.salon_name, b.services?.[0]?.service_name]
-      .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+
+    return [
+      b.customer_id?.name,
+      b.barber_id?.name,
+      b.salon_id?.salon_name,
+      b.services?.[0]?.service_name
+    ]
+      .filter(Boolean)
+      .some((v) => String(v).toLowerCase().includes(q));
   });
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
@@ -671,7 +770,23 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search appointments..." addLabel={null} />
+      {/* <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search appointments..." addLabel={null} /> */}
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => {
+          setSearch(v);
+          setPage(1);
+        }}
+        placeholder="Search appointments..."
+        addLabel={null}
+
+        filterValue={statusFilter}
+        onFilterChange={(value) => {
+          setStatusFilter(value);
+          setPage(1);
+        }}
+        filterOptions={appointmentFilterOptions}
+      />
       <AdminDataTable
         columns={["CUSTOMER", "SERVICE", "BARBER", "SALON", "DATE", "AMOUNT", "STATUS", "ACTIONS"]}
         loading={loading}
@@ -696,9 +811,46 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
               <td className="px-6 py-4"><StatusPill label={b.status} active={b.status === "completed"} /></td>
               <td className="px-6 py-4">
                 {b.status === "pending" && (
-                  <div className="flex gap-2">
-                    <button onClick={() => changeBookingStatus(b._id, "confirmed")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Confirm</button>
-                    <button onClick={() => changeBookingStatus(b._id, "cancelled")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Cancel</button>
+                  // <div className="flex gap-2">
+                  //   <button onClick={() => changeBookingStatus(b._id, "confirmed")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Confirm</button>
+                  //   <button onClick={() => changeBookingStatus(b._id, "cancelled")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Cancel</button>
+                  // </div>
+                  <div className="flex items-center gap-2">
+                    {/* <button
+                      type="button"
+                      onClick={() => changeBookingStatus(b._id, "confirmed")}
+                      className="px-3 py-1.5 rounded-full text-[11px] font-extrabold tracking-wider text-white shadow-sm transition-all hover:scale-105 hover:shadow-md"
+                      style={{
+                        background: "#16A34A"
+                      }}
+                    >
+                      ✓ CONFIRM
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => changeBookingStatus(b._id, "cancelled")}
+                      className="px-3 py-1.5 rounded-full text-[11px] font-extrabold tracking-wider text-white shadow-sm transition-all hover:scale-105 hover:shadow-md"
+                      style={{
+                        background: "#DC2626"
+                      }}
+                    >
+                      ✕ CANCEL
+                    </button> */}
+
+                    <button
+                      onClick={() => console.log("Confirmed", b._id)}
+                      className="px-2 py-1 rounded-full text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700"
+                    >
+                      Confirm
+                    </button>
+
+                    <button
+                      onClick={() => console.log("Cancelled", b._id)}
+                      className="px-2 py-1 rounded-full text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 )}
               </td>
@@ -713,19 +865,19 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
 
 /*----SERVICES----- */
 
-export function ServicesModule({ 
-  services = [], 
-  salons = [], 
-  loading, 
-  newService, 
-  setNewService, 
-  addService, 
-  toggleService, 
-  deleteService 
+export function ServicesModule({
+  services = [],
+  salons = [],
+  loading,
+  newService,
+  setNewService,
+  addService,
+  toggleService,
+  deleteService
 }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  
+
   // ── ✅ ACTIONS AND DROPDOWN DRAWER STATES ──
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -767,13 +919,13 @@ export function ServicesModule({
 
   const handleAddServiceWrapper = async () => {
     await addService();
-    setShowAddDrawer(false); 
+    setShowAddDrawer(false);
   };
 
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      
+
       {/* QUICK ADD EXTENSION PANEL ACCORDION DRAWER */}
       {showAddDrawer && (
         <div className="bg-white rounded-xl border p-5 card-shadow mb-6 animate-fadeIn text-left" style={{ borderColor: C.border }}>
@@ -797,12 +949,12 @@ export function ServicesModule({
       )}
 
       {/* GLOBAL MANAGEMENT ACTION TOOLBAR INTERFACE CONTROL */}
-      <ActionToolbar 
-        search={search} 
-        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
-        placeholder="Search services..." 
-        addLabel={showAddDrawer ? "✕ Close Panel" : "+ Add Service"} 
-        onAdd={() => setShowAddDrawer(!showAddDrawer)} 
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        placeholder="Search services..."
+        addLabel={showAddDrawer ? "✕ Close Panel" : "+ Add Service"}
+        onAdd={() => setShowAddDrawer(!showAddDrawer)}
         filterValue={categoryFilter}
         onFilterChange={(cat) => { setCategoryFilter(cat); setPage(1); }}
         filterOptions={serviceDropdownOptions} // ✅ FIXED: WIRES DOWN THE MOUNT OPTIONS
@@ -843,7 +995,7 @@ export function ServicesModule({
 export function PaymentsModule({ payments, loading }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  
+
   // ── ✅ STEP 1: ADD LOCAL PAYMENT STATUS FILTER STATE ──
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -883,14 +1035,14 @@ export function PaymentsModule({ payments, loading }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      
+
       {/* ── ✅ STEP 4: PASS CONFIGURATIONS DIRECTLY TO THE TOOLBAR COMPONENT ── */}
-      <ActionToolbar 
-        search={search} 
-        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
-        placeholder="Search payments..." 
-        addLabel={null} 
-        
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        placeholder="Search payments..."
+        addLabel={null}
+
         // Dynamic alignment wires:
         filterValue={statusFilter}
         onFilterChange={(status) => { setStatusFilter(status); setPage(1); }}
@@ -930,7 +1082,7 @@ export function PaymentsModule({ payments, loading }) {
 export function ReviewsModule({ reviews, loading, deleteReview }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  
+
   // ── ✅ STEP 1: ADD LOCAL RATING FILTER STATE ──
   const [ratingFilter, setRatingFilter] = useState("all");
 
@@ -976,14 +1128,14 @@ export function ReviewsModule({ reviews, loading, deleteReview }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      
+
       {/* ── ✅ STEP 4: PASS CONFIGURATIONS TO WIRED TOOLBAR PROPS ── */}
-      <ActionToolbar 
-        search={search} 
-        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
-        placeholder="Search reviews..." 
-        addLabel={null} 
-        
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        placeholder="Search reviews..."
+        addLabel={null}
+
         // Dynamic Wires:
         filterValue={ratingFilter}
         onFilterChange={(rating) => { setRatingFilter(rating); setPage(1); }}
