@@ -7,14 +7,34 @@ const ServiceHandler = () => {
   const [selectedGender, setSelectedGender] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
 
-  const serviceCatalog = [
-    { id: 's1', name: 'Premium Haircut', time: 30, price: '₹500', intensity: 70, bestBarber: "Amit", img: 'https://i.pinimg.com/736x/7e/7d/b6/7e7db69384f023cf935f954d09e5f5c3.jpg' },
-    { id: 's2', name: 'Beard Grooming', time: 15, price: '₹200', intensity: 40, bestBarber: "Vicky", img: 'https://i.pinimg.com/1200x/7f/c5/a2/7fc5a2bfa31be902b66a6049d8f4b890.jpg' },
-    { id: 's3', name: 'Face Clean-up', time: 20, price: '₹400', intensity: 30, bestBarber: "Rahul", img: 'https://i.pinimg.com/736x/f5/74/dc/f574dc0a7ae5e8937e0d923b95fdbfa4.jpg' },
-    { id: 's5', name: 'Signature Styling', time: 25, price: '₹600', intensity: 80, bestBarber: "Sahil", img: 'https://i.pinimg.com/736x/c4/af/f7/c4aff7cfc65e4a207eb6d58bbfdb37a2.jpg' },
-    { id: 's6', name: 'Head Massage & Spa', time: 40, price: '₹700', intensity: 50, bestBarber: "Sameer", img: 'https://i.pinimg.com/736x/24/0f/56/240f567877004691c5f56df55ab368d2.jpg' },
-    { id: 's4', name: 'Full Grooming Combo', time: 50, price: '₹800', intensity: 95, bestBarber: "Asif", img: 'https://i.pinimg.com/1200x/69/03/4b/69034b21f1c6a462bc242526af9455bd.jpg' },
-  ];
+  // const serviceCatalog = [
+  //   { id: 's1', name: 'Premium Haircut', time: 30, price: '₹500', intensity: 70, bestBarber: "Amit", img: 'https://i.pinimg.com/736x/7e/7d/b6/7e7db69384f023cf935f954d09e5f5c3.jpg' },
+  //   { id: 's2', name: 'Beard Grooming', time: 15, price: '₹200', intensity: 40, bestBarber: "Vicky", img: 'https://i.pinimg.com/1200x/7f/c5/a2/7fc5a2bfa31be902b66a6049d8f4b890.jpg' },
+  //   { id: 's3', name: 'Face Clean-up', time: 20, price: '₹400', intensity: 30, bestBarber: "Rahul", img: 'https://i.pinimg.com/736x/f5/74/dc/f574dc0a7ae5e8937e0d923b95fdbfa4.jpg' },
+  //   { id: 's5', name: 'Signature Styling', time: 25, price: '₹600', intensity: 80, bestBarber: "Sahil", img: 'https://i.pinimg.com/736x/c4/af/f7/c4aff7cfc65e4a207eb6d58bbfdb37a2.jpg' },
+  //   { id: 's6', name: 'Head Massage & Spa', time: 40, price: '₹700', intensity: 50, bestBarber: "Sameer", img: 'https://i.pinimg.com/736x/24/0f/56/240f567877004691c5f56df55ab368d2.jpg' },
+  //   { id: 's4', name: 'Full Grooming Combo', time: 50, price: '₹800', intensity: 95, bestBarber: "Asif", img: 'https://i.pinimg.com/1200x/69/03/4b/69034b21f1c6a462bc242526af9455bd.jpg' },
+  // ];
+
+  const serviceCatalog = {
+    Gentlemen: [
+      { id: 'g1', name: 'Premium Haircut', time: 30, price: '₹500', bestBarber: 'Amit', img: 'https://i.pinimg.com/736x/7e/7d/b6/7e7db69384f023cf935f954d09e5f5c3.jpg' },
+      { id: 'g2', name: 'Beard Grooming', time: 15, price: '₹200', bestBarber: 'Vicky', img: 'https://i.pinimg.com/1200x/7f/c5/a2/7fc5a2bfa31be902b66a6049d8f4b890.jpg' }
+    ],
+
+    Ladies: [
+      { id: 'l1', name: 'Hair Spa', time: 45, price: '₹800', bestBarber: 'Riya', img: 'https://i.pinimg.com/736x/f5/74/dc/f574dc0a7ae5e8937e0d923b95fdbfa4.jpg' },
+      { id: 'l2', name: 'Hair Coloring', time: 60, price: '₹1200', bestBarber: 'Neha', img: 'https://i.pinimg.com/736x/c4/af/f7/c4aff7cfc65e4a207eb6d58bbfdb37a2.jpg' }
+    ],
+
+    "Senior Master": [
+      { id: 'sm1', name: 'Signature Styling', time: 50, price: '₹1500', bestBarber: 'Asif', img: 'https://i.pinimg.com/1200x/69/03/4b/69034b21f1c6a462bc242526af9455bd.jpg' }
+    ],
+
+    "Kids Specialist": [
+      { id: 'k1', name: 'Kids Haircut', time: 20, price: '₹250', bestBarber: 'Sameer', img: 'https://i.pinimg.com/736x/24/0f/56/240f567877004691c5f56df55ab368d2.jpg' }
+    ]
+  };
 
   const expertCategories = [
     { id: 'gent', title: 'Gentlemen', sub: 'Classic & Modern Cuts', img: 'https://i.pinimg.com/736x/44/75/cf/4475cf227f367f74d7dfe6d7e3a64086.jpg' },
@@ -29,32 +49,32 @@ const ServiceHandler = () => {
     return finishTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   const handleConfirmSelection = () => {
-  if (!selectedService) return;
-  
-  // 🚀 Connect this to your database, local context pipeline, or router navigate:
-  alert(`Successfully confirmed ${selectedService.name} with ${selectedService.bestBarber}!`);
-  
-  // Example: Navigate to the final checkout or checkout log page
-  // navigate('/checkout', { state: { service: selectedService } });
-};
+    if (!selectedService) return;
 
- return (
+    // 🚀 Connect this to your database, local context pipeline, or router navigate:
+    alert(`Successfully confirmed ${selectedService.name} with ${selectedService.bestBarber}!`);
+
+    // Example: Navigate to the final checkout or checkout log page
+    // navigate('/checkout', { state: { service: selectedService } });
+  };
+
+  return (
     <div className="min-h-screen w-full bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden">
-      
+
       {/* ✂️ GLOBAL EXECUTIVE SYSTEM NAVIGATION HEADER */}
-      <Header 
-        title={step === 1 ? "Choose Expert" : "Select Treatment"} 
-        subtitle={step === 1 ? "Top-rated professionals for every style" : `Specialists available for ${selectedGender}`} 
+      <Header
+        title={step === 1 ? "Choose Expert" : "Select Treatment"}
+        subtitle={step === 1 ? "Top-rated professionals for every style" : `Specialists available for ${selectedGender}`}
       />
 
       <main className="max-w-6xl mx-auto w-full px-6 py-12 flex-grow relative flex flex-col justify-start">
-        
+
         {/* 🧭 Back Button Control */}
         {step === 2 && (
           <div className="w-full text-left mb-6">
-            <button 
+            <button
               type="button"
-              onClick={() => { setStep(1); setSelectedService(null); }} 
+              onClick={() => { setStep(1); setSelectedService(null); }}
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer"
             >
               <ArrowLeft size={14} className="stroke-[2.5px]" /> Return to Experts
@@ -81,16 +101,16 @@ const ServiceHandler = () => {
         {step === 1 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
             {expertCategories.map((cat) => (
-              <div 
+              <div
                 key={cat.id}
                 onClick={() => { setSelectedGender(cat.title); setStep(2); }}
                 className="group cursor-pointer relative overflow-hidden rounded-[2rem] bg-white border border-stone-200/60 shadow-3xs hover:shadow-xl hover:border-stone-400 transition-all duration-500 flex flex-col"
               >
                 <div className="h-64 overflow-hidden relative bg-stone-100 flex-shrink-0">
-                  <img 
-                    src={cat.img} 
-                    alt={cat.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                  <img
+                    src={cat.img}
+                    alt={cat.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent mix-blend-multiply opacity-60" />
                 </div>
@@ -109,22 +129,21 @@ const ServiceHandler = () => {
         {step === 2 && (
           <div className="w-full space-y-8 text-left">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {serviceCatalog.map((service) => (
+             {serviceCatalog[selectedGender]?.map((service) => (
                 <div
                   key={service.id}
                   onClick={() => setSelectedService(service)}
-                  className={`relative cursor-pointer p-4 rounded-[2rem] border-2 transition-all duration-300 group flex flex-col bg-white ${
-                    selectedService?.id === service.id 
-                      ? 'border-[#3E362E] shadow-md scale-[1.01]' 
+                  className={`relative cursor-pointer p-4 rounded-[2rem] border-2 transition-all duration-300 group flex flex-col bg-white ${selectedService?.id === service.id
+                      ? 'border-[#3E362E] shadow-md scale-[1.01]'
                       : 'border-stone-200/60 shadow-3xs hover:border-stone-400'
-                  }`}
+                    }`}
                 >
                   <div className="flex flex-col gap-4 flex-1">
                     <div className="w-full aspect-video rounded-xl overflow-hidden relative bg-stone-100 border border-stone-100 flex-shrink-0">
-                      <img 
-                        src={service.img} 
-                        alt={service.name} 
-                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700" 
+                      <img
+                        src={service.img}
+                        alt={service.name}
+                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700"
                       />
                     </div>
                     <div className="flex flex-col flex-grow justify-between">
@@ -163,15 +182,15 @@ const ServiceHandler = () => {
                     </div>
                   </div>
 
-                  
-                  <button 
+
+                  <button
                     type="button"
                     onClick={handleConfirmSelection}
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md cursor-pointer group active:scale-[0.99]"
-                     >
-  <span>Confirm Selection</span>
-  <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform stroke-[2.5px]" />
-</button>
+                  >
+                    <span>Confirm Selection</span>
+                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform stroke-[2.5px]" />
+                  </button>
                 </div>
               ) : (
                 <div className="w-full text-center py-10 border border-dashed border-stone-300 rounded-[2rem] bg-white/40">
