@@ -1,7 +1,21 @@
+import React, { useState } from 'react'
+import { 
+  Bell, 
+  Search, 
+  LayoutDashboard, 
+  Ticket, 
+  Users, 
+  BarChart2, 
+  Settings, 
+  HeadphonesIcon, 
+  LogOut, 
+  ChevronDown,
+  User,
+  ShieldAlert,
+  History
+} from 'lucide-react'
 
-import { Bell, Search, LayoutDashboard, Ticket, Users, BarChart2, Settings, HeadphonesIcon, LogOut, ChevronDown } from 'lucide-react'
-
-// ══ COLORS — identical to AdminOnboarding palette ══
+// ══ COLORS ══
 const C = {
   bg: "#FAF6F0",
   bg2: "#FFFFFF",
@@ -35,14 +49,17 @@ const NAV_ITEMS = [
   { icon: Settings,        label: 'Settings',        page: 'settings' },
 ]
 
-export function Header({ activePage, unreadCount = 0, onBellClick, onAdminClick, onRefresh, loading }) {
+// Added setActivePage and onSignOut to the Header props
+export function Header({ activePage, setActivePage, unreadCount = 0, onBellClick, onSignOut }) {
   const { title, subtitle } = PAGE_TITLES[activePage] || PAGE_TITLES.dashboard
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     <header style={{
       background: C.bg,
       borderBottom: `1px solid ${C.border}`,
       padding: "48px 32px 0",
+      position: "relative",
     }}>
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: 24 }}>
         {/* Title */}
@@ -97,28 +114,134 @@ export function Header({ activePage, unreadCount = 0, onBellClick, onAdminClick,
             )}
           </button>
 
-          {/* Admin avatar */}
-          <button
-            type="button"
-            onClick={onAdminClick}
-            style={{
-              display: "flex", alignItems: "center", gap: 10,
-              paddingLeft: 16, borderLeft: `1px solid ${C.border}`, cursor: "pointer",
-              background: "transparent", border: "none", color: "inherit",
-            }}
-          >
-            <div style={{
-              width: 36, height: 36, borderRadius: "50%",
-              background: "#D1BFA5", display: "flex", alignItems: "center",
-              justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff",
-            }}>
-              AD
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>Admin</span>
-              <ChevronDown size={13} color={C.muted} />
-            </div>
-          </button>
+          {/* Admin Avatar Container */}
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              style={{
+                display: "flex", alignItems: "center", gap: 10,
+                paddingLeft: 16, borderLeft: `1px solid ${C.border}`, cursor: "pointer",
+                background: "transparent", border: "none", color: "inherit",
+              }}
+            >
+              <div style={{
+                width: 36, height: 36, borderRadius: "50%",
+                background: "#D1BFA5", display: "flex", alignItems: "center",
+                justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff",
+              }}>
+                AD
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>Admin</span>
+                <ChevronDown 
+                  size={13} 
+                  color={C.muted} 
+                  style={{ 
+                    transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)", 
+                    transition: "transform 0.2s ease" 
+                  }} 
+                />
+              </div>
+            </button>
+
+            {/* Dropdown panel overlay */}
+            {dropdownOpen && (
+              <>
+                <div 
+                  onClick={() => setDropdownOpen(false)} 
+                  style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
+                />
+                
+                <div style={{
+                  position: "absolute",
+                  top: "calc(100% + 12px)",
+                  right: 0,
+                  width: 240,
+                  background: C.bg2,
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  boxShadow: "0 10px 25px -5px rgba(28, 25, 23, 0.08), 0 8px 10px -6px rgba(28, 25, 23, 0.04)",
+                  padding: "8px 0",
+                  zIndex: 999,
+                  display: "flex",
+                  flexDirection: "column",
+                }}>
+                  <div style={{ padding: "8px 16px 4px", fontSize: 9, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+                    Account Details
+                  </div>
+
+                  {/* Profile Option -> switches view to Settings tab */}
+                  <button
+                    type="button"
+                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('settings'); }}
+                    style={dropdownItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <User size={15} color={C.gold} />
+                    <span style={{ fontWeight: 500, color: C.ink }}>Admin Settings</span>
+                  </button>
+
+                  <div style={{ height: 1, background: C.border, margin: "6px 0" }} />
+
+                  <div style={{ padding: "4px 16px 4px", fontSize: 9, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+                    Escalation Quick links
+                  </div>
+
+                  {/* Dashboard Shortcut */}
+                  <button
+                    type="button"
+                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('dashboard'); }}
+                    style={dropdownItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <LayoutDashboard size={15} color={C.gold} />
+                    <span style={{ fontWeight: 500, color: C.ink }}>SLA Breach Center</span>
+                  </button>
+
+                  {/* Customer Issues Shortcut */}
+                  <button
+                    type="button"
+                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('customer'); }}
+                    style={dropdownItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <Users size={15} color={C.gold} />
+                    <span style={{ fontWeight: 500, color: C.ink }}>Customer Approvals</span>
+                  </button>
+
+                  {/* Reports Shortcut */}
+                  <button
+                    type="button"
+                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('reports'); }}
+                    style={dropdownItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <BarChart2 size={15} color={C.gold} />
+                    <span style={{ fontWeight: 500, color: C.ink }}>System Audit Ledger</span>
+                  </button>
+
+                  <div style={{ height: 1, background: C.border, margin: "6px 0" }} />
+
+                  {/* Sign Out Console */}
+                  <button
+                    type="button"
+                    onClick={() => { setDropdownOpen(false); if(onSignOut) onSignOut(); }}
+                    style={dropdownItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = C.redLight; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <LogOut size={15} color={C.red} />
+                    <span style={{ fontWeight: 600, color: C.red }}>Sign Out Console</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -128,7 +251,7 @@ export function Header({ activePage, unreadCount = 0, onBellClick, onAdminClick,
   )
 }
 
-export function Sidebar({ activePage, setActivePage }) {
+export function Sidebar({ activePage, setActivePage, onSignOut }) {
   return (
     <aside style={{
       width: 256, background: C.sidebar, display: "flex", flexDirection: "column",
@@ -190,11 +313,11 @@ export function Sidebar({ activePage, setActivePage }) {
         })}
       </nav>
 
-      {/* Footer */}
+      {/* Footer Sign Out */}
       <div style={{ padding: 16, borderTop: `1px solid ${C.border}` }}>
         <button
           className="logout-btn"
-          onClick={() => {}}
+          onClick={onSignOut}
           style={{
             display: "flex", alignItems: "center", gap: 10, width: "100%",
             padding: "10px 12px", borderRadius: 8, background: "transparent",
@@ -209,3 +332,18 @@ export function Sidebar({ activePage, setActivePage }) {
     </aside>
   )
 }
+
+const dropdownItemStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  width: "100%",
+  padding: "10px 16px",
+  background: "transparent",
+  border: "none",
+  textAlign: "left",
+  fontSize: 13,
+  cursor: "pointer",
+  transition: "background 0.12s ease",
+  fontFamily: "inherit"
+};

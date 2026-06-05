@@ -69,9 +69,11 @@ export default function Login() {
         localStorage.setItem("role",   "customer");
         localStorage.setItem("name",   data.user?.name || "Customer");
         localStorage.setItem("email",  data.user?.email || "");
+
         if (data.user?.name) {
           localStorage.setItem("userName", data.user.name);
         }
+
         navigate("/");
       } else setError(data.message || "Invalid OTP");
     } catch { setError("Server error!"); }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { 
-  Scissors, Plus, ToggleLeft, ToggleRight, Sparkles, 
-  Clock, DollarSign, Layers, PlusCircle, Search, Edit2, Menu, Bell 
+import {
+  Scissors, Plus, ToggleLeft, ToggleRight, Sparkles,
+  Clock, DollarSign, Layers, PlusCircle, Search, Edit2, Menu, Bell
 } from "lucide-react";
 
 const GOLD = "#C5A059";
@@ -21,13 +21,38 @@ export default function BarberServices() {
   const [services, setServices] = useState(INITIAL_SERVICES);
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [selectedService, setSelectedService] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    price: "",
+    duration: "",
+    category: ""
+  });
+
   // Header States
   const [sideOpen, setSideOpen] = useState(false);
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
   const toggleServiceStatus = (id) => {
     setServices(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
+  };
+
+  const saveServiceChanges = () => {
+    setServices(prev =>
+      prev.map(service =>
+        service.id === selectedService.id
+          ? {
+            ...service,
+            name: editForm.name,
+            price: Number(editForm.price),
+            duration: editForm.duration,
+            category: editForm.category
+          }
+          : service
+      )
+    );
+
+    setSelectedService(null);
   };
 
   const filteredServices = services.filter(svc => {
@@ -38,7 +63,7 @@ export default function BarberServices() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
-      
+
       {/* Header */}
       <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -60,7 +85,7 @@ export default function BarberServices() {
 
       <div>
         <main className="max-w-6xl mx-auto w-full px-5 py-10 text-left">
-          
+
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
             <div>
               <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
@@ -82,7 +107,7 @@ export default function BarberServices() {
           <div className="bg-white border border-stone-200/80 rounded-2xl p-5 mb-6 shadow-3xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="relative flex items-center flex-1 max-w-md">
               <Search size={15} className="absolute left-3.5 text-stone-400" />
-              <input 
+              <input
                 type="text"
                 placeholder="Search catalog services or add-on filters..."
                 value={searchQuery}
@@ -100,11 +125,10 @@ export default function BarberServices() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveCategory(tab.id)}
-                  className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${
-                    activeCategory === tab.id 
-                      ? "text-white shadow-xs" 
-                      : "bg-stone-50 text-stone-500 border border-stone-200/60 hover:border-stone-400 hover:text-stone-800"
-                  }`}
+                  className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${activeCategory === tab.id
+                    ? "text-white shadow-xs"
+                    : "bg-stone-50 text-stone-500 border border-stone-200/60 hover:border-stone-400 hover:text-stone-800"
+                    }`}
                   style={{ backgroundColor: activeCategory === tab.id ? CHARCOAL : "" }}
                 >
                   {tab.label}
@@ -120,11 +144,10 @@ export default function BarberServices() {
               </div>
             ) : (
               filteredServices.map(svc => (
-                <div 
-                  key={svc.id} 
-                  className={`card p-6 bg-white flex flex-col justify-between shadow-2xs hover:shadow-md transition-all border relative overflow-hidden ${
-                    !svc.active ? "opacity-60 grayscale-[30%] border-stone-200" : "border-stone-200/60"
-                  }`}
+                <div
+                  key={svc.id}
+                  className={`card p-6 bg-white flex flex-col justify-between shadow-2xs hover:shadow-md transition-all border relative overflow-hidden ${!svc.active ? "opacity-60 grayscale-[30%] border-stone-200" : "border-stone-200/60"
+                    }`}
                 >
                   {svc.active && svc.popular && (
                     <div className="absolute top-0 right-0">
@@ -143,11 +166,11 @@ export default function BarberServices() {
                         {svc.category} Segment
                       </span>
                     </div>
-                    
+
                     <h3 className="text-lg font-extrabold text-stone-900 tracking-tight leading-snug pt-1">
                       {svc.name}
                     </h3>
-                    
+
                     <div className="flex items-center gap-4 pt-1.5 text-stone-500 text-xs font-bold">
                       <span className="flex items-center gap-1">
                         <Clock size={12} className="text-stone-400" /> {svc.duration}
@@ -159,7 +182,25 @@ export default function BarberServices() {
                   </div>
 
                   <div className="flex items-center justify-between pt-5 mt-5 border-t border-stone-50">
-                    <button type="button" className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1">
+                    {/* <button type="button" className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1">
+                      <Edit2 size={11} /> Modify
+                    </button> */}
+
+                    <button
+                      type="button"
+                      // onClick={() => setSelectedService(svc)}
+                      onClick={() => {
+                        setSelectedService(svc);
+
+                        setEditForm({
+                          name: svc.name,
+                          price: svc.price,
+                          duration: svc.duration,
+                          category: svc.category
+                        });
+                      }}
+                      className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1"
+                    >
                       <Edit2 size={11} /> Modify
                     </button>
 
@@ -167,8 +208,8 @@ export default function BarberServices() {
                       <span className={`text-[9px] font-black uppercase tracking-wider ${svc.active ? "text-emerald-600" : "text-stone-400"}`}>
                         {svc.active ? "Bookable" : "Paused"}
                       </span>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => toggleServiceStatus(svc.id)}
                         className="text-stone-400 hover:text-stone-900 transition-colors focus:outline-none cursor-pointer"
                       >
@@ -186,6 +227,74 @@ export default function BarberServices() {
           </div>
         </main>
       </div>
+
+      {selectedService && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-2xl w-[400px] shadow-xl">
+            <h2 className="text-xl font-bold mb-4">
+              {selectedService.name}
+            </h2>
+
+            {/* <p>Price: ₹{selectedService.price}</p>
+            <p>Duration: {selectedService.duration}</p>
+            <p>Category: {selectedService.category}</p> */}
+
+            <div className="space-y-3 mt-4">
+
+              <input
+                value={editForm.name}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, name: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+                placeholder="Service Name"
+              />
+
+              <input
+                value={editForm.price}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, price: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+                placeholder="Price"
+              />
+
+              <input
+                value={editForm.duration}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, duration: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+                placeholder="Duration"
+              />
+
+              <input
+                value={editForm.category}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, category: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+                placeholder="Category"
+              />
+
+            </div>
+
+            <button
+              onClick={saveServiceChanges}
+              className="mt-4 mr-2 px-4 py-2 bg-[#C5A059] text-white rounded-lg"
+            >
+              Save Changes
+            </button>
+
+            <button
+              onClick={() => setSelectedService(null)}
+              className="mt-4 px-4 py-2 bg-black text-white rounded-lg"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

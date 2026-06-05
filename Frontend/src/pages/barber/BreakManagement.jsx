@@ -32,6 +32,26 @@ export default function BreakManagement() {
     setLunchStart(''); setLunchEnd('');
   };
 
+  const handleApprove = (id) => {
+    setBreakRequests(prev =>
+      prev.map(req =>
+        req.id === id
+          ? { ...req, status: "approved" }
+          : req
+      )
+    );
+  };
+
+  const handleReject = (id) => {
+    setBreakRequests(prev =>
+      prev.map(req =>
+        req.id === id
+          ? { ...req, status: "rejected" }
+          : req
+      )
+    );
+  };
+
   const getStatusBadge = (status) => {
     return status === 'Approved' ? (
       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-lg">
@@ -48,7 +68,7 @@ export default function BreakManagement() {
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased">
-      
+
       {/* हेडर सेक्शन */}
       <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -68,7 +88,7 @@ export default function BreakManagement() {
         </div>
       </header>
       <main className="max-w-5xl mx-auto w-full py-10">
-        
+
         {/* HEADER */}
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
           <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">Break <span className="text-[#C5A059]">Management</span></h1>
@@ -76,7 +96,7 @@ export default function BreakManagement() {
 
         {/* 3-GRID LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
+
           {/* LUNCH & LONG BREAK FORMS */}
           <div className="lg:col-span-2 space-y-8">
             {/* LUNCH FORM */}
@@ -103,15 +123,39 @@ export default function BreakManagement() {
                 <div key={r.id} className="bg-[#FDFBF7]/60 p-3 rounded-xl border border-[#E6D5C3]/50">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <p className="text-[#4A3E3D] font-black text-sm font-serif">{r.name}</p>
-                    <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full border ${r.status === "pending" ? "text-amber-800 bg-amber-50" : "text-emerald-800 bg-emerald-50"}`}>{r.status}</span>
+                    {/* <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-full border ${r.status === "pending" ? "text-amber-800 bg-amber-50" : "text-emerald-800 bg-emerald-50"}`}>{r.status}</span> */}
+                    <span
+                      className={`text-[9px] font-black uppercase px-2 py-1 rounded-full border ${r.status === "pending"
+                          ? "text-amber-800 bg-amber-50"
+                          : r.status === "approved"
+                            ? "text-emerald-800 bg-emerald-50"
+                            : "text-red-800 bg-red-50"
+                        }`}
+                    >
+                      {r.status}
+                    </span>
                   </div>
                   <p className="text-[11px] mb-0.5 text-stone-500 flex items-center gap-1">
                     <Coffee className="w-3 h-3 text-[#8B5A2B]" /> {r.type} · {r.time} ({r.duration})
                   </p>
                   {r.status === "pending" && (
                     <div className="flex gap-2 mt-2.5">
-                      <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-white bg-emerald-700">Approve</button>
-                      <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-red-700 bg-red-50 border border-red-200">Reject</button>
+                      {/* <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-white bg-emerald-700">Approve</button> */}
+
+                      <button
+                        onClick={() => handleApprove(r.id)}
+                        className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-white bg-emerald-700"
+                      >
+                        Approve
+                      </button>
+                      {/* <button className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-red-700 bg-red-50 border border-red-200">Reject</button> */}
+
+                      <button
+                        onClick={() => handleReject(r.id)}
+                        className="flex-1 py-1.5 rounded-lg text-[10px] font-black text-red-700 bg-red-50 border border-red-200"
+                      >
+                        Reject
+                      </button>
                     </div>
                   )}
                 </div>
