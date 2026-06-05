@@ -579,7 +579,7 @@ useEffect(() => {
 
           <div className="text-center mt-14">
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/customer/services")}
               className="inline-flex items-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase text-[11px] tracking-[0.22em] hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               Get Started Now <ArrowRight className="w-4 h-4" />
