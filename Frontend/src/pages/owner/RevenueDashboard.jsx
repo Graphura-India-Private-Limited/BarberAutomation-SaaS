@@ -122,7 +122,7 @@ export default function RevenueDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex font-sans text-stone-800 selection:bg-amber-100" style={{ background: "#FAF6F0" }}>
+    <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
@@ -149,97 +149,8 @@ export default function RevenueDashboard() {
         }
       `}</style>
 
-      {/* ── SIDEBAR NAVIGATION (Rule 4 Text Styles Configured) ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
-        <div className="space-y-8">
-          <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
-              <Scissors size={18} color="#C5A059" strokeWidth={2} />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
-              {/* Rule 2 tag label standard */}
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
-            </div>
-          </div>
-
-          <nav className="space-y-1">
-            {/* Rule 4 UI Layout Link elements */}
-            <button 
-              onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <LayoutDashboard size={18} className={window.location.pathname === "/owner/dashboard" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Console Home</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <Scissors size={18} className={window.location.pathname === "/owner/manage-services" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Barbers & Services</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <BarChart2 size={18} className={window.location.pathname === "/owner/dashboard/analytics" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Analytics Metrics</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <CreditCard size={18} className={window.location.pathname === "/owner/payments" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Payment Gateway</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <DollarSign size={18} className={window.location.pathname === "/owner/revenue" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Revenue Stream</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Rule 4 Standard Exit configuration */}
-        <button 
-          onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
-        >
-          <LogOut size={18} className="text-red-400" />
-          <span>Exit Workspace</span>
-        </button>
-      </aside>
-
       {/* ── MAIN CONTENT WORKSPACE ── */}
-      <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
-        <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto">
           
           {/* TIMING CONTROL METADATA BANNER */}
           <div className="flex justify-end items-center gap-6 mb-4 font-sans text-left">
@@ -319,7 +230,6 @@ export default function RevenueDashboard() {
             </>
           )}
         </div>
-      </main>
     </div>
   );
 }
@@ -372,69 +282,197 @@ function ChartPanel({ title, subtitle, children, className = "" }) {
 }
 
 function LineChart({ data }) {
+  const [hoveredIdx, setHoveredIdx] = useState(null);
   const width = 720;
   const height = 260;
   const pad = 28;
+
   const max = Math.max(...data.map(item => item.revenue || 0), 1);
   const points = data.map((item, index) => {
     const x = pad + (index * (width - pad * 2)) / Math.max(data.length - 1, 1);
     const y = height - pad - ((item.revenue || 0) / max) * (height - pad * 2);
-    return `${x},${y}`;
+    return { x, y, date: item.date, revenue: item.revenue };
   });
+  const pointsStr = points.map(p => `${p.x},${p.y}`).join(" ");
+  const rectWidth = (width - pad * 2) / Math.max(data.length - 1, 1);
 
   if (!data.length) return <EmptyChart label="No revenue trend data" />;
   return (
-    <div className="overflow-x-auto custom-scrollbar font-sans">
+    <div className="relative overflow-x-auto custom-scrollbar font-sans">
       <svg viewBox={`0 0 ${width} ${height}`} className="h-72 min-w-[640px] mx-auto overflow-visible">
         {[0, 1, 2, 3].map(i => <line key={i} x1={pad} x2={width - pad} y1={pad + i * 58} y2={pad + i * 58} stroke="#EADBCE" strokeDasharray="4,2" opacity="0.6" />)}
-        <polygon points={`${pad},${height - pad} ${points.join(" ")} ${width - pad},${height - pad}`} fill={GOLD} opacity="0.04" />
-        <polyline points={points.join(" ")} fill="none" stroke={GOLD} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        {data.map((item, index) => {
-          const [x, y] = points[index].split(",").map(Number);
-          return <circle key={item.date} cx={x} cy={y} r="4.5" fill={GOLD} stroke="#ffffff" strokeWidth="2.5" />;
+        <polygon points={`${pad},${height - pad} ${pointsStr} ${width - pad},${height - pad}`} fill={GOLD} opacity="0.04" />
+        <polyline points={pointsStr} fill="none" stroke={GOLD} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        
+        {hoveredIdx !== null && (
+          <>
+            <line
+              x1={points[hoveredIdx].x}
+              y1={pad}
+              x2={points[hoveredIdx].x}
+              y2={height - pad}
+              stroke="#8B5A2B"
+              strokeWidth="1.5"
+              strokeDasharray="3,3"
+              opacity="0.8"
+            />
+            <circle
+              cx={points[hoveredIdx].x}
+              cy={points[hoveredIdx].y}
+              r="8"
+              fill={GOLD}
+              opacity="0.3"
+            />
+          </>
+        )}
+
+        {points.map((p, index) => (
+          <circle 
+            key={p.date} 
+            cx={p.x} 
+            cy={p.y} 
+            r={hoveredIdx === index ? "6" : "4.5"} 
+            fill={hoveredIdx === index ? "#8B5A2B" : GOLD} 
+            stroke="#ffffff" 
+            strokeWidth="2.5" 
+            style={{ transition: "all 0.15s ease" }}
+          />
+        ))}
+
+        {points.map((p, index) => {
+          const rectX = index === 0 ? p.x : p.x - rectWidth / 2;
+          const currentWidth = (index === 0 || index === data.length - 1) ? rectWidth / 2 : rectWidth;
+          return (
+            <rect
+              key={index}
+              x={rectX}
+              y={pad}
+              width={currentWidth}
+              height={height - pad * 2}
+              fill="transparent"
+              style={{ cursor: "pointer" }}
+              onMouseEnter={() => setHoveredIdx(index)}
+              onMouseLeave={() => setHoveredIdx(null)}
+            />
+          );
         })}
+
         <text x={pad} y={height - 4} fill="#A89E95" fontSize="9" fontWeight="800" className="font-sans uppercase tracking-widest">{data[0]?.date}</text>
         <text x={width - pad - 80} y={height - 4} fill="#A89E95" fontSize="9" fontWeight="800" className="font-sans uppercase tracking-widest text-right">{data[data.length - 1]?.date}</text>
       </svg>
+
+      {hoveredIdx !== null && (
+        <div 
+          className="absolute bg-zinc-900/95 text-[#FAF6F0] px-3 py-2 rounded-xl text-[10px] font-bold shadow-xl border border-[#C5A059]/40 pointer-events-none transition-all duration-150 animate-in fade-in zoom-in-95"
+          style={{
+            left: `${(points[hoveredIdx].x / width) * 100}%`,
+            top: `${(points[hoveredIdx].y / height) * 100}%`,
+            transform: 'translate(-50%, -125%)',
+          }}
+        >
+          <p className="text-[#C5A059] uppercase tracking-wider mb-0.5">{points[hoveredIdx].date}</p>
+          <p className="text-white font-mono font-extrabold text-xs">{money(points[hoveredIdx].revenue)}</p>
+        </div>
+      )}
     </div>
   );
 }
 
 function BarChart({ data }) {
+  const [hoveredIdx, setHoveredIdx] = useState(null);
   const max = Math.max(...data.map(item => item.value || 0), 1);
   if (!data.length) return <EmptyChart label="No barber revenue data logged yet" />;
   return (
     <div className="space-y-4 font-sans text-left">
-      {data.map(item => (
-        <div key={item.name} className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-stone-800 tracking-tight">{item.name}</span>
-            <span className="text-sm font-black text-amber-700 font-serif">{money(item.value)}</span>
+      {data.map((item, index) => {
+        const isHovered = hoveredIdx === index;
+        return (
+          <div 
+            key={item.name} 
+            className="space-y-1.5 p-2 rounded-xl transition-all duration-200"
+            style={{ 
+              background: isHovered ? "rgba(234, 219, 206, 0.2)" : "transparent"
+            }}
+            onMouseEnter={() => setHoveredIdx(index)}
+            onMouseLeave={() => setHoveredIdx(null)}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-stone-800 tracking-tight">{item.name}</span>
+              <span className="text-sm font-black text-amber-700 font-serif">{money(item.value)}</span>
+            </div>
+            <div className="h-2 rounded-full bg-stone-50 border border-stone-200/60 overflow-hidden">
+              <div 
+                className="h-full rounded-full transition-all duration-300" 
+                style={{ 
+                  width: `${Math.max((item.value / max) * 100, 4)}%`, 
+                  backgroundColor: isHovered ? "#8B5A2B" : GOLD 
+                }} 
+              />
+            </div>
           </div>
-          <div className="h-2 rounded-full bg-stone-50 border border-stone-200/60 overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.max((item.value / max) * 100, 4)}%`, backgroundColor: GOLD }} />
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
 function PieChart({ data }) {
+  const [hoveredIdx, setHoveredIdx] = useState(null);
   const total = data.reduce((sum, item) => sum + Number(item.value || 0), 0);
   if (!total) return <EmptyChart label="No service revenue transaction volume captured" />;
   let offset = 0;
   const colors = ["#B45309", "#D97706", "#F59E0B", "#FBBF24", "#FEF3C7", "#A89E95"];
   return (
     <div className="flex flex-col items-center gap-6 font-sans">
-      <svg viewBox="0 0 42 42" className="h-44 w-44 -rotate-90 shadow-sm rounded-full">
+      <svg viewBox="0 0 42 42" className="h-44 w-44 shadow-sm rounded-full overflow-visible">
         <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#FAF6F0" strokeWidth="6" />
-        {data.map((item, index) => {
-          const percent = (item.value / total) * 100;
-          const segment = <circle key={item.name} cx="21" cy="21" r="15.915" fill="transparent" stroke={colors[index % colors.length]} strokeWidth="6" strokeDasharray={`${percent} ${100 - percent}`} strokeDashoffset={-offset} />;
-          offset += percent;
-          return segment;
-        })}
+        <g transform="rotate(-90 21 21)">
+          {data.map((item, index) => {
+            const percent = (item.value / total) * 100;
+            const isHovered = hoveredIdx === index;
+            const segment = (
+              <circle 
+                key={item.name} 
+                cx="21" 
+                cy="21" 
+                r="15.915" 
+                fill="transparent" 
+                stroke={colors[index % colors.length]} 
+                strokeWidth={isHovered ? "7.5" : "6"} 
+                strokeDasharray={`${percent} ${100 - percent}`} 
+                strokeDashoffset={-offset}
+                style={{ cursor: "pointer", transition: "stroke-width 0.2s ease" }}
+                onMouseEnter={() => setHoveredIdx(index)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              />
+            );
+            offset += percent;
+            return segment;
+          })}
+        </g>
+
+        {hoveredIdx !== null ? (
+          <>
+            <text x="21" y="18.5" textAnchor="middle" fontSize="3" fontWeight="800" fill="#3E362E" className="font-sans">
+              {data[hoveredIdx].name.length > 13 ? data[hoveredIdx].name.slice(0, 10) + "..." : data[hoveredIdx].name}
+            </text>
+            <text x="21" y="22.5" textAnchor="middle" fontSize="3" fontWeight="950" fill="#8B5A2B" className="font-mono">
+              {money(data[hoveredIdx].value)}
+            </text>
+            <text x="21" y="26" textAnchor="middle" fontSize="2" fontWeight="800" fill="#A89E95" className="font-sans uppercase tracking-wider">
+              {((data[hoveredIdx].value / total) * 100).toFixed(1)}%
+            </text>
+          </>
+        ) : (
+          <>
+            <text x="21" y="20" textAnchor="middle" fontSize="3.5" fontWeight="900" fill="#3E362E" className="font-serif">
+              Total
+            </text>
+            <text x="21" y="24" textAnchor="middle" fontSize="3" fontWeight="950" fill="#8B5A2B" className="font-mono">
+              {money(total)}
+            </text>
+          </>
+        )}
       </svg>
       <RevenueList rows={data.slice(0, 3).map(item => ({ name: item.name, value: item.value }))} compact />
     </div>

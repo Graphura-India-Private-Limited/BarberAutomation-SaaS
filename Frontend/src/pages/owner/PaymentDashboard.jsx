@@ -100,7 +100,7 @@ export default function PaymentDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex font-sans text-stone-800 selection:bg-amber-100" style={{ background: "#FAF6F0" }}>
+    <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
@@ -129,97 +129,8 @@ export default function PaymentDashboard() {
       
       {toast && <Toast message={toast} onClose={() => setToast("")} />}
 
-      {/* ── SIDEBAR NAVIGATION (Rule 4 Text Styles Utilized) ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
-        <div className="space-y-8">
-          <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
-              <Scissors size={18} color="#C5A059" strokeWidth={2} />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
-              {/* Rule 2 Kicker Tag standard */}
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
-            </div>
-          </div>
-
-          <nav className="space-y-1">
-            {/* Rule 4 UI Layout Link elements */}
-            <button 
-              onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <LayoutDashboard size={18} className={window.location.pathname === "/owner/dashboard" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Console Home</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <Scissors size={18} className={window.location.pathname === "/owner/manage-services" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Barbers & Services</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <BarChart2 size={18} className={window.location.pathname === "/owner/dashboard/analytics" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Analytics Metrics</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <CreditCard size={18} className={window.location.pathname === "/owner/payments" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Payment Gateway</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <DollarSign size={18} className={window.location.pathname === "/owner/revenue" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Revenue Stream</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Rule 4 Exit Trigger Action button */}
-        <button 
-          onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
-        >
-          <LogOut size={18} className="text-red-400" />
-          <span>Exit Workspace</span>
-        </button>
-      </aside>
-
       {/* ── MAIN CONTENT WORKSPACE ── */}
-      <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
-        <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto">
           
           {/* SYSTEM TIMING METADATA */}
           <div className="flex justify-end items-center gap-6 mb-4 font-sans">
@@ -319,12 +230,11 @@ export default function PaymentDashboard() {
           </div>
 
         </div>
-      </main>
-
-      {/* Modal overlays engine blocks drawer controller */}
-      {selected && <TransactionModal payment={selected} onClose={() => setSelected(null)} />}
-    </div>
-  );
+  
+        {/* Modal overlays engine blocks drawer controller */}
+        {selected && <TransactionModal payment={selected} onClose={() => setSelected(null)} />}
+      </div>
+    );
 }
 
 function ClockIcon() {

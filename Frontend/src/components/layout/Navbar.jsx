@@ -283,36 +283,83 @@ const Navbar = () => {
               </>
             )}
 
-            {/* ── LOGGED IN: Profile Icon ── */}
-            {isLoggedIn && (
+            {/* ── LOGGED IN: Profile Pill ── */}
+            {isLoggedIn && user && (
               <div className="relative hidden sm:block" ref={profileRef}>
                 <button
-                  type="button"
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#C5A059]/40 hover:bg-[#C5A059]/10 text-stone-300 hover:text-[#C5A059] flex items-center justify-center transition-all duration-300 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_0_20px_rgba(197,160,89,0.15)] group relative"
-                  title="My Profile / Dashboard"
+                  onClick={() => setProfileOpen((p) => !p)}
+                  className={`flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full border transition-all duration-300 cursor-pointer ${
+                    profileOpen
+                      ? "border-[#C5A059]/50 bg-[#C5A059]/10"
+                      : "border-[#C5A059]/15 bg-[#C5A059]/5 hover:border-[#C5A059]/40 hover:bg-[#C5A059]/10"
+                  }`}
                 >
-                  <User className="w-4 h-4 transition-transform group-hover:scale-110" />
-                  <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-[#C5A059] rounded-full border border-[#2A241F]" />
+                  {/* Avatar */}
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C5A059] to-[#b8860b] flex items-center justify-center text-[11px] font-black text-[#1E1A17] tracking-wide">
+                      {user.initials}
+                    </div>
+                    {/* Online dot */}
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#1E1A17]" />
+                  </div>
+
+                  <div className="text-left">
+                    <p className="text-[11px] font-bold text-white leading-none">{user.shortName}</p>
+                    <p className="text-[9px] text-stone-400 font-semibold uppercase tracking-widest mt-0.5">{user.role}</p>
+                  </div>
+
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-200 ${
+                      profileOpen ? "rotate-180 text-[#C5A059]" : ""
+                    }`}
+                  />
                 </button>
+
+                {/* ── PROFILE DROPDOWN ── */}
                 {profileOpen && (
-                  <div className="absolute right-0 mt-3 w-56 rounded-2xl bg-[#2A241F]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden z-50 animate-fade-in">
-                    <div className="p-2 space-y-1">
-                      <button
-                        onClick={() => handleNav(getDashboardPath())}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.05] transition-all text-left border-none outline-none cursor-pointer group"
-                      >
-                        <div className="text-[11px] font-black uppercase tracking-wider text-stone-300 group-hover:text-[#C5A059] transition-colors">
-                          My Dashboard / Profile
+                  <div className="absolute top-[calc(100%+10px)] right-0 w-56 rounded-2xl bg-[#1E1A17]/98 backdrop-blur-2xl border border-white/10 shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-fade-in">
+                    {/* Header */}
+                    <div className="p-4 border-b border-white/[0.07]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#C5A059] to-[#b8860b] flex items-center justify-center text-sm font-black text-[#1E1A17]">
+                          {user.initials}
                         </div>
-                      </button>
+                        <div>
+                          <p className="text-[13px] font-bold text-white">{user.name}</p>
+                          <p className="text-[10px] text-stone-400 mt-0.5">{user.email}</p>
+                          <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-[#C5A059]/15 border border-[#C5A059]/30 text-[9px] font-black uppercase tracking-wider text-[#C5A059]">
+                            {user.role}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Links */}
+                    <div className="p-2">
+                      {profileLinks.map((link) => (
+                        <button
+                          key={link.path}
+                          onClick={() => handleNav(link.path)}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.05] transition-all group text-left border-none outline-none"
+                        >
+                          <link.icon className="w-4 h-4 text-stone-500 group-hover:text-[#C5A059] transition-colors" />
+                          <span className="text-[11px] font-bold text-stone-300 group-hover:text-white tracking-wide transition-colors">
+                            {link.label}
+                          </span>
+                        </button>
+                      ))}
+
+                      <div className="my-1.5 mx-2 h-[1px] bg-white/[0.07]" />
+
+                      {/* Logout */}
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-rose-950/20 transition-all text-left border-none outline-none cursor-pointer group"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/[0.08] transition-all group text-left border-none outline-none"
                       >
-                        <div className="text-[11px] font-black uppercase tracking-wider text-rose-400 group-hover:text-rose-300 transition-colors">
-                          Logout
-                        </div>
+                        <LogOut className="w-4 h-4 text-red-400/70 group-hover:text-red-400 transition-colors" />
+                        <span className="text-[11px] font-bold text-red-400/80 group-hover:text-red-400 tracking-wide transition-colors">
+                          Sign Out
+                        </span>
                       </button>
                     </div>
                   </div>

@@ -5,6 +5,7 @@ import {
   ChevronDown, Eye, EyeOff, Lock, UserCircle, ArrowRight, Shield,
 } from "lucide-react";
 import salonImage from "../../assets/shop.jpg";
+import { useAuth } from "../../contexts/AppContext";
 
 const API  = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const DEMO = { mobile: "9999999999", password: "owner@123" };
@@ -22,6 +23,7 @@ const FEATURES = [
 
 export default function OwnerLogin() {
   const navigate = useNavigate();
+  const { syncAuth } = useAuth();
   const [mobile,   setMobile]   = useState("");
   const [password, setPassword] = useState("");
   const [showPwd,  setShowPwd]  = useState(false);
@@ -50,6 +52,7 @@ export default function OwnerLogin() {
         localStorage.setItem("salonName", data.salon?.salon_name || "");
         localStorage.setItem("name",      data.salon?.owner_name || "Owner");
         localStorage.setItem("email",     data.salon?.email || "");
+        syncAuth();
         setSuccess("Welcome back! Redirecting to dashboard...");
         setTimeout(() => navigate("/owner/dashboard"), 1200);
       } else {
