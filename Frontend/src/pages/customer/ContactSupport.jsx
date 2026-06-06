@@ -40,9 +40,26 @@ export default function ContactSupport() {
     setLoading(true);
     setError("");
 
-    // Simulate backend payload synchronization stream
     try {
       await new Promise((resolve) => setTimeout(resolve, 1400));
+      // Save ticket details to localStorage
+      const newTicket = {
+        id: Date.now(),
+        category,
+        email,
+        subject,
+        message,
+        date: new Date().toLocaleDateString("en-IN", { 
+          day: "2-digit", 
+          month: "short", 
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }),
+        status: "Open"
+      };
+      const existing = JSON.parse(localStorage.getItem("support_tickets") || "[]");
+      localStorage.setItem("support_tickets", JSON.stringify([newTicket, ...existing]));
       setSubmitted(true);
     } catch {
       setError("Failed to sync message ticket to the support matrix.");

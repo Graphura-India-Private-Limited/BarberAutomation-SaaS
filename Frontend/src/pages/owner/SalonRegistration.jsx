@@ -74,7 +74,7 @@ export default function SalonRegistration() {
       setError("Please geo-tag your studio location coordinates before submission.");
       return;
     }
-    loading(true);
+    setLoading(true);
     setError("");
     setMessage("");
     try {

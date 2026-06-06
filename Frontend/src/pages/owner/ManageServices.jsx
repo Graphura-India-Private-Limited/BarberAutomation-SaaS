@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { 
   Scissors, BarChart2, CreditCard, DollarSign, LayoutDashboard,
   LogOut, Plus, Trash2, ArrowLeft, Clock, Tags 
@@ -11,33 +11,30 @@ const CHARCOAL = "#3E362E";
 
 export default function ManageServices() {
   const navigate = useNavigate();
-  const [salon, setSalon] = useState(null);
+  const { salon, token } = useOutletContext();
   const [services, setServices] = useState([]);
-  const [newService, setNewService] = useState({ name: "", price: "", duration: "30", category: "men" });
+  const [newService, setNewService] = useState({ name: "", price: "", duration: "30", category: "men", description: "", image: "" });
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (!token) {
-      navigate("/owner/login");
-      return;
+    if (salon?._id) {
+      loadServices();
     }
-    loadData();
-  }, []);
+  }, [salon?._id]);
 
-  const loadData = async () => {
+  const loadServices = async () => {
     setLoading(true);
+    setError("");
     try {
-      const profile = await fetch(`${API}/auth/owner/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const serviceData = await fetch(`${API}/services/${salon._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
       }).then(r => r.json());
-      if (!profile.success) throw new Error(profile.message || "Unable to load salon profile");
-      setSalon(profile.salon);
-      if (profile.salon?.status === "approved") {
-        const serviceData = await fetch(`${API}/services/${profile.salon._id}`).then(r => r.json());
-        if (serviceData.success) setServices(serviceData.services || []);
+      if (serviceData.success) {
+        setServices(serviceData.services || []);
+      } else {
+        throw new Error(serviceData.message || "Unable to fetch services");
       }
     } catch (err) {
       setError(err.message || "Unable to load services");
@@ -52,7 +49,10 @@ export default function ManageServices() {
     try {
       const res = await fetch(`${API}/services`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { 
+          "Content-Type": "application/json", 
+          Authorization: `Bearer ${token}` 
+        },
         body: JSON.stringify({
           ...newService,
           salon_id: salon._id,
@@ -63,7 +63,7 @@ export default function ManageServices() {
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Unable to add service");
       setServices(prev => [...prev, data.service]);
-      setNewService({ name: "", price: "", duration: "30", category: "men" });
+      setNewService({ name: "", price: "", duration: "30", category: "men", description: "", image: "" });
       setIsAdding(false);
     } catch (err) {
       setError(err.message || "Unable to add service");
@@ -71,6 +71,7 @@ export default function ManageServices() {
   };
 
   const deleteService = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this service?")) return;
     try {
       const res = await fetch(`${API}/services/${id}`, {
         method: "DELETE",
@@ -84,59 +85,20 @@ export default function ManageServices() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/owner/login");
-  };
-
   if (loading) {
     return (
-      <div style={{ background: "#FAF6F0" }} className="min-h-screen flex items-center justify-center font-sans">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
-            <Scissors className="w-6 h-6 text-amber-600" />
-          </div>
-          {/* Rule 3 Body Style Text */}
-          <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans">Loading Operational Catalog...</p>
+      <div className="flex flex-col items-center justify-center py-20 font-sans">
+        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center animate-pulse mb-3">
+          <Scissors className="w-5 h-5 text-[#C5A059] animate-bounce" />
         </div>
-      </div>
-    );
-  }
-
-  if (salon?.status !== "approved") {
-    return (
-      <div className="min-h-screen p-6 font-sans text-zinc-800 flex items-center justify-center" style={{ background: "#FAF6F0" }}>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-          .font-serif { font-family: 'Playfair Display', serif !important; }
-          .card { background: #FFFFFF; border: 1px solid #EADBCE; border-radius: 24px; box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.03); }
-        `}</style>
-        <div className="mx-auto max-w-xl text-center card p-10">
-          <span className="text-5xl block mb-4">⌛</span>
-          {/* Rule 1 Fallback Title */}
-          <h2 className="font-serif text-2xl sm:text-3xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
-            <span className="font-bold uppercase">Approval</span>
-            <span className="italic text-[#C5A059] normal-case font-medium">Required</span>
-          </h2>
-          {/* Rule 3 Body Description text */}
-          <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-3">
-            Barber management, queue controls and service pricing unlock after admin approval.
-          </p>
-          {/* Rule 4 Action Trigger */}
-          <button onClick={() => navigate("/owner/dashboard")} className="mt-8 rounded-xl text-white font-extrabold text-xs tracking-wider uppercase px-6 py-4 hover:opacity-95 transition shadow-md cursor-pointer font-sans" style={{ background: CHARCOAL }}>
-            Back to Status
-          </button>
-        </div>
+        <p className="text-stone-500 text-xs uppercase font-extrabold tracking-widest animate-pulse">Syncing Service Catalog...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex font-sans text-stone-800" style={{ background: "#FAF6F0" }}>
+    <div className="max-w-4xl mx-auto text-left font-sans animate-fade-in">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
-        .font-serif { font-family: 'Playfair Display', serif !important; }
         .card { 
           background: #FFFFFF; 
           border: 1px solid #EADBCE; 
@@ -151,218 +113,149 @@ export default function ManageServices() {
         }
       `}</style>
 
-      {/* ── SIDEBAR NAVIGATION (Rule 4 Layout Links Set) ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
-        <div className="space-y-8">
-          <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
-              <Scissors size={18} color="#C5A059" strokeWidth={2} />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
-              {/* Rule 2 Tag kicker header label */}
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
-            </div>
-          </div>
-
-          <nav className="space-y-1">
-            {/* Rule 4 UI Dashboard Buttons standard formatting */}
-            <button 
-              onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <LayoutDashboard size={18} className={window.location.pathname === "/owner/dashboard" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Console Home</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <Scissors size={18} className={window.location.pathname === "/owner/manage-services" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Barbers & Services</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <BarChart2 size={18} className={window.location.pathname === "/owner/dashboard/analytics" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Analytics Metrics</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <CreditCard size={18} className={window.location.pathname === "/owner/payments" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Payment Gateway</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <DollarSign size={18} className={window.location.pathname === "/owner/revenue" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Revenue Stream</span>
-            </button>
-          </nav>
+      {/* Manage Services Main Dashboard Heading Component */}
+      <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200 text-left">
+        <div>
+          <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+            <span className="font-bold uppercase">Manage</span>
+            <span className="italic text-[#C5A059] normal-case font-medium">Services</span>
+          </h2>
+          <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2 font-sans">
+            Current Workspace: {salon?.salon_name}
+          </p>
         </div>
-
-        {/* Rule 4 Standalone Exit link action element */}
-        <button 
-          onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
-        >
-          <LogOut size={18} className="text-red-400" />
-          <span>Exit Workspace</span>
-        </button>
-      </aside>
-
-      {/* ── MAIN CONTENT DATA WORKSPACE ── */}
-      <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
-        <div className="max-w-4xl mx-auto">
-          
-          {/* Rule 4 Action Breadcrumb Link */}
+        
+        {!isAdding && (
           <button 
-            onClick={() => navigate("/owner/dashboard")} 
-            className="mb-6 flex items-center gap-2 text-xs font-extrabold tracking-wider uppercase text-stone-400 hover:text-stone-600 transition-colors group cursor-pointer font-sans"
+            onClick={() => setIsAdding(true)} 
+            className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-extrabold text-xs tracking-wider text-white uppercase shadow-md transition-all active:scale-95 hover:opacity-90 cursor-pointer font-sans border-none"
+            style={{ background: CHARCOAL }}
           >
-            <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform text-[#C5A059]" /> 
-            Back to Console
+            <Plus size={14} style={{ color: GOLD }} />
+            Add New Service
           </button>
+        )}
+      </header>
 
-          {/* Manage Services Main Dashboard Heading Component */}
-          <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200 text-left">
-            <div>
-              {/* Rule 1 Master Header Composition standard */}
-              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
-                <span className="font-bold uppercase">Manage</span>
-                <span className="italic text-[#C5A059] normal-case font-medium">Services</span>
-              </h2>
-              {/* Rule 2 Workspace title kicker label metadata standard */}
-              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2 font-sans">
-                Current Workspace: {salon?.salon_name}
-              </p>
+      {error && <p className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-center text-xs font-bold text-red-600 font-sans">{error}</p>}
+
+      {/* Inline Addition layout block workflow details module */}
+      {isAdding && (
+        <div className="mb-8 card p-6 shadow-lg text-left bg-white">
+          <h3 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5">
+            <span className="font-bold uppercase">New Service</span>
+            <span className="italic text-[#C5A059] normal-case font-medium">Specification</span>
+          </h3>
+          <form onSubmit={handleAddService} className="grid gap-4 md:grid-cols-6 font-sans">
+            <div className="md:col-span-3">
+              <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Name</label>
+              <input required placeholder="e.g., Luxury Beard Trim" value={newService.name} onChange={e => setNewService(prev => ({ ...prev, name: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
             </div>
-            
-            {!isAdding && (
-              /* Rule 4 Action trigger button link components mapping standard strings */
-              <button 
-                onClick={() => setIsAdding(true)} 
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-extrabold text-xs tracking-wider text-white uppercase shadow-md transition-all active:scale-95 hover:opacity-90 cursor-pointer font-sans"
-                style={{ background: CHARCOAL }}
-              >
-                <Plus size={14} style={{ color: GOLD }} />
-                Add New Service
+            <div className="md:col-span-3 flex flex-col justify-end">
+              <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Image</label>
+              <div className="flex gap-2">
+                <input 
+                  placeholder="Paste URL or choose file" 
+                  value={newService.image} 
+                  onChange={e => setNewService(prev => ({ ...prev, image: e.target.value }))} 
+                  className="flex-1 rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400 font-sans" 
+                />
+                <label className="rounded-xl border border-dashed border-[#C5A059] hover:bg-amber-50/20 text-[#C5A059] px-4 py-3.5 text-xs font-extrabold uppercase tracking-wider flex items-center justify-center cursor-pointer shrink-0 transition-all font-sans select-none">
+                  Upload PC
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => setNewService(prev => ({ ...prev, image: reader.result }));
+                        reader.readAsDataURL(file);
+                      }
+                    }} 
+                    className="hidden" 
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Ticket Rate (₹)</label>
+              <input required type="number" min="1" placeholder="Price" value={newService.price} onChange={e => setNewService(prev => ({ ...prev, price: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Session Minutes</label>
+              <input type="number" min="5" placeholder="Duration" value={newService.duration} onChange={e => setNewService(prev => ({ ...prev, duration: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Category Slot</label>
+              <select value={newService.category} onChange={e => setNewService(prev => ({ ...prev, category: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-750 cursor-pointer font-sans">
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+                <option value="addon">Addon</option>
+              </select>
+            </div>
+            <div className="md:col-span-6">
+              <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Description</label>
+              <textarea placeholder="Provide detailed operational info about the service..." value={newService.description} onChange={e => setNewService(prev => ({ ...prev, description: e.target.value }))} className="w-full min-h-20 rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans resize-none" />
+            </div>
+            <div className="flex gap-3 md:col-span-6 pt-2 border-t border-stone-100 mt-2 font-sans">
+              <button type="submit" className="rounded-xl px-5 py-3 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer font-sans border-none" style={{ background: CHARCOAL }}>
+                Save Catalog Item
               </button>
-            )}
-          </header>
-
-          {error && <p className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-center text-xs font-bold text-red-600 font-sans">{error}</p>}
-
-          {/* Inline Addition layout block workflow details module */}
-          {isAdding && (
-            <div className="mb-8 card p-6 shadow-lg text-left">
-              {/* Rule 1 Nested module subtitle layout rules standard */}
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5">
-                <span className="font-bold uppercase">New Service</span>
-                <span className="italic text-[#C5A059] normal-case font-medium">Specification</span>
-              </h2>
-              <form onSubmit={handleAddService} className="grid gap-4 md:grid-cols-5 font-sans">
-                <div className="md:col-span-2">
-                  {/* Rule 2 Input Field descriptors metadata tags labels */}
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Name</label>
-                  <input required placeholder="e.g., Luxury Beard Trim" value={newService.name} onChange={e => setNewService(prev => ({ ...prev, name: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
-                </div>
-                <div>
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Ticket Rate (₹)</label>
-                  <input required type="number" min="1" placeholder="Price" value={newService.price} onChange={e => setNewService(prev => ({ ...prev, price: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
-                </div>
-                <div>
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Session Minutes</label>
-                  <input type="number" min="5" placeholder="Duration" value={newService.duration} onChange={e => setNewService(prev => ({ ...prev, duration: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
-                </div>
-                <div>
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Category Slot</label>
-                  <select value={newService.category} onChange={e => setNewService(prev => ({ ...prev, category: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-700 cursor-pointer font-sans">
-                    <option value="men">Men</option>
-                    <option value="women">Women</option>
-                    <option value="addon">Addon</option>
-                  </select>
-                </div>
-                <div className="flex gap-3 md:col-span-5 pt-2 border-t border-stone-100 mt-2 font-sans">
-                  {/* Rule 4 Inside form data trigger action submission keys */}
-                  <button type="submit" className="rounded-xl px-5 py-3 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer font-sans" style={{ background: CHARCOAL }}>
-                    Save Catalog Item
-                  </button>
-                  <button type="button" onClick={() => setIsAdding(false)} className="rounded-xl bg-stone-100 border border-stone-200 text-stone-500 hover:bg-stone-200 font-extrabold text-xs uppercase tracking-wider px-5 py-3 transition-all cursor-pointer font-sans">
-                    Dismiss
-                  </button>
-                </div>
-              </form>
+              <button type="button" onClick={() => setIsAdding(false)} className="rounded-xl bg-stone-100 border border-stone-200 text-stone-500 hover:bg-stone-200 font-extrabold text-xs uppercase tracking-wider px-5 py-3 transition-all cursor-pointer font-sans">
+                Dismiss
+              </button>
             </div>
-          )}
+          </form>
+        </div>
+      )}
 
-          {/* Active Services List Mapping Grid items container */}
-          <div className="space-y-4 text-left">
-            {services.map(service => (
-              <div key={service._id} className="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm bg-white">
-                <div>
-                  <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">{service.name}</h3>
-                  <div className="flex items-center gap-3 mt-2 font-sans">
-                    {/* Rule 2 Category Metadata badge labels styling config tags */}
-                    <span className="px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-100 border border-stone-200/60 rounded">{service.category}</span>
-                    {/* Rule 3 Core layout description sub-labels features details indicators */}
-                    <span className="flex items-center gap-1 text-stone-600 text-sm font-normal leading-relaxed"><Clock size={12} style={{ color: GOLD }} /> {service.duration || 30} Mins</span>
+      {/* Active Services List Mapping Grid items container */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+        {services.map(service => (
+          <div key={service._id} className="card p-5 flex flex-col justify-between shadow-sm bg-white overflow-hidden relative group">
+            <div className="flex gap-4">
+              <div className="w-20 h-20 rounded-2xl bg-stone-50 border border-stone-150 shrink-0 overflow-hidden relative">
+                {service.image ? (
+                  <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-stone-100 text-stone-400">
+                    <Scissors size={24} />
                   </div>
-                </div>
-                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto pt-3 md:pt-0 border-t md:border-0 border-stone-100 font-sans">
-                  <div className="text-left md:text-right">
-                    <p className="text-2xl font-black font-mono text-stone-900">₹{service.price}</p>
-                    {/* Rule 2 Fee metadata tracker label kicker tag */}
-                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Base Price</p>
-                  </div>
-                  {/* Rule 4 Core Action item Delete configuration system elements button link links */}
-                  <button 
-                    onClick={() => deleteService(service._id)} 
-                    className="rounded-xl border border-red-200 bg-red-50/50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2.5 text-xs font-extrabold tracking-wider uppercase transition-all shadow-sm flex items-center gap-1 cursor-pointer"
-                  >
-                    <Trash2 size={12} /> Delete
-                  </button>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-md font-black font-serif text-stone-900 tracking-tight leading-snug truncate">{service.name}</h3>
+                <p className="text-stone-500 text-xs mt-1.5 line-clamp-2 min-h-8 font-sans">
+                  {service.description || "No description provided."}
+                </p>
+                <div className="flex items-center gap-3 mt-3.5 font-sans">
+                  <span className="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-100 border border-stone-200/60 rounded">{service.category}</span>
+                  <span className="flex items-center gap-1 text-stone-600 text-xs font-semibold"><Clock size={11} style={{ color: GOLD }} /> {service.duration || 30} Mins</span>
                 </div>
               </div>
-            ))}
-          </div>
-
-          {services.length === 0 && (
-            /* Rule 2 Empty catalog container context identifier text info */
-            <div className="bg-white border border-[#EADBCE] border-dashed rounded-3xl p-12 text-center text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
-              No services added to your catalog yet.
             </div>
-          )}
+            <div className="flex items-center justify-between pt-4 border-t border-stone-100 mt-4 font-sans">
+              <div>
+                <p className="text-xl font-black font-mono text-stone-900 leading-none">₹{service.price}</p>
+                <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-1.5">Base Price</p>
+              </div>
+              <button 
+                onClick={() => deleteService(service._id)} 
+                className="rounded-xl border border-red-200 bg-red-50/50 text-red-600 hover:bg-red-600 hover:text-white px-3.5 py-2 text-xs font-extrabold tracking-wider uppercase transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+              >
+                <Trash2 size={11} /> Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {services.length === 0 && (
+        <div className="bg-white border border-[#EADBCE] border-dashed rounded-3xl p-12 text-center text-[10px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
+          No services added to your catalog yet.
         </div>
-      </main>
+      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import {
   Calendar, Clock, Award, Image, ChevronRight, ArrowLeft, Save,
   Bell, CheckCircle, ShieldAlert, Sparkles, LogOut, CheckSquare, 
   Square, Edit3, Settings, Gift, List, Heart, CalendarPlus, Star,
-  RefreshCw, Play, Search, ShoppingBag
+  RefreshCw, Play, Search, ShoppingBag, LifeBuoy
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -100,6 +100,7 @@ export default function CustomerProfile() {
   const [newMember, setNewMember] = useState({ name: "", relation: "Son", age: "" });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [supportTickets, setSupportTickets] = useState([]);
 
   const triggerToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -269,6 +270,8 @@ export default function CustomerProfile() {
       console.log("Offline local data fallback active.", err.message);
     } finally {
       compileNotifications(currentProfile, currentAppts);
+      const tickets = JSON.parse(localStorage.getItem("support_tickets") || "[]");
+      setSupportTickets(tickets);
       setLoading(false);
     }
   };
@@ -276,6 +279,29 @@ export default function CustomerProfile() {
   useEffect(() => {
     syncData();
   }, []);
+
+  const handleToggleNewsletter = async () => {
+    const newVal = !profile.newsletter_opt_in;
+    const updated = { ...profile, newsletter_opt_in: newVal };
+    setProfile(updated);
+    triggerToast(newVal ? "Subscribed to newsletter!" : "Unsubscribed from newsletter!");
+
+    const token = getToken();
+    if (token) {
+      try {
+        await fetch(`${API}/auth/profile`, {
+          method: "PUT",
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` 
+          },
+          body: JSON.stringify({ newsletter_opt_in: newVal })
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
 
   const handleSaveProfile = async () => {
     setIsEditingProfile(false);
@@ -931,6 +957,129 @@ export default function CustomerProfile() {
                         <span className="text-[#8A7A6A] font-medium">Stamps Verified</span>
                         <span className="font-black text-[#9E7452]">{profile.total_visits % 10} / 10 stamps</span>
                       </div>
+                    </div>
+
+                  </div>
+
+                  {/* ── NEW: DUAL COLUMN ACTIVITIES ROW ── */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-left">
+                    
+                    {/* Newsletter & Subscriptions Card */}
+                    <div className="card p-6 bg-white shadow-xs border border-[#EADBCE] rounded-2xl flex flex-col justify-between animate-in fade-in duration-300">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-md font-black font-serif text-[#3D3126] tracking-tight">Channel Preferences</h3>
+                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${profile.newsletter_opt_in ? 'bg-emerald-50 text-[#137333] border border-emerald-200' : 'bg-stone-50 text-[#78716C] border border-[#E7E5E4]'}`}>
+                            {profile.newsletter_opt_in ? "Subscribed" : "Opted Out"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#8A7A6A] font-medium leading-relaxed">
+                          Receive custom styling recommendations, smart-queue check-in reminders, and exclusive rewards alerts.
+                        </p>
+
+                        <div className="mt-4 p-4 rounded-xl border border-[#FAF6F0] bg-[#FAF6F0]/40 flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[#FEF9EE] border border-[#F5E6D3] flex items-center justify-center shrink-0 text-[#9E7452]">
+                              <Mail size={15} />
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-black text-[#3D3126]">Newsletter Channel</p>
+                              <p className="text-[9px] text-[#8A7A6A] mt-0.5">Bi-weekly styling insights</p>
+                            </div>
+                          </div>
+                          
+                          <button
+                            type="button"
+                            onClick={handleToggleNewsletter}
+                            className={`w-12 h-6.5 rounded-full p-0.5 transition-colors cursor-pointer border-none outline-none flex items-center ${
+                              profile.newsletter_opt_in ? "bg-[#B58B67]" : "bg-stone-200"
+                            }`}
+                          >
+                            <div
+                              className={`w-5.5 h-5.5 rounded-full bg-white shadow-sm transition-transform ${
+                                profile.newsletter_opt_in ? "translate-x-5.5" : "translate-x-0"
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 mt-4 border-t border-[#EADBCE] space-y-3">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-[#8A7A6A] font-medium">Marketing Emails</span>
+                          <span className="font-bold text-[#3D3126]">{profile.marketing_emails ? "Enabled" : "Disabled"}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-[#8A7A6A] font-medium">Monthly Reminders</span>
+                          <span className="font-bold text-[#3D3126]">{profile.monthly_reminders ? "Enabled" : "Disabled"}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Support & Activity Inquiries Card */}
+                    <div className="card p-6 bg-white shadow-xs border border-[#EADBCE] rounded-2xl flex flex-col justify-between lg:col-span-2 animate-in fade-in duration-300">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <h3 className="text-md font-black font-serif text-[#3D3126] tracking-tight">Support Tickets & Activities</h3>
+                            <p className="text-[11px] text-[#8A7A6A] font-medium mt-0.5">Your resolved support inquiries and active service requests</p>
+                          </div>
+                          <button
+                            onClick={() => window.location.href = "/support"}
+                            className="px-3 py-1.5 bg-[#FAF6F0] hover:bg-[#FEF9EE] border border-[#EADBCE] rounded-xl text-[10px] font-black uppercase tracking-wider text-[#9E7452] transition-colors cursor-pointer"
+                          >
+                            New Ticket
+                          </button>
+                        </div>
+
+                        <div className="mt-4 space-y-3">
+                          {supportTickets.length === 0 ? (
+                            <div className="border border-dashed border-[#EADBCE] rounded-2xl p-6 text-center">
+                              <LifeBuoy size={24} className="mx-auto text-stone-300 mb-2" />
+                              <p className="text-xs font-black uppercase tracking-wider text-stone-400">No active support inquiries</p>
+                              <p className="text-[10px] text-stone-400 mt-1 max-w-md mx-auto">
+                                If you faced any issues regarding your bookings, stylists, payments, or membership tiers, file a support ticket to get help.
+                              </p>
+                            </div>
+                          ) : (
+                            supportTickets.slice(0, 3).map(ticket => (
+                              <div key={ticket.id} className="p-3 border border-[#EADBCE] rounded-xl bg-[#FAF6F0]/20 flex items-start justify-between gap-4">
+                                <div className="flex items-start gap-3 min-w-0">
+                                  <div className="w-8 h-8 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center text-[#B58B67] shrink-0 mt-0.5">
+                                    <LifeBuoy size={14} />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[10px] font-black text-[#3D3126] uppercase truncate max-w-[150px] sm:max-w-[250px]">{ticket.subject}</span>
+                                      <span className="text-[8px] font-black uppercase tracking-wider bg-[#FEF9EE] text-[#9E7452] border border-[#EADBCE]/50 px-1.5 py-0.5 rounded-md">
+                                        {ticket.category}
+                                      </span>
+                                    </div>
+                                    <p className="text-[10px] text-[#8A7A6A] font-medium mt-1 truncate">{ticket.message}</p>
+                                  </div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <span className="text-[8px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+                                    {ticket.status}
+                                  </span>
+                                  <p className="text-[8px] text-[#8A7A6A] font-mono mt-1.5">{ticket.date.split(",")[0]}</p>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+
+                      {supportTickets.length > 3 && (
+                        <div className="pt-2.5 text-center">
+                          <button
+                            onClick={() => window.location.href = "/support"}
+                            className="text-[10px] font-black uppercase tracking-wider text-[#B58B67] hover:underline"
+                          >
+                            View all support logs ({supportTickets.length})
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                   </div>

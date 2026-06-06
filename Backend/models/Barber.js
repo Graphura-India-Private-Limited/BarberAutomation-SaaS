@@ -7,6 +7,8 @@ const barberSchema = new mongoose.Schema({
   experience:{type:Number,default:0},
   status:{type:String,default:"available",enum:["available","busy","break","offline"]},
   rating:{type:Number,default:0}, is_active:{type:Boolean,default:true},
+  aadhaar:{type:String,default:""},
+  image:{type:String,default:""},
   created_at:{type:Date,default:Date.now}
 });
 barberSchema.methods.matchPassword = async function(p){ return bcrypt.compare(p,this.password_hash); };

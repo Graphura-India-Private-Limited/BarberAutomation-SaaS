@@ -41,6 +41,8 @@ import RevenueDashboard from "./pages/owner/RevenueDashboard";
 import SettingsPage from "./pages/owner/SettingsPage";
 import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import AnalyticsDashboard from "./pages/owner/AnalyticsDashboard";
+import OwnerLayout from "./components/layout/OwnerLayout";
+import ManageBarbers from "./pages/owner/ManageBarbers";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import { DashboardPage } from "./pages/admin/DashboardPage";
@@ -177,12 +179,13 @@ function App() {
         {/* --- OWNER HUB CONTROL (RESTRICTED BY RBAC) --- */}
         <Route path="/owner/login" element={<OwnerLogin />} />
         <Route path="/register-salon" element={<SalonRegistration />} />
-        <Route path="/owner" element={<ProtectedRoute allowedRoles={["owner"]}><Outlet /></ProtectedRoute>}>
+        <Route path="/owner" element={<ProtectedRoute allowedRoles={["owner"]}><OwnerLayout /></ProtectedRoute>}>
           <Route path="dashboard" element={<OwnerDashboard />} />
           <Route path="dashboard/analytics" element={<AnalyticsDashboard />} />
           <Route path="payments" element={<PaymentDashboard />} />
           <Route path="revenue" element={<RevenueDashboard />} />
           <Route path="manage-services" element={<ManageServices />} />
+          <Route path="barbers" element={<ManageBarbers />} />
           <Route path="approvals" element={<BreakApprovalDashboard />} />
           <Route path="bookings" element={<BookingManagement />} />
           <Route path="overview" element={<HomeOverview />} />

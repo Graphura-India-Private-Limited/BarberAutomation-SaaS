@@ -58,6 +58,8 @@ const pickSalonProfile = (body) => ({
   support_number: body.support_number || body.supportNumber || "",
   images: Array.isArray(body.images) ? body.images.filter(Boolean) : [],
   about: body.about || "",
+  salary_model: body.salary_model || body.salaryModel || "commission",
+  commission_percent: Number(body.commission_percent ?? body.commissionPercent ?? 10) || 10,
 });
 
 /* ══════════════════════════════════════
