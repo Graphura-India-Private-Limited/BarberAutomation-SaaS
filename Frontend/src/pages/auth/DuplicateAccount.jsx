@@ -1,10 +1,10 @@
+
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
-// Registered numbers mockup check ledger
 const REGISTERED = ['9550105897', '9735897907'];
 
-// ✅ EMBEDDED HIGH-RES PRODUCTION ASSET IMAGE: Replaces the broken local file string path
 const BARBER_HERO_IMAGE = 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&auto=format&fit=crop&q=80';
 
 const ScissorIcon = ({ className }) => (
@@ -18,9 +18,10 @@ const ScissorIcon = ({ className }) => (
 );
 
 export default function DuplicateAccount({ onBack }) {
-  const [name, setName]         = useState('');
-  const [phone, setPhone]       = useState('');
-  const [status, setStatus]     = useState('idle'); // 'idle' | 'duplicate' | 'available'
+  const [name, setName]     = useState('');
+  const [phone, setPhone]   = useState('');
+  const [status, setStatus] = useState('idle');
+  const navigate            = useNavigate();
 
   function handleVerifyCheck() {
     const sanitizedPhone = phone.replace(/\D/g, '');
@@ -48,10 +49,8 @@ export default function DuplicateAccount({ onBack }) {
         .font-serif { font-family: 'Playfair Display', serif !important; }
       `}</style>
       
-      {/* ✂️ LEFT PANEL: LUXURY BRAND INTRO (MATCHES MAIN AUTH PAGES) */}
       <div className="hidden lg:flex lg:w-5/12 bg-[#3E362E] p-12 flex-col justify-between relative overflow-hidden border-r border-[#2A241F] shadow-2xl min-h-screen">
         
-        {/* 📸 IMAGE CONTAINER LAYER */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
           <img 
             src={BARBER_HERO_IMAGE} 
@@ -61,11 +60,9 @@ export default function DuplicateAccount({ onBack }) {
           <div className="absolute inset-0 bg-gradient-to-b from-stone-950/60 via-stone-900/30 to-stone-950/85 mix-blend-multiply" />
         </div>
 
-        {/* Decorative background ambient flares */}
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-[#C5A059]/15 blur-3xl pointer-events-none z-10" />
         <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#A37B58]/15 blur-3xl pointer-events-none z-10" />
 
-        {/* Brand identity */}
         <div className="flex flex-col items-start relative z-20 select-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#3E362E]/90 border border-[#C5A059]/60 flex items-center justify-center shadow-md">
@@ -81,7 +78,6 @@ export default function DuplicateAccount({ onBack }) {
           </p>
         </div>
 
-        {/* Bottom catchphrase text block */}
         <div className="relative z-20 text-left max-w-sm drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
           <h2 className="text-3xl font-serif text-white font-medium leading-tight mb-3 italic">
             Account Integrity & Verification.
@@ -91,19 +87,15 @@ export default function DuplicateAccount({ onBack }) {
           </p>
         </div>
 
-        {/* Footer info label */}
         <p className="text-[9px] text-stone-300 uppercase tracking-widest relative z-20 font-black text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
           Graphura India Private Limited
         </p>
       </div>
             
-      {/* 📄 RIGHT PANEL: CENTERING INTERACTIVE VERIFICATION CARD */}
       <div className="w-full lg:w-7/12 flex items-center justify-center p-6 md:p-12 bg-[#FAF6F0]">
         
-        {/* Card envelope wrapper */}
         <div className="w-full max-w-md bg-[#ffffff] rounded-[2rem] border border-stone-200/60 shadow-md p-8 md:p-10 text-left animate-in fade-in duration-300">
           
-          {/* Form Header */}
           <div className="mb-8">
             <div className="flex lg:hidden items-center gap-2 mb-4">
               <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
@@ -118,10 +110,8 @@ export default function DuplicateAccount({ onBack }) {
             </p>
           </div>
 
-          {/* Form Fields Stack */}
           <div className="space-y-5">
             
-            {/* Name Field Input */}
             <div className="space-y-2">
               <label className="text-[10px] text-stone-400 uppercase font-black tracking-wider ml-0.5">
                 Full Name
@@ -135,7 +125,6 @@ export default function DuplicateAccount({ onBack }) {
               />
             </div>
 
-            {/* Mobile Number Field Input */}
             <div className="space-y-2">
               <label className="text-[10px] text-stone-400 uppercase font-black tracking-wider ml-0.5">
                 Mobile Number
@@ -158,7 +147,6 @@ export default function DuplicateAccount({ onBack }) {
 
           </div>
 
-          {/* STATE 1: DUPLICATE ACCOUNT DETECTED */}
           {status === 'duplicate' && (
             <div className="mt-5 p-3.5 bg-red-50 border border-red-200/60 rounded-xl flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
@@ -171,7 +159,6 @@ export default function DuplicateAccount({ onBack }) {
             </div>
           )}
 
-          {/* STATE 2: ACCOUNT IS UNIQUE & AVAILABLE */}
           {status === 'available' && (
             <div className="mt-5 p-3.5 bg-green-50 border border-green-200/60 rounded-xl flex items-start gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -184,7 +171,6 @@ export default function DuplicateAccount({ onBack }) {
             </div>
           )}
 
-          {/* Core Action Button Group Links */}
           <div className="mt-8 space-y-3.5">
             <button 
               type="button"
@@ -196,7 +182,7 @@ export default function DuplicateAccount({ onBack }) {
             
             <button 
               type="button"
-              onClick={onBack}
+              onClick={() => (onBack ? onBack() : navigate('/login'))}
               className="w-full bg-white border border-stone-200 hover:border-stone-400 text-stone-700 font-black text-xs uppercase tracking-widest py-4 rounded-xl transition-all shadow-2xs cursor-pointer"
             >
               Back to Login
