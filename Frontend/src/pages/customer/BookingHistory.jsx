@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calendar, CheckCircle, Clock, RotateCcw, XCircle, DollarSign, Sparkles, TrendingUp, ArrowLeft } from 'lucide-react'; 
 import { useNavigate } from 'react-router-dom'; 
@@ -14,8 +15,7 @@ export default function BookingHistory() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Mock Data 
-  const mockBookings = [
+  const [mockBookings, setMockBookings] = useState([
     {
       id: 'BKG-001',
       date: 'May 2, 2026 • 10:00 AM',
@@ -40,9 +40,21 @@ export default function BookingHistory() {
       amountPaid: 150,
       status: 'completed'
     }
-  ];
+  ]);
 
-  // Calculate stats values on the fly
+  // ✅ Cancel Visit — removes booking from list after confirmation
+  function handleCancelVisit(bookingId) {
+    const confirmed = window.confirm('Are you sure you want to cancel this visit?');
+    if (confirmed) {
+      setMockBookings(prev => prev.filter(b => b.id !== bookingId));
+    }
+  }
+
+  // ✅ Rebook — navigates to service selection (start of booking flow)
+  function handleRebook() {
+    navigate('/customer/services');
+  }
+
   const totalVisits = mockBookings.filter(b => b.status === 'completed').length;
   const totalSpent = mockBookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + b.amountPaid, 0);
 
@@ -53,15 +65,13 @@ export default function BookingHistory() {
       <Navbar />
       <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white relative overflow-hidden flex flex-col">
         
-        {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
         <div className="absolute top-20 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
         <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* ── 📑 UPDATED: ROUTE CHANGED TO BOOKING FLOW PAGE ── */}
         <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 relative z-50 flex justify-start">
           <button 
-            onClick={() => navigate('/customer/booking')} // 👈 Tumcha actual booking page cha path ithe taka (e.g., '/booking' or '/book')
+            onClick={() => navigate('/customer/booking')}
             className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white"
           >
             <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" style={{ color: GOLD }} />
@@ -69,7 +79,6 @@ export default function BookingHistory() {
           </button>
         </div>
 
-        {/* Premium Hero Banner Aura */}
         <div className="relative h-[180px] sm:h-[220px] flex items-center justify-center overflow-hidden mb-2">
           <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
           
@@ -86,10 +95,8 @@ export default function BookingHistory() {
           </div>
         </div>
 
-        {/* Main Content Area */}
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
           
-          {/* 📊 Summary Metrics Strip */}
           <div className="grid grid-cols-3 gap-4 mb-8">
             <div className="bg-white/80 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-4 shadow-[0_8px_25px_rgba(0,0,0,0.01)] flex flex-col justify-between">
               <div className="flex items-center justify-between mb-1">
@@ -118,7 +125,6 @@ export default function BookingHistory() {
             </div>
           </div>
 
-          {/* 📑 Custom Luxury Tabs */}
           <div className="flex space-x-2 bg-white/60 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-[#EADDCA] mb-8">
             <button
               type="button"
@@ -144,7 +150,6 @@ export default function BookingHistory() {
             </button>
           </div>
 
-          {/* Booking Cards List */}
           <div className="space-y-6">
             {displayedBookings.length === 0 ? (
               <div className="text-center py-16 bg-white/60 backdrop-blur-md rounded-3xl border border-dashed border-[#EADDCA] px-4">
@@ -158,7 +163,6 @@ export default function BookingHistory() {
                     activeTab === 'completed' ? 'border-l-4 border-l-[#C5A059]' : 'border-l-4 border-l-[#3E362E]'
                   }`}
                 >
-                  {/* Upper Card Grid Structure */}
                   <div className="p-6 flex flex-col sm:flex-row justify-between items-start gap-4">
                     <div>
                       <span className="text-[10px] font-black text-[#C5A059] uppercase tracking-widest bg-[#C5A059]/10 px-2.5 py-1 rounded-md inline-block mb-2">
@@ -174,7 +178,6 @@ export default function BookingHistory() {
                         <div className="text-2xl font-serif font-black text-[#3E362E]">₹{booking.amountPaid}</div>
                       </div>
 
-                      {/* UI Status Badges */}
                       {booking.status === 'completed' ? (
                         <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[9px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-widest shadow-3xs">
                           Completed
@@ -187,10 +190,8 @@ export default function BookingHistory() {
                     </div>
                   </div>
 
-                  {/* Card Divider Line */}
                   <div className="border-t border-[#FAF6F0]" />
                   
-                  {/* Lower Footer Area */}
                   <div className="bg-[#FAF6F0]/50 px-6 py-4 flex justify-between items-center text-stone-600 gap-4">
                     <div className="flex items-center gap-2 min-w-0">
                       {booking.status === 'completed' ? (
@@ -203,10 +204,10 @@ export default function BookingHistory() {
                       </span>
                     </div>
                     
-                    {/* Status Aware Dynamic CTA Links */}
                     {activeTab === 'upcoming' ? (
                       <button 
-                        type="button" 
+                        type="button"
+                        onClick={() => handleCancelVisit(booking.id)}
                         className="flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors cursor-pointer select-none"
                       >
                         <XCircle className="w-3.5 h-3.5" />
@@ -214,7 +215,8 @@ export default function BookingHistory() {
                       </button>
                     ) : (
                       <button 
-                        type="button" 
+                        type="button"
+                        onClick={handleRebook}
                         className="flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#3E362E] hover:text-[#C5A059] transition-colors cursor-pointer group select-none"
                       >
                         <RotateCcw className="w-3.5 h-3.5 group-hover:rotate-45 transition-transform duration-300" />
