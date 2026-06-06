@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Calendar, Clock3, User, Award, Star, ArrowLeft } from "lucide-react";
+import { Calendar, Clock3, User, Award, Star, ArrowLeft, Scissors } from "lucide-react";
 import barberImage from "../../assets/login.jpg";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -99,37 +99,54 @@ export default function OTPLogin() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#111] flex">
-      <div className="w-full h-screen bg-white flex">
+  // ── ✅ STATE LOGIC MONITOR FOR DYNAMIC BUTTON GLOW STATUS ──
+  const isPhoneValid = phone.length === 10;
+  const isOtpComplete = otp.join("").length === 6;
 
-        {/* ── LEFT SECTION ── */}
+  return (
+    <div className="min-h-screen bg-[#111] flex antialiased">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .font-serif { font-family: 'Playfair Display', serif !important; }
+        
+        .card-minimalist {
+          background: #FFFFFF;
+          border-radius: 2.5rem;
+          box-shadow: 0 30px 60px -15px rgba(62, 54, 46, 0.06);
+          border: 1px solid rgba(234, 221, 206, 0.4);
+        }
+      `}</style>
+
+      <div className="w-full h-screen bg-[#FAF6F0] flex">
+
+        {/* ── LEFT CONTAINER SECTION ── */}
         <div className="w-1/2 relative hidden md:block">
           <img src={barberImage} alt="Barber" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/45" />
 
-          {/* Logo */}
+          {/* Logo labels */}
           <div className="absolute top-10 left-10 text-white">
-            <h1 className="text-4xl font-bold tracking-wider">
+            <h1 className="text-4xl font-bold tracking-wider font-sans">
               BARBER <span className="text-amber-500">PRO</span>
             </h1>
             <p className="text-sm tracking-[4px] mt-2">EST. 2026</p>
           </div>
 
-          {/* Main Content */}
+          {/* Banner typography block */}
           <div className="absolute left-10 top-[45%] -translate-y-1/2 max-w-md">
-            <h2 className="text-6xl font-serif leading-tight">
+            <h2 className="text-6xl font-serif leading-tight text-white">
               <span className="text-amber-500">YOUR STYLE,</span>
               <br />
-              <span className="text-white">OUR EXPERTISE</span>
+              OUR EXPERTISE
             </h2>
             <div className="w-20 h-1 bg-amber-500 mt-4" />
-            <p className="text-white text-xl mt-6 leading-9">
+            <p className="text-white text-xl mt-6 leading-9 font-sans">
               Log in to your account to manage bookings, track appointments, and more.
             </p>
           </div>
 
-          {/* Features */}
+          {/* Horizontal streaming metrics badges */}
           <div className="absolute bottom-10 left-0 right-0 px-8">
             <div className="grid grid-cols-4 gap-4">
               <FeatureCard icon={<Calendar size={28} />} title="BOOK"          subtitle="APPOINTMENTS" />
@@ -140,42 +157,43 @@ export default function OTPLogin() {
           </div>
         </div>
 
-        {/* ── RIGHT SECTION ── */}
-        <div className="w-full md:w-1/2 bg-[#f7f5f2] flex items-center justify-center">
-          <div className="bg-white w-[450px] p-7 rounded-[30px] shadow-xl">
+        {/* ── RIGHT ACCENTS VIEWPORT CONTAINER ── */}
+        <div className="w-full md:w-1/2 bg-[#FAF6F0] flex items-center justify-center p-6">
+          <div className="card-minimalist w-full max-w-[450px] p-8 sm:p-10 flex flex-col">
 
-            {/* Top Icon */}
-            <div className="flex justify-center">
-              <div className="w-16 h-16 rounded-xl flex items-center justify-center" style={{ background: "#8B6B3E" }}>
-                <Star fill="white" color="white" />
+            {/* Header Identity Badge Group */}
+            <div className="flex items-center gap-4 mb-5 text-left">
+              <div className="w-12 h-12 rounded-xl bg-[#2C211A] flex items-center justify-center shrink-0">
+                <Scissors size={20} color="#C5A059" className="rotate-90" />
+              </div>
+              <div>
+                <h2 className="text-lg font-serif font-bold text-[#2C211A] tracking-wide leading-tight">BarberAutomation</h2>
+                <p className="text-[#C5A059] uppercase text-[9px] font-extrabold tracking-widest mt-0.5 font-sans">
+                  Graphura India Private Limited
+                </p>
               </div>
             </div>
 
-            {/* Brand */}
-            <div className="text-center mt-4">
-              <h2 className="text-4xl font-serif font-semibold">BarberAutomation</h2>
-              <p className="text-amber-600 uppercase text-xs tracking-[3px] mt-2">
-                Graphura India Private Limited
-              </p>
-            </div>
-
-            <hr className="my-5" />
+            <div className="h-[1px] bg-stone-100 w-full mb-6" />
 
             {step === "mobile" ? (
               <>
-                <h3 className="text-xl font-serif font-semibold">Welcome back</h3>
-                <p className="text-gray-500 mt-1 text-sm">
-                  Enter your mobile number to receive a one-time password
-                </p>
+                <div className="mb-6 text-center">
+                  <h3 className="text-3xl font-serif font-normal text-stone-900 tracking-tight">OTP-Login</h3>
+                  <p className="text-stone-500 mt-2 text-sm font-normal leading-relaxed font-sans">
+                    Enter your mobile number to receive a secure login one-time verification password.
+                  </p>
+                </div>
 
-                <form onSubmit={sendOtp}>
-                  {/* Mobile Number */}
-                  <div className="mt-5">
-                    <label className="block text-xs font-semibold text-amber-600 tracking-[2px] mb-3">
-                      MOBILE NUMBER
+                <form onSubmit={sendOtp} className="space-y-5 text-left">
+                  <div>
+                    <label className="block text-[10px] font-extrabold text-[#C5A059] tracking-widest mb-2 uppercase font-sans">
+                      Mobile Contact Number
                     </label>
-                    <div className="flex border rounded-xl overflow-hidden">
-                      <div className="px-5 py-4 border-r bg-gray-50 font-semibold text-gray-700">+91</div>
+                    <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white shadow-3xs focus-within:border-[#8B6B4E] transition-all">
+                      <div className="px-4 flex items-center justify-center border-r border-[#EADBCE] bg-stone-50 text-stone-500 font-bold text-sm select-none font-sans">
+                        +91
+                      </div>
                       <input
                         type="tel"
                         maxLength={10}
@@ -183,59 +201,58 @@ export default function OTPLogin() {
                         placeholder="98765 43210"
                         value={phone}
                         onChange={e => { setPhone(e.target.value.replace(/\D/g, "")); setError(""); }}
-                        className="flex-1 px-4 outline-none text-gray-800"
+                        className="w-full px-4 py-3.5 text-sm outline-none text-stone-800 font-medium font-sans"
                       />
                     </div>
                   </div>
 
-                  {error && <p className="text-red-500 text-sm mt-3 font-medium">{error}</p>}
+                  {error && <p className="text-rose-600 text-xs font-semibold mt-1 font-sans">{error}</p>}
 
+                  {/* ── ✅ FIXED DYNAMIC BUTTON STYLE INTERPOLATION LAYER ── */}
                   <button
                     type="submit"
-                    disabled={loading || phone.length !== 10}
-                    className="w-full mt-5 text-white font-semibold py-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ background: "#8B6B3E" }}
-                    onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#735A32"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "#8B6B3E"; }}
+                    disabled={loading || !isPhoneValid}
+                    className="w-full text-white font-bold text-xs uppercase tracking-wider py-4 rounded-xl transition-all duration-300 shadow-md active:scale-[0.99] font-sans"
+                    style={{ 
+                      backgroundColor: isPhoneValid ? "#2C1810" : "#9C928A",
+                      boxShadow: isPhoneValid ? "0 10px 25px -5px rgba(44, 24, 16, 0.25)" : "none"
+                    }}
                   >
-                    {loading ? "Sending…" : "Send OTP"}
+                    {loading ? "Sending…" : "Request Secure Passcode"}
                   </button>
                 </form>
 
-                <div className="flex items-center my-5">
-                  <div className="flex-1 h-[1px] bg-gray-200" />
-                  <span className="mx-4 text-gray-400">OR</span>
-                  <div className="flex-1 h-[1px] bg-gray-200" />
+                <div className="flex items-center my-6 justify-center">
+                  <div className="flex-1 h-[1px] bg-[#EADBCE]" />
+                  <span className="mx-4 text-[10px] font-black tracking-widest text-stone-300 font-sans">OR</span>
+                  <div className="flex-1 h-[1px] bg-[#EADBCE]" />
                 </div>
 
-                <p className="text-center text-gray-500">
-                  New user?{" "}
-                  <Link to="/signup" className="text-amber-600 font-semibold underline">
-                    Register here
+                <p className="text-center text-xs font-medium text-stone-500 font-sans">
+                  New user to the studio?{" "}
+                  <Link to="/signup" className="text-[#C5A059] font-bold underline hover:text-[#8B6A2E] transition-colors">
+                    Create an account
                   </Link>
                 </p>
               </>
             ) : (
               <>
-                <button
-                  type="button"
-                  onClick={() => { setStep("mobile"); setOtp(["","","","","",""]); setError(""); setDevOtp(""); }}
-                  className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-amber-600 mb-6 transition"
-                >
-                  <ArrowLeft size={16} /> Back
-                </button>
-
-                <h3 className="text-4xl font-serif font-semibold">Verify OTP</h3>
-                <p className="text-gray-500 mt-3 text-lg">Code sent to +91 {phone}</p>
+                <div className="mb-6 text-center">
+                  <h3 className="text-3xl font-serif font-normal text-stone-900 tracking-tight">Verify OTP</h3>
+                  <p className="text-stone-400 mt-2 text-sm font-medium font-sans">
+                    We sent a 6-digit code to <span className="text-stone-800 font-bold">+91 {phone}</span>.
+                  </p>
+                  <p className="text-stone-400 text-xs mt-1 font-sans">Valid for 5 minutes.</p>
+                </div>
 
                 {devOtp && (
-                  <div className="mt-4 p-4 rounded-xl text-center border border-blue-200 bg-blue-50">
-                    <p className="text-[10px] font-bold text-blue-600 uppercase mb-1">Dev OTP</p>
-                    <p className="text-2xl font-black text-blue-800 tracking-[0.3em]">{devOtp}</p>
+                  <div className="mb-4 p-3 rounded-xl text-center border border-sky-100 bg-sky-50/60 font-sans">
+                    <p className="text-[9px] font-black text-sky-600 uppercase tracking-widest mb-0.5">Sandbox Test Code</p>
+                    <p className="text-xl font-black text-sky-800 tracking-[0.2em] pl-1">{devOtp}</p>
                   </div>
                 )}
 
-                <div className="flex justify-between gap-2 mt-8 mb-4">
+                <div className="flex justify-between gap-2 mt-4 mb-6">
                   {otp.map((d, i) => (
                     <input
                       key={i}
@@ -246,37 +263,59 @@ export default function OTPLogin() {
                       onChange={e => handleOtpChange(e, i)}
                       onKeyDown={e => handleOtpKey(e, i)}
                       onFocus={e => e.target.select()}
-                      className="w-full h-14 rounded-xl border-2 text-center text-xl font-bold outline-none transition-colors"
-                      style={{ borderColor: d ? "#d97706" : "#E5E7EB", color: "#d97706" }}
+                      className="w-full h-14 rounded-xl border text-center text-xl font-bold outline-none transition-all font-sans focus:border-[#8B6B4E]"
+                      style={{ 
+                        borderColor: d ? "#A68B5B" : "#E2DFD8", 
+                        backgroundColor: d ? "#FFFDF9" : "#FAF9F6",
+                        color: "#2C211A"
+                      }}
                     />
                   ))}
                 </div>
 
-                {error && <p className="text-red-500 text-sm font-medium text-center mb-4">{error}</p>}
+                {error && <p className="text-rose-600 text-xs font-semibold text-center mb-4 font-sans">{error}</p>}
 
-                <button
-                  type="button"
-                  onClick={verifyOtp}
-                  disabled={loading || otp.join("").length !== 6}
-                  className="w-full mt-4 text-white font-semibold py-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ background: "#8B6B3E" }}
-                  onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = "#735A32"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#8B6B3E"; }}
-                >
-                  {loading ? "Verifying…" : "Verify & Proceed"}
-                </button>
+                <div className="space-y-3">
+                  {/* ── ✅ FIXED DYNAMIC BUTTON STYLE INTERPOLATION LAYER ── */}
+                  <button
+                    type="button"
+                    onClick={verifyOtp}
+                    disabled={loading || !isOtpComplete}
+                    className="w-full text-white font-bold text-xs uppercase tracking-wider py-4 rounded-xl transition-all duration-300 shadow-md active:scale-[0.99] font-sans"
+                    style={{ 
+                      backgroundColor: isOtpComplete ? "#2C1810" : "#9C928A",
+                      boxShadow: isOtpComplete ? "0 10px 25px -5px rgba(44, 24, 16, 0.25)" : "none"
+                    }}
+                  >
+                    {loading ? "Verifying…" : "Verify OTP"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => { setStep("mobile"); setOtp(["","","","","",""]); setError(""); setDevOtp(""); }}
+                    className="w-full bg-white border border-[#EADBCE] hover:bg-stone-50 font-bold text-xs uppercase tracking-wider py-4 rounded-xl transition-all cursor-pointer text-[#8B6B4E] flex items-center justify-center gap-1 font-sans"
+                  >
+                    ← Change Number
+                  </button>
+                </div>
 
                 <button
                   type="button"
                   onClick={sendOtp}
                   disabled={loading}
-                  className="w-full mt-4 text-sm font-semibold hover:underline uppercase tracking-wider"
-                  style={{ color: "#8B6B3E" }}
+                  className="w-full mt-4 bg-transparent border-none outline-none text-[10px] font-extrabold hover:underline uppercase tracking-widest text-[#C5A059] cursor-pointer font-sans"
                 >
-                  Resend OTP
+                  Resend Code
                 </button>
               </>
             )}
+
+            <div className="text-center mt-8">
+              <p className="text-[9px] font-black tracking-widest text-stone-300 uppercase font-sans">
+                Professional Grooming Standards
+              </p>
+            </div>
+
           </div>
         </div>
 
