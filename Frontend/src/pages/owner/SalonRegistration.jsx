@@ -38,11 +38,22 @@ export default function SalonRegistration() {
     setError("");
   };
 
+  // ── 📍 OPTIMIZED GEOLOCATION DETECTION ENGINE ──
   const handleGeoTag = () => {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by this browser.");
       return;
     }
+    
+    setError("");
+    setMessage("Acquiring GPS fix... please check browser prompt.");
+
+    const geoOptions = {
+      enableHighAccuracy: true,
+      timeout: 10000, // 10 seconds maximum wait time
+      maximumAge: 0
+    };
+
     navigator.geolocation.getCurrentPosition(
       position => {
         setForm(prev => ({
@@ -50,9 +61,18 @@ export default function SalonRegistration() {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         }));
+        setError("");
         setMessage("Location coordinates successfully linked.");
       },
-      () => setError("Location permission denied. Please allow location access in your browser.")
+      err => {
+        setMessage("");
+        if (err.code === 1) {
+          setError("Location permission denied! Please click the crossed-out pin icon in your browser URL bar and change it to 'Allow'.");
+        } else {
+          setError("GPS signal timeout. Please try clicking the button again.");
+        }
+      },
+      geoOptions
     );
   };
 
@@ -74,7 +94,9 @@ export default function SalonRegistration() {
       setError("Please geo-tag your studio location coordinates before submission.");
       return;
     }
-    loading(true);
+    
+    // ── ✅ FIXED runtime crash: changed loading(true) to setLoading(true) ──
+    setLoading(true);
     setError("");
     setMessage("");
     try {
@@ -135,7 +157,7 @@ export default function SalonRegistration() {
 
       <div className="relative z-10 w-full max-w-5xl py-6 flex-grow flex flex-col">
         
-        {/* ── TOP ACTION NAVIGATION BAR (Rule 4 Type Setup) ── */}
+        {/* TOP ACTION NAVIGATION BAR */}
         <div className="w-full flex justify-start mb-8">
           <button 
             type="button"
@@ -147,33 +169,25 @@ export default function SalonRegistration() {
           </button>
         </div>
 
-        {/* Form Identity Title (Rule 1 & Rule 2 Mix Composition Setup) */}
+        {/* Title Identity Block */}
         <div className="text-center mb-10">
           <span className="mb-2 block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
             Graphura India Private Limited
           </span>
           <div className="text-center mb-5">
-          <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2">
-    {/* ── 📬 OWNER: INDEPENDENT WEIGHT TO DIAL IN THE MID-BOLDNESS ── */}
-    <span className="font-bold uppercase">
-      Register Your
-    </span>
-    
-    {/* ── 📬 LOGIN: REMAINS ELEGANT AND REFINED ── */}
-    <span className="italic text-[#C5A059] normal-case font-medium">
-      Salon
-    </span>
-  </h2>
-  </div>
+            <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2">
+              <span className="font-bold uppercase">Register Your</span>
+              <span className="italic text-[#C5A059] normal-case font-medium">Salon</span>
+            </h2>
+          </div>
           <div className="w-12 h-[1.5px] bg-[#C5A059] mx-auto mt-4 mb-3" />
           <p className="mx-auto max-w-2xl text-sm font-normal leading-relaxed text-stone-600 font-sans">
             Submit your salon profile setup for system validation. Customers can discover and book slots only after approval sequence completion.
           </p>
         </div>
 
-        {/* Main Application Data Form Card */}
+        {/* Form Main Layout Grid Card */}
         <form onSubmit={handleSubmit} className="card-premium p-6 sm:p-10 space-y-6 text-left">
-          
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Salon Name *">
               <input required minLength={3} placeholder="e.g. Royal Razor Studio" value={form.salon_name} onChange={e => setField("salon_name", e.target.value)} className={inputClass} />
@@ -219,7 +233,6 @@ export default function SalonRegistration() {
               <input required type="number" min="1" placeholder="e.g. 3" value={form.number_of_barbers} onChange={e => setField("number_of_barbers", e.target.value)} className={inputClass} />
             </Field>
             
-            {/* Styled File Upload Zone Component */}
             <Field label="Shop Gallery Images (Max 5)">
               <div className="relative w-full h-[50px]">
                 <input type="file" id="gallery-uploads" accept="image/*" multiple onChange={handleImages} className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" />
@@ -231,7 +244,7 @@ export default function SalonRegistration() {
             </Field>
           </div>
 
-          {/* Address Block with Geotag Trigger */}
+          {/* Address with MapPin Geotag integration layout */}
           <div className="grid gap-5 md:grid-cols-[1fr_auto] items-end">
             <Field label="Physical Studio Address *">
               <textarea required minLength={10} placeholder="Complete shop address details..." value={form.address} onChange={e => setField("address", e.target.value)} className={`${inputClass} min-h-24 resize-none`} />
@@ -256,7 +269,7 @@ export default function SalonRegistration() {
             <textarea placeholder="Describe your shop atmosphere, specialization details..." value={form.about} onChange={e => setField("about", e.target.value)} className={`${inputClass} min-h-24 resize-none`} />
           </Field>
 
-          {/* Uploaded Images Shimmer Stream Grid */}
+          {/* Images preview stream layer */}
           {form.images.length > 0 && (
             <div className="grid grid-cols-3 gap-3 md:grid-cols-5 pt-2">
               {form.images.map((image, index) => (
@@ -265,7 +278,7 @@ export default function SalonRegistration() {
             </div>
           )}
 
-          {/* Error and Success Dialog Framework boxes */}
+          {/* Dialog message status monitors */}
           {error && (
             <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 text-rose-700 text-xs font-medium font-sans animate-in fade-in duration-200">
               <AlertTriangle size={14} className="shrink-0" />
@@ -279,9 +292,10 @@ export default function SalonRegistration() {
             </div>
           )}
 
-          {/* Dispatch Submitter (Rule 4 Type Setup) */}
+          {/* Form Action Dispatcher button */}
           <div className="pt-4">
             <button 
+              type="submit"
               disabled={loading} 
               className="w-full h-14 md:h-16 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white shadow-md transition-all duration-200 hover:opacity-95 disabled:opacity-50 cursor-pointer active:scale-[0.98] hover:shadow-lg font-sans"
               style={{ backgroundColor: CHARCOAL }}
@@ -295,7 +309,6 @@ export default function SalonRegistration() {
   );
 }
 
-// Subheading Framework Component (Rule 2 Type Setup)
 function Field({ label, children }) {
   return (
     <label className="block space-y-1.5">
