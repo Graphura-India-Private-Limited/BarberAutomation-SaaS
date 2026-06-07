@@ -4,29 +4,29 @@ import {
   CheckCircle, Clock, TrendingUp, XCircle,
   Mail, Search, Trash2, RefreshCw,
 } from 'lucide-react';
-import { RecentTickets } from '../../Components/admin/DashboardWidgets.jsx';
+import { RecentTickets } from '../../components/admin/DashboardWidgets.jsx';
 import { getStats, TICKET_STATUS } from '../../utils/tickets.jsx';
 
-const GOLD    = "#C5A059";
+const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
-const API     = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
 
 export function DashboardPage({ tickets, onSelectTicket }) {
   const stats = getStats(tickets);
 
   /* ── Newsletter Subscribers ── */
-  const [subscribers,  setSubscribers]  = useState([]);
-  const [subLoading,   setSubLoading]   = useState(true);
-  const [subSearch,    setSubSearch]    = useState("");
-  const [deletingId,   setDeletingId]   = useState(null);
-  const [subError,     setSubError]     = useState(null);
+  const [subscribers, setSubscribers] = useState([]);
+  const [subLoading, setSubLoading] = useState(true);
+  const [subSearch, setSubSearch] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
+  const [subError, setSubError] = useState(null);
 
   const fetchSubscribers = async () => {
     setSubLoading(true);
     setSubError(null);
     try {
-      const res  = await fetch(`${API}/newsletter/subscribers`, {
+      const res = await fetch(`${API}/newsletter/subscribers`, {
         headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       });
       const data = await res.json();
@@ -44,7 +44,7 @@ export function DashboardPage({ tickets, onSelectTicket }) {
   const handleDeleteSubscriber = async (id) => {
     setDeletingId(id);
     try {
-      const res  = await fetch(`${API}/newsletter/subscriber/${id}`, {
+      const res = await fetch(`${API}/newsletter/subscriber/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
       });
@@ -68,11 +68,11 @@ export function DashboardPage({ tickets, onSelectTicket }) {
   );
 
   const breakdown = [
-    { label: "Open Issue Track",     value: stats.open,       color: "bg-[#C5A059]",   status: TICKET_STATUS.OPEN },
-    { label: "In Progress Handling", value: stats.inProgress, color: "bg-[#3E362E]",   status: TICKET_STATUS.IN_PROGRESS },
-    { label: "Escalated Critical",   value: stats.escalated,  color: "bg-rose-500",    status: TICKET_STATUS.ESCALATED },
-    { label: "Resolved Operations",  value: stats.resolved,   color: "bg-emerald-500", status: TICKET_STATUS.RESOLVED },
-    { label: "Closed Archive",       value: stats.closed,     color: "bg-stone-300",   status: TICKET_STATUS.CLOSED },
+    { label: "Open Issue Track", value: stats.open, color: "bg-[#C5A059]", status: TICKET_STATUS.OPEN },
+    { label: "In Progress Handling", value: stats.inProgress, color: "bg-[#3E362E]", status: TICKET_STATUS.IN_PROGRESS },
+    { label: "Escalated Critical", value: stats.escalated, color: "bg-rose-500", status: TICKET_STATUS.ESCALATED },
+    { label: "Resolved Operations", value: stats.resolved, color: "bg-emerald-500", status: TICKET_STATUS.RESOLVED },
+    { label: "Closed Archive", value: stats.closed, color: "bg-stone-300", status: TICKET_STATUS.CLOSED },
   ];
 
   return (
@@ -99,10 +99,10 @@ export function DashboardPage({ tickets, onSelectTicket }) {
           <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">System Volume Analysis</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCardItem label="Total Tickets"        value={stats.total}          icon={Ticket}         bg="bg-stone-50"    border="border-stone-200"    sub="All time ledger logs" />
-          <StatCardItem label="Customer Issues"      value={stats.customerIssues} icon={Users}          bg="bg-amber-50/50" border="border-amber-200/50" sub="B2C Client Portal" />
-          <StatCardItem label="Salon Partner Issues" value={stats.salonIssues}    icon={HeadphonesIcon} bg="bg-stone-50"    border="border-stone-200"    sub="B2B Merchant Console" />
-          <StatCardItem label="Critical Pipeline"    value={stats.critical}       icon={AlertTriangle}  bg="bg-rose-50/50"  border="border-rose-200/60"  sub="Requires manual action" isCritical={stats.critical > 0} />
+          <StatCardItem label="Total Tickets" value={stats.total} icon={Ticket} bg="bg-stone-50" border="border-stone-200" sub="All time ledger logs" />
+          <StatCardItem label="Customer Issues" value={stats.customerIssues} icon={Users} bg="bg-amber-50/50" border="border-amber-200/50" sub="B2C Client Portal" />
+          <StatCardItem label="Salon Partner Issues" value={stats.salonIssues} icon={HeadphonesIcon} bg="bg-stone-50" border="border-stone-200" sub="B2B Merchant Console" />
+          <StatCardItem label="Critical Pipeline" value={stats.critical} icon={AlertTriangle} bg="bg-rose-50/50" border="border-rose-200/60" sub="Requires manual action" isCritical={stats.critical > 0} />
         </div>
       </div>
 
@@ -112,10 +112,10 @@ export function DashboardPage({ tickets, onSelectTicket }) {
           <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">Active Queue Pipeline States</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCardItem label="Open Status"  value={stats.open}       icon={Clock}       bg="bg-white" border="border-stone-200" />
-          <StatCardItem label="In Progress"  value={stats.inProgress} icon={TrendingUp}  bg="bg-white" border="border-stone-200" />
-          <StatCardItem label="Resolved"     value={stats.resolved}   icon={CheckCircle} bg="bg-white" border="border-stone-200" />
-          <StatCardItem label="Closed Items" value={stats.closed}     icon={XCircle}     bg="bg-white" border="border-stone-200" />
+          <StatCardItem label="Open Status" value={stats.open} icon={Clock} bg="bg-white" border="border-stone-200" />
+          <StatCardItem label="In Progress" value={stats.inProgress} icon={TrendingUp} bg="bg-white" border="border-stone-200" />
+          <StatCardItem label="Resolved" value={stats.resolved} icon={CheckCircle} bg="bg-white" border="border-stone-200" />
+          <StatCardItem label="Closed Items" value={stats.closed} icon={XCircle} bg="bg-white" border="border-stone-200" />
         </div>
       </div>
 
@@ -365,9 +365,8 @@ function StatCardItem({ label, value, icon: Icon, bg, border, sub, isCritical = 
   const GOLD = "#C5A059";
   return (
     <div className={`card p-5 flex items-center gap-4 shadow-2xs ${bg} ${border}`}>
-      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
-        isCritical ? "bg-rose-100 border border-rose-300 text-rose-600" : "bg-white border border-stone-200/80 text-stone-500 shadow-3xs"
-      }`}>
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${isCritical ? "bg-rose-100 border border-rose-300 text-rose-600" : "bg-white border border-stone-200/80 text-stone-500 shadow-3xs"
+        }`}>
         <Icon size={18} strokeWidth={2.5}
           style={{ color: (!isCritical && Icon === Ticket) ? GOLD : undefined }} />
       </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  Users, UserPlus, UserSquare, UserX, Calendar, CalendarDays, Scissors,
+  Users, User, UserPlus, UserSquare, UserX, Calendar, CalendarDays, Scissors,
   CreditCard, Star, Radio, Store, Eye, MoreHorizontal, Trash2,
   IndianRupee, CheckCircle, Clock, Search, Filter, ChevronDown, Plus, X,
 } from "lucide-react";
@@ -43,30 +43,181 @@ const barberImg = (i) => [
 const salonStatusColor = (s) =>
   s === "approved" ? C.green : s === "pending" ? C.orange : s === "rejected" ? C.red : C.muted;
 
-/* ── CUSTOMERS ── */
-export function CustomersModule({ customers, loading, customerSearch, setCustomerSearch, blockCustomer, stats }) {
+/* ── CUSTOMERS MODULE WITH INTEGRATED QUICK-ADD PANEL ── */
+export function CustomersModule({ customers: initialCustomers, loading, customerSearch, setCustomerSearch, blockCustomer, stats }) {
+  // Local list state so we can dynamically append new records instantly
+  const [localCustomers, setLocalCustomers] = useState(initialCustomers);
   const [page, setPage] = useState(1);
   const [menuOpenId, setMenuOpenId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all"); 
 
-  const filtered = customers.filter((c) => {
+  // ── 🆕 STATES FOR THE QUICK ADD FORM PANEL ──
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    status: "Active"
+  });
+
+  const customerFilterOptions = [
+    { label: "All Customers", value: "all" },
+    { label: "Active", value: "active" },
+    { label: "Inactive", value: "inactive" }
+  ];
+
+  // Combine state list + incoming search params
+  const filtered = localCustomers.filter((c) => {
+    if (statusFilter === "active" && c.blocked) return false;
+    if (statusFilter === "inactive" && !c.blocked) return false;
+
     if (!customerSearch) return true;
     const q = customerSearch.toLowerCase();
-    return [c.name, c.email, c.mobile, c.phone].filter(Boolean).some((v) => v.toLowerCase().includes(q));
+    return [c.name, c.email, c.mobile, c.phone]
+      .filter(Boolean)
+      .some((v) => v.toLowerCase().includes(q));
   });
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
 
   const statCards = [
-    { label: "Total Customers", value: stats?.customers ?? customers.length, sub: "Registered users", subColor: C.gold, icon: Users, iconBg: C.goldLight, iconColor: C.gold },
-    { label: "New This Month", value: customers.filter((c) => isThisMonth(c.createdAt || c.created_at)).length, sub: "New customers", subColor: C.green, icon: UserPlus, iconBg: C.greenLight, iconColor: C.green },
-    { label: "Active Customers", value: customers.filter((c) => !c.blocked).length, sub: "Active users", subColor: C.purple, icon: UserPlus, iconBg: C.purpleLight, iconColor: C.purple },
-    { label: "Inactive Customers", value: customers.filter((c) => c.blocked).length, sub: "Inactive users", subColor: C.orange, icon: UserX, iconBg: C.orangeLight, iconColor: C.orange },
+    { label: "Total Customers", value: stats?.customers ?? localCustomers.length, sub: "Registered users", subColor: C.gold, icon: Users, iconBg: C.goldLight, iconColor: C.gold },
+    { label: "New This Month", value: localCustomers.filter((c) => isThisMonth(c.createdAt || c.created_at)).length, sub: "New customers", subColor: C.green, icon: UserPlus, iconBg: C.greenLight, iconColor: C.green },
+    { label: "Active Customers", value: localCustomers.filter((c) => !c.blocked).length, sub: "Active users", subColor: C.purple, icon: UserPlus, iconBg: C.purpleLight, iconColor: C.purple },
+    { label: "Inactive Customers", value: localCustomers.filter((c) => c.blocked).length, sub: "Inactive users", subColor: C.orange, icon: UserX, iconBg: C.orangeLight, iconColor: C.orange },
   ];
+
+  // ── 🆕 HANDLER: PROCESS FORM SUBMISSION & SAVE TO LIVE LIST ──
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) return alert("Please enter a customer name.");
+
+    // Shape the new customer object to match your table schema exactly
+    const newCustomer = {
+      _id: "LOCAL_" + Date.now(),
+      name: formData.name,
+      email: formData.email || "—",
+      phone: formData.phone || "—",
+      createdAt: new Date().toISOString(),
+      blocked: formData.status === "Inactive"
+    };
+
+    // Prepend the new customer right to the top of the local list state
+    setLocalCustomers([newCustomer, ...localCustomers]);
+
+    // Reset Form Fields & Close Drawer
+    setFormData({ name: "", email: "", phone: "", status: "Active" });
+    setIsPanelOpen(false);
+  };
 
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <ActionToolbar search={customerSearch} onSearchChange={(v) => { setCustomerSearch(v); setPage(1); }} placeholder="Search customers..." addLabel="Add Customer" />
+      
+      {/* Dynamic Action Toolbar that toggles text based on panel visibility state */}
+      <ActionToolbar 
+        search={customerSearch} 
+        onSearchChange={(v) => { setCustomerSearch(v); setPage(1); }} 
+        placeholder="Search customers..." 
+        showFilters={true}
+        filterValue={statusFilter}
+        filterOptions={customerFilterOptions}
+        onFilterChange={(newVal) => { setStatusFilter(newVal); setPage(1); }}
+        addLabel={isPanelOpen ? "Close Panel" : "Add Customer"}
+        onAdd={() => setIsPanelOpen(!isPanelOpen)}
+      />
+
+      {/* ── 🆕 MATCHING 'QUICK ADD CUSTOMER' FORM PANEL ── */}
+      {isPanelOpen && (
+        <div 
+          className="mb-6 p-6 rounded-2xl border bg-white shadow-3xs animate-fadeIn font-sans"
+          style={{ borderColor: C.border }}
+        >
+          <div className="flex items-center justify-between border-b pb-3 mb-4" style={{ borderColor: C.border }}>
+            <h3 className="text-sm font-black uppercase tracking-wider text-stone-700 flex items-center gap-2">
+  <User size={16} style={{ color: C.gold }} />
+  Quick Add Customer
+</h3>
+            <button 
+              type="button" 
+              onClick={() => setIsPanelOpen(false)}
+              className="text-stone-400 hover:text-stone-600 transition-colors cursor-pointer border-none background-none outline-none"
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          <form onSubmit={handleFormSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            {/* Input 1: Customer Name */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Customer Name *</label>
+              <input 
+                type="text"
+                placeholder="Full Name"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-2 text-sm border rounded-xl outline-none focus:border-stone-400 font-sans"
+                style={{ borderColor: C.border, color: C.ink }}
+              />
+            </div>
+
+            {/* Input 2: Email Address */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Email Address</label>
+              <input 
+                type="email"
+                placeholder="name@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-2 text-sm border rounded-xl outline-none focus:border-stone-400 font-sans"
+                style={{ borderColor: C.border, color: C.ink }}
+              />
+            </div>
+
+            {/* Input 3: Phone / Mobile */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Phone Number</label>
+              <input 
+                type="text"
+                placeholder="9876543210"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="w-full px-4 py-2 text-sm border rounded-xl outline-none focus:border-stone-400 font-sans"
+                style={{ borderColor: C.border, color: C.ink }}
+              />
+            </div>
+
+            {/* Input 4: Status Segment Dropdown */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Initial Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="w-full px-4 py-2 text-sm border rounded-xl outline-none focus:border-stone-400 bg-white font-sans font-medium appearance-none cursor-pointer"
+                style={{ borderColor: C.border, color: C.ink, backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2378716C\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'%3E%3C/polyline%3E%3C/image%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '12px' }}
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+
+            {/* Submit Action Action Trigger Button */}
+            <div className="md:col-span-4 flex justify-end mt-2">
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-white shadow-xs hover:opacity-90 transition-opacity cursor-pointer border-none outline-none flex items-center gap-2"
+                style={{ background: "#8B6A2E" }} // Matches the primary theme brand brown accent color
+              >
+                <Plus size={14} className="stroke-[3px]" />
+                Add Customer Record
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Main Data Render Layout Table */}
       <AdminDataTable
         columns={["CUSTOMER NAME", "EMAIL", "PHONE", "JOINED ON", "STATUS", "ACTIONS"]}
         loading={loading}
@@ -93,7 +244,13 @@ export function CustomersModule({ customers, loading, customerSearch, setCustome
                 <td className="px-6 py-4"><StatusPill active={active} /></td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 relative">
-                    <button type="button" className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}><Eye size={18} /></button>
+                    <button
+                      type="button"
+                      onClick={() => console.log("View profile:", customer._id)}
+                      className="p-2 rounded-md hover:bg-gray-50"
+                    >
+                      <Eye size={18} />
+                    </button>
                     <button type="button" onClick={() => setMenuOpenId(menuOpenId === customer._id ? null : customer._id)} className="p-2 rounded-md hover:bg-gray-50" style={{ color: C.muted }}>
                       <MoreHorizontal size={18} />
                     </button>
@@ -115,7 +272,6 @@ export function CustomersModule({ customers, loading, customerSearch, setCustome
     </AdminPageShell>
   );
 }
-
 /* ── SALON MANAGEMENT ── */
 export function SalonsModule({
   salons, customers, bookings, stats, loading, pendingBookings, revenueDisplay, updateSalonStatus, addSalon,
@@ -251,7 +407,7 @@ export function SalonsModule({
                 <X size={18} />
               </button>
             </div>
-            
+
             <form onSubmit={async (e) => {
               e.preventDefault();
               if (!newSalon.salon_name || !newSalon.owner_name || !newSalon.mobile) {
@@ -287,7 +443,7 @@ export function SalonsModule({
                 });
               }
             }} className="space-y-5 overflow-y-auto flex-1 pr-2">
-              
+
               {/* SECTION 1: REQUIRED CONTACT DETAILS */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b" style={{ color: C.gold, borderColor: `${C.gold}30` }}>1. Core Contact Info (Required)</h4>
@@ -472,12 +628,46 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [menuId, setMenuId] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // const filtered = barbers.filter((b) => {
+  //   if (!search) return true;
+  //   const q = search.toLowerCase();
+  //   return [b.name, b.email, b.mobile, b.specialization, b.salon_id?.salon_name]
+  //     .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+  // });
 
   const filtered = barbers.filter((b) => {
+
+    if (statusFilter !== "all") {
+
+      if (statusFilter === "active" && !barberActive(b))
+        return false;
+
+      if (statusFilter === "inactive" && barberActive(b))
+        return false;
+
+      if (
+        ["available", "busy", "offline"].includes(statusFilter) &&
+        b.status !== statusFilter
+      ) {
+        return false;
+      }
+    }
+
     if (!search) return true;
+
     const q = search.toLowerCase();
-    return [b.name, b.email, b.mobile, b.specialization, b.salon_id?.salon_name]
-      .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+
+    return [
+      b.name,
+      b.email,
+      b.mobile,
+      b.specialization,
+      b.salon_id?.salon_name
+    ]
+      .filter(Boolean)
+      .some((v) => String(v).toLowerCase().includes(q));
   });
 
   const activeCount = barbers.filter((b) => barberActive(b)).length;
@@ -486,6 +676,15 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
   const newMonth = barbers.filter((b) => isThisMonth(b.createdAt || b.created_at)).length;
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
+
+  const barberFilterOptions = [
+    { value: "all", label: "All Barbers" },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+    { value: "available", label: "Available" },
+    { value: "busy", label: "Busy" },
+    { value: "offline", label: "Offline" }
+  ];
 
   const statCards = [
     { label: "Total Barbers", value: barbers.length, sub: "All barbers", subColor: C.gold, icon: UserSquare, iconBg: C.goldLight, iconColor: C.gold },
@@ -497,12 +696,29 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <ActionToolbar
+      {/* <ActionToolbar
         search={search}
         onSearchChange={(v) => { setSearch(v); setPage(1); }}
         placeholder="Search barbers..."
         addLabel="Add Barber"
         onAdd={() => onSetTab("addbarber")}
+      /> */}
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => {
+          setSearch(v);
+          setPage(1);
+        }}
+        placeholder="Search barbers..."
+        addLabel="Add Barber"
+        onAdd={() => onSetTab("addbarber")}
+
+        filterValue={statusFilter}
+        onFilterChange={(value) => {
+          setStatusFilter(value);
+          setPage(1);
+        }}
+        filterOptions={barberFilterOptions}
       />
       <AdminDataTable
         columns={["BARBER NAME", "EMAIL", "PHONE", "SPECIALTY", "EXPERIENCE", "STATUS", "ACTIONS"]}
@@ -649,14 +865,46 @@ export function AddBarberModule({ salons, newBarber, setNewBarber, addBarber, bu
 export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("all");
   const pending = bookings.filter((b) => b.status === "pending").length;
+
+  const appointmentFilterOptions = [
+    { value: "all", label: "All Appointments" },
+    { value: "pending", label: "Pending" },
+    { value: "confirmed", label: "Confirmed" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" }
+  ];
   const completed = bookings.filter((b) => b.status === "completed").length;
 
+  // const filtered = bookings.filter((b) => {
+  //   if (!search) return true;
+  //   const q = search.toLowerCase();
+  //   return [b.customer_id?.name, b.barber_id?.name, b.salon_id?.salon_name, b.services?.[0]?.service_name]
+  //     .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+  // });
+
   const filtered = bookings.filter((b) => {
+
+    if (
+      statusFilter !== "all" &&
+      b.status?.toLowerCase() !== statusFilter.toLowerCase()
+    ) {
+      return false;
+    }
+
     if (!search) return true;
+
     const q = search.toLowerCase();
-    return [b.customer_id?.name, b.barber_id?.name, b.salon_id?.salon_name, b.services?.[0]?.service_name]
-      .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
+
+    return [
+      b.customer_id?.name,
+      b.barber_id?.name,
+      b.salon_id?.salon_name,
+      b.services?.[0]?.service_name
+    ]
+      .filter(Boolean)
+      .some((v) => String(v).toLowerCase().includes(q));
   });
 
   const { paged, pageSafe, totalPages, total } = usePagination(filtered, page, setPage);
@@ -671,7 +919,23 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search appointments..." addLabel={null} />
+      {/* <ActionToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search appointments..." addLabel={null} /> */}
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => {
+          setSearch(v);
+          setPage(1);
+        }}
+        placeholder="Search appointments..."
+        addLabel={null}
+
+        filterValue={statusFilter}
+        onFilterChange={(value) => {
+          setStatusFilter(value);
+          setPage(1);
+        }}
+        filterOptions={appointmentFilterOptions}
+      />
       <AdminDataTable
         columns={["CUSTOMER", "SERVICE", "BARBER", "SALON", "DATE", "AMOUNT", "STATUS", "ACTIONS"]}
         loading={loading}
@@ -696,9 +960,46 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
               <td className="px-6 py-4"><StatusPill label={b.status} active={b.status === "completed"} /></td>
               <td className="px-6 py-4">
                 {b.status === "pending" && (
-                  <div className="flex gap-2">
-                    <button onClick={() => changeBookingStatus(b._id, "confirmed")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Confirm</button>
-                    <button onClick={() => changeBookingStatus(b._id, "cancelled")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Cancel</button>
+                  // <div className="flex gap-2">
+                  //   <button onClick={() => changeBookingStatus(b._id, "confirmed")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Confirm</button>
+                  //   <button onClick={() => changeBookingStatus(b._id, "cancelled")} className="px-2 py-1 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Cancel</button>
+                  // </div>
+                  <div className="flex items-center gap-2">
+                    {/* <button
+                      type="button"
+                      onClick={() => changeBookingStatus(b._id, "confirmed")}
+                      className="px-3 py-1.5 rounded-full text-[11px] font-extrabold tracking-wider text-white shadow-sm transition-all hover:scale-105 hover:shadow-md"
+                      style={{
+                        background: "#16A34A"
+                      }}
+                    >
+                      ✓ CONFIRM
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => changeBookingStatus(b._id, "cancelled")}
+                      className="px-3 py-1.5 rounded-full text-[11px] font-extrabold tracking-wider text-white shadow-sm transition-all hover:scale-105 hover:shadow-md"
+                      style={{
+                        background: "#DC2626"
+                      }}
+                    >
+                      ✕ CANCEL
+                    </button> */}
+
+                    <button
+                      onClick={() => console.log("Confirmed", b._id)}
+                      className="px-2 py-1 rounded-full text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700"
+                    >
+                      Confirm
+                    </button>
+
+                    <button
+                      onClick={() => console.log("Cancelled", b._id)}
+                      className="px-2 py-1 rounded-full text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 )}
               </td>
@@ -713,19 +1014,19 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
 
 /*----SERVICES----- */
 
-export function ServicesModule({ 
-  services = [], 
-  salons = [], 
-  loading, 
-  newService, 
-  setNewService, 
-  addService, 
-  toggleService, 
-  deleteService 
+export function ServicesModule({
+  services = [],
+  salons = [],
+  loading,
+  newService,
+  setNewService,
+  addService,
+  toggleService,
+  deleteService
 }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  
+
   // ── ✅ ACTIONS AND DROPDOWN DRAWER STATES ──
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -767,13 +1068,13 @@ export function ServicesModule({
 
   const handleAddServiceWrapper = async () => {
     await addService();
-    setShowAddDrawer(false); 
+    setShowAddDrawer(false);
   };
 
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      
+
       {/* QUICK ADD EXTENSION PANEL ACCORDION DRAWER */}
       {showAddDrawer && (
         <div className="bg-white rounded-xl border p-5 card-shadow mb-6 animate-fadeIn text-left" style={{ borderColor: C.border }}>
@@ -797,12 +1098,12 @@ export function ServicesModule({
       )}
 
       {/* GLOBAL MANAGEMENT ACTION TOOLBAR INTERFACE CONTROL */}
-      <ActionToolbar 
-        search={search} 
-        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
-        placeholder="Search services..." 
-        addLabel={showAddDrawer ? "✕ Close Panel" : "+ Add Service"} 
-        onAdd={() => setShowAddDrawer(!showAddDrawer)} 
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        placeholder="Search services..."
+        addLabel={showAddDrawer ? "✕ Close Panel" : "+ Add Service"}
+        onAdd={() => setShowAddDrawer(!showAddDrawer)}
         filterValue={categoryFilter}
         onFilterChange={(cat) => { setCategoryFilter(cat); setPage(1); }}
         filterOptions={serviceDropdownOptions} // ✅ FIXED: WIRES DOWN THE MOUNT OPTIONS
@@ -843,7 +1144,7 @@ export function ServicesModule({
 export function PaymentsModule({ payments, loading }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  
+
   // ── ✅ STEP 1: ADD LOCAL PAYMENT STATUS FILTER STATE ──
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -883,14 +1184,14 @@ export function PaymentsModule({ payments, loading }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      
+
       {/* ── ✅ STEP 4: PASS CONFIGURATIONS DIRECTLY TO THE TOOLBAR COMPONENT ── */}
-      <ActionToolbar 
-        search={search} 
-        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
-        placeholder="Search payments..." 
-        addLabel={null} 
-        
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        placeholder="Search payments..."
+        addLabel={null}
+
         // Dynamic alignment wires:
         filterValue={statusFilter}
         onFilterChange={(status) => { setStatusFilter(status); setPage(1); }}
@@ -930,7 +1231,7 @@ export function PaymentsModule({ payments, loading }) {
 export function ReviewsModule({ reviews, loading, deleteReview }) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  
+
   // ── ✅ STEP 1: ADD LOCAL RATING FILTER STATE ──
   const [ratingFilter, setRatingFilter] = useState("all");
 
@@ -976,14 +1277,14 @@ export function ReviewsModule({ reviews, loading, deleteReview }) {
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
-      
+
       {/* ── ✅ STEP 4: PASS CONFIGURATIONS TO WIRED TOOLBAR PROPS ── */}
-      <ActionToolbar 
-        search={search} 
-        onSearchChange={(v) => { setSearch(v); setPage(1); }} 
-        placeholder="Search reviews..." 
-        addLabel={null} 
-        
+      <ActionToolbar
+        search={search}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
+        placeholder="Search reviews..."
+        addLabel={null}
+
         // Dynamic Wires:
         filterValue={ratingFilter}
         onFilterChange={(rating) => { setRatingFilter(rating); setPage(1); }}

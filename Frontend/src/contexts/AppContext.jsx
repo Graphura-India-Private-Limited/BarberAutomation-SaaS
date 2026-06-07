@@ -37,24 +37,63 @@ const initialQueue = [
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const name = localStorage.getItem("name");
+    const email = localStorage.getItem("email");
+    const showFinance = localStorage.getItem("showFinance") === "true";
+    const salaryModel = localStorage.getItem("salaryModel");
+    if (token && role) {
+      return { token, role, name, email, showFinance, salaryModel };
+    }
+    return null;
+  });
+
+  const syncAuth = () => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const name = localStorage.getItem("name");
+    const email = localStorage.getItem("email");
+    const showFinance = localStorage.getItem("showFinance") === "true";
+    const salaryModel = localStorage.getItem("salaryModel");
+    if (token && role) {
+      setCurrentUser({ token, role, name, email, showFinance, salaryModel });
+    } else {
+      setCurrentUser(null);
+    }
+  };
 
   const login = (email, password) => {
     const user = users.find(u => u.email === email && u.password === password);
-    if (user) { setCurrentUser(user); return true; }
+    if (user) { 
+      setCurrentUser(user); 
+      localStorage.setItem("token", "demo-token");
+      localStorage.setItem("role", user.role);
+      localStorage.setItem("name", user.name);
+      localStorage.setItem("email", user.email);
+      localStorage.setItem("showFinance", String(user.showFinance || false));
+      localStorage.setItem("salaryModel", user.salaryModel || "");
+      return true; 
+    }
     return false;
   };
 
-  const logout = () => setCurrentUser(null);
+  const logout = () => {
+    localStorage.clear();
+    setCurrentUser(null);
+  };
 
   const canViewFinance = () => {
-    if (!currentUser) return false;
-    if (currentUser.role === "owner") return true;
-    return currentUser.showFinance === true && currentUser.salaryModel !== "fixed";
+    const role = localStorage.getItem("role") || currentUser?.role;
+    if (role === "owner") return true;
+    const showFinance = localStorage.getItem("showFinance") === "true" || currentUser?.showFinance === true;
+    const salaryModel = localStorage.getItem("salaryModel") || currentUser?.salaryModel;
+    return showFinance && salaryModel !== "fixed";
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, canViewFinance }}>
+    <AuthContext.Provider value={{ currentUser, login, logout, canViewFinance, syncAuth }}>
       {children}
     </AuthContext.Provider>
   );

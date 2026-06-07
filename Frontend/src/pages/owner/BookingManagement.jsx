@@ -127,7 +127,7 @@ export default function BookingManagement() {
   };
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 selection:bg-amber-100 flex flex-col pt-24" style={{ background: "#FAF6F0" }}>
+    <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
@@ -159,11 +159,8 @@ export default function BookingManagement() {
         }
       `}</style>
 
-      {/* ── ✅ GLOBAL CUSTOM NAVBAR ELEMENT ── */}
-      <Navbar />
-
       {/* ── MAIN WORKSPACE CONTENT GRID ── */}
-      <main className="mx-auto max-w-7xl px-4 py-8 md:px-8 flex-grow w-full">
+      <div className="mx-auto max-w-7xl">
         
         {/* ── CONTEXT HEADER TITLE CARD (Rule 1 & Rule 2 Standard Set) ── */}
         <div className="relative rounded-3xl p-6 md:p-8 mb-6 overflow-hidden card bg-white text-left">
@@ -342,10 +339,7 @@ export default function BookingManagement() {
             </table>
           </div>
         </div>
-      </main>
-
-      {/* ── ✅ GLOBAL CUSTOM FOOTER ELEMENT ── */}
-      <Footer />
+      </div>
 
       {/* ── MODAL ADD/EDIT APPOINTMENT FORM DIALOGUE ── */}
       {isModalOpen && (

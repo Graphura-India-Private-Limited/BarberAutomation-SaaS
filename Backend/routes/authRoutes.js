@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
+const { requireRoles } = require("../middleware/roleMiddleware");
 
 /* ══════════════════════════════════════
     CUSTOMER AUTH — OTP Based
@@ -16,10 +17,10 @@ router.post("/verify-otp", authController.verifyOtp);
 /* ── Signup — creates new account ── */
 router.post("/signup", authController.signup);
 
-router.get("/profile", protect, authController.getProfile);
-router.put("/profile", protect, authController.updateProfile);
-router.post("/family-member", protect, authController.addFamilyMember);
-router.delete("/family-member/:id", protect, authController.deleteFamilyMember);
+router.get("/profile", protect, requireRoles("customer"), authController.getProfile);
+router.put("/profile", protect, requireRoles("customer"), authController.updateProfile);
+router.post("/family-member", protect, requireRoles("customer"), authController.addFamilyMember);
+router.delete("/family-member/:id", protect, requireRoles("customer"), authController.deleteFamilyMember);
 
 /* ══════════════════════════════════════
     OWNER AUTH
@@ -29,17 +30,17 @@ router.post("/owner/send-otp", authController.sendOwnerOtp);
 router.post("/owner/register", authController.registerOwner);
 router.post("/owner/login", authController.loginOwner);
 
-router.get("/owner/profile", protect, authController.getOwnerProfile);
-router.put("/owner/profile", protect, authController.updateOwnerProfile);
-router.put("/owner/resubmit", protect, authController.resubmitOwnerProfile);
+router.get("/owner/profile", protect, requireRoles("owner"), authController.getOwnerProfile);
+router.put("/owner/profile", protect, requireRoles("owner"), authController.updateOwnerProfile);
+router.put("/owner/resubmit", protect, requireRoles("owner"), authController.resubmitOwnerProfile);
 
 /* ══════════════════════════════════════
     BARBER AUTH
    ══════════════════════════════════════ */
 
-router.post("/barber/register", protect, authController.registerBarber);
+router.post("/barber/register", protect, requireRoles("owner", "admin"), authController.registerBarber);
 router.post("/barber/login", authController.loginBarber);
-router.put("/barber/change-password", protect, authController.changeBarberPassword);
+router.put("/barber/change-password", protect, requireRoles("barber"), authController.changeBarberPassword);
 
 /* ══════════════════════════════════════
     ADMIN AUTH
@@ -47,10 +48,10 @@ router.put("/barber/change-password", protect, authController.changeBarberPasswo
 
 router.post("/admin/login", authController.loginAdmin);
 router.post("/admin/login/mobile", authController.loginAdminMobile);
-router.post("/admin/verify-mpin", protect, authController.verifyMpin);
+router.post("/admin/verify-mpin", protect, requireRoles("admin"), authController.verifyMpin);
 router.post("/admin/create", authController.createAdmin);
 /* ── ✅ GET: Fetch current profile values on page refresh ── */
-router.get("/barber/profile", protect, async (req, res) => {
+router.get("/barber/profile", protect, requireRoles("barber", "owner", "admin"), async (req, res) => {
   try {
     // req.user is hydrated cleanly by your protect middleware
     const barberId = req.user?.id;
@@ -82,7 +83,7 @@ router.get("/barber/profile", protect, async (req, res) => {
 });
 
 /* ── ✅ PUT: Commit changed data values securely back to database ── */
-router.put("/barber/update-profile", protect, async (req, res) => {
+router.put("/barber/update-profile", protect, requireRoles("barber", "owner", "admin"), async (req, res) => {
   try {
     const barberId = req.user?.id;
     if (!barberId) {

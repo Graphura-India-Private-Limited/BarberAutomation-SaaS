@@ -159,7 +159,7 @@ export default function WomenServices() {
   }}
 >
   <button
-    onClick={() => navigate("/")}
+    onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
     style={{
       width: "48px",
       height: "48px",

@@ -19,6 +19,7 @@ export default function OwnerDashboard() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [selectedDay, setSelectedDay] = useState(null);
 
   const token = localStorage.getItem("token");
 
@@ -157,7 +158,7 @@ export default function OwnerDashboard() {
   }
 
   return (
-    <div className="min-h-screen flex font-sans text-stone-800" style={{ background: "#FAF6F0" }}>
+    <div className="p-6 md:p-10 font-sans text-stone-800 min-h-screen" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
@@ -177,55 +178,7 @@ export default function OwnerDashboard() {
         }
       `}</style>
 
-      {/* ── STICKY LIGHT NAVIGATION SIDEBAR ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
-        <div className="space-y-8">
-          <div className="flex items-center gap-3 text-left border-b pb-5 border-stone-100">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
-              <Scissors size={18} color="#C5A059" strokeWidth={2} />
-            </div>
-            <div>
-              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
-              {/* Rule 2 Kicker Label Standard */}
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
-            </div>
-          </div>
-
-          <nav className="space-y-1">
-            {/* Rule 4 Primary UI Action Link Standardized Buttons */}
-            <button className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl bg-amber-50/60 text-[#C5A059] border border-amber-200/40 cursor-pointer">
-              <LayoutDashboard size={18} color="#C5A059" />
-              <span>Console Home</span>
-            </button>
-            <button onClick={() => navigate("/owner/manage-services")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
-              <Scissors size={18} className="text-stone-400" />
-              <span>Barbers & Services</span>
-            </button>
-            <button onClick={() => navigate("/owner/dashboard/analytics")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
-              <BarChart2 size={18} className="text-stone-400" />
-              <span>Analytics Metrics</span>
-            </button>
-            <button onClick={() => navigate("/owner/payments")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
-              <CreditCard size={18} className="text-stone-400" />
-              <span>Payment Gateway</span>
-            </button>
-            <button onClick={() => navigate("/owner/revenue")} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-stone-500 hover:text-stone-900 hover:bg-stone-50 cursor-pointer">
-              <DollarSign size={18} className="text-stone-400" />
-              <span>Revenue Stream</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Rule 4 Standardized Exit Button */}
-        <button onClick={handleLogout} className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer">
-          <LogOut size={18} className="text-red-400" />
-          <span>Exit Workspace</span>
-        </button>
-      </aside>
-
-      {/* ── MAIN SCREEN DATA WORKSPACE ── */}
-      <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
-        <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto">
           
           {/* Main Dashboard Header */}
           <header className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200 text-left">
@@ -369,20 +322,35 @@ export default function OwnerDashboard() {
                     {/* Chart visual display tracking bar lines */}
                     <div className="flex justify-between items-end h-32 pt-4 px-2">
                       {[
-                        { day: "Mon", val: "₹3.2k", h: "35%" },
-                        { day: "Tue", val: "₹4.1k", h: "45%" },
-                        { day: "Wed", val: "₹3.8k", h: "40%" },
-                        { day: "Thu", val: "₹5.2k", h: "60%" },
-                        { day: "Fri", val: "₹6.8k", h: "75%" },
-                        { day: "Sat", val: "₹9.1k", h: "95%" },
-                        { day: "Sun", val: "₹5.6k", h: "65%", active: true }
-                      ].map((item, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2 flex-1 group">
-                          <span className="text-[9px] font-mono font-bold text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity">{item.val}</span>
-                          <div className="w-full max-w-[32px] rounded-t-md transition-all duration-300" style={{ height: item.h, backgroundColor: item.active ? GOLD : "#FAF1E6" }} />
-                          <span className="text-[11px] font-extrabold uppercase tracking-widest text-stone-400 font-sans mt-1">{item.day}</span>
-                        </div>
-                      ))}
+                        { day: "Mon", val: "₹3,200", h: "35%" },
+                        { day: "Tue", val: "₹4,100", h: "45%" },
+                        { day: "Wed", val: "₹3,800", h: "40%" },
+                        { day: "Thu", val: "₹5,200", h: "60%" },
+                        { day: "Fri", val: "₹6,800", h: "75%" },
+                        { day: "Sat", val: "₹9,100", h: "95%" },
+                        { day: "Sun", val: "₹5,600", h: "65%" }
+                      ].map((item, i) => {
+                        const isSelected = selectedDay === item.day;
+                        return (
+                          <div 
+                            key={i} 
+                            onClick={() => setSelectedDay(item.day)}
+                            className="flex flex-col items-center justify-end h-full flex-1 group cursor-pointer"
+                            title={`Click to view ${item.day} transactions`}
+                          >
+                            <span className="text-[9px] font-mono font-bold text-[#8B5A2B] opacity-0 group-hover:opacity-100 transition-opacity mb-1">{item.val}</span>
+                            <div 
+                              className="w-full max-w-[32px] rounded-t-md transition-all duration-300 group-hover:scale-y-105 origin-bottom group-hover:brightness-95" 
+                              style={{ 
+                                height: item.h, 
+                                backgroundColor: isSelected ? "#8B5A2B" : (item.day === "Sun" ? GOLD : "#EADBCE"),
+                                border: isSelected ? "1.5px solid #3E362E" : "none"
+                              }} 
+                            />
+                            <span className={`text-[10px] font-extrabold uppercase tracking-wider font-sans mt-2 ${isSelected ? "text-[#8B5A2B] font-black" : "text-stone-400"}`}>{item.day}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -403,12 +371,72 @@ export default function OwnerDashboard() {
               </>
             )}
           </div>
-
         </div>
-      </main>
+
+      {/* ── 🌟 DAILY TRANSACTION LEDGER MODAL ── */}
+      {selectedDay && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FDFBF7] border border-[#EADBCE] rounded-3xl p-6 max-w-sm w-full shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 text-left font-sans">
+            <h3 className="font-serif text-xl font-bold text-stone-900 border-b pb-3 mb-4 flex justify-between items-center">
+              <span>{selectedDay} Ledger Breakdown</span>
+              <button 
+                onClick={() => setSelectedDay(null)}
+                className="text-stone-400 hover:text-stone-900 font-sans font-bold text-sm cursor-pointer border border-stone-200 rounded-lg px-2 py-0.5 hover:bg-stone-50 transition"
+              >
+                Close
+              </button>
+            </h3>
+            
+            {(() => {
+              const ledger = MOCK_DAY_LEDGERS[selectedDay] || { revenue: 0, count: 0, haircut: 0, shave: 0, facial: 0, topBarber: "N/A" };
+              return (
+                <div className="space-y-4 text-xs font-semibold text-stone-600">
+                  <div className="flex justify-between items-center border-b pb-2 border-stone-100">
+                    <span className="text-stone-400 uppercase tracking-widest text-[9px]">Total Revenue</span>
+                    <span className="text-base font-black text-[#8B5A2B] font-mono">₹{ledger.revenue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b pb-2 border-stone-100">
+                    <span className="text-stone-400 uppercase tracking-widest text-[9px]">Customers Served</span>
+                    <span className="text-sm font-bold text-stone-900 font-mono">{ledger.count} Guests</span>
+                  </div>
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[10px] font-bold text-[#C5A059] uppercase tracking-wider mb-2">Services Completed</p>
+                    <div className="flex justify-between items-center pl-2">
+                      <span>Haircut & Styling</span>
+                      <span className="font-mono font-bold text-stone-900">{ledger.haircut}</span>
+                    </div>
+                    <div className="flex justify-between items-center pl-2">
+                      <span>Beard Grooming / Shave</span>
+                      <span className="font-mono font-bold text-stone-900">{ledger.shave}</span>
+                    </div>
+                    <div className="flex justify-between items-center pl-2">
+                      <span>Facial Scrub / Spa</span>
+                      <span className="font-mono font-bold text-stone-900">{ledger.facial}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-3 border-t border-stone-100">
+                    <span className="text-stone-400 uppercase tracking-widest text-[9px]">Top Artist Stylist</span>
+                    <span className="text-xs font-black bg-amber-50 text-[#8B5A2B] border border-amber-200/50 px-2 py-0.5 rounded-md">{ledger.topBarber}</span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+const MOCK_DAY_LEDGERS = {
+  Mon: { revenue: 3200, count: 8, haircut: 5, shave: 2, facial: 1, topBarber: "Ali" },
+  Tue: { revenue: 4100, count: 11, haircut: 7, shave: 3, facial: 1, topBarber: "Ravi" },
+  Wed: { revenue: 3800, count: 9, haircut: 6, shave: 2, facial: 1, topBarber: "Ali" },
+  Thu: { revenue: 5200, count: 14, haircut: 9, shave: 3, facial: 2, topBarber: "James" },
+  Fri: { revenue: 6800, count: 18, haircut: 11, shave: 4, facial: 3, topBarber: "Ravi" },
+  Sat: { revenue: 9100, count: 24, haircut: 15, shave: 6, facial: 3, topBarber: "Ali" },
+  Sun: { revenue: 5600, count: 15, haircut: 10, shave: 3, facial: 2, topBarber: "James" },
+};
 
 const emptyForm = { salon_name: "", owner_name: "", email: "", address: "", latitude: 0, longitude: 0, opening_time: "09:00", closing_time: "21:00", services_offered: "", basic_pricing: "", number_of_barbers: "", support_number: "", images: [], about: "" };
 

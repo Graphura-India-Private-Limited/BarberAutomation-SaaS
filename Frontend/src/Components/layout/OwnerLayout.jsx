@@ -1,0 +1,136 @@
+import React, { useState } from "react";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { 
+  Scissors, LayoutDashboard, Clock, Calendar, Coffee, 
+  CreditCard, DollarSign, BarChart2, IndianRupee, Settings, 
+  LogOut, Menu, X, Users
+} from "lucide-react";
+
+export default function OwnerLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [sideOpen, setSideOpen] = useState(false);
+
+  const salonName = localStorage.getItem("salonName") || "Barber Salon";
+  const ownerName = localStorage.getItem("name") || "Owner";
+  const initials = ownerName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "OW";
+
+  const NAV = [
+    { id: "dashboard", label: "Console Home", icon: LayoutDashboard, route: "/owner/dashboard" },
+    { id: "queue", label: "Live Queue", icon: Clock, route: "/owner/queue" },
+    { id: "bookings", label: "Bookings & Slots", icon: Calendar, route: "/owner/bookings" },
+    { id: "services", label: "Services Catalog", icon: Scissors, route: "/owner/manage-services" },
+    { id: "barbers", label: "Barber Team", icon: Users, route: "/owner/barbers" },
+    { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
+    { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
+    { id: "revenue", label: "Revenue Stream", icon: DollarSign, route: "/owner/revenue" },
+    { id: "analytics", label: "Analytics Metrics", icon: BarChart2, route: "/owner/dashboard/analytics" },
+    { id: "finance", label: "Finance Overview", icon: IndianRupee, route: "/owner/finance" },
+    { id: "settings", label: "Salon Settings", icon: Settings, route: "/owner/settings" },
+  ];
+
+  return (
+    <div className="flex min-h-screen text-[#4A3E3D] relative overflow-x-hidden" style={{ background: "#FDFBF7", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      
+      {/* 📱 Mobile Backdrop Overlay */}
+      {sideOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300"
+          onClick={() => setSideOpen(false)}
+        />
+      )}
+
+      {/* ── ═══ LUXURY SIDEBAR ═══ ── */}
+      <aside 
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 bg-[#FDFBF7]/95 border-r border-[#E6D5C3] backdrop-blur-md 
+          ${sideOpen ? "w-64 translate-x-0" : "-translate-x-full w-64 md:translate-x-0 md:w-64"}`}
+      >
+        {/* Logo Brand Header */}
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-[#E6D5C3]">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#A06D3B] to-[#8B5A2B] shrink-0">
+            <Scissors className="w-4.5 h-4.5 text-white" size={18} />
+          </div>
+          <div className="overflow-hidden">
+            <p className="font-serif font-black text-sm leading-none uppercase tracking-wider truncate w-40">Barber Pro</p>
+            <p className="text-[10px] mt-1.5 font-bold uppercase tracking-widest text-[#8B5A2B]">Owner Hub</p>
+          </div>
+        </div>
+
+        {/* Profile Details Panel */}
+        <div className="mx-4 my-4 rounded-xl p-4 bg-[#8B5A2B]/5 border border-[#8B5A2B]/15">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full flex items-center justify-center font-black text-sm text-white bg-gradient-to-br from-[#8B5A2B] to-[#4A3E3D] shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-serif font-black text-sm truncate">{salonName}</p>
+              <p className="text-[10px] text-stone-500 font-medium truncate">{ownerName}</p>
+            </div>
+          </div>
+
+          {/* Active Status Badge */}
+          <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider bg-white border border-[#E6D5C3] text-stone-700 h-9">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-emerald-700">Active</span>
+          </div>
+        </div>
+
+        {/* Nav Links */}
+        <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-4">
+          {NAV.map((n) => {
+            const isActive = location.pathname === n.route;
+            return (
+              <button 
+                key={n.id} 
+                onClick={() => { navigate(n.route); setSideOpen(false); }} 
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-left cursor-pointer group relative ${
+                  isActive 
+                    ? "bg-[#8B5A2B]/10 font-black text-[#4A3E3D]" 
+                    : "text-stone-500 hover:bg-[#8B5A2B]/5 hover:text-stone-900 font-extrabold"
+                }`}
+              >
+                <n.icon className="w-4 h-4 shrink-0 transition-colors" style={{ color: isActive ? "#8B5A2B" : "#A39796" }} />
+                <span className="text-xs uppercase tracking-wider font-sans">{n.label}</span>
+                
+                {isActive && (
+                  <div className="w-1.5 h-4 rounded-full bg-[#8B5A2B] ml-auto" />
+                )}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Logout Exit Hub */}
+        <div className="px-3 pb-4 pt-3 border-t border-[#E6D5C3]">
+          <button 
+            onClick={() => { localStorage.clear(); navigate("/owner/login"); }} 
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-red-700 hover:bg-red-50/60 text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
+          >
+            <LogOut className="w-4 h-4 text-red-600" /> Exit Hub
+          </button>
+        </div>
+      </aside>
+
+      {/* ── ═══ MAIN CONTENT AREA ═══ ── */}
+      <div className="flex-1 min-w-0 md:ml-64 flex flex-col">
+        
+        {/* Mobile Top Navbar Header */}
+        <header className="md:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-[#E6D5C3] sticky top-0 z-30">
+          <button onClick={() => setSideOpen(!sideOpen)} className="p-1 text-[#4A3E3D] cursor-pointer">
+            {sideOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+          <p className="font-serif font-black text-sm truncate max-w-[180px]">{salonName}</p>
+          <div className="w-8 h-8 rounded-full bg-[#8B5A2B] text-white flex items-center justify-center font-bold text-xs shrink-0">
+            {initials}
+          </div>
+        </header>
+
+        {/* Dynamic Inner Page Content Area */}
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
+
+    </div>
+  );
+}

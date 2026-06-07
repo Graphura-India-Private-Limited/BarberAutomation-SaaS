@@ -78,7 +78,7 @@ export default function BreakApprovalDashboard() {
   }
 
   return (
-    <div className="min-h-screen font-sans text-stone-800 selection:bg-amber-100 flex flex-col pt-24" style={{ background: "#FAF6F0" }}>
+    <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen relative" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
@@ -98,26 +98,12 @@ export default function BreakApprovalDashboard() {
         }
       `}</style>
 
-      {/* ── ✅ MOUNTED SYSTEM GLOBAL NAVBAR COMPONENT CONTAINER ── */}
-      <Navbar />
-
       {/* Decorative Blur Overlays */}
       <div className="absolute top-[15%] right-[-5%] w-96 h-96 bg-amber-100/30 rounded-full blur-[120px] opacity-60 pointer-events-none" />
       <div className="absolute bottom-[10%] left-[-5%] w-80 h-80 bg-orange-100/20 rounded-full blur-[120px] opacity-50 pointer-events-none" />
 
       {/* ── CENTRAL APP WORKSPACE CONTENT PANEL ── */}
-      <main className="relative z-10 max-w-4xl mx-auto py-10 px-4 sm:px-6 flex-grow w-full">
-        
-        {/* Rule 4 Action Breadcrumb Link Button */}
-        <div className="w-full flex justify-start mb-6">
-          <button 
-            onClick={() => navigate("/owner/dashboard")} 
-            className="flex items-center gap-2 text-xs font-extrabold tracking-wider uppercase text-stone-400 hover:text-stone-600 transition-colors group cursor-pointer font-sans bg-transparent border-none"
-          >
-            <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform text-[#C5A059]" /> 
-            Back to Console
-          </button>
-        </div>
+      <div className="relative z-10 max-w-4xl mx-auto">
 
         {/* ── CONTEXT HEADER TITLE CARD (Rule 1 & Rule 2 Standard Set) ── */}
         <header className="mb-8 rounded-3xl p-6 md:p-8 card relative overflow-hidden bg-white text-left">
@@ -237,10 +223,7 @@ export default function BreakApprovalDashboard() {
             )}
           </AnimatePresence>
         </div>
-      </main>
-
-      {/* ── ✅ MOUNTED SYSTEM GLOBAL FOOTER COMPONENT CONTAINER ── */}
-      <Footer />
+      </div>
     </div>
   );
 }

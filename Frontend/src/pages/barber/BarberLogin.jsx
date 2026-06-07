@@ -5,9 +5,10 @@ import {
   ChevronDown, Eye, EyeOff, Lock, ArrowRight, Shield,
 } from "lucide-react";
 import barberImage from "../../assets/login.jpg";
+import { useAuth } from "../../contexts/AppContext";
 
 const API  = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-const DEMO = { mobile: "9876543210", password: "Barber@123" };
+const DEMO = { mobile: "8888888801", password: "Barber@123" };
 
 const GOLD        = "#C5A059";
 const BROWN       = "#8B6B3E";
@@ -22,6 +23,7 @@ const FEATURES = [
 
 export default function BarberLogin() {
   const navigate = useNavigate();
+  const { syncAuth } = useAuth();
   const [mobile,   setMobile]   = useState("");
   const [password, setPassword] = useState("");
   const [showPwd,  setShowPwd]  = useState(false);
@@ -48,6 +50,9 @@ export default function BarberLogin() {
         localStorage.setItem("barberId",   data.barber?._id || "");
         localStorage.setItem("barberName", data.barber?.name || "");
         localStorage.setItem("salonId",    data.barber?.salon_id?._id || "");
+        localStorage.setItem("name",       data.barber?.name || "Barber");
+        localStorage.setItem("email",      data.barber?.email || "");
+        syncAuth();
         setSuccess("Login successful! Redirecting to dashboard...");
         setTimeout(() => navigate("/barber/dashboard"), 1200);
       } else {

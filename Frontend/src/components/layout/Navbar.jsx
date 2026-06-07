@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import {
   Scissors,
@@ -21,28 +21,49 @@ import {
   LogIn,
 } from "lucide-react";
 
-
-const MOCK_USER = {
-  name: "Arjun Kumar",
-  shortName: "Arjun K.",
-  initials: "AK",
-  email: "arjun@email.com",
-  role: "Gold Member",
-};
-
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [menuOpen, setMenuOpen]       = useState(false);
-const [dropOpen, setDropOpen] = useState(false); // Desktop
-const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false); // Desktop
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
   const [profileOpen, setProfileOpen] = useState(false);
-  const [scrolled, setScrolled]       = useState(false);
-  const [isLoggedIn, setIsLoggedIn]   = useState(false);
-  const user = isLoggedIn ? MOCK_USER : null;
+  const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const dropRef     = useRef(null);
-  const profileRef  = useRef(null);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const name = localStorage.getItem("name") || localStorage.getItem("userName") || localStorage.getItem("barberName") || localStorage.getItem("salonName") || "User";
+    const email = localStorage.getItem("email") || "";
+
+    if (token && role) {
+      setIsLoggedIn(true);
+      const initials = name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "US";
+
+      setUser({
+        name,
+        shortName: name.split(" ")[0],
+        initials,
+        email,
+        role: role.toUpperCase() + (role === "customer" ? " MEMBER" : " PORTAL"),
+      });
+    } else {
+      setIsLoggedIn(false);
+      setUser(null);
+    }
+  }, [location.pathname]); // Update state on navigation
+
+  const dropRef = useRef(null);
+  const profileRef = useRef(null);
+
 
 
   useEffect(() => {
@@ -79,44 +100,83 @@ const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false); 
+    localStorage.clear();
+    setIsLoggedIn(false);
+    setUser(null);
     setProfileOpen(false);
     setMenuOpen(false);
     navigate("/");
   };
 
+  const getDashboardPath = () => {
+    const role = localStorage.getItem("role") || "";
+    const lowerRole = role.toLowerCase();
+    if (lowerRole.includes("barber")) return "/barber/dashboard";
+    if (lowerRole.includes("owner")) return "/owner/dashboard";
+    if (lowerRole.includes("admin")) return "/admin/dashboard";
+    return "/dashboard";
+  };
+
   // ── NAV CONFIG ──
   const NAV_ITEMS = [
-    { label: "Home",     path: "/",        icon: Home },
+    { label: "Home", path: "/", icon: Home },
     { label: "Services", hasDropdown: true, icon: Sparkles },
-    { label: "Studios",  path: "/barbers", icon: Users },
-    { label: "About",    section: "about", icon: Info },
-    { label: "Contact",  path: "/support", icon: Phone },
+    { label: "Studios", path: "/barbers", icon: Users },
+    { label: "About", section: "about", icon: Info },
+    { label: "Contact", path: "/support", icon: Phone },
   ];
 
   const SERVICE_LINKS = [
-    { label: "Men Services",   path: "/customer/services/men",    desc: "Haircut & Beard",  icon: Scissors },
-    { label: "Women Services", path: "/customer/services/women",  desc: "Beauty & Spa",     icon: Crown },
-    { label: "Addon Services", path: "/customer/services/addons", desc: "Premium Addons",   icon: Sparkles },
-    { label: "All Services",   path: "/customer/services",        desc: "Explore All",      icon: Home },
+    { label: "Men Services", path: "/customer/services/men", desc: "Haircut & Beard", icon: Scissors },
+    { label: "Women Services", path: "/customer/services/women", desc: "Beauty & Spa", icon: Crown },
+    { label: "Addon Services", path: "/customer/services/addons", desc: "Premium Addons", icon: Sparkles },
+    { label: "All Services", path: "/customer/services", desc: "Explore All", icon: Home },
   ];
 
-  const PROFILE_LINKS = [
-    { label: "My Profile",       icon: User,     path: "/profile" },
-    { label: "My Appointments",  icon: Calendar, path: "/appointments" },
-    { label: "Rewards & Points", icon: Star,     path: "/rewards" },
-    { label: "Settings",         icon: Settings, path: "/settings" },
-  ];
+  const getProfileLinks = (userRole) => {
+    const cleanRole = String(userRole).toLowerCase();
+    if (cleanRole.includes("owner")) {
+      return [
+        { label: "Owner Dashboard", icon: Home, path: "/owner/dashboard" },
+        { label: "Manage Services", icon: Scissors, path: "/owner/manage-services" },
+        { label: "Finance & Revenue", icon: Star, path: "/owner/finance" },
+        { label: "Settings", icon: Settings, path: "/owner/settings" },
+      ];
+    }
+    if (cleanRole.includes("barber")) {
+      return [
+        { label: "Barber Dashboard", icon: Home, path: "/barber/dashboard" },
+        { label: "My Queue", icon: Users, path: "/barber/queue" },
+        { label: "Earnings", icon: Star, path: "/barber/earnings" },
+        { label: "Settings", icon: Settings, path: "/barber/settings" },
+      ];
+    }
+    if (cleanRole.includes("admin")) {
+      return [
+        { label: "Admin Dashboard", icon: Home, path: "/admin/dashboard" },
+        { label: "Requests & Salons", icon: Users, path: "/admin/requests" },
+        { label: "Reports & Tickets", icon: Star, path: "/admin/tickets" },
+        { label: "Platform Settings", icon: Settings, path: "/admin/settings" },
+      ];
+    }
+    return [
+      { label: "My Profile", icon: User, path: "/customerprofile" },
+      { label: "My Appointments", icon: Calendar, path: "/customer/history" },
+      { label: "Book Appointment", icon: Sparkles, path: "/customer/booking" },
+      { label: "Rewards & Points", icon: Star, path: "/membership" },
+    ];
+  };
+
+  const profileLinks = getProfileLinks(localStorage.getItem("role") || "");
 
   return (
     <>
       {/* ══ NAVBAR ══ */}
       <nav
-        className={`fixed top-0 left-0 w-full z-[9999] transition-all duration-500 ${
-          scrolled
-            ? "bg-[#1E1A17]/95 backdrop-blur-2xl border-b border-[#C5A059]/10 shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
-            : "bg-gradient-to-r from-[#1E1A17] via-[#2A241F] to-[#1E1A17] border-b border-white/5"
-        }`}
+        className={`fixed top-0 left-0 w-full z-[9999] transition-all duration-500 ${scrolled
+          ? "bg-[#1E1A17]/95 backdrop-blur-2xl border-b border-[#C5A059]/10 shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
+          : "bg-gradient-to-r from-[#1E1A17] via-[#2A241F] to-[#1E1A17] border-b border-white/5"
+          }`}
       >
         <div className="flex w-full items-center justify-between pl-5 pr-6 py-3 max-w-[1700px] mx-auto">
 
@@ -152,15 +212,13 @@ const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
                   onMouseLeave={() => setDropOpen(false)}
                 >
                   <button
-                    className={`flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest transition-colors cursor-pointer border-none bg-transparent outline-none ${
-                      dropOpen ? "text-[#C5A059]" : "text-stone-300 hover:text-[#C5A059]"
-                    }`}
+                    className={`flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest transition-colors cursor-pointer border-none bg-transparent outline-none ${dropOpen ? "text-[#C5A059]" : "text-stone-300 hover:text-[#C5A059]"
+                      }`}
                   >
                     {item.label}
                     <ChevronDown
-                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                        dropOpen ? "rotate-180 text-[#C5A059]" : "text-stone-400"
-                      }`}
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${dropOpen ? "rotate-180 text-[#C5A059]" : "text-stone-400"
+                        }`}
                     />
                   </button>
 
@@ -260,7 +318,6 @@ const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
                 {/* ── PROFILE DROPDOWN ── */}
                 {profileOpen && (
                   <div className="absolute top-[calc(100%+10px)] right-0 w-56 rounded-2xl bg-[#1E1A17]/98 backdrop-blur-2xl border border-white/10 shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-fade-in">
-
                     {/* Header */}
                     <div className="p-4 border-b border-white/[0.07]">
                       <div className="flex items-center gap-3">
@@ -279,7 +336,7 @@ const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
 
                     {/* Links */}
                     <div className="p-2">
-                      {PROFILE_LINKS.map((link) => (
+                      {profileLinks.map((link) => (
                         <button
                           key={link.path}
                           onClick={() => handleNav(link.path)}
@@ -332,105 +389,108 @@ const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile
         </div>
 
         {/* MOBILE MENU */}
-{menuOpen && (
-<div className="absolute top-full left-0 w-full lg:hidden px-5 pb-5 bg-[#1E1A17] border-t border-white/5 z-[10000] shadow-2xl">
+        {menuOpen && (
+          <div className="absolute top-full left-0 w-full lg:hidden px-5 pb-5 bg-[#1E1A17] border-t border-white/5 z-[10000] shadow-2xl">
 
-    {NAV_ITEMS.map((item) => (
-      <div key={item.label}>
-        <button
-          onClick={() => {
-           if (item.hasDropdown) {
-  setMobileServicesOpen(!mobileServicesOpen);
-            } else if (item.section) {
-              handleSectionNav(item.section);
-            } else if (item.path) {
-              handleNav(item.path);
-            }
-          }}
-          className="flex items-center justify-between w-full text-xs font-black uppercase tracking-widest text-stone-300 hover:text-[#C5A059] py-3 border-b border-stone-800/40 bg-transparent transition-colors"
-        >
-          {item.label}
+            {NAV_ITEMS.map((item) => (
+              <div key={item.label}>
+                <button
+                  onClick={() => {
+                    if (item.hasDropdown) {
+                      setMobileServicesOpen(!mobileServicesOpen);
+                    } else if (item.section) {
+                      handleSectionNav(item.section);
+                    } else if (item.path) {
+                      handleNav(item.path);
+                    }
+                  }}
+                  className="flex items-center justify-between w-full text-xs font-black uppercase tracking-widest text-stone-300 hover:text-[#C5A059] py-3 border-b border-stone-800/40 bg-transparent transition-colors"
+                >
+                  {item.label}
 
-          {item.hasDropdown && (
-            <ChevronDown
-              className={`w-4 h-4 transition-transform ${
-                dropOpen ? "rotate-180" : ""
-              }`}
-            />
-          )}
-        </button>
+                  {item.hasDropdown && (
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${dropOpen ? "rotate-180" : ""
+                        }`}
+                    />
+                  )}
+                </button>
 
-       {item.hasDropdown && mobileServicesOpen && (
-          <div className="bg-[#1E1A17]/50 py-1 px-2 mb-2 rounded-xl border border-stone-800/30">
-            {SERVICE_LINKS.map((svc) => (
-              <Link
-  to={svc.path}
-  onClick={() => setMenuOpen(false)}
-  className="w-full flex items-center gap-3 p-3 hover:bg-[#2A241F] rounded-lg transition-all text-left"
->
-  <svc.icon className="w-3.5 h-3.5 text-[#C5A059]" />
-  <span className="text-[10px] font-bold text-white uppercase tracking-wider">
-    {svc.label}
-  </span>
-</Link>
+                {item.hasDropdown && mobileServicesOpen && (
+                  <div className="bg-[#1E1A17]/50 py-1 px-2 mb-2 rounded-xl border border-stone-800/30">
+                    {SERVICE_LINKS.map((svc) => (
+                      <Link
+                        to={svc.path}
+                        onClick={() => setMenuOpen(false)}
+                        className="w-full flex items-center gap-3 p-3 hover:bg-[#2A241F] rounded-lg transition-all text-left"
+                      >
+                        <svc.icon className="w-3.5 h-3.5 text-[#C5A059]" />
+                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                          {svc.label}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
+
+            {!isLoggedIn ? (
+              <div className="flex gap-2.5 mt-3">
+                <button
+                  onClick={() => handleNav("/login")}
+                  className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-white border border-white/10 rounded-xl"
+                >
+                  Login
+                </button>
+
+                <button
+                  onClick={() => handleNav("/customer/services")}
+                  className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-[#1E1A17] bg-[#C5A059] rounded-xl"
+                >
+                  Book Now
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="mt-2 pt-2 border-t border-stone-800/50">
+                  {profileLinks.map((link) => (
+                    <button
+                      key={link.path}
+                      onClick={() => handleNav(link.path)}
+                      className="flex items-center gap-2.5 w-full text-left text-xs font-bold uppercase tracking-widest text-stone-400 hover:text-[#C5A059] py-2.5"
+                    >
+                      <link.icon className="w-3.5 h-3.5" />
+                      {link.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2.5 mt-3">
+                  <button
+                    onClick={handleLogout}
+                    className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-red-400 border border-red-500/20 rounded-xl"
+                  >
+                    Sign Out
+                  </button>
+
+                  <button
+                    onClick={() => handleNav("/customer/services")}
+                    className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-[#1E1A17] bg-[#C5A059] rounded-xl"
+                  >
+                    Book Now
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
-      </div>
-    ))}
+      </nav>
+    </>
+  );
+};
+export default Navbar;
 
-    {!isLoggedIn ? (
-      <div className="flex gap-2.5 mt-3">
-        <button
-          onClick={() => handleNav("/login")}
-          className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-white border border-white/10 rounded-xl"
-        >
-          Login
-        </button>
 
-        <button
-          onClick={() => handleNav("/customer/services")}
-          className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-[#1E1A17] bg-[#C5A059] rounded-xl"
-        >
-          Book Now
-        </button>
-      </div>
-    ) : (
-      <>
-        <div className="mt-2 pt-2 border-t border-stone-800/50">
-          {PROFILE_LINKS.map((link) => (
-            <button
-              key={link.path}
-              onClick={() => handleNav(link.path)}
-              className="flex items-center gap-2.5 w-full text-left text-xs font-bold uppercase tracking-widest text-stone-400 hover:text-[#C5A059] py-2.5"
-            >
-              <link.icon className="w-3.5 h-3.5" />
-              {link.label}
-            </button>
-          ))}
-        </div>
 
-        <div className="flex gap-2.5 mt-3">
-          <button
-            onClick={handleLogout}
-            className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-red-400 border border-red-500/20 rounded-xl"
-          >
-            Sign Out
-          </button>
 
-          <button
-            onClick={() => handleNav("/customer/services")}
-            className="flex-1 py-2.5 text-[10px] font-black uppercase tracking-wider text-[#1E1A17] bg-[#C5A059] rounded-xl"
-          >
-            Book Now
-          </button>
-        </div>
-      </>
-    )}
-  </div>
-)}
-      </nav>  
-</>
-);
- };
-   export default Navbar;

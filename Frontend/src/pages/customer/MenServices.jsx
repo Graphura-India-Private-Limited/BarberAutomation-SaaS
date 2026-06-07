@@ -145,7 +145,7 @@ export default function MenServices() {
         {/* FLOATING BACK BUTTON — fixed, same as WomenServices */}
         <div style={{ position: "fixed", top: "90px", left: "20px", zIndex: 9999 }}>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
             style={{ width: 48, height: 48, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(10px)", cursor: "pointer", fontSize: 20, boxShadow: "0 8px 20px rgba(0,0,0,0.15)", transition: "all 0.3s ease" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#000"; }}

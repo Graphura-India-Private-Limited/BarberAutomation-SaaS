@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const reviewController = require("../controllers/reviewController");
 const { protect } = require("../middleware/authMiddleware");
+const { requireRoles } = require("../middleware/roleMiddleware");
 
 /* ── POST /api/review — Submit new review (requires login) ── */
 router.post("/", protect, reviewController.createReview);
@@ -19,6 +20,6 @@ router.get("/barber/:barber_id", reviewController.getBarberReviews);
 router.get("/my", protect, reviewController.getMyReviews);
 
 /* ── DELETE /api/review/:id — Admin can delete inappropriate reviews ── */
-router.delete("/:id", protect, reviewController.deleteReview);
+router.delete("/:id", protect, requireRoles("admin", "owner"), reviewController.deleteReview);
 
 module.exports = router;

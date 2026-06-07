@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../layout/Header"; 
-import Footer from "../../components/layout/Footer";
-import Navbar from "../../components/layout/Navbar";
+import Header from "../layout/Header";
+import Footer from "../layout/Footer";
+import Navbar from "../layout/Navbar";
 
 import {
   ArrowLeft, // Used for the floating action overlay button
@@ -64,113 +64,113 @@ const services = [
 export default function SalonDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  
+
   // Find matching salon dynamically or fall back to the first item
   const salon = demoSalons.find((item) => item.id === id) || demoSalons[0];
 
   return (
     <main className="min-h-screen bg-[#FAF6F0] text-[#1A1612] font-sans antialiased flex flex-col">
       <Navbar />
-    
+
 
       {/* 📸 PREMIUM HERO IMAGE DISPLAY */}
-<section className="relative h-[72vh] md:h-[88vh] overflow-hidden flex items-end">
+      <section className="relative h-[72vh] md:h-[88vh] overflow-hidden flex items-end">
 
-  {/* Background Image */}
-  <img
-    src={salon.image}
-    alt={salon.name}
-    className="absolute inset-0 w-full h-full object-cover scale-[1.03]"
-  />
+        {/* Background Image */}
+        <img
+          src={salon.image}
+          alt={salon.name}
+          className="absolute inset-0 w-full h-full object-cover scale-[1.03]"
+        />
 
-  {/* Luxury Dark Overlay */}
-  <div className="absolute inset-0 bg-gradient-to-t from-[#120F0C] via-[#120F0C]/55 to-black/20" />
+        {/* Luxury Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#120F0C] via-[#120F0C]/55 to-black/20" />
 
-  {/* Soft Golden Ambient Glow */}
-  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,160,89,0.18),transparent_35%)]" />
+        {/* Soft Golden Ambient Glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,160,89,0.18),transparent_35%)]" />
 
-  {/* Floating Back Button */}
-<div className="absolute top-20 md:top-24 left-6 sm:left-8 lg:left-10 z-[10000]">
-  <button
-    type="button"
-    onClick={() => navigate(-1)}
-    className="w-11 h-11 rounded-full flex items-center justify-center bg-black/35 backdrop-blur-xl border border-white/15 text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-white hover:text-stone-900 hover:scale-105 active:scale-95 group"
-  >
-    <ArrowLeft
-      size={17}
-      className="transition-transform duration-300 group-hover:-translate-x-0.5"
-    />
-  </button>
-</div>
-
-  {/* Hero Content */}
-  <div className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pb-14 md:pb-20">
-
-    <div className="max-w-3xl text-left text-white">
-
-      {/* Premium Badges */}
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-
-        <div className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 shadow-lg">
-          <Star
-            size={14}
-            className="fill-[#C5A059] text-[#C5A059]"
-          />
-          <span className="text-[11px] font-black uppercase tracking-wider text-stone-900">
-            {salon.rating} Rating
-          </span>
+        {/* Floating Back Button */}
+        <div className="absolute top-20 md:top-24 left-6 sm:left-8 lg:left-10 z-[10000]">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-black/35 backdrop-blur-xl border border-white/15 text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-white hover:text-stone-900 hover:scale-105 active:scale-95 group"
+          >
+            <ArrowLeft
+              size={17}
+              className="transition-transform duration-300 group-hover:-translate-x-0.5"
+            />
+          </button>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-xl bg-black/35 backdrop-blur-xl border border-white/10 px-4 py-2">
-          <MapPin
-            size={14}
-            className="text-[#C5A059]"
-          />
-          <span className="text-[11px] font-black uppercase tracking-wider text-white">
-            {salon.distance} Away
-          </span>
+        {/* Hero Content */}
+        <div className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pb-14 md:pb-20">
+
+          <div className="max-w-3xl text-left text-white">
+
+            {/* Premium Badges */}
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+
+              <div className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 shadow-lg">
+                <Star
+                  size={14}
+                  className="fill-[#C5A059] text-[#C5A059]"
+                />
+                <span className="text-[11px] font-black uppercase tracking-wider text-stone-900">
+                  {salon.rating} Rating
+                </span>
+              </div>
+
+              <div className="inline-flex items-center gap-2 rounded-xl bg-black/35 backdrop-blur-xl border border-white/10 px-4 py-2">
+                <MapPin
+                  size={14}
+                  className="text-[#C5A059]"
+                />
+                <span className="text-[11px] font-black uppercase tracking-wider text-white">
+                  {salon.distance} Away
+                </span>
+              </div>
+
+            </div>
+
+            {/* Heading */}
+            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
+              {salon.name}
+            </h1>
+
+            {/* Description */}
+            <p className="mt-5 max-w-2xl text-sm sm:text-base text-stone-200/90 leading-relaxed font-medium">
+              Premium grooming, real-time queue updates, experienced stylists,
+              and luxury salon comfort — all designed for a smooth modern
+              booking experience.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+
+              <button
+                onClick={() => navigate("/customer/services")}
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] text-[11px] font-black uppercase tracking-[0.25em] shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-105 transition-all duration-300"
+              >
+                Book Appointment
+              </button>
+
+              <button
+                onClick={() => {
+                  const element = document.getElementById("popular-services");
+                  if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl text-white text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all duration-300"
+              >
+                Explore Services
+              </button>
+
+            </div>
+          </div>
         </div>
-
-      </div>
-
-      {/* Heading */}
-      <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
-        {salon.name}
-      </h1>
-
-      {/* Description */}
-      <p className="mt-5 max-w-2xl text-sm sm:text-base text-stone-200/90 leading-relaxed font-medium">
-        Premium grooming, real-time queue updates, experienced stylists,
-        and luxury salon comfort — all designed for a smooth modern
-        booking experience.
-      </p>
-
-      {/* CTA Buttons */}
-      <div className="mt-8 flex flex-wrap items-center gap-4">
-
-        <button
-          onClick={() => navigate("/customer/services")}
-          className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] text-[11px] font-black uppercase tracking-[0.25em] shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-105 transition-all duration-300"
-        >
-          Book Appointment
-        </button>
-
-        <button
-          onClick={() => {
-            const element = document.getElementById("popular-services");
-            if (element) {
-              element.scrollIntoView({ behavior: "smooth" });
-            }
-          }}
-          className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl text-white text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all duration-300"
-        >
-          Explore Services
-        </button>
-
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* 🧱 DATA PROFILE DETAILS LAYOUT COLUMNS GRID */}
       <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-10 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:px-10 flex-1">
@@ -240,7 +240,7 @@ export default function SalonDetailPage() {
           </div>
         </aside>
       </section>
-      <Footer/>
+      <Footer />
     </main>
   );
 }

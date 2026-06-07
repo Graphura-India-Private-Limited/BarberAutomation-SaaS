@@ -27,6 +27,41 @@ const AnalyticsDashboard = () => {
   const [timeFilter, setTimeFilter] = useState('daily');
   const [reportType, setReportType] = useState('salon-wise');
 
+  const [hoveredTrafficIdx, setHoveredTrafficIdx] = useState(null);
+  const [hoveredQueueIdx, setHoveredQueueIdx] = useState(null);
+
+  const trafficData = [
+    { day: "Mon", val: 25 },
+    { day: "Tue", val: 40 },
+    { day: "Wed", val: 30 },
+    { day: "Thu", val: 55 },
+    { day: "Fri", val: 50 },
+    { day: "Sat", val: 75 },
+    { day: "Sun", val: 90 },
+  ];
+
+  const queueData = [
+    { name: "Served", value: 45, color: GOLD },
+    { name: "Waiting", value: 30, color: CHARCOAL },
+    { name: "Delayed", value: 15, color: "#CBD5E1" },
+    { name: "Drops", value: 10, color: "#EF4444" },
+  ];
+
+  const trafficWidth = 720;
+  const trafficHeight = 220;
+  const trafficPad = 20;
+  const maxTraffic = 100;
+  
+  const trafficPoints = trafficData.map((item, index) => {
+    const x = trafficPad + (index * (trafficWidth - trafficPad * 2)) / (trafficData.length - 1);
+    const y = trafficHeight - trafficPad - (item.val / maxTraffic) * (trafficHeight - trafficPad * 2);
+    return { x, y, day: item.day, val: item.val };
+  });
+  
+  const trafficPointsStr = trafficPoints.map(p => `${p.x},${p.y}`).join(" ");
+  const trafficRectWidth = (trafficWidth - trafficPad * 2) / (trafficData.length - 1);
+  const areaPointsStr = `${trafficPad},${trafficHeight - trafficPad} ${trafficPointsStr} ${trafficWidth - trafficPad},${trafficHeight - trafficPad}`;
+
   // --- Mock Data ---
   const performanceMetrics = [
     { title: 'Total Customers', value: '1,245', icon: Users, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
@@ -77,7 +112,7 @@ const AnalyticsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen flex font-sans text-stone-800" style={{ background: "#FAF6F0" }}>
+    <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans {
@@ -107,97 +142,8 @@ const AnalyticsDashboard = () => {
         }
       `}</style>
 
-      {/* ── SIDEBAR NAVIGATION (Rule 4 Text Styles Used) ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
-        <div className="space-y-8">
-          <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
-              <Scissors size={18} color="#C5A059" strokeWidth={2} />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
-              {/* Rule 2 Kicker Label */}
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
-            </div>
-          </div>
-
-          <nav className="space-y-1">
-            {/* Rule 4 UI Navigation Links Setup */}
-            <button 
-              onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <LayoutDashboard size={18} className={window.location.pathname === "/owner/dashboard" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Console Home</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <Scissors size={18} className={window.location.pathname === "/owner/manage-services" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Barbers & Services</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <BarChart2 size={18} className={window.location.pathname === "/owner/dashboard/analytics" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Analytics Metrics</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <CreditCard size={18} className={window.location.pathname === "/owner/payments" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Payment Gateway</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <DollarSign size={18} className={window.location.pathname === "/owner/revenue" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Revenue Stream</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Rule 4 Standardized Action Exit Button */}
-        <button 
-          onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
-        >
-          <LogOut size={18} className="text-red-400" />
-          <span>Exit Workspace</span>
-        </button>
-      </aside>
-
       {/* ── MAIN SCREEN DATA WORKSPACE ── */}
-      <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
-        <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto">
           
           {/* Top Header Card Container Block */}
           <div className="rounded-2xl p-6 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-5 card">
@@ -269,8 +215,8 @@ const AnalyticsDashboard = () => {
                     <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Daily customer traffic index logs and active wait times breakdown.</p>
                   </div>
                   
-                  <div className="relative h-60 w-full pl-8 pr-2 mb-6">
-                    <div className="absolute inset-0 pl-8 pr-2 flex flex-col justify-between">
+                  <div className="relative h-60 w-full pl-8 pr-2 mb-6 font-sans">
+                    <div className="absolute inset-0 pl-8 pr-2 flex flex-col justify-between pointer-events-none">
                       {[0, 1, 2, 3, 4].map((i) => (
                         <div key={i} className="w-full h-px relative flex items-center border-dashed border-t border-stone-200/60">
                           <span className="absolute -left-8 text-[9px] font-bold font-mono text-stone-400">{(4-i) * 25}</span>
@@ -278,31 +224,89 @@ const AnalyticsDashboard = () => {
                       ))}
                     </div>
                     
-                    <div className="absolute bottom-0 left-8 right-2 translate-y-5 flex justify-between text-[10px] font-bold font-mono text-stone-400">
+                    <div className="absolute bottom-0 left-8 right-2 translate-y-5 flex justify-between text-[10px] font-bold font-mono text-stone-400 pointer-events-none">
                       <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                     </div>
 
                     <div className="absolute inset-0 left-8 pr-2 pb-px pt-2">
-                      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-                        <path 
-                          d="M0,75 Q16.6,60 33.3,70 T66.6,45 T100,25 L100,100 L0,100 Z" 
-                          fill="url(#orange-gradient)" 
-                          className="opacity-15"
-                        />
-                        <path 
-                          d="M0,75 Q16.6,60 33.3,70 T66.6,45 T100,25" 
-                          fill="none" 
-                          stroke={GOLD} 
-                          strokeWidth="2.5"
-                          vectorEffect="non-scaling-stroke"
-                        />
+                      <svg viewBox={`0 0 ${trafficWidth} ${trafficHeight}`} className="w-full h-full overflow-visible">
                         <defs>
                           <linearGradient id="orange-gradient" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor={GOLD} stopOpacity="1" />
+                            <stop offset="0%" stopColor={GOLD} stopOpacity="0.4" />
                             <stop offset="100%" stopColor={GOLD} stopOpacity="0" />
                           </linearGradient>
                         </defs>
+                        
+                        <polygon points={areaPointsStr} fill="url(#orange-gradient)" />
+                        <polyline points={trafficPointsStr} fill="none" stroke={GOLD} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                        
+                        {hoveredTrafficIdx !== null && (
+                          <>
+                            <line 
+                              x1={trafficPoints[hoveredTrafficIdx].x} 
+                              y1={trafficPad} 
+                              x2={trafficPoints[hoveredTrafficIdx].x} 
+                              y2={trafficHeight - trafficPad} 
+                              stroke="#8B5A2B" 
+                              strokeWidth="1.5" 
+                              strokeDasharray="3,3" 
+                              opacity="0.8" 
+                            />
+                            <circle 
+                              cx={trafficPoints[hoveredTrafficIdx].x} 
+                              cy={trafficPoints[hoveredTrafficIdx].y} 
+                              r="8" 
+                              fill={GOLD} 
+                              opacity="0.3" 
+                            />
+                          </>
+                        )}
+                        
+                        {trafficPoints.map((p, index) => (
+                          <circle 
+                            key={p.day} 
+                            cx={p.x} 
+                            cy={p.y} 
+                            r={hoveredTrafficIdx === index ? "6" : "4"} 
+                            fill={hoveredTrafficIdx === index ? "#8B5A2B" : GOLD} 
+                            stroke="#ffffff" 
+                            strokeWidth="2" 
+                            style={{ transition: "all 0.15s ease" }}
+                          />
+                        ))}
+                        
+                        {trafficPoints.map((p, index) => {
+                          const rectX = index === 0 ? p.x : p.x - trafficRectWidth / 2;
+                          const currentWidth = (index === 0 || index === trafficData.length - 1) ? trafficRectWidth / 2 : trafficRectWidth;
+                          return (
+                            <rect
+                              key={index}
+                              x={rectX}
+                              y={trafficPad}
+                              width={currentWidth}
+                              height={trafficHeight - trafficPad * 2}
+                              fill="transparent"
+                              style={{ cursor: "pointer" }}
+                              onMouseEnter={() => setHoveredTrafficIdx(index)}
+                              onMouseLeave={() => setHoveredTrafficIdx(null)}
+                            />
+                          );
+                        })}
                       </svg>
+                      
+                      {hoveredTrafficIdx !== null && (
+                        <div 
+                          className="absolute bg-zinc-900/95 text-[#FAF6F0] px-3 py-2 rounded-xl text-[10px] font-bold shadow-xl border border-[#C5A059]/40 pointer-events-none transition-all duration-150 animate-in fade-in zoom-in-95 z-20"
+                          style={{
+                            left: `${(trafficPoints[hoveredTrafficIdx].x / trafficWidth) * 100}%`,
+                            top: `${(trafficPoints[hoveredTrafficIdx].y / trafficHeight) * 100}%`,
+                            transform: 'translate(-50%, -125%)',
+                          }}
+                        >
+                          <p className="text-[#C5A059] uppercase tracking-wider mb-0.5">{trafficPoints[hoveredTrafficIdx].day}</p>
+                          <p className="text-white font-mono font-extrabold text-xs">Traffic: {trafficPoints[hoveredTrafficIdx].val}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -321,15 +325,68 @@ const AnalyticsDashboard = () => {
                       <span className="italic text-[#C5A059] normal-case font-medium">Breakdown</span>
                     </h2>
                     {/* Rule 3 Metric summary description label */}
-                    <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Current execution allocation status of daily visitors parameters.</p>
+                    <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Current execution allocation status of daily visitors pool.</p>
                   </div>
                   
-                  <div className="flex flex-col items-center justify-center my-auto py-4">
-                    <div className="w-36 h-36 rounded-full relative shadow-sm" style={{
-                      background: `conic-gradient(${GOLD} 0% 45%, ${CHARCOAL} 45% 75%, #CBD5E1 75% 90%, #EF4444 90% 100%)`
-                    }}>
-                      <div className="absolute inset-0 m-auto w-20 h-20 rounded-full border border-stone-100/50" style={{ backgroundColor: "#FFFFFF" }}></div>
-                    </div>
+                  <div className="flex flex-col items-center justify-center my-auto py-4 font-sans">
+                    {(() => {
+                      let queueOffset = 0;
+                      return (
+                        <svg viewBox="0 0 42 42" className="h-44 w-44 shadow-sm rounded-full overflow-visible">
+                          <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#FAF6F0" strokeWidth="6" />
+                          <g transform="rotate(-90 21 21)">
+                            {queueData.map((item, index) => {
+                              const percent = item.value;
+                              const isHovered = hoveredQueueIdx === index;
+                              const segment = (
+                                <circle 
+                                  key={item.name} 
+                                  cx="21" 
+                                  cy="21" 
+                                  r="15.915" 
+                                  fill="transparent" 
+                                  stroke={item.color} 
+                                  strokeWidth={isHovered ? "7.5" : "6"} 
+                                  strokeDasharray={`${percent} ${100 - percent}`} 
+                                  strokeDashoffset={-queueOffset}
+                                  style={{ cursor: "pointer", transition: "stroke-width 0.2s ease" }}
+                                  onMouseEnter={() => setHoveredQueueIdx(index)}
+                                  onMouseLeave={() => setHoveredQueueIdx(null)}
+                                />
+                              );
+                              queueOffset += percent;
+                              return segment;
+                            })}
+                          </g>
+
+                          {hoveredQueueIdx !== null ? (
+                            <>
+                              <text x="21" y="18.5" textAnchor="middle" fontSize="3" fontWeight="800" fill="#3E362E" className="font-sans font-bold">
+                                {queueData[hoveredQueueIdx].name}
+                              </text>
+                              <text x="21" y="23" textAnchor="middle" fontSize="4.5" fontWeight="950" fill={queueData[hoveredQueueIdx].color} className="font-mono">
+                                {queueData[hoveredQueueIdx].value}%
+                              </text>
+                              <text x="21" y="26.5" textAnchor="middle" fontSize="2" fontWeight="800" fill="#A89E95" className="font-sans uppercase tracking-wider">
+                                of visitor pool
+                              </text>
+                            </>
+                          ) : (
+                            <>
+                              <text x="21" y="19" textAnchor="middle" fontSize="3.5" fontWeight="900" fill="#3E362E" className="font-serif">
+                                Queue
+                              </text>
+                              <text x="21" y="23.5" textAnchor="middle" fontSize="3" fontWeight="950" fill="#8B5A2B" className="font-mono">
+                                12 Active
+                              </text>
+                              <text x="21" y="26.5" textAnchor="middle" fontSize="1.8" fontWeight="800" fill="#A89E95" className="font-sans uppercase tracking-wider">
+                                hover for %
+                              </text>
+                            </>
+                          )}
+                        </svg>
+                      );
+                    })()}
                   </div>
 
                   {/* Rule 2 Labels Grid setup for pie-charts details definitions links */}
@@ -562,8 +619,7 @@ const AnalyticsDashboard = () => {
               </div>
             </div>
           )}
-        </div>
-      </main>
+      </div>
     </div>
   );
 };

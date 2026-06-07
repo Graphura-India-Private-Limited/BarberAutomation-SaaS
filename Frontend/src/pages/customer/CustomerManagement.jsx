@@ -93,7 +93,7 @@ export default function CustomerManagement() {
 <div className="fixed top-20 left-4 z-[60]"> 
   
   <button
-    onClick={() => navigate("/")}
+    onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
     className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#3E362E] bg-white border border-[#EADDCA] px-4 py-2.5 rounded-xl shadow-lg grid-cols-1 md:grid-cols-2 xl:grid-cols-4"
   >
     <ArrowLeft size={12} className="text-[#C5A059]" />

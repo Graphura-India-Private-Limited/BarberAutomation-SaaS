@@ -13,19 +13,17 @@ export default function ManageServices() {
   const navigate = useNavigate();
   const [salon, setSalon] = useState(null);
   const [services, setServices] = useState([]);
-  const [newService, setNewService] = useState({ name: "", price: "", duration: "30", category: "men" });
+  const [newService, setNewService] = useState({ name: "", price: "", duration: "30", category: "men", description: "", image: "" });
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/owner/login");
-      return;
-    }
-    loadData();
-  }, []);
+  const fallbacks = {
+    men: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=150&q=80",
+    women: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=150&q=80",
+    addon: "https://images.unsplash.com/photo-1620331311520-246422fd82f9?auto=format&fit=crop&w=150&q=80"
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -49,12 +47,14 @@ export default function ManageServices() {
   const handleAddService = async (event) => {
     event.preventDefault();
     setError("");
+    const finalImage = newService.image || fallbacks[newService.category];
     try {
       const res = await fetch(`${API}/services`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           ...newService,
+          image: finalImage,
           salon_id: salon._id,
           price: Number(newService.price),
           duration: Number(newService.duration) || 30,
@@ -63,7 +63,7 @@ export default function ManageServices() {
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Unable to add service");
       setServices(prev => [...prev, data.service]);
-      setNewService({ name: "", price: "", duration: "30", category: "men" });
+      setNewService({ name: "", price: "", duration: "30", category: "men", description: "", image: "" });
       setIsAdding(false);
     } catch (err) {
       setError(err.message || "Unable to add service");
@@ -88,6 +88,10 @@ export default function ManageServices() {
     localStorage.clear();
     navigate("/owner/login");
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   if (loading) {
     return (
@@ -132,7 +136,7 @@ export default function ManageServices() {
   }
 
   return (
-    <div className="min-h-screen flex font-sans text-stone-800" style={{ background: "#FAF6F0" }}>
+    <div className="p-6 md:p-10 font-sans text-stone-800 min-h-screen" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
@@ -151,97 +155,8 @@ export default function ManageServices() {
         }
       `}</style>
 
-      {/* ── SIDEBAR NAVIGATION (Rule 4 Layout Links Set) ── */}
-      <aside className="w-64 border-r fixed h-screen flex flex-col justify-between p-6 z-30 shrink-0 bg-white border-stone-200 font-sans">
-        <div className="space-y-8">
-          <div className="flex items-center gap-3 border-b pb-5 border-stone-100">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 border border-[#C5A059]/20">
-              <Scissors size={18} color="#C5A059" strokeWidth={2} />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-black tracking-tight text-stone-900">Barber Pro</div>
-              {/* Rule 2 Tag kicker header label */}
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Owner Panel</div>
-            </div>
-          </div>
-
-          <nav className="space-y-1">
-            {/* Rule 4 UI Dashboard Buttons standard formatting */}
-            <button 
-              onClick={() => navigate("/owner/dashboard")}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <LayoutDashboard size={18} className={window.location.pathname === "/owner/dashboard" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Console Home</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/manage-services")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/manage-services"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <Scissors size={18} className={window.location.pathname === "/owner/manage-services" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Barbers & Services</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/dashboard/analytics")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/dashboard/analytics"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <BarChart2 size={18} className={window.location.pathname === "/owner/dashboard/analytics" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Analytics Metrics</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/payments")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/payments"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <CreditCard size={18} className={window.location.pathname === "/owner/payments" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Payment Gateway</span>
-            </button>
-
-            <button 
-              onClick={() => navigate("/owner/revenue")} 
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl transition-all cursor-pointer ${
-                window.location.pathname === "/owner/revenue"
-                  ? "bg-amber-50/60 text-[#C5A059] border border-amber-200/40"
-                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-              }`}
-            >
-              <DollarSign size={18} className={window.location.pathname === "/owner/revenue" ? "text-[#C5A059]" : "text-stone-400"} />
-              <span>Revenue Stream</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Rule 4 Standalone Exit link action element */}
-        <button 
-          onClick={handleLogout} 
-          className="w-full flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold tracking-wider uppercase rounded-xl text-red-500 hover:bg-red-50 transition-all border border-transparent cursor-pointer"
-        >
-          <LogOut size={18} className="text-red-400" />
-          <span>Exit Workspace</span>
-        </button>
-      </aside>
-
       {/* ── MAIN CONTENT DATA WORKSPACE ── */}
-      <main className="flex-1 ml-64 p-8 md:p-12 min-w-0">
-        <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto">
           
           {/* Rule 4 Action Breadcrumb Link */}
           <button 
@@ -311,6 +226,14 @@ export default function ManageServices() {
                     <option value="addon">Addon</option>
                   </select>
                 </div>
+                <div className="md:col-span-2">
+                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Image URL</label>
+                  <input placeholder="e.g., https://example.com/image.jpg" value={newService.image} onChange={e => setNewService(prev => ({ ...prev, image: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
+                </div>
+                <div className="md:col-span-3">
+                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Description</label>
+                  <input placeholder="e.g., Premium style and custom grooming detailing..." value={newService.description} onChange={e => setNewService(prev => ({ ...prev, description: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
+                </div>
                 <div className="flex gap-3 md:col-span-5 pt-2 border-t border-stone-100 mt-2 font-sans">
                   {/* Rule 4 Inside form data trigger action submission keys */}
                   <button type="submit" className="rounded-xl px-5 py-3 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer font-sans" style={{ background: CHARCOAL }}>
@@ -328,16 +251,28 @@ export default function ManageServices() {
           <div className="space-y-4 text-left">
             {services.map(service => (
               <div key={service._id} className="card p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm bg-white">
-                <div>
-                  <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">{service.name}</h3>
-                  <div className="flex items-center gap-3 mt-2 font-sans">
-                    {/* Rule 2 Category Metadata badge labels styling config tags */}
-                    <span className="px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-100 border border-stone-200/60 rounded">{service.category}</span>
-                    {/* Rule 3 Core layout description sub-labels features details indicators */}
-                    <span className="flex items-center gap-1 text-stone-600 text-sm font-normal leading-relaxed"><Clock size={12} style={{ color: GOLD }} /> {service.duration || 30} Mins</span>
+                <div className="flex items-start gap-4 flex-1">
+                  <img 
+                    src={service.image || fallbacks[service.category] || fallbacks.men} 
+                    alt={service.name} 
+                    className="w-16 h-16 rounded-xl object-cover border border-stone-100 shrink-0" 
+                  />
+                  <div className="text-left">
+                    <h3 className="text-md font-black font-serif text-stone-900 tracking-tight">{service.name}</h3>
+                    {service.description && (
+                      <p className="text-stone-500 text-xs mt-1 max-w-md font-sans font-medium line-clamp-2">
+                        {service.description}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-3 mt-2 font-sans">
+                      {/* Rule 2 Category Metadata badge labels styling config tags */}
+                      <span className="px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-100 border border-stone-200/60 rounded">{service.category}</span>
+                      {/* Rule 3 Core layout description sub-labels features details indicators */}
+                      <span className="flex items-center gap-1 text-stone-600 text-sm font-normal leading-relaxed"><Clock size={12} style={{ color: GOLD }} /> {service.duration || 30} Mins</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto pt-3 md:pt-0 border-t md:border-0 border-stone-100 font-sans">
+                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto pt-3 md:pt-0 border-t md:border-0 border-stone-100 font-sans shrink-0">
                   <div className="text-left md:text-right">
                     <p className="text-2xl font-black font-mono text-stone-900">₹{service.price}</p>
                     {/* Rule 2 Fee metadata tracker label kicker tag */}
@@ -362,7 +297,6 @@ export default function ManageServices() {
             </div>
           )}
         </div>
-      </main>
-    </div>
-  );
-}
+      </div>
+    );
+  }

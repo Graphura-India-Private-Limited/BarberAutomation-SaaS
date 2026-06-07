@@ -2,10 +2,10 @@
 // Frontend-integrated premium layout update
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Header from "../../components/layout/Header";
-import { 
-  User, RefreshCw, AlertTriangle, CheckCircle, Clock, 
-  Trash2, Bell, Phone, Award, Layers, HelpCircle, Send 
+import Header from "../layout/Header";
+import {
+  User, RefreshCw, AlertTriangle, CheckCircle, Clock,
+  Trash2, Bell, Phone, Award, Layers, HelpCircle, Send
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,18 +15,18 @@ const SALON_ID = 1;
 
 // Refactored unified status configuration mapping to eliminate raw primary color clashing
 const STATUSES = {
-  waiting:   { label: "Waiting",   color: "text-amber-800",  bg: "bg-amber-50/60",     border: "border-amber-200" },
-  inqueue:   { label: "In Queue",  color: "text-stone-800",  bg: "bg-stone-100",        border: "border-stone-200" },
-  delayed:   { label: "Delayed",   color: "text-rose-700",   bg: "bg-rose-50/40",       border: "border-rose-200" },
-  noshow:    { label: "No-Show",   color: "text-red-700",    bg: "bg-red-50/60",        border: "border-red-200" },
-  completed: { label: "Completed", color: "text-emerald-800", bg: "bg-emerald-50/60",   border: "border-emerald-200" },
+  waiting: { label: "Waiting", color: "text-amber-800", bg: "bg-amber-50/60", border: "border-amber-200" },
+  inqueue: { label: "In Queue", color: "text-stone-800", bg: "bg-stone-100", border: "border-stone-200" },
+  delayed: { label: "Delayed", color: "text-rose-700", bg: "bg-rose-50/40", border: "border-rose-200" },
+  noshow: { label: "No-Show", color: "text-red-700", bg: "bg-red-50/60", border: "border-red-200" },
+  completed: { label: "Completed", color: "text-emerald-800", bg: "bg-emerald-50/60", border: "border-emerald-200" },
 };
 
 const DEMO_QUEUE = [
   { id: 1, booking_id: 1, position: 1, customer_name: "Rohit Sharma", customer_mobile: "+91 98765 43210", services: [{ service: "Haircut & Beard" }], status: "inqueue", joined_at: new Date().toISOString() },
-  { id: 2, booking_id: 2, position: 2, customer_name: "Priya Mehta",  customer_mobile: "+91 91234 56789", services: [{ service: "Hair Spa" }],        status: "waiting", joined_at: new Date().toISOString() },
-  { id: 3, booking_id: 3, position: 3, customer_name: "Amit Kumar",   customer_mobile: "+91 99887 66554", services: [{ service: "Haircut" }],         status: "waiting", joined_at: new Date().toISOString() },
-  { id: 4, booking_id: 4, position: 4, customer_name: "Sneha Patil",  customer_mobile: "+91 77665 44321", services: [{ service: "Hair Color" }],       status: "waiting", joined_at: new Date().toISOString() },
+  { id: 2, booking_id: 2, position: 2, customer_name: "Priya Mehta", customer_mobile: "+91 91234 56789", services: [{ service: "Hair Spa" }], status: "waiting", joined_at: new Date().toISOString() },
+  { id: 3, booking_id: 3, position: 3, customer_name: "Amit Kumar", customer_mobile: "+91 99887 66554", services: [{ service: "Haircut" }], status: "waiting", joined_at: new Date().toISOString() },
+  { id: 4, booking_id: 4, position: 4, customer_name: "Sneha Patil", customer_mobile: "+91 77665 44321", services: [{ service: "Hair Color" }], status: "waiting", joined_at: new Date().toISOString() },
 ];
 
 const pad = n => String(Math.max(0, n)).padStart(2, "0");
@@ -211,7 +211,7 @@ export default function NoShowDelayPage() {
       <Header title="Exceptions Monitor" subtitle="Real-time handling of delays and workflow gaps" />
 
       <main className="max-w-6xl mx-auto w-full px-6 py-10 flex-1 flex flex-col lg:flex-row gap-8 items-start">
-        
+
         {/* COLUMN 1: LIVE MONITOR PIPELINE GRID VIEW */}
         <div className="w-full lg:w-4/12 flex flex-col gap-4">
           <div className="bg-white border border-stone-200/60 rounded-3xl p-5 shadow-3xs text-left w-full">
@@ -229,14 +229,13 @@ export default function NoShowDelayPage() {
               {queue.length === 0 ? (
                 <p className="text-center py-10 text-stone-400 text-xs font-semibold">Workspace pipeline logs empty.</p>
               ) : queue.map((c, i) => (
-                <div 
-                  key={c.id} 
+                <div
+                  key={c.id}
                   onClick={() => { setSelected(i); startTimer(15 * 60); }}
-                  className={`flex items-center gap-3.5 p-4 rounded-xl border transition-all cursor-pointer text-left ${
-                    i === selected 
-                      ? 'bg-[#FAF6F0] border-stone-400 ring-1 ring-stone-900/5 shadow-3xs' 
+                  className={`flex items-center gap-3.5 p-4 rounded-xl border transition-all cursor-pointer text-left ${i === selected
+                      ? 'bg-[#FAF6F0] border-stone-400 ring-1 ring-stone-900/5 shadow-3xs'
                       : 'bg-white border-stone-200/60 hover:border-stone-400'
-                  }`}
+                    }`}
                 >
                   <div className="w-9 h-9 rounded-xl bg-[#3E362E] text-[#C5A059] flex items-center justify-center font-black text-xs shrink-0 shadow-3xs">
                     {c.customer_name?.[0] || "?"}

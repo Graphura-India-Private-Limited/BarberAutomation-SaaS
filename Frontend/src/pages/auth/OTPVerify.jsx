@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CORRECT_OTP = '1234';
 const MAX_ATTEMPTS = 3;
 const TIMER_SECS = 150;
 
-// Premium salon backdrop asset string
 const SALON_IMAGE = 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=900&q=80';
 
 function ScissorIcon({ size = 20, color = 'currentColor' }) {
@@ -29,8 +30,8 @@ export default function OTPVerify({ phone, onBack }) {
   const [canResend, setCanResend] = useState(false);
   const [shaking, setShaking]     = useState(false);
   const [mounted, setMounted]     = useState(false);
-  
-  // Instantiating input index mapping controllers
+  const navigate                  = useNavigate();
+
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
   const timerRef  = useRef(null);
 
@@ -68,8 +69,8 @@ export default function OTPVerify({ phone, onBack }) {
 
   function handleKeyDown(e, idx) {
     if (e.key === 'Backspace') {
-      if (otp[idx]) { 
-        const n = [...otp]; n[idx] = ''; setOtp(n); 
+      if (otp[idx]) {
+        const n = [...otp]; n[idx] = ''; setOtp(n);
       } else if (idx > 0) {
         const n = [...otp]; n[idx - 1] = ''; setOtp(n);
         inputRefs[idx - 1].current?.focus();
@@ -98,7 +99,7 @@ export default function OTPVerify({ phone, onBack }) {
     const code = otp.join('');
     if (code.length < 4) { setError('Please enter all 4 digits of the OTP.'); return; }
     const newAttempts = attempts + 1; setAttempts(newAttempts);
-    
+
     if (code === CORRECT_OTP) {
       setError(''); setSuccess(true);
     } else {
@@ -112,15 +113,14 @@ export default function OTPVerify({ phone, onBack }) {
     }
   }
 
-  const locked   = attempts >= MAX_ATTEMPTS && !success;
-  const allFilled = otp.every(d => d !== '');
+  const locked      = attempts >= MAX_ATTEMPTS && !success;
+  const allFilled   = otp.every(d => d !== '');
   const displayPhone = phone || '98765 43210';
 
   return (
     <div style={S.page}>
       <style>{CSS}</style>
 
-      {/* ── LEFT: Dynamic Production Side Frame ── */}
       <div style={S.left} className={mounted ? 'slide-in-left' : ''}>
         <img src={SALON_IMAGE} alt="Barber salon view layout background" style={S.bgImg} />
         <div style={S.overlay} />
@@ -148,7 +148,6 @@ export default function OTPVerify({ phone, onBack }) {
         </div>
       </div>
 
-      {/* ── RIGHT: Managed Token Form Grid ── */}
       <div style={S.right}>
         <div style={{ ...S.card, ...(mounted ? {} : { opacity: 0 }) }} className={mounted ? 'slide-in-right' : ''}>
 
@@ -231,7 +230,11 @@ export default function OTPVerify({ phone, onBack }) {
             Verify OTP
           </button>
 
-          <button onClick={onBack} style={S.btnSec} className="btn-sec">
+          <button
+            onClick={() => (onBack ? onBack() : navigate('/otp-login'))}
+            style={S.btnSec}
+            className="btn-sec"
+          >
             ← Change Number
           </button>
 
