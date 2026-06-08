@@ -186,6 +186,15 @@ export default function Login() {
                       className="flex-1 px-4 py-3.5 text-sm outline-none bg-white text-gray-800"
                     />
                   </div>
+                  <div className="flex justify-end mt-2">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/forgot-password")}
+                      className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] hover:text-[#3E362E] hover:underline bg-transparent border-none cursor-pointer select-none transition-colors duration-200"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                 </div>
 
                 {error && <p className="text-red-500 text-xs font-medium text-center">{error}</p>}

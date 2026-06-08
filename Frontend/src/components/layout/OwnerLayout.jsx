@@ -21,6 +21,7 @@ export default function OwnerLayout() {
     { id: "bookings", label: "Bookings & Slots", icon: Calendar, route: "/owner/bookings" },
     { id: "services", label: "Services Catalog", icon: Scissors, route: "/owner/manage-services" },
     { id: "barbers", label: "Barber Team", icon: Users, route: "/owner/barbers" },
+    { id: "customers", label: "Customer Registry", icon: Users, route: "/owner/customers" },
     { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
     { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
     { id: "revenue", label: "Revenue Stream", icon: DollarSign, route: "/owner/revenue" },

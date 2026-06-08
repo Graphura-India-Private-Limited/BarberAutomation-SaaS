@@ -2,7 +2,6 @@
 // Frontend-integrated premium layout update
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Header from "../layout/Header";
 import {
   User, RefreshCw, AlertTriangle, CheckCircle, Clock,
   Trash2, Bell, Phone, Award, Layers, HelpCircle, Send
@@ -206,9 +205,7 @@ export default function NoShowDelayPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden">
-      {/* ✂️ MASTER GLOBAL MONITOR NAVIGATION HEADER */}
-      <Header title="Exceptions Monitor" subtitle="Real-time handling of delays and workflow gaps" />
+    <div className="w-full text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden">
 
       <main className="max-w-6xl mx-auto w-full px-6 py-10 flex-1 flex flex-col lg:flex-row gap-8 items-start">
 

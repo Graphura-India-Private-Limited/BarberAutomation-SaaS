@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { 
   Calendar, Clock, CheckCircle2, AlertCircle, XCircle, 
-  Search, SlidersHorizontal, User, Sparkles, Scissors, Landmark, Menu, Bell 
+  Search, SlidersHorizontal, User, Sparkles, Scissors, Landmark
 } from "lucide-react";
 
 // Mock operational dataset
@@ -22,8 +22,6 @@ export default function BarberBookings() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   
-  // परिभाषित स्टेट्स
-  const [sideOpen, setSideOpen] = useState(false);
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
   const filteredBookings = bookings.filter(booking => {
@@ -41,25 +39,7 @@ export default function BarberBookings() {
   };
 
   return (
-   <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
-      {/* Header */}
-     <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="text-left">
-            <h1 className="text-white font-bold text-xl font-serif">Bookings</h1>
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10"><Bell className="w-4 h-4" /></button>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
-            {profile.initials}
-          </div>
-        </div>
-      </header>
+   <div className="w-full text-stone-800 font-sans antialiased flex flex-col">
         
 
         {/* ── WORKSPACE DASHBOARD CONTENT CANVAS ── */}

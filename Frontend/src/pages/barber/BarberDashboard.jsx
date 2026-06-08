@@ -279,61 +279,10 @@ export default function BarberDashboard() {
       {sideOpen && <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSideOpen(false)} />}
 
       {/* ═══ MAIN CONTENT ═══ */}
-      <div className="flex-1 flex flex-col min-h-screen">
-
-        {/* Top Bar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between px-4 md:px-8 py-4 bg-[#FAF6F0] border-b border-[#E6D5C3] relative">
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#A1804E] opacity-90" />
-
-          <div className="flex items-center gap-3">
-            <button className="md:hidden p-2 rounded-lg text-[#4A3E3D] hover:bg-[#FAF6F0] transition" onClick={() => setSideOpen(!sideOpen)}>
-              <Menu className="w-5 h-5" />
-            </button>
-            <div className="text-left">
-              <h1 className="text-[#4A3E3D] font-bold text-2xl font-serif tracking-normal leading-none">Dashboard</h1>
-              <p className="text-[13px] mt-1 font-sans normal-case text-stone-500">
-                {profile.salonName} · {currentTime.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-3">
-            {/* Salon open badge */}
-            <button
-              onClick={() => setSalonOpen(!salonOpen)}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition font-sans normal-case"
-              style={{ 
-                background: salonOpen ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)", 
-                border: `1px solid ${salonOpen ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`, 
-                color: salonOpen ? "#047857" : "#b91c1c"
-              }}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full pulse-dot ${salonOpen ? "bg-[#10B981]" : "bg-red-400"}`} />
-              Salon {salonOpen ? "Open" : "Closed"}
-            </button>
-
-            {/* Notifications */}
-            <button className="relative p-2 rounded-xl text-[#4A3E3D] hover:bg-stone-50 transition border border-[#E6D5C3] bg-white">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 pulse-dot" />
-            </button>
-
-            {/* Profile */}
-            <button onClick={() => navigate("/barber/profile")}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-xl transition border border-[#E6D5C3] bg-white hover:bg-stone-50">
-              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white font-serif tracking-normal bg-gradient-to-br from-[#8B5A2B] to-[#4A3E3D]">
-                {profile.initials}
-              </div>
-              <div className="hidden md:block text-left">
-                <p className="text-[#4A3E3D] text-xs font-semibold leading-none font-serif tracking-normal">{profile.name.split(" ")[0]}</p>
-                <p className="text-[10px] mt-0.5 font-sans normal-case text-[#8B5A2B]">Barber</p>
-              </div>
-            </button>
-          </div>
-        </header>
+      <div className="flex-1 flex flex-col">
 
         {/* Page Content */}
-        <main className="flex-1 px-4 md:px-6 pt-2 pb-6 space-y-5 bg-[#FDFBF7] text-[#4A3E3D]">
+        <main className="flex-1 px-4 md:px-6 pt-6 pb-6 space-y-5 bg-[#FDFBF7] text-[#4A3E3D]">
 
   {/* ── STAT CARDS ── */}
 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mx-auto w-full">

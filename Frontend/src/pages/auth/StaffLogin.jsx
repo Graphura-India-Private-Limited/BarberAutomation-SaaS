@@ -8,7 +8,7 @@ import {
 import salonImage from "../../assets/shop.jpg"; // Reuses your unified dashboard luxury salon asset file
 
 export default function StaffLogin() {
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +30,13 @@ export default function StaffLogin() {
       const ok = login(email, password);
       setLoading(false);
       if (ok) {
-        navigate("/owner/overview");
+        const role = localStorage.getItem("role");
+        if (role === "barber") {
+          navigate("/barber/overview");
+        } else {
+          logout();
+          setError("Access Denied. Only staff (barbers) are allowed to access the Staff Portal.");
+        }
       } else {
         setError("Invalid credentials. Please verify your access tokens.");
       }
@@ -42,7 +48,15 @@ export default function StaffLogin() {
     setTimeout(() => {
       const ok = login(em, pw);
       setLoading(false);
-      if (ok) navigate("/owner/overview");
+      if (ok) {
+        const role = localStorage.getItem("role");
+        if (role === "barber") {
+          navigate("/barber/overview");
+        } else {
+          logout();
+          setError("Access Denied. Only staff (barbers) are allowed to access the Staff Portal.");
+        }
+      }
     }, 400);
   };
 
@@ -200,7 +214,6 @@ export default function StaffLogin() {
             {/* ── DEMO SEED ACCOUNT TRIGGER LIST ── */}
             <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
               {[
-                { label: "Owner", role: "Management", email: "ravi@salon.com", pass: "owner123", icon: "💎" },
                 { label: "Ajay", role: "Barber (With Finances)", email: "ajay@salon.com", pass: "barber123", icon: "💈" },
                 { label: "Kiran", role: "Barber (Fixed Salary)", email: "kiran@salon.com", pass: "kiran123", icon: "✂️" }
               ].map((demo) => (

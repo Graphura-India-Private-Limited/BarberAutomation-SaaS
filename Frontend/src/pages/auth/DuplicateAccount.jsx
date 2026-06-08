@@ -1,27 +1,18 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Scissors } from 'lucide-react';
 
 const REGISTERED = ['9550105897', '9735897907'];
 
 const BARBER_HERO_IMAGE = 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=900&auto=format&fit=crop&q=80';
-
-const ScissorIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="6" cy="6" r="3" stroke="currentColor"/>
-    <circle cx="6" cy="18" r="3" stroke="currentColor"/>
-    <line x1="20" y1="4" x2="8.12" y2="15.88" stroke="currentColor"/>
-    <line x1="14.47" y1="14.48" x2="20" y2="20" stroke="currentColor"/>
-    <line x1="8.12" y1="8.12" x2="12" y2="12" stroke="currentColor"/>
-  </svg>
-);
 
 export default function DuplicateAccount({ onBack }) {
   const [name, setName]     = useState('');
   const [phone, setPhone]   = useState('');
   const [status, setStatus] = useState('idle');
   const navigate            = useNavigate();
+
+  const isFormValid = name.trim() !== '' && phone.replace(/\D/g, '').length === 10;
 
   function handleVerifyCheck() {
     const sanitizedPhone = phone.replace(/\D/g, '');
@@ -45,8 +36,15 @@ export default function DuplicateAccount({ onBack }) {
     <div className="min-h-screen w-full bg-[#FAF6F0] font-sans text-stone-800 antialiased flex text-left">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
         .font-serif { font-family: 'Playfair Display', serif !important; }
+        
+        .card-minimalist {
+          background: #FFFFFF;
+          border-radius: 2.5rem;
+          box-shadow: 0 30px 60px -15px rgba(62, 54, 46, 0.06);
+          border: 1px solid rgba(234, 221, 206, 0.4);
+        }
       `}</style>
       
       <div className="hidden lg:flex lg:w-5/12 bg-[#3E362E] p-12 flex-col justify-between relative overflow-hidden border-r border-[#2A241F] shadow-2xl min-h-screen">
@@ -66,9 +64,9 @@ export default function DuplicateAccount({ onBack }) {
         <div className="flex flex-col items-start relative z-20 select-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#3E362E]/90 border border-[#C5A059]/60 flex items-center justify-center shadow-md">
-              <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
+              <Scissors size={18} className="text-[#C5A059] rotate-90" />
             </div>
-            <h1 className="text-xl font-black text-[#C5A059] tracking-[0.15em] uppercase leading-none">
+            <h1 className="text-xl font-bold text-[#C5A059] tracking-[0.15em] uppercase leading-none">
               BARBER <span className="text-white">PRO</span>
             </h1>
           </div>
@@ -94,43 +92,61 @@ export default function DuplicateAccount({ onBack }) {
             
       <div className="w-full lg:w-7/12 flex items-center justify-center p-6 md:p-12 bg-[#FAF6F0]">
         
-        <div className="w-full max-w-md bg-[#ffffff] rounded-[2rem] border border-stone-200/60 shadow-md p-8 md:p-10 text-left animate-in fade-in duration-300">
+        <div className="card-minimalist w-full max-w-[450px] p-8 sm:p-10 flex flex-col animate-in fade-in duration-300">
           
-          <div className="mb-8">
-            <div className="flex lg:hidden items-center gap-2 mb-4">
-              <ScissorIcon className="w-5 h-5 text-[#C5A059]" />
-              <span className="text-xs font-black uppercase tracking-widest text-[#3E362E]">Barber Pro</span>
+          {/* Header Identity Badge Group */}
+          <div className="flex items-center gap-4 mb-5 text-left">
+            <div className="w-12 h-12 rounded-xl bg-[#2C211A] flex items-center justify-center shrink-0">
+              <Scissors size={20} color="#C5A059" className="rotate-90" />
             </div>
-            
-            <h2 className="text-3xl font-black font-serif text-stone-900 tracking-tight uppercase leading-none">
+            <div>
+              <h2 className="text-lg font-serif font-bold text-[#2C211A] tracking-wide leading-tight">Barber Pro</h2>
+              <p className="text-[#C5A059] uppercase text-[9px] font-extrabold tracking-widest mt-0.5 font-sans">
+                Graphura India Private Limited
+              </p>
+            </div>
+          </div>
+
+          <div className="h-[1px] bg-stone-100 w-full mb-6" />
+
+          {/* Title */}
+          <div className="mb-6 text-center">
+            {/* Header Title */}
+            <h3 className="text-3xl font-serif font-semibold text-gray-900">
               Verify Profile
-            </h2>
-            <p className="text-xs font-bold tracking-wide text-[#A37B58] uppercase mt-1.5">
-              Check for existing profiles before registration
+            </h3>
+            
+            {/* Subtitle Description */}
+            <p className="mt-2 text-sm font-normal leading-relaxed text-slate-400 font-sans">
+              Check for existing profiles before registration.
             </p>
           </div>
 
           <div className="space-y-5">
             
-            <div className="space-y-2">
-              <label className="text-[10px] text-stone-400 uppercase font-black tracking-wider ml-0.5">
+            {/* Full name */}
+            <div className="space-y-2 text-left">
+              <label className="block text-[10px] font-extrabold text-[#C5A059] tracking-widest uppercase font-sans">
                 Full Name
               </label>
-              <input 
-                type="text" 
-                placeholder="e.g. Mayur K." 
-                value={name} 
-                onChange={e => { setName(e.target.value); setStatus('idle'); }}
-                className="w-full bg-white border border-stone-200/80 rounded-xl px-4 py-3.5 text-sm font-bold text-stone-900 placeholder-stone-400 outline-none transition-all focus:border-[#C5A059] shadow-2xs"
-              />
+              <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white shadow-3xs focus-within:border-[#8B6B4E] transition-all">
+                <input 
+                  type="text" 
+                  placeholder="e.g. Mayur K." 
+                  value={name} 
+                  onChange={e => { setName(e.target.value); setStatus('idle'); }}
+                  className="w-full px-4 py-3.5 text-sm outline-none text-stone-800 font-medium font-sans"
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] text-stone-400 uppercase font-black tracking-wider ml-0.5">
+            {/* Mobile number */}
+            <div className="space-y-2 text-left">
+              <label className="block text-[10px] font-extrabold text-[#C5A059] tracking-widest uppercase font-sans">
                 Mobile Number
               </label>
-              <div className="flex gap-2">
-                <div className="bg-white border border-stone-200/80 text-stone-500 font-bold text-sm rounded-xl px-4 flex items-center justify-center shadow-2xs">
+              <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white shadow-3xs focus-within:border-[#8B6B4E] transition-all">
+                <div className="px-4 flex items-center justify-center border-r border-[#EADBCE] bg-stone-50 text-stone-500 font-bold text-sm select-none font-sans">
                   +91
                 </div>
                 <input 
@@ -138,9 +154,7 @@ export default function DuplicateAccount({ onBack }) {
                   placeholder="98765 43210" 
                   value={phone} 
                   onChange={e => { setPhone(e.target.value.replace(/\D/g, '').slice(0, 10)); setStatus('idle'); }}
-                  className={`w-full bg-white border rounded-xl px-4 py-3.5 text-sm font-bold font-mono tracking-wide text-stone-900 placeholder-stone-400 outline-none transition-all shadow-2xs ${
-                    status === 'duplicate' ? 'border-red-300 focus:border-red-500' : status === 'available' ? 'border-green-300 focus:border-green-500' : 'border-stone-200/80 focus:border-[#C5A059]'
-                  }`}
+                  className="w-full px-4 py-3.5 text-sm outline-none text-stone-800 font-medium font-sans tracking-wider"
                 />
               </div>
             </div>
@@ -148,7 +162,7 @@ export default function DuplicateAccount({ onBack }) {
           </div>
 
           {status === 'duplicate' && (
-            <div className="mt-5 p-3.5 bg-red-50 border border-red-200/60 rounded-xl flex items-start gap-2.5">
+            <div className="mt-5 p-3.5 bg-red-50 border border-red-200/60 rounded-xl flex items-start gap-2.5 text-left">
               <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-red-800 text-xs font-black uppercase tracking-wider">Duplicate Profile Found</p>
@@ -160,7 +174,7 @@ export default function DuplicateAccount({ onBack }) {
           )}
 
           {status === 'available' && (
-            <div className="mt-5 p-3.5 bg-green-50 border border-green-200/60 rounded-xl flex items-start gap-2.5">
+            <div className="mt-5 p-3.5 bg-green-50 border border-green-200/60 rounded-xl flex items-start gap-2.5 text-left">
               <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-green-800 text-xs font-black uppercase tracking-wider">Profile Available</p>
@@ -171,25 +185,32 @@ export default function DuplicateAccount({ onBack }) {
             </div>
           )}
 
-          <div className="mt-8 space-y-3.5">
+          <div className="mt-8 space-y-3">
+            {/* Verify Registration button */}
             <button 
               type="button"
+              disabled={!isFormValid}
               onClick={handleVerifyCheck}
-              className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-xs uppercase tracking-widest py-4 rounded-xl shadow-md transition-all active:scale-[0.98] cursor-pointer"
+              className="w-full text-white font-bold text-xs uppercase tracking-widest py-4 rounded-xl transition-all duration-300 shadow-md active:scale-[0.99] font-sans"
+              style={{ 
+                backgroundColor: isFormValid ? "#2C1810" : "#9C928A",
+                boxShadow: isFormValid ? "0 10px 25px -5px rgba(44, 24, 16, 0.25)" : "none"
+              }}
             >
               Verify Registration
             </button>
             
+            {/* Back to Login */}
             <button 
               type="button"
               onClick={() => (onBack ? onBack() : navigate('/login'))}
-              className="w-full bg-white border border-stone-200 hover:border-stone-400 text-stone-700 font-black text-xs uppercase tracking-widest py-4 rounded-xl transition-all shadow-2xs cursor-pointer"
+              className="w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest bg-white hover:bg-[#f0ece3] text-[#2b2118] border border-[#e0d8cc] transition-colors"
             >
               Back to Login
             </button>
           </div>
 
-          <p className="text-center text-[#8C8475] text-[8px] mt-8 uppercase tracking-[0.3em] opacity-40 leading-none">
+          <p className="text-center text-[9px] uppercase tracking-widest text-[#bbb] mt-6">
             Professional Grooming Standards
           </p>
 

@@ -12,7 +12,8 @@ import {
   ChevronDown,
   User,
   ShieldAlert,
-  History
+  History,
+  TrendingUp
 } from 'lucide-react'
 
 // ══ COLORS ══
@@ -37,6 +38,8 @@ const PAGE_TITLES = {
   customer:  { title: 'Customer Issues', subtitle: 'Tickets raised by customers' },
   salon:     { title: 'Salon Issues',    subtitle: 'Tickets raised by salon partners' },
   reports:   { title: 'Reports',         subtitle: 'Analytics and performance metrics' },
+  analytics: { title: 'Platform Analytics', subtitle: 'Real-time SaaS operational telemetry & insights' },
+  users:     { title: 'User Management', subtitle: 'Platform directory database and node provision control' },
   settings:  { title: 'Settings',        subtitle: 'System preferences and configuration' },
 }
 
@@ -46,6 +49,8 @@ const NAV_ITEMS = [
   { icon: Users,           label: 'Customer Issues', page: 'customer' },
   { icon: HeadphonesIcon,  label: 'Salon Issues',    page: 'salon' },
   { icon: BarChart2,       label: 'Reports',         page: 'reports' },
+  { icon: TrendingUp,      label: 'Platform Analytics', page: 'analytics' },
+  { icon: User,            label: 'User Management', page: 'users' },
   { icon: Settings,        label: 'Settings',        page: 'settings' },
 ]
 

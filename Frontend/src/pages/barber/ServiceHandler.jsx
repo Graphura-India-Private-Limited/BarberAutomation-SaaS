@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Clock, Check, ChevronRight, Sparkles, Star, ArrowLeft, Lightbulb } from 'lucide-react';
-import Header from "../../components/layout/Header";
 
 const ServiceHandler = () => {
   const [step, setStep] = useState(1);
@@ -59,13 +58,7 @@ const ServiceHandler = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden">
-
-      {/* ✂️ GLOBAL EXECUTIVE SYSTEM NAVIGATION HEADER */}
-      <Header
-        title={step === 1 ? "Choose Expert" : "Select Treatment"}
-        subtitle={step === 1 ? "Top-rated professionals for every style" : `Specialists available for ${selectedGender}`}
-      />
+    <div className="w-full text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden">
 
       <main className="max-w-6xl mx-auto w-full px-6 py-12 flex-grow relative flex flex-col justify-start">
 

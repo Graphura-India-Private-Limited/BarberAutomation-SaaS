@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useAuth, useQueue } from "../../contexts/AppContext";
 import { useNavigate } from "react-router-dom";
 import {
-  Menu,
-  Bell,
   User,
   Trash2,
   PlayCircle,
@@ -31,19 +29,12 @@ export default function QueuePage() {
   const queue = Array.isArray(queueContext.queue)
     ? queueContext.queue
     : [];
-  // console.log("QUEUE CONTEXT =", queueContext);
-  // console.log("QUEUE DATA =", queue);
-
-  // const setQueue =
-  //   queueContext.setQueue ||
-  //   (() => console.log("setQueue missing"));
 
   const addToQueue = queueContext.addToQueue;
   const removeFromQueue = queueContext.removeFromQueue;
   const updateStatus = queueContext.updateStatus;
 
   const [showAdd, setShowAdd] = useState(false);
-  const [sideOpen, setSideOpen] = useState(false);
   const [salonOpen] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -101,12 +92,6 @@ const visibleQueue = isOwner
       addedAt: new Date().toLocaleTimeString(),
     };
 
-    // IMPORTANT FIX
-    // setQueue((prevQueue = []) => [
-    //   ...prevQueue,
-    //   newEntry,
-    // ]);
-
     addToQueue(newEntry);
 
     setNewCustomer({
@@ -119,21 +104,11 @@ const visibleQueue = isOwner
 
   /* ───────── DELETE ───────── */
   const handleDeleteCustomer = (id) => {
-    // setQueue((prevQueue) =>
-    //   prevQueue.filter((item) => item.id !== id)
-    // );
     removeFromQueue(id);
   };
 
   /* ───────── COMPLETE ───────── */
   const handleComplete = (id) => {
-    // setQueue((prevQueue) =>
-    //   prevQueue.map((item) =>
-    //     item.id === id
-    //       ? { ...item, status: "Completed" }
-    //       : item
-    //   )
-    // );
     updateStatus(id, "done");
   };
 
@@ -145,46 +120,7 @@ const visibleQueue = isOwner
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#4A3E3D] font-sans antialiased">
-      {/* HEADER */}
-      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            className="md:hidden p-2 text-zinc-400"
-            onClick={() => setSideOpen(!sideOpen)}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-
-          <div className="text-left">
-            <h1 className="text-white font-bold text-xl font-serif">
-              Queue
-            </h1>
-
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">
-              {profile.salonName}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-[#10B981]/10 border border-[#10B981]/20">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-
-            <span className="text-[9px] font-bold text-[#10B981] uppercase">
-              {salonOpen ? "Salon Open" : "Closed"}
-            </span>
-          </div>
-
-          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10">
-            <Bell className="w-4 h-4" />
-          </button>
-
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
-            {profile.initials}
-          </div>
-        </div>
-      </header>
+    <div className="w-full text-[#4A3E3D] font-sans antialiased">
 
       {/* MAIN */}
       <main className="max-w-7xl mx-auto px-4 md:px-8 py-10">

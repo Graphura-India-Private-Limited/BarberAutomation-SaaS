@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { 
   Star, MessageSquare, Award, ThumbsUp, Filter, Calendar, 
-  Heart, ShieldCheck, Menu, Bell 
+  Heart, ShieldCheck
 } from "lucide-react";
 
 const GOLD = "#C5A059";
@@ -75,7 +75,6 @@ export default function BarberReviews() {
   
   // Track liked review elements locally to prevent double voting spam
   const [clickedHelpful, setClickedHelpful] = useState({});
-  const [sideOpen, setSideOpen] = useState(false);
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
   // ── ✅ NEW INTERACTIVE FUNCTIONALITY ENGINE ──
@@ -98,31 +97,12 @@ export default function BarberReviews() {
 
   return (
     /* ✅ FIX: Removed 'justify-between' structure and enforced 'h-auto overflow-y-auto' layout blueprint so you can see all elements clearly when scrolling down */
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col h-auto overflow-y-auto pb-12">
+    <div className="w-full text-stone-800 font-sans antialiased flex flex-col h-auto overflow-y-auto pb-12">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
         .font-serif { font-family: 'Playfair Display', serif !important; }
       `}</style>
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="text-left">
-            <h1 className="text-white font-bold text-xl font-serif">Reviews</h1>
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10"><Bell className="w-4 h-4" /></button>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
-            {profile.initials}
-          </div>
-        </div>
-      </header>
         
       <div className="w-full flex-grow">
         {/* ── MAIN WORKSPACE CONTENT CANVAS ── */}

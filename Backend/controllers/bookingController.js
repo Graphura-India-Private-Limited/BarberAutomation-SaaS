@@ -23,6 +23,37 @@ exports.createBooking = async (req, res) => {
 
     const total = serviceDetails.reduce((sum, s) => sum + s.price, 0);
 
+    if (booking_type === "slot" && slot_time) {
+      const slotDate = new Date(slot_time);
+      if (isNaN(slotDate.getTime())) {
+        return res.status(400).json({ success: false, message: "Invalid slot time format." });
+      }
+
+      const now = new Date();
+      const istTimeStr = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+      const nowIST = new Date(istTimeStr);
+
+      const slotUTC = Date.UTC(
+        slotDate.getUTCFullYear(),
+        slotDate.getUTCMonth(),
+        slotDate.getUTCDate(),
+        slotDate.getUTCHours(),
+        slotDate.getUTCMinutes()
+      );
+
+      const nowLocalComponents = Date.UTC(
+        nowIST.getFullYear(),
+        nowIST.getMonth(),
+        nowIST.getDate(),
+        nowIST.getHours(),
+        nowIST.getMinutes()
+      );
+
+      if (slotUTC < nowLocalComponents) {
+        return res.status(400).json({ success: false, message: "Cannot book a slot in the past." });
+      }
+    }
+
     const booking = await Booking.create({
       customer_id: req.user.id,
       salon_id,

@@ -29,12 +29,12 @@ import BarberReviews from "./pages/barber/BarberReviews";
 import BarberServices from "./pages/barber/BarberServices";
 import BarberLayout from "./components/layout/BarberLayout";
 import AdminLayout from "./components/layout/AdminLayout";
-import SmartQueue from "./pages/customer/SmartQueue";
+import SmartQueue from "./pages/barber/SmartQueue";
 import OwnerLogin from "./pages/owner/OwnerLogin";
 import SalonRegistration from "./pages/owner/SalonRegistration";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import ManageServices from "./pages/owner/ManageServices";
-import HomeOverview from "./pages/owner/HomeOverview";
+import HomeOverview from "./pages/barber/HomeOverview";
 import FinancePage from "./pages/owner/FinancePage";
 import PaymentDashboard from "./pages/owner/PaymentDashboard";
 import RevenueDashboard from "./pages/owner/RevenueDashboard";
@@ -144,10 +144,7 @@ function App() {
           <Route path="booking" element={<CustomerBookingFlow />} />
           <Route path="history" element={<BookingHistory />} />
           <Route path="flow" element={<CustomerBookingFlow />} />
-          <Route path="interactions" element={<CustomerInteractionView />} />
-          <Route path="customers" element={<CustomerManagement />} />
         </Route>
-        <Route path="/smart-queue" element={<ProtectedRoute allowedRoles={["customer"]}><SmartQueue /></ProtectedRoute>} />
 
         {/* --- DISCOVERY & REVIEWS --- */}
         <Route path="/nearby" element={<NearbyBarbers />} />
@@ -161,6 +158,7 @@ function App() {
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber" element={<ProtectedRoute allowedRoles={["barber"]}><Outlet /></ProtectedRoute>}>
           <Route path="dashboard" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BarberDashboard stats={stats} currentSvc={currentSvc} setCurrentSvc={setCurrentSvc} getElapsed={getElapsed} showToast={showToast} queue={queue} breakRequests={breakRequests} reviews={reviews} /></BarberLayout>} />
+          <Route path="overview" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><HomeOverview /></BarberLayout>} />
           <Route path="profile" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberProfile /></BarberLayout>} />
           <Route path="breaks" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout>} />
           <Route path="live-session" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
@@ -169,11 +167,12 @@ function App() {
           <Route path="noshow-delay" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><NoShowDelayPage /> </BarberLayout>} />
           <Route path="noshow-handle" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <NoShowHandle /> </BarberLayout>} />
           <Route path="settings" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberSettings /> </BarberLayout>} />
-          <Route path="queue" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <QueuePage /> </BarberLayout>} />
+          <Route path="queue" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <SmartQueue /> </BarberLayout>} />
           <Route path="bookings" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BarberBookings /></BarberLayout>} />
           <Route path="earnings" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberEarnings /> </BarberLayout>} />
           <Route path="reviews" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BarberReviews /></BarberLayout>} />
           <Route path="services" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberServices /></BarberLayout>} />
+          <Route path="interactions" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><CustomerInteractionView /></BarberLayout>} />
         </Route>
 
         {/* --- OWNER HUB CONTROL (RESTRICTED BY RBAC) --- */}
@@ -187,11 +186,11 @@ function App() {
           <Route path="manage-services" element={<ManageServices />} />
           <Route path="approvals" element={<BreakApprovalDashboard />} />
           <Route path="bookings" element={<BookingManagement />} />
-          <Route path="overview" element={<HomeOverview />} />
           <Route path="finance" element={<FinancePage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="queue" element={<LiveQueue />} />
           <Route path="barbers" element={<BarberTeam />} />
+          <Route path="customers" element={<CustomerManagement />} />
         </Route>
 
         {/* --- SUPER ADMIN CENTRAL PANEL (RESTRICTED BY RBAC) --- */}
@@ -209,8 +208,8 @@ function App() {
           <Route path="live" element={<AdminRequests initialTab="live" />} />
           <Route path="platform-settings" element={<AdminRequests initialTab="settings" />} />
           <Route path="onboarding" element={<AdminOnboarding />} />
-          <Route path="user-management" element={<AdminUserManagement />} />
-          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="user-management" element={<AdminLayout page="users"><AdminUserManagement /></AdminLayout>} />
+          <Route path="analytics" element={<AdminLayout page="analytics"><AdminAnalytics /></AdminLayout>} />
           <Route path="dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
           <Route path="tickets" element={<AdminLayout page="tickets"><TicketsPage {...ticketState} /></AdminLayout>} />
           <Route path="reports" element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />

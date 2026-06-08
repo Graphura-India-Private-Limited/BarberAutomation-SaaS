@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Settings, Lock, Bell, ShieldCheck, Eye, EyeOff, Menu } from "lucide-react";
+import { Settings, Lock, Bell, ShieldCheck, Eye, EyeOff } from "lucide-react";
 
 export default function BarberSettings() {
   const [showPassword, setShowPassword] = useState(false); 
@@ -7,7 +7,6 @@ export default function BarberSettings() {
   const [soundAlerts, setSoundAlerts] = useState(true);
   
   // Header States
-  const [sideOpen, setSideOpen] = useState(false);
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
   const [passwords, setPasswords] = useState({
@@ -29,25 +28,7 @@ export default function BarberSettings() {
   const formInputStyle = "w-full pl-4 pr-11 py-3 bg-white border border-[#EADDCA] rounded-xl text-stone-900 font-semibold outline-none focus:border-[#C5A059] focus:shadow-[0_0_0_4px_rgba(197,160,89,0.08)] text-sm transition-all duration-300 h-11";
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col relative overflow-hidden">
-      
-      {/* हेडर सेक्शन */}
-      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="text-left">
-            <h1 className="text-white font-bold text-xl font-serif">Settings</h1>
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">{profile.salonName}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black">
-            {profile.initials}
-          </div>
-        </div>
-      </header>
+    <div className="w-full text-[#3E362E] font-sans antialiased flex flex-col relative overflow-hidden">
 
       {/* Luxury Background Ambient Glows */}
       <div className="absolute top-24 left-0 w-80 h-80 bg-[#C5A059]/5 rounded-full blur-3xl pointer-events-none" />

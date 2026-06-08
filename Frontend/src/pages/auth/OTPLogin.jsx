@@ -179,11 +179,16 @@ export default function OTPLogin() {
             {step === "mobile" ? (
               <>
                 <div className="mb-6 text-center">
-                  <h3 className="text-3xl font-serif font-normal text-stone-900 tracking-tight">OTP-Login</h3>
-                  <p className="text-stone-500 mt-2 text-sm font-normal leading-relaxed font-sans">
-                    Enter your mobile number to receive a secure login one-time verification password.
-                  </p>
-                </div>
+  {/* Header Title */}
+  <h3 className="text-3xl font-serif font-semibold text-gray-900">
+                OTP-Login
+              </h3>
+  
+  {/* Subtitle Description */}
+  <p className="mt-2 text-sm font-normal leading-relaxed text-slate-400 font-sans">
+    Enter your mobile number to receive a secure login one-time verification password.
+  </p>
+</div>
 
                 <form onSubmit={sendOtp} className="space-y-5 text-left">
                   <div>
@@ -238,7 +243,9 @@ export default function OTPLogin() {
             ) : (
               <>
                 <div className="mb-6 text-center">
-                  <h3 className="text-3xl font-serif font-normal text-stone-900 tracking-tight">Verify OTP</h3>
+                  <h3 className="text-3xl font-serif font-semibold text-gray-900">
+                Verify OTP
+              </h3>
                   <p className="text-stone-400 mt-2 text-sm font-medium font-sans">
                     We sent a 6-digit code to <span className="text-stone-800 font-bold">+91 {phone}</span>.
                   </p>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, ShieldCheck, Briefcase, Phone, Award, Save, Menu, Bell } from "lucide-react";
+import { User, ShieldCheck, Briefcase, Phone, Award, Save } from "lucide-react";
 
 const API      = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const CHARCOAL = "#3E362E";
@@ -33,7 +33,6 @@ function BarberProfile() {
 
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
-  const [sideOpen, setSideOpen] = useState(false);
 
   const salonInfo = { salonName: "Master Barber Lounge", initials: "AS" };
 
@@ -110,28 +109,7 @@ function BarberProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-stone-800 font-sans antialiased flex flex-col">
-
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between font-sans">
-        <div className="flex items-center gap-4">
-          <button className="md:hidden p-2 text-zinc-400" onClick={() => setSideOpen(!sideOpen)}>
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="text-left">
-            <h1 className="text-white font-bold text-xl font-serif">Profile</h1>
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-sans">{salonInfo.salonName}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10">
-            <Bell className="w-4 h-4" />
-          </button>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C842] to-[#E8A020] flex items-center justify-center text-xs font-bold text-black font-sans">
-            {salonInfo.initials}
-          </div>
-        </div>
-      </header>
+    <div className="w-full text-stone-800 font-sans antialiased flex flex-col">
 
       {/* ── Main ── */}
       <main className="max-w-5xl mx-auto w-full px-6 py-10 flex-1">

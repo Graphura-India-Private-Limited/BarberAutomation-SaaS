@@ -11,6 +11,8 @@ export default function AdminLayout({ page, children }) {
     customer: "/admin/customer-issues",
     salon: "/admin/salon-issues",
     reports: "/admin/reports",
+    analytics: "/admin/analytics",
+    users: "/admin/user-management",
     settings: "/admin/settings",
   };
 

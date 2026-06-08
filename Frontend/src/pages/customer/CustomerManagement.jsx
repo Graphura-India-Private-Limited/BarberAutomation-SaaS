@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
-import Navbar from "../../components/layout/Navbar";
 
 import {
   Users,
@@ -12,9 +11,8 @@ import {
   Mail,
   Zap,
   ArrowUpRight,
-  ArrowLeft // ✅ Imported ArrowLeft navigation icon
+  ArrowLeft
 } from "lucide-react";
-import Footer from "../../components/layout/Footer";
 
 // Corporate Brand Scissor SVG Icon Component
 const ScissorIcon = ({ className }) => (
@@ -82,26 +80,11 @@ export default function CustomerManagement() {
     "bg-white/80 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-5 md:p-6 shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_15px_30px_rgba(62,54,46,0.04)] transition-all duration-300 text-left";
 
   return (
-    <>
-    <Navbar />
- <div className="min-h-screen bg-[#FAF6F0] font-sans ... pt-24 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
-      
+    <div className="w-full bg-[#FAF6F0] font-sans pb-12">
       {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
       <div className="absolute top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
       <div className="absolute bottom-1/4 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
-<div className="absolute top-6 left-6 z-[9999]"> {/* z-50 ऐवजी हे वापरून पहा */}
-<div className="fixed top-20 left-4 z-[60]"> 
-  
-  <button
-    onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
-    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#3E362E] bg-white border border-[#EADDCA] px-4 py-2.5 rounded-xl shadow-lg grid-cols-1 md:grid-cols-2 xl:grid-cols-4"
-  >
-    <ArrowLeft size={12} className="text-[#C5A059]" />
-  </button>
-</div>
-</div>
       
-
       {/* SUB-HEADER UTILITIES SECTION */}
       <div className="max-w-7xl mx-auto w-full px-4 md:px-8 flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center mb-8 text-left z-10 relative ">
         <div>
@@ -286,7 +269,5 @@ export default function CustomerManagement() {
         </div>
       </div>   
     </div>
-          <Footer />
-    </>
   );
 }

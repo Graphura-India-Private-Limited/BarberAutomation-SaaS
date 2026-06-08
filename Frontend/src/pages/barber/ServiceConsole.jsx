@@ -105,31 +105,17 @@ export default function ServiceConsole() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col">
-      {/* ───────── HEADER ───────── */}
-      <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="w-full text-[#3E362E] font-sans antialiased flex flex-col">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
+        <div className="w-full max-w-xl text-left mb-4">
           <button
-            className="text-zinc-400 hover:text-white transition"
+            type="button"
             onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft size={14} className="stroke-[2.5px]" /> Return to Dashboard
           </button>
-
-          <div className="text-left">
-            <h1 className="text-white font-bold text-lg font-serif">
-              Live Console
-            </h1>
-
-            <p className="text-[10px] text-zinc-500 uppercase tracking-widest">
-              {salonInfo.salonName}
-            </p>
-          </div>
         </div>
-      </header>
-
-      {/* ───────── MAIN ───────── */}
-      <main className="flex-1 flex items-center justify-center p-4 md:p-8">
         <div className="max-w-xl w-full bg-white border border-[#EADDCA] rounded-[24px] p-6 sm:p-8 shadow-sm space-y-8 relative">
           {/* CUSTOMER */}
           <div className="flex justify-between items-start">

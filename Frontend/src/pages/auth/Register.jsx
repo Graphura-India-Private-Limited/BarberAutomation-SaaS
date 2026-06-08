@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom' // ✅ Imported the Router navigate hook
+import { useNavigate } from 'react-router-dom'
+import { Scissors } from 'lucide-react'
 import heroImg from '../../assets/blog27.png'
 
 const REGISTERED = ['9550105897', '9735897907']
@@ -10,6 +11,8 @@ export default function Register({ onBack }) {
   const [phone, setPhone] = useState('')
   const [error, setError] = useState('')
   const [done, setDone]   = useState(false)
+
+  const isFormValid = name.trim() !== '' && phone.replace(/\D/g, '').length === 10;
 
   function handleRegister() {
     const cleanPhone = phone.replace(/\s/g, '').trim()
@@ -43,6 +46,18 @@ export default function Register({ onBack }) {
 
   return (
     <div className="flex min-h-screen font-sans">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+        .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+        .font-serif { font-family: 'Playfair Display', serif !important; }
+        
+        .card-minimalist {
+          background: #FFFFFF;
+          border-radius: 2.5rem;
+          box-shadow: 0 30px 60px -15px rgba(62, 54, 46, 0.06);
+          border: 1px solid rgba(234, 221, 206, 0.4);
+        }
+      `}</style>
 
       {/* ── Left hero ── */}
       <div className="relative hidden md:flex flex-col justify-end w-[52%] overflow-hidden">
@@ -106,53 +121,75 @@ export default function Register({ onBack }) {
       <div className="flex flex-1 items-center justify-center px-8 py-12 bg-[#FAF6F0]">
 
         {/* Card */}
-        <div className="w-full max-w-md rounded-2xl shadow-xl px-10 py-10 bg-[#ffffff]">
+        <div className="card-minimalist w-full max-w-[450px] p-8 sm:p-10 flex flex-col">
+
+          {/* Header Identity Badge Group */}
+          <div className="flex items-center gap-4 mb-5 text-left">
+            <div className="w-12 h-12 rounded-xl bg-[#2C211A] flex items-center justify-center shrink-0">
+              <Scissors size={20} color="#C5A059" className="rotate-90" />
+            </div>
+            <div>
+              <h2 className="text-lg font-serif font-bold text-[#2C211A] tracking-wide leading-tight">Barber Pro</h2>
+              <p className="text-[#C5A059] uppercase text-[9px] font-extrabold tracking-widest mt-0.5 font-sans">
+                Graphura India Private Limited
+              </p>
+            </div>
+          </div>
+
+          <div className="h-[1px] bg-stone-100 w-full mb-6" />
 
           {/* Title */}
-          <h1 className="text-3xl font-black uppercase tracking-tight mb-1 text-[#1a1a1a]">
-            Create Account
-          </h1>
-          <p className="text-[10px] font-semibold uppercase tracking-widest mb-8 text-[#b5541a]">
-            Register with your mobile number to get started
-          </p>
+          <div className="mb-6 text-center">
+            {/* Header Title */}
+            <h3 className="text-3xl font-serif font-semibold text-gray-900">
+              Create Account
+            </h3>
+            
+            {/* Subtitle Description */}
+            <p className="mt-2 text-sm font-normal leading-relaxed text-slate-400 font-sans">
+              Register with your mobile number to get started.
+            </p>
+          </div>
 
           {/* Full name */}
-          <div className="mb-5">
-            <label className="block text-[10px] font-bold uppercase tracking-widest mb-1.5 text-[#888]">
+          <div className="mb-5 text-left">
+            <label className="block text-[10px] font-extrabold text-[#C5A059] tracking-widest mb-2 uppercase font-sans">
               Full Name
             </label>
-            <input
-              type="text"
-              placeholder="e.g. Mayur K."
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="w-full bg-white rounded-xl px-4 py-3 text-sm text-[#333] placeholder-[#bbb] outline-none border border-transparent focus:border-[#b5541a] transition-colors"
-            />
+            <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white shadow-3xs focus-within:border-[#8B6B4E] transition-all">
+              <input
+                type="text"
+                placeholder="e.g. Mayur K."
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="w-full px-4 py-3.5 text-sm outline-none text-stone-800 font-medium font-sans"
+              />
+            </div>
           </div>
 
           {/* Mobile number */}
-          <div className="mb-7">
-            <label className="block text-[10px] font-bold uppercase tracking-widest mb-1.5 text-[#888]">
+          <div className="mb-7 text-left">
+            <label className="block text-[10px] font-extrabold text-[#C5A059] tracking-widest mb-2 uppercase font-sans">
               Mobile Number
             </label>
-            <div className="flex gap-2">
-              <div className="bg-white rounded-xl px-4 py-3 text-sm font-medium text-[#444] flex items-center select-none border border-transparent">
+            <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white shadow-3xs focus-within:border-[#8B6B4E] transition-all">
+              <div className="px-4 flex items-center justify-center border-r border-[#EADBCE] bg-stone-50 text-stone-500 font-bold text-sm select-none font-sans">
                 +91
               </div>
               <input
                 type="tel"
                 placeholder="98765 43210"
                 value={phone}
-                onChange={e => setPhone(e.target.value)}
+                onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
                 maxLength={10}
-                className="flex-1 bg-white rounded-xl px-4 py-3 text-sm text-[#333] placeholder-[#bbb] outline-none border border-transparent focus:border-[#b5541a] transition-colors tracking-wider"
+                className="w-full px-4 py-3.5 text-sm outline-none text-stone-800 font-medium font-sans tracking-wider"
               />
             </div>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="mb-4 text-xs rounded-lg px-3 py-2.5 flex items-start gap-2 bg-[#fdf5f0] border border-[#e8b49a] text-[#7a3018]">
+            <div className="mb-4 text-xs rounded-lg px-3 py-2.5 flex items-start gap-2 bg-[#fdf5f0] border border-[#e8b49a] text-[#7a3018] text-left">
               <span className="flex-shrink-0">⚠</span>
               <span>{error}</span>
             </div>
@@ -160,7 +197,7 @@ export default function Register({ onBack }) {
 
           {/* Success */}
           {done && (
-            <div className="mb-4 text-xs rounded-lg px-3 py-2.5 flex items-start gap-2 bg-green-50 border border-green-200 text-green-800">
+            <div className="mb-4 text-xs rounded-lg px-3 py-2.5 flex items-start gap-2 bg-green-50 border border-green-200 text-green-800 text-left">
               <span className="flex-shrink-0">✓</span>
               <span>Registration successful! OTP sent to +91 {phone}</span>
             </div>
@@ -169,7 +206,12 @@ export default function Register({ onBack }) {
           {/* Create Account button */}
           <button
             onClick={handleRegister}
-            className="w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest bg-[#2b2118] hover:bg-[#3d2f22] text-white transition-colors mb-3"
+            disabled={!isFormValid}
+            className="w-full text-white font-bold text-xs uppercase tracking-widest py-4 rounded-xl transition-all duration-300 shadow-md active:scale-[0.99] font-sans mb-3"
+            style={{ 
+              backgroundColor: isFormValid ? "#2C1810" : "#9C928A",
+              boxShadow: isFormValid ? "0 10px 25px -5px rgba(44, 24, 16, 0.25)" : "none"
+            }}
           >
             Create Account
           </button>
