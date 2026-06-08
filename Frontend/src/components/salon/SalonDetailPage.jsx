@@ -216,85 +216,62 @@ export default function SalonDetailPage() {
     <main className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col">
       <Navbar />
 
-      {/* 📸 PREMIUM HERO IMAGE DISPLAY */}
-      <section className="relative h-[72vh] md:h-[85vh] overflow-hidden flex items-end">
-        {/* Background Image */}
-        <img
-          src={activeImage || salon.image}
-          alt={salon.name}
-          onError={(e) => {
-            e.currentTarget.src = defaultShopImage;
-          }}
-          className="absolute inset-0 w-full h-full object-cover scale-[1.03] transition-all duration-500"
-        />
+      {/* 📸 EDITORIAL SHOWCASE HERO DISPLAY */}
+      <section className="relative bg-[#FAF6F0] pt-28 pb-8 px-6 sm:px-8 lg:px-10">
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left Side: Salon Info */}
+          <div className="lg:col-span-7 text-left space-y-6">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#8A7B6A] hover:text-[#C5A059] transition cursor-pointer border-none bg-transparent"
+            >
+              <ArrowLeft size={14} className="stroke-[2.5px]" /> Back to Studios
+            </button>
 
-        {/* Luxury Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#120F0C] via-[#120F0C]/65 to-black/25" />
-
-        {/* Soft Golden Ambient Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,160,89,0.2),transparent_35%)]" />
-
-        {/* Floating Back Button */}
-        <div className="absolute top-20 md:top-24 left-6 sm:left-8 lg:left-10 z-[10000]">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-black/35 backdrop-blur-xl border border-white/15 text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] hover:scale-105 active:scale-95 group"
-          >
-            <ArrowLeft
-              size={17}
-              className="transition-transform duration-300 group-hover:-translate-x-0.5"
-            />
-          </button>
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pb-14 md:pb-20">
-          <div className="max-w-3xl text-left text-white">
             {/* Premium Badges */}
-            <div className="mb-5 flex flex-wrap items-center gap-3">
-              <div className="inline-flex items-center gap-2 rounded-xl bg-white/95 backdrop-blur px-4 py-2 shadow-lg">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="inline-flex items-center gap-2 rounded-xl bg-white border border-[#E8DCCB] px-3.5 py-2 shadow-3xs">
                 <Star
-                  size={14}
+                  size={12}
                   className="fill-[#C5A059] text-[#C5A059]"
                 />
-                <span className="text-[11px] font-black uppercase tracking-wider text-stone-900">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#3E362E]">
                   {salon.rating} Rating
                 </span>
               </div>
 
-              <div className="inline-flex items-center gap-2 rounded-xl bg-black/45 backdrop-blur-xl border border-white/10 px-4 py-2">
+              <div className="inline-flex items-center gap-2 rounded-xl bg-white border border-[#E8DCCB] px-3.5 py-2 shadow-3xs">
                 <MapPin
-                  size={14}
+                  size={12}
                   className="text-[#C5A059]"
                 />
-                <span className="text-[11px] font-black uppercase tracking-wider text-white">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#3E362E]">
                   {salon.distance} Away
                 </span>
               </div>
 
-              <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/15 backdrop-blur border border-emerald-500/20 px-4 py-2">
-                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400">
+              <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-250 px-3.5 py-2 shadow-3xs">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">
                   ● LIVE QUEUE ACTIVE
                 </span>
               </div>
             </div>
 
             {/* Heading */}
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight text-[#FAF6F0]">
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-[#3E362E]">
               {salon.name}
             </h1>
 
             {/* Description */}
-            <p className="mt-5 max-w-2xl text-sm sm:text-base text-stone-200/90 leading-relaxed font-medium">
+            <p className="text-stone-500 text-sm sm:text-base leading-relaxed font-medium max-w-xl">
               {salon.about}
             </p>
 
             {/* CTA Buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="pt-2 flex flex-wrap items-center gap-4">
               <button
                 onClick={handleBookVisit}
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] text-[11px] font-black uppercase tracking-[0.25em] shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-105 transition-all duration-300 cursor-pointer"
+                className="px-7 py-4 rounded-xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] hover:from-[#bfa05d] hover:to-[#bfa05d] text-[#2A241F] text-[10px] font-black uppercase tracking-[0.22em] shadow-md hover:scale-[1.02] transition duration-300 cursor-pointer border-none"
               >
                 Book Appointment
               </button>
@@ -306,10 +283,25 @@ export default function SalonDetailPage() {
                     element.scrollIntoView({ behavior: "smooth" });
                   }
                 }}
-                className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl text-white text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all duration-300 cursor-pointer"
+                className="px-7 py-4 rounded-xl border border-[#E8DCCB] bg-white hover:bg-stone-50 text-[#3E362E] text-[10px] font-black uppercase tracking-[0.22em] hover:scale-[1.02] transition duration-300 cursor-pointer"
               >
                 Explore Services
               </button>
+            </div>
+          </div>
+
+          {/* Right Side: Showcase Image Frame */}
+          <div className="lg:col-span-5">
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] rounded-[2rem] overflow-hidden border border-[#E8DCCB] bg-stone-100 shadow-xl group">
+              <img
+                src={activeImage || salon.image}
+                alt={salon.name}
+                onError={(e) => {
+                  e.currentTarget.src = defaultShopImage;
+                }}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
         </div>
