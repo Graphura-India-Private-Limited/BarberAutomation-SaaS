@@ -36,26 +36,40 @@ npm run dev
 
 ## 🔐 Test Credentials
 
-| Role | Mobile | Password |
-|------|--------|----------|
-| Customer | Any mobile | OTP shown in blue box |
-| Owner | 9999999999 | Owner@123 |
-| Barber | 9876543210 | Barber@123 |
-| Admin | 9000000000 | Admin@123 |
-| Admin MPIN | — | 123456 |
+### 👥 Global Roles
+| Role | Mobile / Email | Password / OTP | Notes |
+|------|--------|----------|-------|
+| **Customer** | Any mobile | OTP shown in UI blue box | Login at `/login` |
+| **Admin** | `9000000000` | `Admin@123` | Login at `/admin/login` |
+| **Admin MPIN** | — | `123456` | For sensitive actions |
 
----
-## Staff Login Credentials
+### 🏢 Salon Owners (Login at `/owner/login`)
+All salon owner accounts in the database have been set to the password `owner@123` for testing convenience:
 
-| Role   | Email                                     | Password  |
-| ------ | ----------------------------------------- | --------- |
-| Owner  | [ravi@salon.com](mailto:ravi@salon.com)   | owner123  |
-| Barber | [ajay@salon.com](mailto:ajay@salon.com)   | barber123 |
-| Barber | [kiran@salon.com](mailto:kiran@salon.com) | kiran123  |
+| Salon Name | Owner Name | Mobile (Username) | Password |
+| :--- | :--- | :--- | :--- |
+| **The Royal Blade** | Rahul Kumar | `9999999999` | `owner@123` |
+| **Noor Beauty Parlor** | Aarti | `7038959005` | `owner@123` |
+| **VanshTest** | vanshmalik | `9674367213` | `owner@123` |
+| **Royal cut studio** | vansh malik | `9958765434` | `owner@123` |
+| **Vansh** | Vansh | `8506998800` | `owner@123` |
+| **vansh** | owner | `7753422424` | `owner@123` |
+| **fsefsef** | fsvsf | `9582103293` | `owner@123` |
 
-```bash
-http://localhost:5173/staff-login
-```
+### 💈 Barbers (Login at `/barber/login`)
+All active barber accounts in the database have been set to the password `Barber@123` for testing convenience:
+
+| Salon Name | Barber Name | Mobile (Username) | Password |
+| :--- | :--- | :--- | :--- |
+| **Noor Beauty Parlor** | rahul barber | `9506998800` | `Barber@123` |
+| **The Royal Blade** | Ali (Master Stylist) | `8888888801` | `Barber@123` |
+| **The Royal Blade** | Ravi (Beard Expert) | `8888888802` | `Barber@123` |
+| **The Royal Blade** | James (Color Specialist) | `8888888803` | `Barber@123` |
+| **The Royal Blade** | Nitin | `7038959005` | `Barber@123` |
+| **VanshTest** | Jan aman | `8506998800` | `Barber@123` |
+| **Royal cut studio** | piyush sharma | `rahulaggarwal31090@gmail.com` | `Barber@123` |
+| **Vansh** | Varsha Singh | `8149328145` | `Barber@123` |
+| **vansh** | barber testing | `9999999999` | `Barber@123` |
 
 
 ---
