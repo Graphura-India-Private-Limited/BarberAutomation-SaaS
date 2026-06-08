@@ -307,21 +307,26 @@ export default function SalonDetailPage() {
         </div>
       </section>
 
-      {/* 🧱 DATA PROFILE DETAILS LAYOUT COLUMNS GRID */}
-      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-10 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:px-10 flex-1">
-        <div className="space-y-8">
-          {/* Quick Context Details InfoTiles */}
-          <div className="grid gap-4 sm:grid-cols-3">
-            <InfoTile icon={MapPin} label="Address" value={salon.address} />
-            <InfoTile icon={Clock} label="Hours" value={salon.hours} />
-            <InfoTile icon={Phone} label="Phone" value={salon.phone} />
-          </div>
+      {/* 📊 QUICK CONTEXT INFO TILES ROW — spans full width below hero banner */}
+      <section className="mx-auto max-w-7xl w-full px-6 sm:px-8 lg:px-10 pt-8">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+          <InfoTile icon={MapPin} label="Address" value={salon.address} />
+          <InfoTile icon={Clock} label="Hours" value={salon.hours} />
+          <InfoTile icon={Phone} label="Phone" value={salon.phone} />
+        </div>
+      </section>
 
+      {/* 🧱 DATA PROFILE DETAILS LAYOUT COLUMNS GRID */}
+      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:px-10 flex-1">
+        <div className="space-y-8">
           {/* 📸 Gallery Section */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left text-[#3E362E]">
-            <div className="mb-5 flex items-center gap-3 border-b border-stone-100 pb-4">
-              <ImageIcon className="text-[#C5A059]" size={20} />
-              <h2 className="text-xl font-black uppercase tracking-tight text-[#3E362E]">Studio Gallery</h2>
+            <div className="mb-5 flex items-center justify-between border-b border-stone-100 pb-4">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-[#3E362E] flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase text-[17px] sm:text-[19px]">Studio</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Gallery Vault</span>
+              </h2>
+              <ImageIcon className="text-[#C5A059]" size={18} />
             </div>
             {salon.images && salon.images.length > 0 ? (
               <div>
@@ -360,9 +365,12 @@ export default function SalonDetailPage() {
 
           {/* 💈 Services Section with Sidebar and Images */}
           <div id="popular-services" className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left">
-            <div className="mb-6 flex items-center gap-3 border-b border-stone-100 pb-4">
-              <Scissors className="text-[#C5A059] stroke-[2px]" size={20} />
-              <h2 className="text-xl font-black uppercase tracking-tight text-[#3E362E]">Available Services</h2>
+            <div className="mb-6 flex items-center justify-between border-b border-stone-100 pb-4">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-[#3E362E] flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase text-[17px] sm:text-[19px]">Available</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Services Menu</span>
+              </h2>
+              <Scissors className="text-[#C5A059] stroke-[2px]" size={18} />
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[0.3fr_0.7fr]">
@@ -468,9 +476,12 @@ export default function SalonDetailPage() {
 
           {/* 💈 Stylists Section */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left">
-            <div className="mb-5 flex items-center gap-3 border-b border-stone-100 pb-4">
-              <Users className="text-[#C5A059]" size={20} />
-              <h2 className="text-xl font-black uppercase tracking-tight text-[#3E362E]">Meet Our Stylists</h2>
+            <div className="mb-5 flex items-center justify-between border-b border-stone-100 pb-4">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-[#3E362E] flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase text-[17px] sm:text-[19px]">Meet Our</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Stylists Team</span>
+              </h2>
+              <Users className="text-[#C5A059]" size={18} />
             </div>
             {barbers.length === 0 ? (
               <p className="text-xs font-semibold text-stone-400">Stylists are currently busy or offline. Walk-ins are welcome!</p>
@@ -518,9 +529,12 @@ export default function SalonDetailPage() {
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           {/* Booking Card */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-6 shadow-sm text-left transition-all hover:border-[#C5A059]/40">
-            <div className="mb-4 flex items-center gap-3 border-b border-stone-100 pb-3">
-              <CalendarClock className="text-[#C5A059]" size={20} />
-              <h2 className="text-lg font-black uppercase tracking-tight text-[#3E362E]">Book Your Visit</h2>
+            <div className="mb-4 flex items-center justify-between border-b border-stone-100 pb-3">
+              <h2 className="font-serif text-lg tracking-normal text-[#3E362E] flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase text-[15px]">Book Your</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Visit</span>
+              </h2>
+              <CalendarClock className="text-[#C5A059]" size={18} />
             </div>
             <p className="mb-6 text-xs font-medium leading-relaxed text-stone-500">
               Select a service and barber, then reserve your slot with a small
@@ -541,42 +555,33 @@ export default function SalonDetailPage() {
 
           {/* Owner & Verification Details */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-6 shadow-sm text-left transition-all hover:border-[#C5A059]/40">
-            <div className="mb-4 flex items-center gap-3 border-b border-stone-100 pb-3">
-              <UserCheck className="text-[#C5A059]" size={20} />
-              <h2 className="text-lg font-black uppercase tracking-tight text-[#3E362E]">Studio Verification</h2>
+            <div className="mb-4 flex items-center justify-between border-b border-stone-100 pb-3">
+              <h2 className="font-serif text-lg tracking-normal text-[#3E362E] flex items-center justify-start gap-2 whitespace-nowrap">
+                <span className="font-bold uppercase text-[15px]">Studio</span>
+                <span className="italic text-[#C5A059] normal-case font-medium">Verification Check</span>
+              </h2>
+              <UserCheck className="text-[#C5A059]" size={18} />
             </div>
             <div className="space-y-4">
-              <div className="flex items-start gap-3 bg-[#FAF6F0]/40 p-3 rounded-xl border border-[#E8DCCB]/60">
-                <UserCheck size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-[#B58B67] mb-0.5">Studio Owner</p>
-                  <p className="text-xs font-extrabold text-[#3E362E]">{salon.owner_name}</p>
-                </div>
+              <div className="border-b last:border-0 pb-3 last:pb-0">
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] block">Studio Owner</label>
+                <p className="font-extrabold text-[#3E362E] mt-0.5 text-sm">{salon.owner_name}</p>
               </div>
 
-              <div className="flex items-start gap-3 bg-emerald-50/40 p-3 rounded-xl border border-emerald-200/50">
-                <ShieldCheck size={16} className="text-emerald-500 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 mb-0.5">Verification Status</p>
-                  <p className="text-xs font-extrabold text-emerald-700">Approved Profile</p>
-                  <p className="text-[9px] font-medium text-emerald-600 mt-1">Verified: {salon.approved_at ? new Date(salon.approved_at).toLocaleDateString("en-IN", {day: "numeric", month: "short", year: "numeric"}) : "June 2026"}</p>
-                </div>
+              <div className="border-b last:border-0 pb-3 last:pb-0">
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] block">Verification Status</label>
+                <p className="font-extrabold text-emerald-700 mt-0.5 text-sm">Approved Profile</p>
+                <p className="text-[9px] font-semibold text-stone-400 mt-0.5">Verified: {salon.approved_at ? new Date(salon.approved_at).toLocaleDateString("en-IN", {day: "numeric", month: "short", year: "numeric"}) : "June 2026"}</p>
               </div>
 
-              <div className="flex items-start gap-3 bg-[#FAF6F0]/40 p-3 rounded-xl border border-[#E8DCCB]/60">
-                <Mail size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-[#B58B67] mb-0.5">Admin Approver Email</p>
-                  <p className="text-xs font-bold font-mono text-[#3E362E]">admin@barberpro.com</p>
-                </div>
+              <div className="border-b last:border-0 pb-3 last:pb-0">
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] block">Admin Approver Email</label>
+                <p className="font-extrabold text-[#3E362E] mt-0.5 text-sm font-mono">{salon.email || "contact@barberpro.com"}</p>
               </div>
 
-              <div className="flex items-start gap-3 bg-[#FAF6F0]/40 p-3 rounded-xl border border-[#E8DCCB]/60">
-                <Phone size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[9px] font-black uppercase tracking-widest text-[#B58B67] mb-0.5">Admin Verification Call</p>
-                  <p className="text-xs font-bold font-mono text-[#3E362E]">+91 90000 00000</p>
-                </div>
+              <div className="border-b last:border-0 pb-3 last:pb-0">
+                <label className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] block">Verification Hotline</label>
+                <p className="font-extrabold text-[#3E362E] mt-0.5 text-sm font-mono">+91 90000 00000</p>
               </div>
             </div>
           </div>
