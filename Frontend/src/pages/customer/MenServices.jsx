@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 
 const services = [
   { id: 1, name: "Classic Executive Cut", desc: "A timeless, sharp haircut designed for a professional aesthetic.", price: 400, duration: "40 min", category: "styling", rating: 5, reviews: 156, tag: "Bestseller", img: "https://i.pinimg.com/736x/b6/ff/a4/b6ffa4916c9b5f375ba8b01987a07fcc.jpg" },
@@ -140,6 +141,7 @@ export default function MenServices() {
   return (
     <>
       <Navbar />
+      <SalonSelectorBar />
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond','Georgia',serif", color: "#2C241E" }}>
 
         {/* FLOATING BACK BUTTON — fixed, same as WomenServices */}

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 
 const services = [
   { id: 1, name: "Haircut & Styling", desc: "Precision cuts tailored to your face shape and lifestyle.", price: 500, duration: "60 min", category: "styling", rating: 5, reviews: 128, tag: "Bestseller", img: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800" },
@@ -142,6 +143,7 @@ export default function WomenServices() {
   return (
     <>
       <Navbar />
+      <SalonSelectorBar />
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond','Georgia',serif", color: "#2C241E" }}>
 
         {/* HERO */}

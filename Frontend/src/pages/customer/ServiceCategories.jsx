@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 
 const CATEGORIES = [
   {
@@ -198,6 +199,7 @@ export default function ServiceCategories() {
       `}</style>
 
       <Navbar />
+      <SalonSelectorBar />
 
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
 

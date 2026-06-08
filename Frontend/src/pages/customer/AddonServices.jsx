@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
+
 
 /* ─── DATA ─────────────────────────────────────────────────── */
 const HERO_IMAGES = [
@@ -242,6 +244,7 @@ export default function AddonServices() {
   return (
     <>
     <Navbar />
+    <SalonSelectorBar />
       {/* inject Google Fonts */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&family=Montserrat:wght@300;400;600;700&display=swap');
