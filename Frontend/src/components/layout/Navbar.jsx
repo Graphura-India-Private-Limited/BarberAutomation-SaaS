@@ -121,7 +121,6 @@ const Navbar = () => {
   const NAV_ITEMS = [
     { label: "Home", path: "/", icon: Home },
     { label: "Services", hasDropdown: true, icon: Sparkles },
-    { label: "Studios", path: "/barbers", icon: Users },
     { label: "About", section: "about", icon: Info },
     { label: "Contact", path: "/support", icon: Phone },
   ];

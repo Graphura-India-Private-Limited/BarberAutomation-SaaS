@@ -109,17 +109,18 @@ function TermsPage() {
 
         {/* HERO */}
         <section className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-16 pb-10">
-
-          {/* CREATIVE MINIMAL BACK BUTTON */}
+   
+   {/* CREATIVE MINIMAL BACK BUTTON (Using < instead of arrow) */}
+        <div className="absolute top-6 left-4 sm:left-6 md:left-8 z-20">
           <button
             onClick={() => navigate("/")}
-            className="group absolute left-4 sm:left-6 top-6 flex items-center gap-3 bg-white/70 backdrop-blur-md border border-[#EADDCA] px-5 py-2.5 rounded-2xl text-[#3E362E] font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 shadow-sm hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] hover:scale-105 cursor-pointer z-20"
+            className="group flex items-center gap-3 bg-white/70 backdrop-blur-md border border-[#EADDCA] px-5 py-2.5 rounded-2xl text-[#3E362E] font-black text-[11px] uppercase tracking-[0.2em] transition-all duration-300 shadow-sm hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] hover:scale-105 cursor-pointer"
           >
             <span className="text-sm font-light text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-1 inline-block">
               &lt;
             </span>
-            <span className="relative">Return</span>
           </button>
+        </div>
 
           {/* Heading */}
           <div className="text-center pt-12">
