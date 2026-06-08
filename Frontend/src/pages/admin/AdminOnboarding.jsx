@@ -259,8 +259,8 @@ export default function AdminOnboarding() {
     if (!newBarber.name||!newBarber.mobile||!newBarber.password) { pop("Name, mobile and password required","error"); return; }
     setBusy(true);
     try {
-      const salonId = newBarber.salon_id || salons.find(s=>s.status==="approved")?._id;
-      if (!salonId) { pop("No approved salon found! Approve a salon first.","error"); setBusy(false); return; }
+      const salonId = newBarber.salon_id;
+      if (!salonId) { pop("Please select a salon to assign this barber to.", "error"); setBusy(false); return; }
       const r = await fetch(`${API}/admin/barber`, {
         method:"POST", headers:h(),
         body: JSON.stringify({

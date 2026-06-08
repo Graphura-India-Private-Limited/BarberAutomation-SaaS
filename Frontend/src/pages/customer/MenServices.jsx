@@ -9,7 +9,7 @@ const services = [
   { id: 3, name: "Gentleman's Facial", desc: "Deep-cleansing treatment to remove impurities and rejuvenate skin.", price: 800, duration: "45 min", category: "spa", rating: 4, reviews: 94, tag: null, img: "https://i.pinimg.com/736x/d5/42/e3/d542e36a5630e84bcc7f0214474247e3.jpg" },
   { id: 4, name: "Grey Blending", desc: "Subtle colour application to reduce grey hair naturally.", price: 1000, duration: "60 min", category: "color", rating: 4, reviews: 45, tag: null, img: "https://i.pinimg.com/736x/ae/65/e3/ae65e3f17deb79872414b037fd997045.jpg" },
   { id: 5, name: "Royal Shave Ritual", desc: "Traditional straight-razor shave with premium oils.", price: 600, duration: "50 min", category: "beard", rating: 5, reviews: 138, tag: "Premium", img: "https://i.pinimg.com/1200x/a7/84/59/a784597c5a31691b0c652634fa4726b5.jpg" },
-  { id: 6, name: "Scalp Revitalize", desc: "Invigorating massage and treatment for hair health.", price: 500, duration: "35 min", category: "spa", rating: 5, reviews: 72, tag: "Luxury", img: "https://i.pinimg.com/736x/1a/39/92/1a399236e295ebd22a054260b6c02cf4.jpg" },
+  { id: 6, name: "Scalp Revitalize", desc: "Invigorating massage and treatment for hair health.", price: 500, duration: "35 min", category: "spa", rating: 5, reviews: 72, tag: "Luxury", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600" },
 ];
 
 const heroImages = [

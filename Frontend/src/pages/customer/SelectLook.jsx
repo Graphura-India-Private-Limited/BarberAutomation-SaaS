@@ -75,9 +75,9 @@ const LOOKS_DB = {
     { id: "ht3", name: "Luxury Foam & Towel Shave", img: "https://i.pinimg.com/1200x/83/17/75/831775720cb642376ee34c64ada61202.jpg" },
   ],
   scalp_revitalize: [
-    { id: "sr1", name: "Scalp Revitalize Therapy", img: "https://i.pinimg.com/736x/7e/ce/a3/7ecea3ac6a931c1c172f8b96a5c8b4a0.jpg" },
-    { id: "sr2", name: "Premium Scalp Detox", img: "https://i.pinimg.com/1200x/bb/0d/ff/bb0dff7adbd80c5ae3322f070bc562ed.jpg" },
-    { id: "sr3", name: "Luxury Hair & Scalp Rejuvenation", img: "https://i.pinimg.com/1200x/3e/e4/36/3ee4366fbe905d991236d88793e799c8.jpg" },
+    { id: "sr1", name: "Scalp Revitalize Therapy", img: "https://images.unsplash.com/photo-1517832606299-7ae9b720a186?w=600" },
+    { id: "sr2", name: "Premium Scalp Detox", img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=600" },
+    { id: "sr3", name: "Luxury Hair & Scalp Rejuvenation", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600" },
   ],
   default: [
     { id: "df1", name: "Signature Salon Ritual", img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600" },
