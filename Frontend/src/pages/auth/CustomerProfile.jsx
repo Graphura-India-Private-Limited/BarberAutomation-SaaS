@@ -29,6 +29,7 @@ const BARBER_IMAGES = {
   "piyush": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400",
   "vansh": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400",
   "ajay": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400",
+  "rahul": "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&q=80",
 };
 
 const getBarberImage = (name) => {

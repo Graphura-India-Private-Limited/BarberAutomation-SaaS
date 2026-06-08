@@ -345,7 +345,10 @@ useEffect(() => {
           </div>
 
           <div className="relative h-full w-full min-h-[260px] sm:min-h-[320px] md:min-h-[400px] flex items-end justify-center md:justify-end">
-            <div className="w-full max-w-sm bg-white/85 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/40 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]">
+            <div 
+              onClick={() => navigate("/customer/barber")}
+              className="w-full max-w-sm bg-white/85 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/40 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+            >
               <img
                 src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?&w=100&q=80"
                 alt="Rahul Sharma - Senior Stylist"

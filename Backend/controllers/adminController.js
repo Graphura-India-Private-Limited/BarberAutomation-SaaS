@@ -7,6 +7,8 @@ const Barber = require("../models/Barber");
 const Review = require("../models/Review");
 const Service = require("../models/Service");
 const Admin = require("../models/Admin");
+const Queue = require("../models/Queue");
+const BreakRequest = require("../models/BreakRequest");
 
 // @desc    Get global platform metrics
 // @route   GET /api/admin/global-metrics
@@ -166,6 +168,49 @@ exports.updateSalonStatus = async (req, res) => {
     };
     const salon = await Salon.findByIdAndUpdate(req.params.id, updates, { new: true });
     res.json({ success: true, salon });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Delete a salon
+// @route   DELETE /api/admin/salon/:id
+// @access  Private (Admin)
+exports.deleteSalon = async (req, res) => {
+  try {
+    const salonId = req.params.id;
+    // 1. Delete the salon
+    const deletedSalon = await Salon.findByIdAndDelete(salonId);
+    if (!deletedSalon) {
+      return res.status(404).json({ success: false, message: "Salon not found" });
+    }
+
+    // Find all barbers of this salon to clean up break requests
+    const barbers = await Barber.find({ salon_id: salonId }, "_id");
+    const barberIds = barbers.map(b => b._id);
+
+    // 2. Delete break requests associated with these barbers
+    await BreakRequest.deleteMany({ barber_id: { $in: barberIds } });
+
+    // 3. Delete all barbers associated with this salon
+    await Barber.deleteMany({ salon_id: salonId });
+
+    // 4. Delete all services associated with this salon
+    await Service.deleteMany({ salon_id: salonId });
+
+    // 5. Delete bookings associated with this salon
+    await Booking.deleteMany({ salon_id: salonId });
+
+    // 6. Delete payments associated with this salon
+    await Payment.deleteMany({ salon_id: salonId });
+
+    // 7. Delete queues associated with this salon
+    await Queue.deleteMany({ salon_id: salonId });
+
+    // 8. Delete reviews associated with this salon
+    await Review.deleteMany({ salon_id: salonId });
+
+    res.json({ success: true, message: "Salon and all its associated data deleted successfully" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -249,6 +249,23 @@ export function AdminRequests({ initialTab = "dashboard" }) {
     finally { setBusy(false); }
   };
 
+  const deleteSalon = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this salon? This will delete all its barbers, services, and bookings!")) return;
+    setBusy(true);
+    try {
+      const r = await fetch(`${API}/admin/salon/${id}`, {
+        method: "DELETE", headers: h(),
+      });
+      const d = await r.json();
+      if (d.success) {
+        setSalons(p => p.filter(s => s._id !== id));
+        pop("Salon deleted successfully!");
+        fetchAll(); // Refresh stats
+      } else pop(d.message || "Failed to delete salon", "error");
+    } catch { pop("Server error", "error"); }
+    finally { setBusy(false); }
+  };
+
   const blockCustomer = async (id, blocked) => {
     try {
       const r = await fetch(`${API}/admin/customer/${id}/block`, {
@@ -746,6 +763,7 @@ export function AdminRequests({ initialTab = "dashboard" }) {
                 revenueDisplay={revenueDisplay}
                 updateSalonStatus={updateSalonStatus}
                 addSalon={addSalon}
+                deleteSalon={deleteSalon}
               />
             )}
             {tab === "customers" && (

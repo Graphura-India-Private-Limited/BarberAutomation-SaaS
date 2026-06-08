@@ -13,6 +13,7 @@ router.get("/stats", protect, requireRoles("admin"), adminController.getAdminSta
 /* ── SALONS ── */
 router.get("/salons", protect, requireRoles("admin"), adminController.getAllSalons);
 router.put("/salon/:id/status", protect, requireRoles("admin"), adminController.updateSalonStatus);
+router.delete("/salon/:id", protect, requireRoles("admin"), adminController.deleteSalon);
 
 /* ── CUSTOMERS ── */
 router.get("/customers", protect, requireRoles("admin"), adminController.getAllCustomers);

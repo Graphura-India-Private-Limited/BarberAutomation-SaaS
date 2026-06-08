@@ -44,6 +44,19 @@ const BARBERS = [
     img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400",
     aiWait: { queue: 1, pace: "12 mins/cut", wait: "~12 mins" },
   },
+  {
+    id: 4,
+    name: "Rahul Sharma",
+    role: "Senior Stylist",
+    experience: "4 yrs",
+    rating: 4.7,
+    reviews: 245,
+    status: "Available",
+    distance: 3,
+    specialties: ["Classic Cut", "Beard Trim", "Men's Grooming"],
+    img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=500&q=80",
+    aiWait: { queue: 2, pace: "18 mins/cut", wait: "~36 mins" },
+  },
 ];
 
 /* ─── HELPERS ───────────────────────────────────────────────── */
