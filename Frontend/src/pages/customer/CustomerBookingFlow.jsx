@@ -173,6 +173,12 @@ export default function Wrapper() {
       const getDistributedBarberId = (barberList, mockBarberName, mockBarberId) => {
         if (!barberList || barberList.length === 0) return null;
         
+        // 0. Try direct database ID match first
+        if (mockBarberId) {
+          const directMatch = barberList.find(b => String(b._id) === String(mockBarberId) || String(b.id) === String(mockBarberId));
+          if (directMatch) return directMatch._id;
+        }
+        
         // 1. Try exact/partial name match
         let match = barberList.find(
           b => b.name.toLowerCase().includes(mockBarberName.toLowerCase()) || 

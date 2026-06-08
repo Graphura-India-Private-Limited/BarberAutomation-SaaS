@@ -233,6 +233,16 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
   );
 }
 
+const BARBER_IMAGES = [
+  "https://i.pinimg.com/1200x/8d/21/29/8d2129c8a618f113eb8aa2bc596b1658.jpg",
+  "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400",
+  "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400"
+];
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 /* ─── MAIN PAGE ─────────────────────────────────────────────── */
 export default function BarberSelection() {
   const location  = useLocation();
@@ -249,7 +259,69 @@ export default function BarberSelection() {
   const [visibleCards,   setVisibleCards]    = useState(new Set());
   const cardRefs = useRef({});
 
+  const [barbersList,    setBarbersList]     = useState([]);
+  const [loading,        setLoading]         = useState(true);
+
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  useEffect(() => {
+    const fetchBarbers = async () => {
+      setLoading(true);
+      const salonId = localStorage.getItem("selectedSalonId");
+      if (!salonId) {
+        console.warn("No selected salon ID found in localStorage.");
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/barber/salon/${salonId}`);
+        const data = await res.json();
+        if (data.success && data.barbers) {
+          const mapped = data.barbers.map((b, index) => {
+            const specs = b.specialization
+              ? b.specialization.split(",").map(s => s.trim()).filter(Boolean)
+              : ["Haircut", "Styling"];
+              
+            let status = "Available";
+            if (b.status === "busy") status = "Busy";
+            else if (b.status === "break") status = "On Break";
+            else if (b.status === "offline") status = "Offline";
+
+            let aiWait = { queue: 0, pace: "15 mins/cut", wait: "Ready Now" };
+            if (b.status === "busy") {
+              aiWait = { queue: 2, pace: "20 mins/cut", wait: "~40 mins" };
+            } else if (b.status === "break") {
+              aiWait = { queue: 0, pace: "15 mins/cut", wait: "On Break" };
+            } else if (b.status === "offline") {
+              aiWait = { queue: 0, pace: "—", wait: "Offline" };
+            }
+
+            return {
+              id: b._id,
+              _id: b._id,
+              name: b.name,
+              role: b.experience >= 5 ? "Senior Stylist" : "Stylist",
+              experience: `${b.experience || 0} yrs`,
+              rating: b.rating || 5.0,
+              reviews: Math.floor(Math.random() * 80) + 20,
+              status: status,
+              distance: Math.floor(Math.random() * 3) + 1,
+              specialties: specs,
+              img: BARBER_IMAGES[index % BARBER_IMAGES.length],
+              aiWait: aiWait,
+            };
+          });
+          setBarbersList(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to fetch barbers:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBarbers();
+  }, []);
 
   useEffect(() => {
     setVisibleCards(new Set());
@@ -265,9 +337,9 @@ export default function BarberSelection() {
       });
     }, 60);
     return () => { clearTimeout(t); observers.forEach((o) => o.disconnect()); };
-  }, [searchQuery, minRating, maxDistance, showAll]);
+  }, [searchQuery, minRating, maxDistance, showAll, barbersList]);
 
-  const filtered = BARBERS.filter((b) => {
+  const filtered = barbersList.filter((b) => {
     const q = searchQuery.toLowerCase();
     const matchSearch = b.name.toLowerCase().includes(q) || b.role.toLowerCase().includes(q) || b.specialties.some((s) => s.toLowerCase().includes(q));
     const matchRating = b.rating >= minRating;
@@ -294,6 +366,10 @@ export default function BarberSelection() {
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #FAF6F0; }
         ::-webkit-scrollbar-thumb { background: #C5A059; border-radius: 3px; }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
       `}</style>
 
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
@@ -427,7 +503,7 @@ export default function BarberSelection() {
               {/* top bar */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
                 <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: "#888", margin: 0 }}>
-                  Showing <strong style={{ color: "#2C241E" }}>{filtered.length}</strong> of {BARBERS.length} stylists
+                  Showing <strong style={{ color: "#2C241E" }}>{filtered.length}</strong> of {barbersList.length} stylists
                   {hasFilters && <button onClick={clearFilters} style={{ marginLeft: 10, fontSize: 11, color: "#C5A059", background: "none", border: "none", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", textDecoration: "underline", padding: 0 }}>Clear all</button>}
                 </p>
                 <button
@@ -442,7 +518,19 @@ export default function BarberSelection() {
               </div>
 
               {/* grid */}
-              {filtered.length === 0 ? (
+              {loading ? (
+                <div style={{ textAlign: "center", padding: "80px 20px" }}>
+                  <div style={{ width: 40, height: 40, border: "3px solid #EAE0D0", borderTopColor: "#C5A059", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
+                  <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 14, color: "#888" }}>Finding active stylists...</p>
+                </div>
+              ) : barbersList.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
+                  <div style={{ fontSize: 32, marginBottom: 12 }}>💈</div>
+                  <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 20, color: "#8A7060", margin: "0 0 8px" }}>No stylists registered</p>
+                  <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: "#AAA", margin: "0 0 24px", lineHeight: 1.6 }}>There are no stylists registered for this salon yet. Please choose another studio or check back later.</p>
+                  <button onClick={() => navigate("/nearby")} style={{ padding: "10px 28px", background: "#2C241E", color: "#fff", border: "none", borderRadius: 8, fontSize: 11, fontFamily: "'Montserrat',sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Change Studio</button>
+                </div>
+              ) : filtered.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
                   <div style={{ fontSize: 32, marginBottom: 12 }}>✦</div>
                   <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 20, color: "#8A7060", margin: "0 0 8px" }}>No stylists found</p>
