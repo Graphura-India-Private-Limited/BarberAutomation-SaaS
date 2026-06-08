@@ -59,3 +59,124 @@
   background: #b88a4f;
   box-shadow: 0 4px 12px rgba(200, 155, 94, 0.3);
 }
+
+/* ==========================================================================
+   BARBER PANEL LIGHT THEME OVERRIDES (BEIGE/CREAM THEME)
+   ========================================================================== */
+
+/* Target the dark headers and replace with light beige theme */
+header.bg-\[\#1A1A1A\],
+header[class*="bg-[#1A1A1A]"] {
+  background: #FAF6F0 !important;
+  border-bottom: 1px solid #E6D5C3 !important;
+  position: relative !important;
+}
+
+/* Add the 2px premium gold line under the header */
+header.bg-\[\#1A1A1A\]::after,
+header[class*="bg-[#1A1A1A]"]::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #A1804E !important;
+  opacity: 0.9 !important;
+  z-index: 100;
+}
+
+/* Header titles color override */
+header.bg-\[\#1A1A1A\] h1,
+header[class*="bg-[#1A1A1A]"] h1,
+header.bg-\[\#1A1A1A\] .text-white,
+header[class*="bg-[#1A1A1A]"] .text-white {
+  color: #4A3E3D !important;
+}
+
+/* Header subtitles color override */
+header.bg-\[\#1A1A1A\] p,
+header[class*="bg-[#1A1A1A]"] p,
+header.bg-\[\#1A1A1A\] .text-zinc-500,
+header[class*="bg-[#1A1A1A]"] .text-zinc-500 {
+  color: #A39796 !important;
+}
+
+/* Menu toggle, buttons, and icons color override */
+header.bg-\[\#1A1A1A\] button,
+header[class*="bg-[#1A1A1A]"] button,
+header.bg-\[\#1A1A1A\] svg,
+header[class*="bg-[#1A1A1A]"] svg {
+  color: #4A3E3D !important;
+}
+
+/* Target specific utility classes like bell icon background */
+header.bg-\[\#1A1A1A\] .bg-white\/5,
+header[class*="bg-[#1A1A1A]"] .bg-white\/5 {
+  background: #FFFFFF !important;
+  border: 1px solid #E6D5C3 !important;
+}
+
+/* Target the salon open/closed badge */
+header.bg-\[\#1A1A1A\] .bg-\[\#10B981\]\/10,
+header[class*="bg-[#1A1A1A]"] .bg-\[\#10B981\]\/10,
+header.bg-\[\#1A1A1A\] .border-\[\#10B981\]\/20,
+header[class*="bg-[#1A1A1A]"] .border-\[\#10B981\]\/20 {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+header.bg-\[\#1A1A1A\] span.text-\[\#10B981\],
+header[class*="bg-[#1A1A1A]"] span.text-\[\#10B981\] {
+  color: #047857 !important;
+}
+
+/* Initials avatar profile circle */
+header.bg-\[\#1A1A1A\] div[class*="bg-gradient-to-tr"],
+header[class*="bg-[#1A1A1A]"] div[class*="bg-gradient-to-tr"] {
+  background: linear-gradient(135deg, #8B5A2B, #4A3E3D) !important;
+  color: #FFFFFF !important;
+}
+
+/* Shared layout Header overrides (used in ServiceHandler.jsx) */
+header.bg-\[\#3E362E\],
+header[class*="bg-[#3E362E]"] {
+  background: #FAF6F0 !important;
+  border-bottom: 1px solid #E6D5C3 !important;
+  position: relative !important;
+}
+
+header.bg-\[\#3E362E\]::after,
+header[class*="bg-[#3E362E]"]::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #A1804E !important;
+  opacity: 0.9 !important;
+  z-index: 100;
+}
+
+header.bg-\[\#3E362E\] h1,
+header[class*="bg-[#3E362E]"] h1,
+header.bg-\[\#3E362E\] h1 span,
+header[class*="bg-[#3E362E]"] h1 span {
+  color: #4A3E3D !important;
+}
+
+header.bg-\[\#3E362E\] p,
+header[class*="bg-[#3E362E]"] p {
+  color: #A39796 !important;
+}
+
+header.bg-\[\#3E362E\] svg,
+header[class*="bg-[#3E362E]"] svg {
+  color: #4A3E3D !important;
+}
+
+header.bg-\[\#3E362E\] div[class*="bg-\[\#C5A059\]\/20"] {
+  background: rgba(139, 90, 43, 0.1) !important;
+  border-color: rgba(139, 90, 43, 0.3) !important;
+}
