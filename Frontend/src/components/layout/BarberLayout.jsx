@@ -35,6 +35,19 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
     { id: "settings", label: "Settings", icon: Settings, route: "/barber/settings" },
   ];
 
+  const getInitials = (name) => {
+    if (!name) return "AM";
+    const clean = name.replace(/\(.*?\)/g, "").trim();
+    const words = clean.split(/\s+/).filter(Boolean);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return words[0] ? words[0].slice(0, 2).toUpperCase() : "AM";
+  };
+
+  const barberName = localStorage.getItem("barberName") || localStorage.getItem("name") || profile?.name || "Ali (Master Stylist)";
+  const initials = getInitials(barberName);
+  const salonName = localStorage.getItem("salonName") || profile?.salonName || "The Royal Cuts";
+  const specialization = profile?.specialization || "Haircut & Beard Expert";
+
   return (
     <div className="flex min-h-screen text-[#4A3E3D] relative overflow-x-hidden" style={{ background: "#FDFBF7", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       
@@ -57,7 +70,7 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
             <Scissors className="w-4.5 h-4.5 text-white" size={18} />
           </div>
           <div className="overflow-hidden">
-            <p className="font-serif font-black text-sm leading-none truncate w-40">{profile?.salonName || "The Royal Cuts"}</p>
+            <p className="font-serif font-black text-sm leading-none truncate w-40">{salonName}</p>
             <p className="text-[10px] mt-1 font-bold uppercase tracking-widest text-[#8B5A2B]">Barber Panel</p>
           </div>
         </div>
@@ -66,11 +79,11 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
         <div className="mx-4 my-4 rounded-xl p-4 bg-[#8B5A2B]/5 border border-[#8B5A2B]/15">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full flex items-center justify-center font-black text-sm text-white bg-gradient-to-br from-[#8B5A2B] to-[#4A3E3D] shrink-0">
-              {profile?.initials || "SK"}
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-serif font-black text-sm truncate">{profile?.name || "Sameer Khan"}</p>
-              <p className="text-[10px] text-stone-500 font-medium truncate">{profile?.specialization || "Haircut & Beard Expert"}</p>
+              <p className="font-serif font-black text-sm truncate">{barberName}</p>
+              <p className="text-[10px] text-stone-500 font-medium truncate">{specialization}</p>
             </div>
           </div>
 
@@ -156,9 +169,9 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
           <button onClick={() => setSideOpen(!sideOpen)} className="p-1 text-[#4A3E3D] cursor-pointer">
             {sideOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          <p className="font-serif font-black text-sm truncate max-w-[180px]">{profile?.salonName || "The Royal Cuts"}</p>
+          <p className="font-serif font-black text-sm truncate max-w-[180px]">{salonName}</p>
           <div className="w-8 h-8 rounded-full bg-[#8B5A2B] text-white flex items-center justify-center font-bold text-xs shrink-0">
-            {profile?.initials || "SK"}
+            {initials}
           </div>
         </header>
 
