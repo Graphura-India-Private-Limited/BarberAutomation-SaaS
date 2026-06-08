@@ -58,7 +58,6 @@ function FaqPage() {
             <span className="text-sm font-light text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-1 inline-block">
               &lt;
             </span>
-            <span className="relative">Return</span>
           </button>
         </div>
 
