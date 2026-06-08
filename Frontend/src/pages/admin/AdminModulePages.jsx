@@ -274,7 +274,7 @@ export function CustomersModule({ customers: initialCustomers, loading, customer
 }
 /* ── SALON MANAGEMENT ── */
 export function SalonsModule({
-  salons, customers, bookings, stats, loading, pendingBookings, revenueDisplay, updateSalonStatus, addSalon,
+  salons, customers, bookings, stats, loading, pendingBookings, revenueDisplay, updateSalonStatus, addSalon, deleteSalon,
 }) {
   const [salonTab, setSalonTab] = useState("requests");
   const [salonSearch, setSalonSearch] = useState("");
@@ -608,10 +608,17 @@ export function SalonsModule({
                     <>
                       <button type="button" onClick={() => updateSalonStatus(s._id, "approved")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Approve</button>
                       <button type="button" onClick={() => updateSalonStatus(s._id, "rejected")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Reject</button>
+                      <button type="button" onClick={() => deleteSalon(s._id)} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700 hover:bg-red-100 transition-colors">Delete</button>
                     </>
                   )}
                   {s.status === "rejected" && (
-                    <button type="button" onClick={() => updateSalonStatus(s._id, "pending")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-gray-100 text-gray-700">Reconsider</button>
+                    <>
+                      <button type="button" onClick={() => updateSalonStatus(s._id, "pending")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-gray-100 text-gray-700">Reconsider</button>
+                      <button type="button" onClick={() => deleteSalon(s._id)} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700 hover:bg-red-100 transition-colors">Delete</button>
+                    </>
+                  )}
+                  {s.status === "approved" && (
+                    <button type="button" onClick={() => deleteSalon(s._id)} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700 hover:bg-red-100 transition-colors">Delete</button>
                   )}
                 </div>
               </td>
