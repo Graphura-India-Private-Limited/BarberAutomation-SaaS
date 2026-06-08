@@ -178,6 +178,7 @@ const ServiceCard = ({ service, selected, onSelect }) => {
    MAIN COMPONENT
 ───────────────────────────────────────────── */
 const NearbyBarbers = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [salons, setSalons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -186,6 +187,7 @@ const NearbyBarbers = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [bookingDone, setBookingDone] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [services, setServices] = useState([]);
   const sectionRef = useRef(null);
   const [services, setServices] = useState([]);
 
@@ -251,11 +253,9 @@ const handleSalonSelect = async (salon) => {
 
   const handleConfirmSalon = () => {
     if (!selectedSalon) return;
-    setStep(2);
-    setTimeout(
-      () => sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-      100
-    );
+    localStorage.setItem("selectedSalonId", selectedSalon.id);
+    localStorage.setItem("selectedSalonName", selectedSalon.name);
+    navigate("/customer/services");
   };
 
   const handleConfirmService = () => {
@@ -277,7 +277,7 @@ const handleBook = async () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        salonId: selectedSalon._id,
+        salonId: selectedSalon.id,
         serviceId: selectedService.id,
       }),
     });

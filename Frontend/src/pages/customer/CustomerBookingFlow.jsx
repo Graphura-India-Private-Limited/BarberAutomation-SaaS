@@ -99,11 +99,16 @@ export default function Wrapper() {
         throw new Error("No approved salons found in system.");
       }
       
-      const salon = salonsData.salons[0];
+      const storedSalonId = localStorage.getItem("selectedSalonId");
+      let salon = salonsData.salons[0];
+      if (storedSalonId) {
+        const found = salonsData.salons.find(s => s._id === storedSalonId);
+        if (found) salon = found;
+      }
       const salonId = salon._id;
 
       // 2. Fetch services for this salon from backend
-      const servicesRes = await fetch(`${API}/service/${salonId}`);
+      const servicesRes = await fetch(`${API}/services/${salonId}`);
       const servicesData = await servicesRes.json();
       let matchedServiceId = null;
       let matchedPrice = finalBookingData.price || 200;
@@ -122,21 +127,101 @@ export default function Wrapper() {
         }
       }
 
+      if (!matchedServiceId) {
+        let allServices = [];
+        for (const sln of salonsData.salons) {
+          try {
+            const fallbackRes = await fetch(`${API}/services/${sln._id}`);
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.success && fallbackData.services) {
+              allServices.push(...fallbackData.services);
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        // Prioritize premium active salon
+        allServices.sort((a, b) => {
+          if (a.salon_id === b.salon_id) return 0;
+          if (a.salon_id === "6a23177862fa6d8d2c894a3c") return -1;
+          if (b.salon_id === "6a23177862fa6d8d2c894a3c") return 1;
+          return 0;
+        });
+
+        let match = allServices.find(
+          s => s.name.toLowerCase().includes(finalBookingData.service.toLowerCase()) || 
+               finalBookingData.service.toLowerCase().includes(s.name.toLowerCase())
+        );
+        if (!match) {
+          const words = finalBookingData.service.toLowerCase().split(/\s+/);
+          match = allServices.find(s => words.some(w => w.length > 3 && s.name.toLowerCase().includes(w)));
+        }
+        if (match) {
+          matchedServiceId = match._id;
+          matchedPrice = match.price;
+        } else if (allServices.length > 0) {
+          matchedServiceId = allServices[0]._id;
+          matchedPrice = allServices[0].price;
+        }
+      }
+
       // 3. Fetch barbers for this salon from backend
       const barbersRes = await fetch(`${API}/barber/salon/${salonId}`);
       const barbersData = await barbersRes.json();
       let matchedBarberId = null;
 
-      if (barbersData.success && barbersData.barbers && barbersData.barbers.length > 0) {
-        const match = barbersData.barbers.find(
-          b => b.name.toLowerCase().includes(finalBookingData.barber.toLowerCase()) || 
-               finalBookingData.barber.toLowerCase().includes(b.name.toLowerCase())
+      const getDistributedBarberId = (barberList, mockBarberName, mockBarberId) => {
+        if (!barberList || barberList.length === 0) return null;
+        
+        // 1. Try exact/partial name match
+        let match = barberList.find(
+          b => b.name.toLowerCase().includes(mockBarberName.toLowerCase()) || 
+               mockBarberName.toLowerCase().includes(b.name.toLowerCase())
         );
-        if (match) {
-          matchedBarberId = match._id;
-        } else {
-          matchedBarberId = barbersData.barbers[0]._id;
+        if (match) return match._id;
+
+        // 2. Try first name match
+        const firstName = mockBarberName.toLowerCase().split(" ")[0];
+        match = barberList.find(b => b.name.toLowerCase().includes(firstName));
+        if (match) return match._id;
+
+        // 3. Map to distinct database barbers by selected mock ID modulo
+        const mockId = parseInt(mockBarberId, 10);
+        if (!isNaN(mockId)) {
+          const index = (mockId - 1) % barberList.length;
+          return barberList[index >= 0 ? index : 0]._id;
         }
+
+        // 4. Default fallback
+        return barberList[0]._id;
+      };
+
+      if (barbersData.success && barbersData.barbers && barbersData.barbers.length > 0) {
+        matchedBarberId = getDistributedBarberId(barbersData.barbers, finalBookingData.barber, finalBookingData.barber_id);
+      }
+
+      if (!matchedBarberId) {
+        let allBarbers = [];
+        for (const sln of salonsData.salons) {
+          try {
+            const fallbackRes = await fetch(`${API}/barber/salon/${sln._id}`);
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.success && fallbackData.barbers) {
+              allBarbers.push(...fallbackData.barbers);
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        // Prioritize premium active salon
+        allBarbers.sort((a, b) => {
+          if (a.salon_id === b.salon_id) return 0;
+          if (a.salon_id === "6a23177862fa6d8d2c894a3c") return -1;
+          if (b.salon_id === "6a23177862fa6d8d2c894a3c") return 1;
+          return 0;
+        });
+
+        matchedBarberId = getDistributedBarberId(allBarbers, finalBookingData.barber, finalBookingData.barber_id);
       }
 
       if (!matchedServiceId) {

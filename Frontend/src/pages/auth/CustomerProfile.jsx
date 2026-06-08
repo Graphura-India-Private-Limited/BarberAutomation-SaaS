@@ -4,7 +4,7 @@ import {
   Calendar, Clock, Award, Image, ChevronRight, ArrowLeft, Save,
   Bell, CheckCircle, ShieldAlert, Sparkles, LogOut, CheckSquare, 
   Square, Edit3, Settings, Gift, List, Heart, CalendarPlus, Star,
-  RefreshCw, Play, Search, ShoppingBag, Compass, HelpCircle
+  RefreshCw, Play, Search, ShoppingBag, Compass, HelpCircle, LifeBuoy
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import NearbyBarbers from "../../components/queue/NearbyBarbers";
@@ -17,10 +17,54 @@ const CHARCOAL = "#3D3126";
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
 
+const BARBER_IMAGES = {
+  "john": "https://i.pinimg.com/1200x/8d/21/29/8d2129c8a618f113eb8aa2bc596b1658.jpg",
+  "mike": "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400",
+  "alex": "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400",
+  "james": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
+  "ravi": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+  "ali": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400",
+  "nitin": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400",
+  "varsha": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+  "piyush": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400",
+  "vansh": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400",
+  "ajay": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400",
+};
+
+const getBarberImage = (name) => {
+  if (!name) return null;
+  const lowercaseName = name.toLowerCase();
+  for (const [key, value] of Object.entries(BARBER_IMAGES)) {
+    if (lowercaseName.includes(key)) {
+      return value;
+    }
+  }
+  return null;
+};
+
+const BarberAvatar = ({ name, sizeClass = "w-12 h-12", iconSize = 20 }) => {
+  const imgUrl = getBarberImage(name);
+  if (imgUrl) {
+    return (
+      <img
+        src={imgUrl}
+        alt={name}
+        className={`${sizeClass} rounded-xl object-cover border border-[#EADBCE] shadow-2xs shrink-0`}
+      />
+    );
+  }
+  return (
+    <div className={`${sizeClass} rounded-xl bg-[#FEF9EE] border border-[#EADBCE] shadow-2xs flex items-center justify-center text-[#B58B67] shrink-0`}>
+      <User size={iconSize} />
+    </div>
+  );
+};
+
 export default function CustomerProfile() {
   const [activeTab, setActiveTab] = useState("overview");
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [selectedApptDetails, setSelectedApptDetails] = useState(null);
 
   const [profile, setProfile] = useState({
     name: "Rahul Jagtap",
@@ -46,6 +90,7 @@ export default function CustomerProfile() {
       _id: "101", 
       service: "Classic Haircut & Beard Trim", 
       barberName: "Barber Ajay", 
+      salonName: "The Royal Blade",
       barberImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
       date: "2026-06-15", 
       time: "10:30 AM", 
@@ -58,6 +103,7 @@ export default function CustomerProfile() {
       _id: "102", 
       service: "Beard Trim & Spa", 
       barberName: "Barber Ajay", 
+      salonName: "The Royal Blade",
       barberImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
       date: "2026-05-15", 
       time: "02:15 PM", 
@@ -96,7 +142,10 @@ export default function CustomerProfile() {
   const [newMember, setNewMember] = useState({ name: "", relation: "Son", age: "" });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
-  const [supportTickets] = useState([]);
+  const [supportTickets, setSupportTickets] = useState([
+    { id: "1", subject: "Refund for cancelled booking", category: "Payment", message: "UPI transaction failed, but amount debited from account.", status: "Resolved", date: "2026-06-05" },
+    { id: "2", subject: "Stylist Ajay not available", category: "Booking", message: "Cannot select Ajay Barber for haircut booking slots.", status: "In Progress", date: "2026-06-08" }
+  ]);
 
   const triggerToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -106,7 +155,7 @@ export default function CustomerProfile() {
   const compileNotifications = (uProfile, uAppts) => {
     const list = [];
     let idCounter = 1;
-    const upcoming = uAppts.filter(a => a.status === "Upcoming" || a.status === "Pending");
+    const upcoming = uAppts.filter(a => a.status === "Upcoming" || a.status === "Pending" || a.status === "Confirmed" || a.status === "In-progress");
     if (upcoming.length > 0) {
       list.push({ id: idCounter++, type: "status", title: "Booking Active", message: `Your appointment for ${upcoming[0].service} with ${upcoming[0].barberName} is scheduled for ${upcoming[0].date} at ${upcoming[0].time}.`, date: "Active", read: false });
     } else {
@@ -163,13 +212,14 @@ export default function CustomerProfile() {
           _id: b._id,
           service: b.services?.[0]?.service_name || "Custom Haircut",
           barberName: b.barber_id?.name || "Barber Ajay",
+          salonName: b.salon_id?.salon_name || "The Royal Blade",
           barberImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
           date: b.slot_time ? b.slot_time.split("T")[0] : new Date(b.created_at).toISOString().split("T")[0],
           time: b.slot_time ? new Date(b.slot_time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "10:30 AM",
           status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
-          servicesList: b.services?.map(s => ({ name: s.service_name, price: s.price })) || [{ name: "Custom Haircut", price: 400 }],
+          servicesList: b.services?.map(s => ({ name: s.service_name, price: s.price, member_name: s.member_name })) || [{ name: "Custom Haircut", price: 400, member_name: "Self" }],
           total: b.total_amount || 400, paymentMethod: "Razorpay Secure",
-          styleNotes: b.barber_note || "Standard clean fade cut."
+          styleNotes: b.notes || "Standard clean fade cut."
         }));
         setAppointments(currentAppts);
         const completedVisits = currentAppts.filter(a => a.status === "Completed").length;
@@ -286,7 +336,7 @@ export default function CustomerProfile() {
     setTimeout(() => { window.location.href = `/customer/booking?svcId=${service.id}&price=${service.price}`; }, 1200);
   };
 
-  const upcomingAppts = appointments.filter(a => a.status === "Upcoming" || a.status === "Pending");
+  const upcomingAppts = appointments.filter(a => a.status === "Upcoming" || a.status === "Pending" || a.status === "Confirmed" || a.status === "In-progress");
   const completedAppts = appointments.filter(a => a.status === "Completed");
 
   const getBarberFrequencies = () => {
@@ -578,7 +628,7 @@ export default function CustomerProfile() {
                           upcomingAppts.map(appt => (
                             <div key={appt._id} className="p-4 border border-[#EADBCE] rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#FAF6F0]/20">
                               <div className="flex items-center gap-3">
-                                <img src={appt.barberImage} alt={appt.barberName} className="w-10 h-10 rounded-xl object-cover" />
+                                <BarberAvatar name={appt.barberName} sizeClass="w-10 h-10" iconSize={16} />
                                 <div>
                                   <h4 className="text-xs font-black text-[#3D3126]">{appt.service}</h4>
                                   <p className="text-[10px] text-[#8A7A6A] font-medium mt-0.5">Stylist: {appt.barberName} • Cost: ₹{appt.total}</p>
@@ -703,9 +753,9 @@ export default function CustomerProfile() {
                         <div className="text-center py-16 bg-white border border-[#EADBCE] rounded-2xl"><Calendar size={28} className="mx-auto text-stone-200 mb-2" /><p className="text-xs font-black uppercase tracking-wider text-[#8A7A6A]">No upcoming appointments scheduled</p></div>
                       ) : (
                         upcomingAppts.map(appt => (
-                          <div key={appt._id} className="p-5 bg-white border border-[#EADBCE] rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-3xs">
+                          <div key={appt._id} className="p-5 bg-white border border-[#EADBCE] rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-3xs cursor-pointer hover:border-[#B58B67] transition-all" onClick={() => setSelectedApptDetails(appt)}>
                             <div className="flex items-center gap-4">
-                              <img src={appt.barberImage} alt={appt.barberName} className="w-12 h-12 rounded-xl object-cover border border-[#EADBCE] shadow-2xs" />
+                              <BarberAvatar name={appt.barberName} sizeClass="w-12 h-12" iconSize={20} />
                               <div>
                                 <span className="bg-[#FEF9EE] text-[#9E7452] border border-[#EADBCE] text-[8px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Scheduled Session</span>
                                 <h4 className="text-sm font-black text-[#3D3126] mt-2">{appt.service}</h4>
@@ -717,7 +767,7 @@ export default function CustomerProfile() {
                               <span className="flex items-center gap-1 font-sans"><Clock size={13} className="text-[#B58B67]" /> {appt.time}</span>
                             </div>
                             <div className="flex gap-2 w-full md:w-auto shrink-0">
-                              <button onClick={() => handleCancelBooking(appt._id)} className="flex-1 md:flex-none px-4 py-2.5 bg-rose-50 text-rose-500 border border-rose-200 rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-rose-100 transition-colors cursor-pointer">Cancel Booking</button>
+                              <button onClick={(e) => { e.stopPropagation(); handleCancelBooking(appt._id); }} className="flex-1 md:flex-none px-4 py-2.5 bg-rose-50 text-rose-500 border border-rose-200 rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-rose-100 transition-colors cursor-pointer">Cancel Booking</button>
                             </div>
                           </div>
                         ))
@@ -754,17 +804,17 @@ export default function CustomerProfile() {
                               </thead>
                               <tbody className="divide-y divide-[#F0E8DF]">
                                 {completedAppts.map(appt => (
-                                  <tr key={appt._id} className="hover:bg-[#FAF6F0]/40 transition-colors">
+                                  <tr key={appt._id} className="hover:bg-[#FAF6F0]/40 transition-colors cursor-pointer" onClick={() => setSelectedApptDetails(appt)}>
                                     <td className="px-5 py-4">
                                       <div className="flex items-center gap-3">
-                                        <img src={appt.barberImage} alt={appt.barberName} className="w-9 h-9 rounded-lg object-cover" />
+                                        <BarberAvatar name={appt.barberName} sizeClass="w-9 h-9" iconSize={14} />
                                         <div><p className="font-bold text-[#3D3126]">{appt.service}</p><p className="text-[9px] text-[#8A7A6A] font-medium mt-0.5">With {appt.barberName} • ₹{appt.total}</p></div>
                                       </div>
                                     </td>
                                     <td className="px-5 py-4 text-[#8A7A6A] font-sans font-semibold">{appt.date}</td>
                                     <td className="px-5 py-4"><span className="bg-[#E6F4EA] text-[#137333] border border-[#CEEAD6] text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full inline-block">COMPLETED</span></td>
                                     <td className="px-5 py-4 text-right">
-                                      <button onClick={() => { setSelectedBarberForReview(appt.barberName); setShowReviewModal(true); }} className="px-3 py-1.5 border border-[#EADBCE] hover:bg-[#FEF9EE] rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer text-[#9E7452]">Leave Review</button>
+                                      <button onClick={(e) => { e.stopPropagation(); setSelectedBarberForReview(appt.barberName); setShowReviewModal(true); }} className="px-3 py-1.5 border border-[#EADBCE] hover:bg-[#FEF9EE] rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer text-[#9E7452]">Leave Review</button>
                                     </td>
                                   </tr>
                                 ))}
@@ -1011,6 +1061,80 @@ export default function CustomerProfile() {
                 <h3 className="text-md font-black font-serif text-[#3D3126]">BarberPro Premium Styling & Grooming Guide</h3>
                 <p className="text-[11px] text-[#8A7A6A] font-medium mt-1 leading-relaxed">Discover professional advice on maintaining your taper fades, beard styling with essential nourishing oils, and selecting your signature cut structure.</p>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* APPOINTMENT DETAILS MODAL */}
+      <AnimatePresence>
+        {selectedApptDetails && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedApptDetails(null)} className="absolute inset-0 bg-black/60 backdrop-blur-xs" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative bg-[#FFFDF9] border border-[#EADBCE] w-full max-w-md rounded-[2rem] p-6 shadow-2xl z-10 text-left space-y-5"
+            >
+              <div className="flex justify-between items-center border-b pb-3 border-[#EADBCE]">
+                <h3 className="text-sm font-black uppercase tracking-wider text-[#3D3126]">Appointment Ticket Details</h3>
+                <button type="button" onClick={() => setSelectedApptDetails(null)} className="text-gray-400 hover:text-gray-600 cursor-pointer"><X size={16} /></button>
+              </div>
+
+              <div className="space-y-4 text-xs font-sans">
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Service Name</span>
+                  <span className="font-extrabold text-[#3D3126] text-right">{selectedApptDetails.service}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Salon Name</span>
+                  <span className="font-extrabold text-[#3D3126] text-right">{selectedApptDetails.salonName || "The Royal Blade"}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Barber Stylist</span>
+                  <span className="font-extrabold text-[#3D3126]">{selectedApptDetails.barberName}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Client (For Who)</span>
+                  <span className="font-extrabold text-[#3D3126]">
+                    {selectedApptDetails.servicesList?.[0]?.member_name || "Self"}
+                  </span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Date</span>
+                  <span className="font-extrabold text-[#3D3126] font-mono">{selectedApptDetails.date}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Time Slot</span>
+                  <span className="font-extrabold text-[#3D3126] font-mono">{selectedApptDetails.time}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Status</span>
+                  <span className="font-extrabold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md text-[9px] uppercase tracking-wider">{selectedApptDetails.status}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Total Price</span>
+                  <span className="font-extrabold text-[#C5A059] text-[13px]">₹{selectedApptDetails.total}</span>
+                </div>
+                
+                {selectedApptDetails.styleNotes && (
+                  <div className="pt-2">
+                    <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px] block mb-1">Styling Notes</span>
+                    <div className="bg-[#FAF6F0]/80 border border-[#EADBCE] rounded-xl p-3 text-[11px] text-[#3D3126] italic">
+                      "{selectedApptDetails.styleNotes}"
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedApptDetails(null)}
+                className="w-full py-3.5 text-[#FFFBF2] font-black text-[10px] uppercase tracking-widest rounded-xl shadow-md transition-all duration-200 hover:opacity-95 cursor-pointer bg-[#3D3126]"
+              >
+                Close Receipt
+              </button>
             </motion.div>
           </div>
         )}
