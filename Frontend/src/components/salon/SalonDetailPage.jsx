@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import Navbar from "../layout/Navbar";
+import defaultShopImage from "../../assets/shop.jpg";
 
 import {
-  ArrowLeft, // Used for the floating action overlay button
+  ArrowLeft,
   CalendarClock,
   Clock,
   MapPin,
@@ -13,6 +14,12 @@ import {
   Scissors,
   ShieldCheck,
   Star,
+  UserCheck,
+  Users,
+  Image as ImageIcon,
+  ImageOff,
+  Info,
+  Mail
 } from "lucide-react";
 
 const demoSalons = [
@@ -65,36 +72,174 @@ export default function SalonDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Find matching salon dynamically or fall back to the first item
-  const salon = demoSalons.find((item) => item.id === id) || demoSalons[0];
+  const [salon, setSalon] = useState(null);
+  const [servicesList, setServicesList] = useState([]);
+  const [barbers, setBarbers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const [activeImage, setActiveImage] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  useEffect(() => {
+    const fetchSalonData = async () => {
+      try {
+        setLoading(true);
+        const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+        // Fetch Salon details
+        const salonRes = await fetch(`${API}/salon/${id}`);
+        const salonData = await salonRes.json();
+
+        if (salonData.success) {
+          const s = salonData.salon;
+          const mappedSalon = {
+            id: s._id,
+            name: s.salon_name,
+            address: s.address || "Address not listed",
+            phone: s.support_number || s.mobile || "No contact info",
+            email: s.email || "contact@barberpro.com",
+            rating: s.rating || 4.5,
+            reviews: s.total_reviews || 0,
+            distance: "Nearby",
+            image: s.images?.[0] || defaultShopImage,
+            hours: `${s.opening_time || "09:00"} - ${s.closing_time || "21:00"}`,
+            about: s.about || "Premium grooming, experienced stylists, and luxury comfort — all designed for a smooth modern booking experience.",
+            images: s.images || [],
+            owner_name: s.owner_name || "Valued Partner",
+            approved_at: s.approved_at
+          };
+          setSalon(mappedSalon);
+          setActiveImage(mappedSalon.image);
+        } else {
+          setError(salonData.message || "Failed to load salon details");
+        }
+
+        // Fetch Salon services
+        const servicesRes = await fetch(`${API}/services/${id}`);
+        const servicesData = await servicesRes.json();
+        if (servicesData.success) {
+          setServicesList(servicesData.services);
+        }
+
+        // Fetch Salon barbers
+        const barbersRes = await fetch(`${API}/barber/salon/${id}`);
+        const barbersData = await barbersRes.json();
+        if (barbersData.success) {
+          setBarbers(barbersData.barbers);
+        }
+      } catch (err) {
+        console.error("Error fetching salon details:", err);
+        setError("Network error. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchSalonData();
+    }
+  }, [id]);
+
+  const handleBookVisit = () => {
+    if (!salon) return;
+    localStorage.setItem("selectedSalonId", salon.id);
+    localStorage.setItem("selectedSalonName", salon.name);
+    navigate("/customer/services");
+  };
+
+  const getServiceImage = (service) => {
+    if (service.image && service.image.trim() !== "") return service.image;
+    const name = service.name.toLowerCase();
+    const cat = (service.category || "").toLowerCase();
+    if (name.includes("cut") || name.includes("hair") || name.includes("shamp") || name.includes("trim")) {
+      return "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600";
+    }
+    if (name.includes("beard") || name.includes("shave") || name.includes("mustache")) {
+      return "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600";
+    }
+    if (name.includes("facial") || name.includes("massage") || name.includes("spa") || name.includes("clean") || name.includes("scrub") || name.includes("face")) {
+      return "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=600";
+    }
+    if (name.includes("colour") || name.includes("color") || name.includes("dye") || name.includes("highlight")) {
+      return "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=600";
+    }
+    if (cat === "women") {
+      return "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=600";
+    }
+    return "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=600";
+  };
+
+  const filteredServices = servicesList.filter((service) => {
+    if (selectedCategory === "all") return true;
+    return (service.category || "").toLowerCase() === selectedCategory.toLowerCase();
+  });
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#FAF6F0] text-[#1A1612] font-sans antialiased flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center py-20">
+          <div className="text-center">
+            <Clock className="animate-spin text-[#C5A059] mx-auto mb-4" size={36} />
+            <p className="text-[#3E362E] font-black uppercase tracking-widest text-xs">Loading Studio Details...</p>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
+  if (error || !salon) {
+    return (
+      <main className="min-h-screen bg-[#FAF6F0] text-[#1A1612] font-sans antialiased flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center py-20 px-6">
+          <div className="max-w-md w-full bg-white border border-[#E8DCCB] rounded-3xl p-8 text-center shadow-sm">
+            <Scissors className="text-red-500 mx-auto mb-4 stroke-[1.5px]" size={48} />
+            <h2 className="text-xl font-black text-[#3E362E] mb-2">Studio Not Found</h2>
+            <p className="text-stone-500 text-sm mb-6">{error || "This studio profile is currently not live."}</p>
+            <button
+              onClick={() => navigate(-1)}
+              className="w-full rounded-xl bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] font-black text-xs uppercase tracking-widest py-4 transition"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-[#FAF6F0] text-[#1A1612] font-sans antialiased flex flex-col">
+    <main className="min-h-screen bg-[#FAF6F0] text-[#3E362E] font-sans antialiased flex flex-col">
       <Navbar />
 
-
       {/* 📸 PREMIUM HERO IMAGE DISPLAY */}
-      <section className="relative h-[72vh] md:h-[88vh] overflow-hidden flex items-end">
-
+      <section className="relative h-[72vh] md:h-[85vh] overflow-hidden flex items-end">
         {/* Background Image */}
         <img
-          src={salon.image}
+          src={activeImage || salon.image}
           alt={salon.name}
-          className="absolute inset-0 w-full h-full object-cover scale-[1.03]"
+          onError={(e) => {
+            e.currentTarget.src = defaultShopImage;
+          }}
+          className="absolute inset-0 w-full h-full object-cover scale-[1.03] transition-all duration-500"
         />
 
         {/* Luxury Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#120F0C] via-[#120F0C]/55 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#120F0C] via-[#120F0C]/65 to-black/25" />
 
         {/* Soft Golden Ambient Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,160,89,0.18),transparent_35%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,160,89,0.2),transparent_35%)]" />
 
         {/* Floating Back Button */}
         <div className="absolute top-20 md:top-24 left-6 sm:left-8 lg:left-10 z-[10000]">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-black/35 backdrop-blur-xl border border-white/15 text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-white hover:text-stone-900 hover:scale-105 active:scale-95 group"
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-black/35 backdrop-blur-xl border border-white/15 text-white shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] hover:scale-105 active:scale-95 group"
           >
             <ArrowLeft
               size={17}
@@ -105,13 +250,10 @@ export default function SalonDetailPage() {
 
         {/* Hero Content */}
         <div className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 pb-14 md:pb-20">
-
           <div className="max-w-3xl text-left text-white">
-
             {/* Premium Badges */}
             <div className="mb-5 flex flex-wrap items-center gap-3">
-
-              <div className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 shadow-lg">
+              <div className="inline-flex items-center gap-2 rounded-xl bg-white/95 backdrop-blur px-4 py-2 shadow-lg">
                 <Star
                   size={14}
                   className="fill-[#C5A059] text-[#C5A059]"
@@ -121,7 +263,7 @@ export default function SalonDetailPage() {
                 </span>
               </div>
 
-              <div className="inline-flex items-center gap-2 rounded-xl bg-black/35 backdrop-blur-xl border border-white/10 px-4 py-2">
+              <div className="inline-flex items-center gap-2 rounded-xl bg-black/45 backdrop-blur-xl border border-white/10 px-4 py-2">
                 <MapPin
                   size={14}
                   className="text-[#C5A059]"
@@ -131,26 +273,28 @@ export default function SalonDetailPage() {
                 </span>
               </div>
 
+              <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/15 backdrop-blur border border-emerald-500/20 px-4 py-2">
+                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-400">
+                  ● LIVE QUEUE ACTIVE
+                </span>
+              </div>
             </div>
 
             {/* Heading */}
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight">
+            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight text-[#FAF6F0]">
               {salon.name}
             </h1>
 
             {/* Description */}
             <p className="mt-5 max-w-2xl text-sm sm:text-base text-stone-200/90 leading-relaxed font-medium">
-              Premium grooming, real-time queue updates, experienced stylists,
-              and luxury salon comfort — all designed for a smooth modern
-              booking experience.
+              {salon.about}
             </p>
 
             {/* CTA Buttons */}
             <div className="mt-8 flex flex-wrap items-center gap-4">
-
               <button
-                onClick={() => navigate("/customer/services")}
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] text-[11px] font-black uppercase tracking-[0.25em] shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-105 transition-all duration-300"
+                onClick={handleBookVisit}
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] text-[11px] font-black uppercase tracking-[0.25em] shadow-[0_0_30px_rgba(197,160,89,0.35)] hover:scale-105 transition-all duration-300 cursor-pointer"
               >
                 Book Appointment
               </button>
@@ -162,11 +306,10 @@ export default function SalonDetailPage() {
                     element.scrollIntoView({ behavior: "smooth" });
                   }
                 }}
-                className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl text-white text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all duration-300"
+                className="px-8 py-4 rounded-2xl border border-white/15 bg-white/5 backdrop-blur-xl text-white text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all duration-300 cursor-pointer"
               >
                 Explore Services
               </button>
-
             </div>
           </div>
         </div>
@@ -182,61 +325,268 @@ export default function SalonDetailPage() {
             <InfoTile icon={Phone} label="Phone" value={salon.phone} />
           </div>
 
-          {/* Core Menu Panel List */}
-          <div id="popular-services" className="rounded-2xl border border-stone-200/60 bg-white p-6 shadow-xs text-left">
+          {/* 📸 Gallery Section */}
+          <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left text-[#3E362E]">
             <div className="mb-5 flex items-center gap-3 border-b border-stone-100 pb-4">
-              <Scissors className="text-[#A37B58]" size={20} />
-              <h2 className="text-xl font-black uppercase tracking-tight text-stone-900">Popular Menu Services</h2>
+              <ImageIcon className="text-[#C5A059]" size={20} />
+              <h2 className="text-xl font-black uppercase tracking-tight text-[#3E362E]">Studio Gallery</h2>
+            </div>
+            {salon.images && salon.images.length > 0 ? (
+              <div>
+                <p className="text-[10px] text-stone-400 font-extrabold uppercase tracking-wider mb-3">Click on any photo to set it as storefront background image</p>
+                <div className="grid gap-3 grid-cols-2 sm:grid-cols-3">
+                  {salon.images.map((img, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setActiveImage(img)}
+                      className={`relative aspect-video rounded-xl overflow-hidden bg-black/5 group border cursor-pointer transition-all duration-300 ${
+                        activeImage === img ? "border-[#C5A059] ring-2 ring-[#C5A059]/20" : "border-[#E8DCCB] hover:border-[#C5A059]"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`${salon.name} Gallery ${idx + 1}`}
+                        onError={(e) => {
+                          e.currentTarget.src = defaultShopImage;
+                        }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-[#FAF6F0]/50 rounded-xl border border-[#E8DCCB]/60">
+                <ImageOff className="mx-auto text-[#8A7B6A] mb-2" size={32} />
+                <p className="text-xs font-semibold text-stone-400">No custom photos uploaded yet.</p>
+                <div className="mt-4 max-w-xs mx-auto aspect-video rounded-xl overflow-hidden border border-[#E8DCCB]">
+                  <img src={defaultShopImage} alt={salon.name} className="w-full h-full object-cover" />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 💈 Services Section with Sidebar and Images */}
+          <div id="popular-services" className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left">
+            <div className="mb-6 flex items-center gap-3 border-b border-stone-100 pb-4">
+              <Scissors className="text-[#C5A059] stroke-[2px]" size={20} />
+              <h2 className="text-xl font-black uppercase tracking-tight text-[#3E362E]">Available Services</h2>
             </div>
 
-            <div className="divide-y divide-stone-100">
-              {services.map((service) => (
-                <div
-                  key={service.name}
-                  className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between transition-all"
-                >
-                  <div>
-                    <h3 className="font-extrabold text-stone-900 text-base">{service.name}</h3>
-                    <p className="text-xs font-semibold text-stone-400 uppercase mt-0.5 tracking-wider">{service.duration}</p>
-                  </div>
-                  <div className="flex items-center justify-between sm:justify-end gap-6">
-                    <span className="font-black text-stone-900 font-mono text-sm">
-                      Rs. {service.price}
-                    </span>
+            <div className="grid gap-6 lg:grid-cols-[0.3fr_0.7fr]">
+              {/* Left Column: Category Filters Sidebar */}
+              <div className="space-y-2 lg:border-r lg:border-stone-150 lg:pr-4">
+                <p className="text-[10px] font-black uppercase tracking-wider text-[#B58B67] mb-3">Categories</p>
+                <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+                  {[
+                    { id: "all", label: "All Services" },
+                    { id: "men", label: "Men Services" },
+                    { id: "women", label: "Women Services" },
+                    { id: "addon", label: "Addon Services" }
+                  ].map((cat) => (
                     <button
-                      type="button"
-                      onClick={() => navigate("/customer/barber", { state: { service } })}
-                      className="rounded-xl bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-[10px] uppercase tracking-widest px-5 py-3 transition shadow-xs cursor-pointer"
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl border text-left whitespace-nowrap transition-all duration-300 cursor-pointer ${
+                        selectedCategory === cat.id
+                          ? "bg-[#FEF3E2] text-[#9E7452] border-[#EEDBCA] font-extrabold shadow-3xs"
+                          : "text-[#8A7B6A] border-transparent hover:bg-stone-50"
+                      }`}
                     >
-                      Book
+                      {cat.label}
                     </button>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Right Column: Grid of Service Cards with Images */}
+              <div>
+                {filteredServices.length === 0 ? (
+                  <div className="py-12 text-center bg-[#FAF6F0]/50 rounded-2xl border border-dashed border-[#E8DCCB]">
+                    <Scissors className="text-stone-300 mx-auto mb-2 animate-pulse" size={32} />
+                    <p className="text-sm font-bold text-stone-505">No services listed for this category.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {filteredServices.map((service) => (
+                      <div
+                        key={service._id}
+                        className="group rounded-2xl border border-[#E8DCCB] bg-white overflow-hidden shadow-xs hover:shadow-md hover:border-[#C5A059]/50 transition-all duration-300 flex flex-col justify-between"
+                      >
+                        {/* Service Image Section */}
+                        <div className="relative h-36 bg-stone-100 overflow-hidden">
+                          <img
+                            src={getServiceImage(service)}
+                            alt={service.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          {/* Duration Badge */}
+                          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur px-2.5 py-1 rounded-lg text-white text-[9px] font-bold">
+                            {service.duration} min
+                          </div>
+                          {/* Category Badge */}
+                          <div className="absolute top-3 left-3 bg-[#FEF3E2]/95 backdrop-blur text-[#9E7452] text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded border border-[#EEDBCA]">
+                            {service.category === "addon" ? "Addon" : service.category === "women" ? "Women" : "Men"}
+                          </div>
+                        </div>
+
+                        {/* Card details */}
+                        <div className="p-4 flex-grow flex flex-col justify-between text-left">
+                          <div>
+                            <h3 className="font-extrabold text-[#3E362E] text-sm tracking-tight leading-tight mb-1">{service.name}</h3>
+                            <div className="flex items-center gap-1 mb-2">
+                              <div className="flex text-[#C5A059]">
+                                <Star size={10} className="fill-[#C5A059] text-[#C5A059]" />
+                                <Star size={10} className="fill-[#C5A059] text-[#C5A059]" />
+                                <Star size={10} className="fill-[#C5A059] text-[#C5A059]" />
+                                <Star size={10} className="fill-[#C5A059] text-[#C5A059]" />
+                                <Star size={10} className="fill-[#C5A059] text-[#C5A059]" />
+                              </div>
+                              <span className="text-[10px] text-stone-400 font-semibold">(5.0)</span>
+                            </div>
+                            <p className="text-[11px] text-stone-505 font-medium leading-relaxed line-clamp-2 mb-4">
+                              {service.description || `Premium ${service.name} service tailored to provide a professional result.`}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2.5 border-t border-stone-100">
+                            <span className="font-black text-stone-900 font-mono text-sm">
+                              ₹ {service.price}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                localStorage.setItem("selectedSalonId", salon.id);
+                                localStorage.setItem("selectedSalonName", salon.name);
+                                navigate("/customer/services");
+                              }}
+                              className="rounded-xl bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-[10px] uppercase tracking-widest px-4 py-2.5 transition shadow-sm hover:scale-103 cursor-pointer"
+                            >
+                              Book
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* 💈 Stylists Section */}
+          <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left">
+            <div className="mb-5 flex items-center gap-3 border-b border-stone-100 pb-4">
+              <Users className="text-[#C5A059]" size={20} />
+              <h2 className="text-xl font-black uppercase tracking-tight text-[#3E362E]">Meet Our Stylists</h2>
+            </div>
+            {barbers.length === 0 ? (
+              <p className="text-xs font-semibold text-stone-400">Stylists are currently busy or offline. Walk-ins are welcome!</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {barbers.map((barber) => (
+                  <div key={barber._id} className="flex items-center gap-3 p-4 rounded-xl border border-[#E8DCCB]/60 bg-[#FAF6F0]/65 hover:border-[#C5A059]/40 hover:shadow-xs transition-all duration-300">
+                    <div className="w-12 h-12 rounded-full bg-white border border-[#E8DCCB] flex items-center justify-center text-[#C5A059] flex-shrink-0 shadow-2xs">
+                      <Users size={20} className="stroke-[1.5px]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="font-extrabold text-[#3E362E] text-sm truncate">{barber.name}</h3>
+                        <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                          barber.status === "available"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
+                            : barber.status === "busy"
+                            ? "bg-amber-50 text-amber-700 border-amber-200/50"
+                            : barber.status === "break"
+                            ? "bg-blue-50 text-blue-700 border-blue-200/50"
+                            : "bg-stone-50 text-stone-600 border-stone-200/50"
+                        }`}>
+                          {barber.status}
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-bold text-[#B58B67] uppercase tracking-wide mt-0.5">
+                        {barber.specialization || "Hair Specialist"}
+                      </p>
+                      <div className="flex items-center justify-between mt-2.5">
+                        <span className="text-[10px] font-semibold text-stone-505">{barber.experience || 0} yrs exp</span>
+                        <div className="flex items-center gap-0.5">
+                          <Star size={10} className="fill-[#C5A059] text-[#C5A059]" />
+                          <span className="text-[10px] font-black text-stone-800">{barber.rating || 4.5}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         {/* 📑 FIXED FLOATING RIGHT SIDEBAR ANCHOR */}
-        <aside className="rounded-2xl border border-stone-200/60 bg-white p-6 shadow-xs lg:sticky lg:top-24 lg:self-start text-left">
-          <div className="mb-4 flex items-center gap-3 border-b border-stone-100 pb-3">
-            <CalendarClock className="text-[#A37B58]" size={20} />
-            <h2 className="text-lg font-black uppercase tracking-tight text-stone-900">Book Your Visit</h2>
+        <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+          {/* Booking Card */}
+          <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-6 shadow-sm text-left transition-all hover:border-[#C5A059]/40">
+            <div className="mb-4 flex items-center gap-3 border-b border-stone-100 pb-3">
+              <CalendarClock className="text-[#C5A059]" size={20} />
+              <h2 className="text-lg font-black uppercase tracking-tight text-[#3E362E]">Book Your Visit</h2>
+            </div>
+            <p className="mb-6 text-xs font-medium leading-relaxed text-stone-500">
+              Select a service and barber, then reserve your slot with a small
+              token payment.
+            </p>
+            <button
+              type="button"
+              onClick={handleBookVisit}
+              className="w-full rounded-xl bg-[#3E362E] hover:bg-[#2A241F] text-white px-5 py-4 text-xs font-black uppercase tracking-widest shadow-sm transition-all active:scale-[0.99] hover:scale-[1.02] cursor-pointer"
+            >
+              Choose Services
+            </button>
+            <div className="flex items-start gap-3 rounded-xl bg-[#FAF6F0]/70 border border-[#E8DCCB] p-4 text-xs text-[#8A7B6A] mt-4">
+              <ShieldCheck size={16} className="shrink-0 text-[#C5A059]" />
+              <span className="font-medium leading-normal">Verified salon profile with appointment logs and live smart queue support.</span>
+            </div>
           </div>
-          <p className="mb-6 text-xs font-medium leading-relaxed text-stone-500">
-            Select a service and barber, then reserve your slot with a small
-            token payment.
-          </p>
-          <button
-            type="button"
-            onClick={() => navigate("/customer/services")}
-            className="w-full rounded-xl bg-[#3E362E] hover:bg-[#2A241F] px-5 py-4 text-xs font-black uppercase tracking-widest text-white shadow-md transition-all active:scale-[0.99] cursor-pointer"
-          >
-            Choose Services
-          </button>
-          <div className="flex items-start gap-3 rounded-xl bg-[#FAF7F2] border border-stone-200/40 p-4 text-xs text-stone-600 mt-4">
-            <ShieldCheck size={16} className="shrink-0 text-[#C5A059]" />
-            <span className="font-medium leading-normal">Verified salon profile with appointment logs and live smart queue support.</span>
+
+          {/* Owner & Verification Details */}
+          <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-6 shadow-sm text-left transition-all hover:border-[#C5A059]/40">
+            <div className="mb-4 flex items-center gap-3 border-b border-stone-100 pb-3">
+              <UserCheck className="text-[#C5A059]" size={20} />
+              <h2 className="text-lg font-black uppercase tracking-tight text-[#3E362E]">Studio Verification</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 bg-[#FAF6F0]/40 p-3 rounded-xl border border-[#E8DCCB]/60">
+                <UserCheck size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-[#B58B67] mb-0.5">Studio Owner</p>
+                  <p className="text-xs font-extrabold text-[#3E362E]">{salon.owner_name}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-emerald-50/40 p-3 rounded-xl border border-emerald-200/50">
+                <ShieldCheck size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 mb-0.5">Verification Status</p>
+                  <p className="text-xs font-extrabold text-emerald-700">Approved Profile</p>
+                  <p className="text-[9px] font-medium text-emerald-600 mt-1">Verified: {salon.approved_at ? new Date(salon.approved_at).toLocaleDateString("en-IN", {day: "numeric", month: "short", year: "numeric"}) : "June 2026"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-[#FAF6F0]/40 p-3 rounded-xl border border-[#E8DCCB]/60">
+                <Mail size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-[#B58B67] mb-0.5">Admin Approver Email</p>
+                  <p className="text-xs font-bold font-mono text-[#3E362E]">admin@barberpro.com</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-[#FAF6F0]/40 p-3 rounded-xl border border-[#E8DCCB]/60">
+                <Phone size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-[#B58B67] mb-0.5">Admin Verification Call</p>
+                  <p className="text-xs font-bold font-mono text-[#3E362E]">+91 90000 00000</p>
+                </div>
+              </div>
+            </div>
           </div>
         </aside>
       </section>
@@ -247,12 +597,12 @@ export default function SalonDetailPage() {
 
 function InfoTile({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-2xl border border-stone-200/60 bg-white p-5 shadow-xs text-left">
-      <Icon className="mb-3 text-[#A37B58]" size={20} />
-      <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">
+    <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-5 shadow-sm text-left transition-all hover:border-[#C5A059]/55 hover:shadow-md hover:scale-[1.01] duration-300 font-sans">
+      <Icon className="mb-3 text-[#C5A059] stroke-[2.5px]" size={20} />
+      <p className="text-[10px] font-black uppercase tracking-widest text-[#B58B67]">
         {label}
       </p>
-      <p className="mt-2 font-extrabold text-stone-900 text-sm leading-snug">{value}</p>
+      <p className="mt-2 font-extrabold text-[#3E362E] text-sm leading-snug">{value}</p>
     </div>
   );
 }
