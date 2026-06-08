@@ -59,7 +59,7 @@ const Navbar = () => {
       setIsLoggedIn(false);
       setUser(null);
     }
-  }, [location.pathname]); // Update state on navigation
+  }, [location.pathname]); 
 
   const dropRef = useRef(null);
   const profileRef = useRef(null);
@@ -121,6 +121,7 @@ const Navbar = () => {
   const NAV_ITEMS = [
     { label: "Home", path: "/", icon: Home },
     { label: "Services", hasDropdown: true, icon: Sparkles },
+    { label: "Studios", path: "/nearby", icon: Users },
     { label: "About", section: "about", icon: Info },
     { label: "Contact", path: "/support", icon: Phone },
   ];

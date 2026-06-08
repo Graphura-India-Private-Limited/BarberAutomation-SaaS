@@ -28,8 +28,6 @@ const NAV_ITEMS = [
 ];
 
 const FEATURES = [
- 
- 
    
  { title: "Signature Cuts",  Icon: Scissors, image: "https://i.pinimg.com/736x/82/c5/3d/82c53d8a1ea142d096daec6430eca0db.jpg", description: "Precision tailoring for the modern gentleman.",          path: "/customer/look" },
   { title: "Luxury Styling",  Icon: Sparkles, image: "https://i.pinimg.com/736x/ab/00/ea/ab00ead61169995482cc7703115efda2.jpg", description: "Couture hair transformations for feminine silhouette.",  path: "/customer/services/women" },
