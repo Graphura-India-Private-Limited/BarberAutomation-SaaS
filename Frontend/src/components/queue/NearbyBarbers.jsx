@@ -187,6 +187,7 @@ const NearbyBarbers = () => {
   const [bookingDone, setBookingDone] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const sectionRef = useRef(null);
+  const [services, setServices] = useState([]);
 
   /* fetch salons */
  useEffect(() => {
@@ -200,10 +201,21 @@ const NearbyBarbers = () => {
 
       const response = await fetch(`${API}/salon`);
       const data = await response.json();
-
-      if (data.success) {
-        setSalons(data.salons);
-      }
+if (data.success) {
+  const mapped = data.salons.map(s => ({
+    ...s,
+    id: s._id,
+    name: s.salon_name,
+    address: s.address || "Address not listed",
+    image: s.images?.[0] || "",
+    rating: s.rating || 4.5,
+    reviews: s.total_reviews || 0,
+    distance: "Nearby",
+    openNow: true,
+    tags: s.services_offered?.slice(0, 3) || ["Haircut", "Grooming"],
+  }));
+  setSalons(mapped);
+}
     } catch (error) {
       console.error("Failed to fetch salons:", error);
     } finally {
@@ -213,29 +225,29 @@ const NearbyBarbers = () => {
 
   fetchSalons();
 }, []);
-
 const handleSalonSelect = async (salon) => {
   setSelectedSalon(salon);
   setSelectedService(null);
 
   try {
-    const API =
-      import.meta.env.VITE_API_URL ||
-      "http://localhost:5000/api";
-
-    const response = await fetch(
-      `${API}/service/salon/${salon._id}`
-    );
-
+    const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    const response = await fetch(`${API}/services/${salon._id || salon.id}`);
     const data = await response.json();
 
     if (data.success) {
-      setServices(data.services);
+      const mapped = data.services.map(s => ({
+        ...s,
+        id: s._id,
+        duration: `${s.duration} min`,
+        popular: false,
+      }));
+      setServices(mapped);
     }
   } catch (error) {
     console.error("Failed to fetch services:", error);
   }
 };
+
 
   const handleConfirmSalon = () => {
     if (!selectedSalon) return;
@@ -477,7 +489,7 @@ const handleBook = async () => {
     key={service._id}
     service={{
       id: service._id,
-      name: service.service_name,
+      name: service.name,
       duration: `${service.duration} min`,
       price: service.price,
       popular: service.popular,

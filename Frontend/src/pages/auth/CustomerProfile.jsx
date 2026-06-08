@@ -4,7 +4,7 @@ import {
   Calendar, Clock, Award, Image, ChevronRight, ArrowLeft, Save,
   Bell, CheckCircle, ShieldAlert, Sparkles, LogOut, CheckSquare, 
   Square, Edit3, Settings, Gift, List, Heart, CalendarPlus, Star,
-  RefreshCw, Play, Search, ShoppingBag
+  RefreshCw, Play, Search, ShoppingBag, Compass, HelpCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import NearbyBarbers from "../../components/queue/NearbyBarbers";
@@ -96,6 +96,7 @@ export default function CustomerProfile() {
   const [newMember, setNewMember] = useState({ name: "", relation: "Son", age: "" });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [supportTickets] = useState([]);
 
   const triggerToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -324,7 +325,7 @@ export default function CustomerProfile() {
                 <p className="px-3 text-[9px] font-bold text-[#78716C] uppercase tracking-[0.18em] mb-2.5">Navigation</p>
                 {[
                   { id: "overview", label: "Dashboard Hub", icon: Sparkles },
-                  { id: "studios", label: "Our Studios", icon: LifeBuoy },
+                  { id: "studios", label: "Our Studios", icon: Compass },
                   { id: "history", label: "Appointments Registry", icon: Calendar },
                   { id: "dummy_services", label: "Grooming Menu", icon: ShoppingBag },
                   { id: "membership", label: "Membership Perks", icon: Award },
@@ -652,7 +653,7 @@ export default function CustomerProfile() {
                         <div className="mt-4 space-y-3">
                           {supportTickets.length === 0 ? (
                             <div className="border border-dashed border-[#EADBCE] rounded-2xl p-6 text-center">
-                              <LifeBuoy size={24} className="mx-auto text-stone-300 mb-2" />
+                              <HelpCircle size={24} className="mx-auto text-stone-300 mb-2" />
                               <p className="text-xs font-black uppercase tracking-wider text-stone-400">No active support inquiries</p>
                               <p className="text-[10px] text-stone-400 mt-1 max-w-md mx-auto">If you faced any issues regarding your bookings, stylists, payments, or membership tiers, file a support ticket to get help.</p>
                             </div>
@@ -660,7 +661,7 @@ export default function CustomerProfile() {
                             supportTickets.slice(0, 3).map(ticket => (
                               <div key={ticket.id} className="p-3 border border-[#EADBCE] rounded-xl bg-[#FAF6F0]/20 flex items-start justify-between gap-4">
                                 <div className="flex items-start gap-3 min-w-0">
-                                  <div className="w-8 h-8 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center text-[#B58B67] shrink-0 mt-0.5"><LifeBuoy size={14} /></div>
+                                  <div className="w-8 h-8 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center text-[#B58B67] shrink-0 mt-0.5"><HelpCircle size={14} /></div>
                                   <div className="min-w-0">
                                     <div className="flex items-center gap-2"><span className="text-[10px] font-black text-[#3D3126] uppercase truncate max-w-[150px] sm:max-w-[250px]">{ticket.subject}</span><span className="text-[8px] font-black uppercase tracking-wider bg-[#FEF9EE] text-[#9E7452] border border-[#EADBCE]/50 px-1.5 py-0.5 rounded-md">{ticket.category}</span></div>
                                     <p className="text-[10px] text-[#8A7A6A] font-medium mt-1 truncate">{ticket.message}</p>
