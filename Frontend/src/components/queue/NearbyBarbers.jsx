@@ -189,7 +189,6 @@ const NearbyBarbers = () => {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [services, setServices] = useState([]);
   const sectionRef = useRef(null);
-  const [services, setServices] = useState([]);
 
   /* fetch salons */
  useEffect(() => {
