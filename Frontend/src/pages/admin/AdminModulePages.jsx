@@ -995,14 +995,14 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
                     </button> */}
 
                     <button
-                      onClick={() => console.log("Confirmed", b._id)}
+                      onClick={() => changeBookingStatus(b._id, "confirmed")}
                       className="px-2 py-1 rounded-full text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700"
                     >
                       Confirm
                     </button>
 
                     <button
-                      onClick={() => console.log("Cancelled", b._id)}
+                      onClick={() => changeBookingStatus(b._id, "cancelled")}
                       className="px-2 py-1 rounded-full text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700"
                     >
                       Cancel
