@@ -276,7 +276,6 @@ export function CustomersModule({ customers: initialCustomers, loading, customer
 export function SalonsModule({
   salons, customers, bookings, stats, loading, pendingBookings, revenueDisplay, updateSalonStatus, addSalon, deleteSalon,
 }) {
-  const [salonTab, setSalonTab] = useState("requests");
   const [salonSearch, setSalonSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -305,10 +304,6 @@ export function SalonsModule({
   const cities = ["all", ...new Set(salons.map((s) => s.salon_city || s.city || s.address?.split(",").pop()?.trim()).filter(Boolean))];
 
   const filtered = salons
-    .filter((s) =>
-      salonTab === "requests" ? s.status === "pending" :
-        salonTab === "approved" ? s.status === "approved" : s.status === "rejected"
-    )
     .filter((s) => {
       if (selectedCity === "all") return true;
       const city = (s.salon_city || s.city || s.address?.split(",").pop()?.trim() || "").toLowerCase();
@@ -330,34 +325,11 @@ export function SalonsModule({
     { label: "Revenue", value: revenueDisplay, sub: "Total collected", subColor: C.orange, icon: IndianRupee, iconBg: C.orangeLight, iconColor: C.orange },
   ];
 
-  const tabCounts = {
-    requests: salons.filter((s) => s.status === "pending").length,
-    approved: approvedCount,
-    rejected: salons.filter((s) => s.status === "rejected").length,
-  };
-
   return (
     <AdminPageShell>
       <StatCardsRow cards={statCards} loading={loading} />
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex flex-wrap gap-2">
-          {["requests", "approved", "rejected"].map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => { setSalonTab(key); setPage(1); }}
-              className="admin-tab-btn px-4 py-2 rounded-md font-sans text-[11px] font-extrabold uppercase tracking-widest"
-              style={{
-                background: salonTab === key ? C.brown : "#fff",
-                color: salonTab === key ? "#fff" : C.brown,
-                border: `1px solid ${C.brown}`,
-              }}
-            >
-              {key.toUpperCase()} ({tabCounts[key]})
-            </button>
-          ))}
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-1 sm:justify-end">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:w-full sm:justify-end">
           <div className="flex items-center gap-2 rounded-md border bg-white px-3 py-2 w-full sm:max-w-md" style={{ borderColor: C.border }}>
             <Search size={16} color={C.brown} />
             <input value={salonSearch} onChange={(e) => { setSalonSearch(e.target.value); setPage(1); }}
@@ -592,7 +564,7 @@ export function SalonsModule({
         footer={<TablePagination total={total} pageSafe={pageSafe} totalPages={totalPages} onPrev={() => setPage((p) => Math.max(1, p - 1))} onNext={() => setPage((p) => Math.min(totalPages, p + 1))} />}
       >
         {!loading && paged.length === 0 ? (
-          <TableEmptyRow colSpan={7} icon={Store} title={salonTab === "requests" ? "No requests salons" : `No ${salonTab} salons`} subtitle="New salon requests will appear here" />
+          <TableEmptyRow colSpan={7} icon={Store} title="No salons found" subtitle="New salon requests will appear here" />
         ) : (
           paged.map((s) => (
             <tr key={s._id} className="border-t" style={{ borderColor: C.border }}>
@@ -603,23 +575,29 @@ export function SalonsModule({
               <td className="px-6 py-4"><StatusBadge label={s.status || "unknown"} color={salonStatusColor(s.status)} /></td>
               <td className="px-6 py-4 font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{formatJoined(s.requested_on || s.createdAt || s.created_at)}</td>
               <td className="px-6 py-4">
-                <div className="flex flex-wrap gap-2">
-                  {s.status === "pending" && (
-                    <>
-                      <button type="button" onClick={() => updateSalonStatus(s._id, "approved")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-green-50 text-green-700">Approve</button>
-                      <button type="button" onClick={() => updateSalonStatus(s._id, "rejected")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700">Reject</button>
-                      <button type="button" onClick={() => deleteSalon(s._id)} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700 hover:bg-red-100 transition-colors">Delete</button>
-                    </>
-                  )}
-                  {s.status === "rejected" && (
-                    <>
-                      <button type="button" onClick={() => updateSalonStatus(s._id, "pending")} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-gray-100 text-gray-700">Reconsider</button>
-                      <button type="button" onClick={() => deleteSalon(s._id)} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700 hover:bg-red-100 transition-colors">Delete</button>
-                    </>
-                  )}
-                  {s.status === "approved" && (
-                    <button type="button" onClick={() => deleteSalon(s._id)} className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider bg-red-50 text-red-700 hover:bg-red-100 transition-colors">Delete</button>
-                  )}
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <select
+                    value={s.status || "pending"}
+                    onChange={(e) => updateSalonStatus(s._id, e.target.value)}
+                    className="px-3 py-1.5 rounded-full font-sans text-[11px] font-extrabold tracking-wider border outline-none bg-white cursor-pointer text-center"
+                    style={{
+                      borderColor: C.border,
+                      color: s.status === "approved" ? C.green : s.status === "rejected" ? C.red : C.orange,
+                      background: s.status === "approved" ? C.greenLight : s.status === "rejected" ? C.redLight : C.orangeLight,
+                    }}
+                  >
+                    <option value="pending">REQUESTS</option>
+                    <option value="approved">APPROVED</option>
+                    <option value="rejected">REJECTED</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => deleteSalon(s._id)}
+                    className="p-2 rounded-full text-red-600 hover:bg-red-50 transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </td>
             </tr>
