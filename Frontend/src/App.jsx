@@ -196,17 +196,18 @@ function App() {
         {/* --- SUPER ADMIN CENTRAL PANEL (RESTRICTED BY RBAC) --- */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><Outlet /></ProtectedRoute>}>
-          <Route path="requests" element={<AdminRequests initialTab="dashboard" />} />
-          <Route path="customers" element={<AdminRequests initialTab="customers" />} />
-          <Route path="salon-management" element={<AdminRequests initialTab="salons" />} />
-          <Route path="barbers" element={<AdminRequests initialTab="barbers" />} />
-          <Route path="add-barber" element={<AdminRequests initialTab="addbarber" />} />
-          <Route path="appointments" element={<AdminRequests initialTab="appointments" />} />
-          <Route path="services" element={<AdminRequests initialTab="services" />} />
-          <Route path="payments" element={<AdminRequests initialTab="payments" />} />
-          <Route path="reviews" element={<AdminRequests initialTab="reviews" />} />
-          <Route path="live" element={<AdminRequests initialTab="live" />} />
-          <Route path="platform-settings" element={<AdminRequests initialTab="settings" />} />
+          <Route path="requests" element={<AdminOnboarding />} />
+          <Route path="customers" element={<AdminOnboarding />} />
+          <Route path="salon-management" element={<AdminOnboarding />} />
+          <Route path="barbers" element={<AdminOnboarding />} />
+          <Route path="add-barber" element={<AdminOnboarding />} />
+          <Route path="appointments" element={<AdminOnboarding />} />
+          <Route path="services" element={<AdminOnboarding />} />
+          <Route path="payments" element={<AdminOnboarding />} />
+          <Route path="reviews" element={<AdminOnboarding />} />
+          <Route path="live" element={<AdminOnboarding />} />
+          <Route path="platform-settings" element={<AdminOnboarding />} />
+          <Route index element={<AdminOnboarding />} />
           <Route path="onboarding" element={<AdminOnboarding />} />
           <Route path="user-management" element={<AdminLayout page="users"><AdminUserManagement /></AdminLayout>} />
           <Route path="analytics" element={<AdminLayout page="analytics"><AdminAnalytics /></AdminLayout>} />

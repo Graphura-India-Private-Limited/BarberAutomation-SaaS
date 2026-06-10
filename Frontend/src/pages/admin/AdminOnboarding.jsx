@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Store, Users, UserSquare2, UserPlus2, 
   CalendarCheck, Scissors, CreditCard, Star, Activity, Settings, LogOut,
@@ -134,11 +134,57 @@ const NAV_ICONS = {
 
 export default function AdminOnboarding() {
   const navigate  = useNavigate();
+  const location  = useLocation();
   const photoRef  = useRef();
   const docRef    = useRef();
   const adminMenuRef = useRef(null);
 
-  const [tab,        setTab]       = useState("dashboard");
+  const ROUTE_TAB_MAP = {
+    "/admin": "dashboard",
+    "/admin/": "dashboard",
+    "/admin/requests": "dashboard",
+    "/admin/salons": "salons",
+    "/admin/salon-management": "salons",
+    "/admin/customers": "customers",
+    "/admin/barbers": "barbers",
+    "/admin/add-barber": "addbarber",
+    "/admin/addbarber": "addbarber",
+    "/admin/appointments": "appointments",
+    "/admin/services": "services",
+    "/admin/payments": "payments",
+    "/admin/reviews": "reviews",
+    "/admin/live": "live",
+    "/admin/live-monitoring": "live",
+    "/admin/settings": "settings",
+    "/admin/platform-settings": "settings",
+    "/admin/onboarding": "dashboard"
+  };
+
+  const [tab, setTab] = useState(() => {
+    return ROUTE_TAB_MAP[window.location.pathname] || "dashboard";
+  });
+
+  useEffect(() => {
+    const routeTab = ROUTE_TAB_MAP[location.pathname];
+    if (routeTab) {
+      setTab(routeTab);
+    }
+  }, [location.pathname]);
+
+  const handleTabChange = (tabKey) => {
+    setTab(tabKey);
+    if (tabKey === "dashboard") {
+      navigate("/admin");
+    } else if (tabKey === "salons") {
+      navigate("/admin/salon-management");
+    } else if (tabKey === "addbarber") {
+      navigate("/admin/add-barber");
+    } else if (tabKey === "settings") {
+      navigate("/admin/platform-settings");
+    } else {
+      navigate(`/admin/${tabKey}`);
+    }
+  };
   const [salons,     setSalons]    = useState([]);
   const [stats,      setStats]     = useState(null);
   const [loading,    setLoading]   = useState(true);
@@ -435,7 +481,7 @@ export default function AdminOnboarding() {
                 )}
                 <button
                   className={isActive ? "" : "nav-btn"}
-                  onClick={() => setTab(n.k)}
+                  onClick={() => handleTabChange(n.k)}
                   style={{
                     display: "flex", alignItems: "center", gap: 10, width: "100%",
                     padding: "10px 12px", borderRadius: 8,
@@ -497,7 +543,7 @@ export default function AdminOnboarding() {
                 <p style={{ fontSize: 15, fontWeight: 500, color: C.muted }}>Welcome back, Admin!</p>
               ) : (
                 <p style={{ fontSize: 13, fontWeight: 500, color: C.muted, marginTop: 4 }}>
-                  <button onClick={() => setTab("dashboard")} style={{ background:"none", border:"none", cursor:"pointer", color: C.gold, fontWeight: 500, fontSize: 13, padding: 0 }}>Dashboard</button>
+                  <button onClick={() => handleTabChange("dashboard")} style={{ background:"none", border:"none", cursor:"pointer", color: C.gold, fontWeight: 500, fontSize: 13, padding: 0 }}>Dashboard</button>
                   <span style={{ margin: "0 8px", color: C.muted }}>&gt;</span>
                   <span style={{ color: C.ink }}>{currentNavLabel}</span>
                 </p>
@@ -516,7 +562,7 @@ export default function AdminOnboarding() {
               </button>
               <button
                 type="button"
-                onClick={() => setTab("appointments")}
+                onClick={() => handleTabChange("appointments")}
                 style={{ position:"relative", cursor:"pointer", width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", border:`1px solid ${C.border}` }}
               >
                 <Bell size={17} color={C.muted} />
@@ -556,14 +602,14 @@ export default function AdminOnboarding() {
                   >
                     <button
                       type="button"
-                      onClick={() => { setTab("dashboard"); setAdminMenuOpen(false); }}
+                      onClick={() => { handleTabChange("dashboard"); setAdminMenuOpen(false); }}
                       style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", cursor: "pointer", fontSize: 13, color: C.ink, fontFamily: "inherit" }}
                     >
                       Profile
                     </button>
                     <button
                       type="button"
-                      onClick={() => { setTab("settings"); setAdminMenuOpen(false); }}
+                      onClick={() => { handleTabChange("settings"); setAdminMenuOpen(false); }}
                       style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", borderTop: `1px solid ${C.border}`, cursor: "pointer", fontSize: 13, color: C.ink, fontFamily: "inherit" }}
                     >
                       Settings
@@ -601,7 +647,7 @@ export default function AdminOnboarding() {
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
 
                   {/* Recent Bookings */}
-                  <SectionCard title="Recent Bookings" actionLabel="View All →" onAction={()=>setTab("appointments")}>
+                  <SectionCard title="Recent Bookings" actionLabel="View All →" onAction={()=>handleTabChange("appointments")}>
                     {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
                     : bookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No bookings yet</div>
                     : bookings.slice(0,4).map((b,i) => (
@@ -622,7 +668,7 @@ export default function AdminOnboarding() {
                   </SectionCard>
 
                   {/* Barber Status */}
-                  <SectionCard title="Barber Status" actionLabel="Live View →" onAction={()=>setTab("live")}>
+                  <SectionCard title="Barber Status" actionLabel="Live View →" onAction={()=>handleTabChange("live")}>
                     {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
                     : barbers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers added yet</div>
                     : barbers.slice(0,4).map((b,i) => (
@@ -640,7 +686,7 @@ export default function AdminOnboarding() {
                   </SectionCard>
 
                   {/* Pending Salon Requests */}
-                  <SectionCard title="Pending Salon Requests" actionLabel="View All →" onAction={()=>setTab("salons")}>
+                  <SectionCard title="Pending Salon Requests" actionLabel="View All →" onAction={()=>handleTabChange("salons")}>
                     {salons.filter(s=>s.status==="pending").length===0
                       ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No pending requests — all caught up!</div>
                       : salons.filter(s=>s.status==="pending").slice(0,3).map((s,i) => (

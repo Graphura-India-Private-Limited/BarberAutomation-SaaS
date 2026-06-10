@@ -46,7 +46,7 @@ export default function AdminLogin() {
         localStorage.setItem("name", "System Admin");
         localStorage.setItem("email", "admin@barberpro.com");
         setSuccess("Access granted! Redirecting...");
-        setTimeout(() => navigate("/admin/requests"), 1000);
+        setTimeout(() => navigate("/admin"), 1000);
       } else {
         setError(data.message || "Login failed");
       }

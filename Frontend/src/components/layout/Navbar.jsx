@@ -113,7 +113,7 @@ const Navbar = () => {
     const lowerRole = role.toLowerCase();
     if (lowerRole.includes("barber")) return "/barber/dashboard";
     if (lowerRole.includes("owner")) return "/owner/dashboard";
-    if (lowerRole.includes("admin")) return "/admin/dashboard";
+    if (lowerRole.includes("admin")) return "/admin";
     return "/dashboard";
   };
 
@@ -153,7 +153,7 @@ const Navbar = () => {
     }
     if (cleanRole.includes("admin")) {
       return [
-        { label: "Admin Dashboard", icon: Home, path: "/admin/dashboard" },
+        { label: "Admin Dashboard", icon: Home, path: "/admin" },
         { label: "Requests & Salons", icon: Users, path: "/admin/requests" },
         { label: "Reports & Tickets", icon: Star, path: "/admin/tickets" },
         { label: "Platform Settings", icon: Settings, path: "/admin/settings" },
