@@ -820,7 +820,7 @@ export default function CustomerProfile() {
                           </span>
 
                           <div className="my-6">
-                            <h2 className="text-5xl font-serif font-black tracking-tight text-[#B58B67] font-mono">
+                            <h2 className="text-5xl font-serif font-black tracking-tight text-[#B58B67] ">
                               {activeQueue.status === "in-progress" ? "0" : activeQueue.estimated_wait}
                               <span className="text-lg font-sans font-bold ml-1 text-white">mins</span>
                             </h2>
