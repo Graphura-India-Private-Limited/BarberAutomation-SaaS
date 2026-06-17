@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   Scissors, Calendar, Clock, Star, Sparkles,
   ChevronDown, ArrowRight, Shield, ArrowLeft,
@@ -21,6 +21,7 @@ const FEATURES = [
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step,    setStep]   = useState("mobile");
   const [mobile,  setMobile] = useState("");
   const [otp,     setOtp]    = useState(["", "", "", "", "", ""]);
@@ -74,7 +75,12 @@ export default function Login() {
           localStorage.setItem("userName", data.user.name);
         }
 
-        navigate("/");
+        const from = location.state?.from;
+        if (from) {
+          navigate(from.pathname + (from.search || ""), { state: from.state, replace: true });
+        } else {
+          navigate("/customer/services");
+        }
       } else setError(data.message || "Invalid OTP");
     } catch { setError("Server error!"); }
     finally { setLoading(false); }

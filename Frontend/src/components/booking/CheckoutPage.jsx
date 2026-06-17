@@ -1,0 +1,247 @@
+import React, { useState } from 'react';
+import { CreditCard, Landmark, Phone, ArrowLeft, ShieldCheck, Sparkles, Building, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const GOLD = "#C5A059";
+
+export default function CheckoutPage({ bookingData, onBack, onComplete }) {
+  const [paymentType, setPaymentType] = useState("TOKEN"); // "TOKEN" or "FULL"
+  const [payMethod, setPayMethod] = useState("upi"); // "upi", "card", "netbanking"
+  const [processing, setProcessing] = useState(false);
+  const [upiId, setUpiId] = useState("");
+  const [cardDetails, setCardDetails] = useState({ number: "", expiry: "", cvc: "", name: "" });
+
+  const attendeesCount = bookingData.attendees ? bookingData.attendees.length : 1;
+  const tokenAmount = attendeesCount * 50;
+  const servicePrice = bookingData.price || 500;
+  const fullAmount = servicePrice * attendeesCount;
+
+  const amountToPayNow = paymentType === "FULL" ? fullAmount : tokenAmount;
+  const remainingAtSalon = paymentType === "FULL" ? 0 : (fullAmount - tokenAmount);
+
+  // Billing calculation details
+  const platformFee = 15;
+  const taxRate = 0.18; // 18% GST (already included or added?) Let's show as included to keep total clean
+  const taxesIncluded = Math.round(amountToPayNow * taxRate);
+
+  const handlePay = async () => {
+    setProcessing(true);
+    // Simulate Razorpay handshake / payment gateway loader
+    setTimeout(async () => {
+      try {
+        await onComplete(paymentType, amountToPayNow);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setProcessing(false);
+      }
+    }, 2000);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100 max-w-2xl mx-auto text-left font-sans">
+      <AnimatePresence>
+        {processing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-[#3E362E]/80 backdrop-blur-md z-[9999] flex flex-col items-center justify-center text-white"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-[#C5A059]/10 border border-[#C5A059]/30 flex items-center justify-center mb-6 animate-pulse">
+              <Sparkles className="w-8 h-8 text-[#C5A059]" />
+            </div>
+            <h3 className="font-serif text-2xl font-bold tracking-wide animate-bounce text-center">
+              Processing Secure Payment
+            </h3>
+            <p className="text-stone-400 text-xs mt-2 tracking-widest uppercase">
+              Simulating Razorpay Handshake...
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex items-center mb-6 pb-4 border-b">
+        <button type="button" onClick={onBack} className="text-gray-400 hover:text-stone-700 transition-colors mr-4 cursor-pointer">
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        <h2 className="text-2xl font-bold text-gray-900">Payment Checkout</h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* Token Payment Option */}
+        <div 
+          onClick={() => setPaymentType("TOKEN")}
+          className={`p-5 rounded-2xl border-2 cursor-pointer transition-all select-none relative overflow-hidden ${
+            paymentType === "TOKEN" 
+              ? "border-[#C5A059] bg-[#FEF9EE]" 
+              : "border-stone-200 hover:border-[#C5A059]/40 bg-white"
+          }`}
+        >
+          {paymentType === "TOKEN" && (
+            <div className="absolute top-0 right-0 w-8 h-8 bg-[#C5A059] flex items-center justify-center rounded-bl-xl">
+              <span className="text-white text-xs font-bold">✓</span>
+            </div>
+          )}
+          <span className="text-[9px] font-black uppercase tracking-widest text-[#C5A059]">Option A</span>
+          <h4 className="font-serif text-lg font-bold text-[#3E362E] mt-1">Partial Payment</h4>
+          <p className="text-stone-500 text-xs mt-1 leading-relaxed">
+            Pay ₹50 per person now to confirm your reservation. Balance due at salon.
+          </p>
+          <div className="mt-4 text-2xl font-black font-mono text-[#3E362E]">₹{tokenAmount}</div>
+        </div>
+
+        {/* Full Payment Option */}
+        <div 
+          onClick={() => setPaymentType("FULL")}
+          className={`p-5 rounded-2xl border-2 cursor-pointer transition-all select-none relative overflow-hidden ${
+            paymentType === "FULL" 
+              ? "border-[#C5A059] bg-[#FEF9EE]" 
+              : "border-stone-200 hover:border-[#C5A059]/40 bg-white"
+          }`}
+        >
+          {paymentType === "FULL" && (
+            <div className="absolute top-0 right-0 w-8 h-8 bg-[#C5A059] flex items-center justify-center rounded-bl-xl">
+              <span className="text-white text-xs font-bold">✓</span>
+            </div>
+          )}
+          <span className="text-[9px] font-black uppercase tracking-widest text-[#C5A059]">Option B</span>
+          <h4 className="font-serif text-lg font-bold text-[#3E362E] mt-1">Pay Full Amount</h4>
+          <p className="text-stone-500 text-xs mt-1 leading-relaxed">
+            Prepay the entire amount now for a completely contactless, premium check-out.
+          </p>
+          <div className="mt-4 text-2xl font-black font-mono text-[#3E362E]">₹{fullAmount}</div>
+        </div>
+      </div>
+
+      {/* Invoice Breakdown */}
+      <div className="bg-[#FAF6F0] rounded-2xl p-5 border border-[#EADBCE] mb-6">
+        <h3 className="text-xs font-black uppercase tracking-wider text-stone-500 mb-3">Invoice Details</h3>
+        <div className="space-y-2.5 text-xs text-stone-600 font-semibold">
+          <div className="flex justify-between">
+            <span>Service Total ({attendeesCount} person)</span>
+            <span className="font-mono text-stone-800">₹{fullAmount}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Platform Service Fee</span>
+            <span className="flex items-center gap-1.5">
+              <span className="line-through text-stone-400 font-mono">₹{platformFee}</span>
+              <span className="bg-[#C5A059]/20 text-[#B06000] px-1.5 py-0.5 rounded text-[8px] font-black">PROMO FREE</span>
+            </span>
+          </div>
+          <div className="flex justify-between">
+            <span>GST & Service Taxes (18% Included)</span>
+            <span className="font-mono text-stone-400">₹{taxesIncluded}</span>
+          </div>
+          <div className="border-t border-[#EADBCE] pt-2.5 mt-2.5 flex justify-between text-sm">
+            <span className="text-stone-800 font-black">Amount to Pay Now</span>
+            <span className="font-black text-[#C5A059] font-mono text-base">₹{amountToPayNow}</span>
+          </div>
+          {remainingAtSalon > 0 && (
+            <div className="flex justify-between text-[11px] text-amber-700 bg-amber-50/50 p-2 rounded-lg border border-amber-100/60 mt-2.5">
+              <span>Remaining Balance (Pay at Salon)</span>
+              <span className="font-black font-mono">₹{remainingAtSalon}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Payment Gateway Panel */}
+      <div className="border border-stone-200 rounded-2xl p-5 mb-6">
+        <h3 className="text-sm font-serif font-bold text-stone-800 mb-4">Select Payment Mode</h3>
+        <div className="flex gap-2 mb-4 border-b border-stone-100 pb-3">
+          <button 
+            type="button" 
+            onClick={() => setPayMethod("upi")}
+            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+              payMethod === "upi" ? "bg-[#3E362E] text-white border-transparent" : "bg-white text-stone-500 border-stone-200 hover:bg-stone-50"
+            }`}
+          >
+            UPI / GPay
+          </button>
+          <button 
+            type="button" 
+            onClick={() => setPayMethod("card")}
+            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+              payMethod === "card" ? "bg-[#3E362E] text-white border-transparent" : "bg-white text-stone-500 border-stone-200 hover:bg-stone-50"
+            }`}
+          >
+            Credit / Debit Card
+          </button>
+        </div>
+
+        {payMethod === "upi" ? (
+          <div>
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 block mb-1">Enter UPI ID</label>
+            <input 
+              type="text"
+              value={upiId}
+              onChange={(e) => setUpiId(e.target.value)}
+              placeholder="username@okhdfcbank"
+              className="w-full bg-[#FAF6F0] border border-[#EADBCE] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#C5A059] transition-all font-semibold"
+            />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 block mb-1">Card Holder Name</label>
+              <input 
+                type="text"
+                placeholder="Rahul Kumar"
+                value={cardDetails.name}
+                onChange={(e) => setCardDetails({ ...cardDetails, name: e.target.value })}
+                className="w-full bg-[#FAF6F0] border border-[#EADBCE] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#C5A059] transition-all font-semibold"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 block mb-1">Card Number</label>
+              <input 
+                type="text"
+                placeholder="4321 8765 9000 1234"
+                value={cardDetails.number}
+                onChange={(e) => setCardDetails({ ...cardDetails, number: e.target.value })}
+                className="w-full bg-[#FAF6F0] border border-[#EADBCE] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#C5A059] transition-all font-semibold"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 block mb-1">Expiry Date</label>
+                <input 
+                  type="text"
+                  placeholder="MM/YY"
+                  value={cardDetails.expiry}
+                  onChange={(e) => setCardDetails({ ...cardDetails, expiry: e.target.value })}
+                  className="w-full bg-[#FAF6F0] border border-[#EADBCE] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#C5A059] transition-all font-semibold"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 block mb-1">CVC Code</label>
+                <input 
+                  type="password"
+                  placeholder="•••"
+                  value={cardDetails.cvc}
+                  onChange={(e) => setCardDetails({ ...cardDetails, cvc: e.target.value })}
+                  className="w-full bg-[#FAF6F0] border border-[#EADBCE] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#C5A059] transition-all font-semibold"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-start gap-2 text-stone-500 text-[10px] leading-relaxed mb-6">
+        <ShieldCheck size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+        <p>
+          Payments are secure and processed via <strong>Razorpay Payment Gateway</strong>. Refunds are eligible according to our Cancellation Policy (Token fee non-refundable; full payments refundable minus ₹50 fee).
+        </p>
+      </div>
+
+      <button
+        onClick={handlePay}
+        className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 cursor-pointer text-center block border-none outline-none"
+      >
+        Proceed to Pay ₹{amountToPayNow}
+      </button>
+    </div>
+  );
+}

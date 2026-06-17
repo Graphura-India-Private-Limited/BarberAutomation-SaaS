@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
+// import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 /* ── Pages ── */
 import HomePage from "./pages/public/HomePage";
@@ -74,6 +76,7 @@ import TermsPage from "./pages/public/TermsPage";
 import PrivacyPolicy from "./pages/public/PrivacyPolicy";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ContactSupport from "./pages/customer/ContactSupport";
+import RefundPage from "./pages/customer/RefundPage";
 
 /* ── Components ── */
 import ReviewSystem from "./components/reviews/ReviewSystem";
@@ -83,7 +86,15 @@ import NoShowDelayPage from "./components/queue/NoShowDelayPage";
 import MembershipSection from "./components/membership/MembershipSection";
 import LiveQueue from "./pages/owner/LiveQueue";
 
-const demoBooking = { status: "completed", barberName: "Rahul" };
+function WriteReviewRoute() {
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  if (!state) {
+    navigate("/customer/services");
+    return null;
+  }
+  return <ReviewSystem bookingData={state} />;
+}
 
 function App() {
   const ticketState = useTickets();
@@ -112,6 +123,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
 
         {/* --- HOME --- */}
@@ -131,19 +143,24 @@ function App() {
         <Route path="/rate-limit" element={<RateLimit />} />
         <Route path="/payment" element={<Payment />} />
 
-        {/* --- CUSTOMER BOOKING & DASHBOARD (RESTRICTED BY RBAC) --- */}
-        <Route path="/customer" element={<ProtectedRoute allowedRoles={["customer"]}><Outlet /></ProtectedRoute>}>
+        {/* --- CUSTOMER BOOKING & DASHBOARD --- */}
+        <Route path="/customer" element={<Outlet />}>
+          {/* Public customer booking paths */}
           <Route path="services" element={<ServiceCategories />} />
           <Route path="services/men" element={<MenServices />} />
           <Route path="services/women" element={<WomenServices />} />
           <Route path="services/addon" element={<AddonServices />} />
           <Route path="services/addons" element={<AddonServices />} />
           <Route path="barber" element={<BarberSelection />} />
-          <Route path="look" element={<SelectLook />} />
-          <Route path="details" element={<CustomerDetails />} />
-          <Route path="booking" element={<CustomerBookingFlow />} />
-          <Route path="history" element={<BookingHistory />} />
-          <Route path="flow" element={<CustomerBookingFlow />} />
+          {/* Protected customer booking paths */}
+          <Route element={<ProtectedRoute allowedRoles={["customer"]}><Outlet /></ProtectedRoute>}>
+            <Route path="look" element={<SelectLook />} />
+            <Route path="details" element={<CustomerDetails />} />
+            <Route path="booking" element={<CustomerBookingFlow />} />
+            <Route path="history" element={<BookingHistory />} />
+            <Route path="flow" element={<CustomerBookingFlow />} />
+            <Route path="refund/:bookingId" element={<RefundPage />} />
+          </Route>
         </Route>
 
         {/* --- DISCOVERY & REVIEWS --- */}
@@ -151,7 +168,7 @@ function App() {
         <Route path="/barbers" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
-        <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><ReviewSystem bookingData={demoBooking} /></ProtectedRoute>} />
+       <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteReviewRoute /></ProtectedRoute>} />
         <Route path="/membership" element={<MembershipSection />} />
 
         {/* --- BARBER PROFILE & ACTIONS (RESTRICTED BY RBAC) --- */}

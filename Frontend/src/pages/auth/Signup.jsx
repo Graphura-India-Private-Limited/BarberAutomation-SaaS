@@ -157,7 +157,7 @@ export default function Signup() {
               {/* Full Name */}
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-widest mb-2 text-gray-600">
-                  Full Name
+                  Full Name <span className="text-red-500 font-bold">*</span>
                 </label>
                 <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
                   <div className="flex items-center px-4 border-r bg-gray-50" style={{ borderColor: "#E5E7EB" }}>
@@ -179,7 +179,7 @@ export default function Signup() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-[11px] font-bold uppercase tracking-widest text-gray-600">
-                    Mobile Number
+                    Mobile Number <span className="text-red-500 font-bold">*</span>
                   </label>
                   {mobileError && (
                     <span className="text-[10px] text-red-500 font-semibold">{mobileError}</span>
@@ -236,7 +236,7 @@ export default function Signup() {
               {/* Password */}
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-widest mb-2 text-gray-600">
-                  Password
+                  Password <span className="text-red-500 font-bold">*</span>
                 </label>
                 <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
                   <div className="flex items-center px-4 border-r bg-gray-50" style={{ borderColor: "#E5E7EB" }}>

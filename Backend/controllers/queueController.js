@@ -40,3 +40,49 @@ exports.updateQueueStatus = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Get active queue entry for the logged-in customer
+// @route   GET /api/queue/customer/active
+// @access  Private (Customer)
+exports.getActiveCustomerQueue = async (req, res, next) => {
+  try {
+    const entry = await Queue.findOne({
+      customer_id: req.user.id,
+      status: { $in: ["waiting", "in-progress", "paused", "delayed"] }
+    })
+    .populate("salon_id", "salon_name address")
+    .populate("barber_id", "name")
+    .populate("booking_id");
+
+    if (!entry) {
+      return res.status(200).json({ success: true, active: false });
+    }
+
+    let services = [];
+    if (entry.booking_id && entry.booking_id.services) {
+      services = entry.booking_id.services;
+    }
+
+    const peopleAhead = Math.max(0, entry.position - 1);
+    const currentEstWait = entry.status === "in-progress" ? 0 : Math.max(20, entry.estimated_wait);
+
+    res.status(200).json({
+      success: true,
+      active: true,
+      queue: {
+        id: entry._id,
+        position: entry.position,
+        peopleAhead,
+        status: entry.status,
+        estimated_wait: currentEstWait,
+        joined_at: entry.joined_at,
+        salon: entry.salon_id,
+        barber: entry.barber_id,
+        services,
+        booking: entry.booking_id
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};

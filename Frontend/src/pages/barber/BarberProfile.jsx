@@ -154,7 +154,7 @@ function BarberProfile() {
                 {/* Mobile */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-0.5 flex items-center gap-1 font-sans">
-                    <Phone size={10} className="text-[#C5A059]" /> Contact Mobile Number
+                    <Phone size={10} className="text-[#C5A059]" /> Contact Mobile Number <span className="text-red-500 font-bold">*</span>
                   </label>
                   <div className="relative font-sans">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C5A059] font-black text-sm font-sans">+91</span>

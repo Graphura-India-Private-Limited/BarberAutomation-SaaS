@@ -42,12 +42,9 @@ export default function BookingHistory() {
     }
   ]);
 
-  // ✅ Cancel Visit — removes booking from list after confirmation
+  // ✅ Cancel Visit — redirects user to refund flow page
   function handleCancelVisit(bookingId) {
-    const confirmed = window.confirm('Are you sure you want to cancel this visit?');
-    if (confirmed) {
-      setMockBookings(prev => prev.filter(b => b.id !== bookingId));
-    }
+    navigate(`/customer/refund/${bookingId}`);
   }
 
   // ✅ Rebook — navigates to service selection (start of booking flow)
