@@ -87,33 +87,34 @@ exports.getActiveCustomerQueue = async (req, res, next) => {
     next(error);
   }
 };
-// @desc    Notify customer from queue status console
+
+// @desc    Notify a customer about their queue status
 // @route   POST /api/queue/notify
-// @access  Private
-exports.notifyCustomer = async (req, res) => {
+// @access  Private (Owner, Admin, Barber)
+exports.notifyCustomer = async (req, res, next) => {
   try {
-    const { queue_id, message } = req.body;
-    if (!queue_id) {
-      return res.status(400).json({ success: false, message: "Missing queue_id parameter." });
-    }
+    const { queue_id } = req.body;
 
     const queueEntry = await Queue.findById(queue_id);
     if (!queueEntry) {
-      return res.status(404).json({ success: false, message: "Queue entry not found." });
+      return res.status(404).json({ success: false, message: "Queue entry not found" });
     }
 
-    const notif = new Notification({
-      customer_id: queueEntry.customer_id,
-      type: "queue_turn",
-      title: "Queue Alert!",
-      message: message || "Please head to the salon, your turn is coming up soon."
+    // Create an in-app system notification document for the specific client
+    const notification = await Notification.create({
+      user_id: queueEntry.customer_id,
+      title: "Your Turn is Approaching! 🎯",
+      message: `Please head over to the station. You are currently next in line!`,
+      type: "queue_update",
+      is_read: false
     });
 
-    await notif.save();
-
-    res.status(200).json({ success: true, message: "Notification sent successfully." });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(200).json({
+      success: true,
+      message: "Customer notified successfully!",
+      notification
+    });
+  } catch (error) {
+    next(error);
   }
 };
-
