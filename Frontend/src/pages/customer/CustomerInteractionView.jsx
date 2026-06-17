@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CUSTOMERS } from "../../config/data";
 import CustomerCard from '../../components/customer/CustomerCard';
 import DetailPanel from '../../components/customer/DetailPanel';
@@ -8,8 +8,23 @@ import { useNavigate } from 'react-router-dom';
 const GOLD = "#C5A059";
 
 export default function CustomerInteractionView() {
-  const [customers, setCustomers] = useState(CUSTOMERS);
-  const [selectedId, setSelectedId] = useState(CUSTOMERS[0]?.id || null);
+  const loggedInBarberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "";
+  
+  const initialCustomers = CUSTOMERS.filter(c => {
+    if (!loggedInBarberName) return true;
+    const cBarber = (c.barber || "").toLowerCase();
+    const curBarber = loggedInBarberName.toLowerCase();
+    if (cBarber === "unassigned" || !cBarber) return true;
+    
+    const getFirstWord = (str) => str.split(" ")[0].replace(/[^a-zA-Z]/g, "").toLowerCase();
+    const firstWordCur = getFirstWord(curBarber);
+    const firstWordC = getFirstWord(cBarber);
+    
+    return firstWordCur === firstWordC || curBarber.includes(cBarber) || cBarber.includes(curBarber);
+  });
+
+  const [customers, setCustomers] = useState(initialCustomers);
+  const [selectedId, setSelectedId] = useState(initialCustomers[0]?.id || null);
   const [search, setSearch] = useState('');
   const navigate = useNavigate(); 
 

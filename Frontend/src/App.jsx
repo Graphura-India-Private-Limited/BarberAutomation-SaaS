@@ -1,6 +1,6 @@
-
-import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet } from "react-router-dom";
+import React, { useState } from "react";
+// import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ScrollToTop from "./components/common/ScrollToTop";
 
@@ -170,6 +170,7 @@ function App() {
         {/* --- BARBER PROFILE & ACTIONS (RESTRICTED BY RBAC) --- */}
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber" element={<ProtectedRoute allowedRoles={["barber"]}><Outlet /></ProtectedRoute>}>
+          <Route index element={<Navigate to="overview" replace />} />
           <Route path="dashboard" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BarberDashboard stats={stats} currentSvc={currentSvc} setCurrentSvc={setCurrentSvc} getElapsed={getElapsed} showToast={showToast} queue={queue} breakRequests={breakRequests} reviews={reviews} /></BarberLayout>} />
           <Route path="overview" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><HomeOverview /></BarberLayout>} />
           <Route path="profile" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberProfile /></BarberLayout>} />

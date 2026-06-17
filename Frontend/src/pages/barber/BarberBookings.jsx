@@ -178,7 +178,7 @@ export default function BarberBookings() {
                                 Complete 🏁
                               </button>
                             )}
-                            {item.status !== "in-service" && (
+                            {item.status === "pending" && (
                               <button 
                                 onClick={() => updateBookingStatus(item.id, "cancelled")}
                                 className="p-1.5 rounded-lg bg-rose-50/40 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200/60 transition-colors cursor-pointer"

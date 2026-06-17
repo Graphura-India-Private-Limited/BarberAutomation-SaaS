@@ -23,6 +23,7 @@ const ProfileField = ({ label, value, icon: Icon }) => (
 );
 
 function BarberProfile() {
+  const isBarber = localStorage.getItem("role") === "barber";
   const [profile, setProfile] = useState({
     name:          "Arjun Sharma",
     mobile:        "9876543210",
@@ -178,18 +179,25 @@ function BarberProfile() {
                     </label>
                     <div className="flex items-center bg-[#FAF6F0]/40 border border-stone-200 rounded-xl overflow-hidden focus-within:border-stone-900 transition-all h-[46px] font-sans">
                       <button type="button"
-                        onClick={() => profile.experience > 0 && setProfile({ ...profile, experience: profile.experience - 1 })}
-                        className="h-full px-4 text-[#A37B58] hover:bg-stone-100 font-black text-lg w-12 transition-colors cursor-pointer outline-none bg-transparent select-none">
+                        disabled={isBarber}
+                        onClick={() => !isBarber && profile.experience > 0 && setProfile({ ...profile, experience: profile.experience - 1 })}
+                        className={`h-full px-4 text-[#A37B58] font-black text-lg w-12 transition-colors outline-none bg-transparent select-none ${isBarber ? 'opacity-30 cursor-not-allowed' : 'hover:bg-stone-100 cursor-pointer'}`}>
                         −
                       </button>
                       <input type="text" readOnly value={`${profile.experience} Years`}
                         className="w-full bg-transparent text-center outline-none text-sm font-extrabold text-stone-900 pointer-events-none font-sans" />
                       <button type="button"
-                        onClick={() => setProfile({ ...profile, experience: profile.experience + 1 })}
-                        className="h-full px-4 text-[#A37B58] hover:bg-stone-100 font-black text-lg w-12 transition-colors cursor-pointer outline-none bg-transparent select-none">
+                        disabled={isBarber}
+                        onClick={() => !isBarber && setProfile({ ...profile, experience: profile.experience + 1 })}
+                        className={`h-full px-4 text-[#A37B58] font-black text-lg w-12 transition-colors outline-none bg-transparent select-none ${isBarber ? 'opacity-30 cursor-not-allowed' : 'hover:bg-stone-100 cursor-pointer'}`}>
                         +
                       </button>
                     </div>
+                    {isBarber && (
+                      <span className="inline-flex items-center gap-1 text-[9px] text-stone-400 font-black uppercase tracking-widest mt-1 font-sans">
+                        <ShieldCheck size={10} className="text-stone-400 stroke-[2.5px]" /> Locked by Management
+                      </span>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-1.5">
@@ -197,14 +205,20 @@ function BarberProfile() {
                       Specialization
                     </label>
                     <select
+                      disabled={isBarber}
                       value={profile.specialization}
                       onChange={e => setProfile({ ...profile, specialization: e.target.value })}
-                      className="w-full bg-[#FAF6F0]/40 border border-stone-200 px-4 py-3 text-sm text-stone-900 font-extrabold outline-none focus:border-stone-900 rounded-xl h-[46px] cursor-pointer font-sans"
+                      className={`w-full bg-[#FAF6F0]/40 border border-stone-200 px-4 py-3 text-sm text-stone-900 font-extrabold outline-none focus:border-stone-900 rounded-xl h-[46px] font-sans ${isBarber ? 'opacity-65 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       <option value="Haircut & Beard">Haircut & Beard Styling</option>
                       <option value="Skin Fade Expert">Skin Fade Specialist</option>
                       <option value="Complete Grooming">Premium Executive Grooming</option>
                     </select>
+                    {isBarber && (
+                      <span className="inline-flex items-center gap-1 text-[9px] text-stone-400 font-black uppercase tracking-widest mt-1 font-sans">
+                        <ShieldCheck size={10} className="text-stone-400 stroke-[2.5px]" /> Locked by Management
+                      </span>
+                    )}
                   </div>
                 </div>
 

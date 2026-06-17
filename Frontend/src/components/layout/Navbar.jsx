@@ -111,7 +111,7 @@ const Navbar = () => {
   const getDashboardPath = () => {
     const role = localStorage.getItem("role") || "";
     const lowerRole = role.toLowerCase();
-    if (lowerRole.includes("barber")) return "/barber/dashboard";
+    if (lowerRole.includes("barber")) return "/barber/overview";
     if (lowerRole.includes("owner")) return "/owner/dashboard";
     if (lowerRole.includes("admin")) return "/admin";
     return "/dashboard";
@@ -145,7 +145,7 @@ const Navbar = () => {
     }
     if (cleanRole.includes("barber")) {
       return [
-        { label: "Barber Dashboard", icon: Home, path: "/barber/dashboard" },
+        { label: "Barber Dashboard", icon: Home, path: "/barber/overview" },
         { label: "My Queue", icon: Users, path: "/barber/queue" },
         { label: "Earnings", icon: Star, path: "/barber/earnings" },
         { label: "Settings", icon: Settings, path: "/barber/settings" },

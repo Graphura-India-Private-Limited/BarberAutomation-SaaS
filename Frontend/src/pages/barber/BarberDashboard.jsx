@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueue } from "../../contexts/AppContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, ResponsiveContainer, XAxis, Cell } from "recharts";
 import {
   Scissors, Calendar, Clock, Star, TrendingUp, User,
   CheckCircle, PlayCircle, LogOut, Bell, Phone,
   Award, Coffee, AlertCircle, Activity, IndianRupee,
-  Users, ChevronRight, Timer, Settings, MapPin,
+  Users, ChevronRight, ChevronLeft, Timer, Settings, MapPin,
   BarChart2, Layers, Shield, Heart, ChevronDown,
   MoreVertical, Sparkles, Menu, X, ChevronUp,
   CreditCard, Zap, Hash, UserCheck, PauseCircle,
@@ -60,6 +61,7 @@ export default function BarberDashboard() {
   const [toast,       setToast]       = useState(null);
   const [currentSvc,  setCurrentSvc]  = useState(null);
   const [salonOpen,   setSalonOpen]   = useState(true);
+  const [showNextClient, setShowNextClient] = useState(false);
 
   const getInitials = (name) => {
     if (!name) return "AM";
@@ -131,12 +133,49 @@ export default function BarberDashboard() {
   },
 ];
 
-  const [queue] = useState([
-    { id:1, customer:"Rahul Sharma",  service:"Premium Haircut",    amount:499, time:"10:30 AM", position:1, mobile:"98765 43210", wait:"5 min" },
-    { id:2, customer:"Aryan Patel",   service:"Beard Styling",      amount:299, time:"11:00 AM", position:2, mobile:"99887 66554", wait:"25 min" },
-    { id:3, customer:"Snehal Reddy",  service:"Hair Spa",           amount:799, time:"12:30 PM", position:3, mobile:"91234 56789", wait:"45 min" },
-    { id:4, customer:"Karan Mehta",   service:"Haircut + Beard",    amount:699, time:"01:00 PM", position:4, mobile:"90012 34567", wait:"65 min" },
-  ]);
+  const { queue: globalQueue, setQueue: setGlobalQueue, servedCount, setServedCount } = useQueue();
+
+  const SERVICES_LIST = [
+    { id: 'haircut', label: 'Haircut',         mins: 20, price: 15 },
+    { id: 'shave',   label: 'Shave',           mins: 15, price: 10 },
+    { id: 'beard',   label: 'Beard Trim',      mins: 10, price: 8  },
+    { id: 'combo',   label: 'Haircut + Shave', mins: 35, price: 22 },
+    { id: 'color',   label: 'Hair Color',      mins: 60, price: 45 },
+    { id: 'kids',    label: "Kids' Cut",       mins: 15, price: 10 },
+  ];
+
+  const fmtWaitLocal = (pos, serviceId) => {
+    const svc = SERVICES_LIST.find(s => s.id === serviceId);
+    const mins = (pos - 1) * 20 + (svc?.mins ?? 20);
+    if (mins < 60) return `${mins} min`;
+    return `${Math.floor(mins/60)}h ${mins%60}m`;
+  };
+
+  const loggedInBarberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "";
+  const currentBarberId = loggedInBarberName ? loggedInBarberName.split(" ")[0].toLowerCase() : "ali";
+
+  const myQueue = globalQueue.filter(e => {
+    if (e.status === "done" || e.status === "Completed") return false;
+    return e.barber === currentBarberId;
+  });
+
+  const queue = myQueue.map((item, index) => {
+    const svcObj = SERVICES_LIST.find(s => s.id === item.service);
+    const amount = item.amount || (svcObj ? svcObj.price * 80 : 499);
+    const serviceLabel = item.serviceLabel || (svcObj ? svcObj.label : item.service);
+    const waitTime = item.wait || fmtWaitLocal(index + 1, item.service);
+    
+    return {
+      ...item,
+      customer: item.customer || item.name,
+      mobile: item.mobile || item.phone,
+      service: serviceLabel,
+      amount,
+      time: item.time || (item.slot || new Date(item.joinedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
+      wait: waitTime,
+      position: index + 1
+    };
+  });
 
   const [breakRequests] = useState([
     { id:1, name:"Arjun Singh",  type:"Lunch",      time:"14:00–14:30", duration:"30min", status:"pending" },
@@ -339,7 +378,11 @@ export default function BarberDashboard() {
             <p className="font-serif tracking-normal font-black text-2xl text-[#4A3E3D]">₹{currentSvc.amount}</p>
           </div>
           <button
-            onClick={() => { setCurrentSvc(null); showToast(`Completed — ${currentSvc.customer}`); }}
+            onClick={() => {
+              setCurrentSvc(null);
+              setServedCount(n => n + 1);
+              showToast(`Completed — ${currentSvc.customer}`);
+            }}
             className="px-5 py-3 rounded-xl text-white hover:text-[#FDFBF7] font-black text-xs flex items-center gap-2 transition duration-300 shadow-md hover:shadow-lg cursor-pointer font-sans uppercase tracking-wider"
             style={{ background: "linear-gradient(135deg, #5C4D4C, #4A3E3D)" }}
           >
@@ -413,13 +456,13 @@ export default function BarberDashboard() {
 
     
 
- {/* ── QUICK ACTIONS STRIP ── */}
+  {/* ── QUICK ACTIONS STRIP ── */}
   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
     {[
-      { label: "Request Break",   icon: Coffee,      color: "#8B5A2B", route: null },
+      { label: "Request Break",   icon: Coffee,      color: "#8B5A2B", route: "/barber/breaks" },
       { label: "View Profile",    icon: User,        color: "#4A3E3D", route: "/barber/profile" },
       { label: "Manage Services", icon: Scissors,    color: "#8B5A2B", route: "/barber/live-session" },
-      { label: "Handle No-Show",  icon: AlertCircle, color: "#D9534F", route: "/barber/noshow-handle" },
+      { label: "Handle No-Show",  icon: AlertCircle, color: "#D9534F", route: "/barber/noshow-delay" },
     ].map((a, i) => (
       <button key={i}
         onClick={() => { if (a.route) navigate(a.route); else showToast(`${a.label} — coming soon`); }}
@@ -453,6 +496,139 @@ export default function BarberDashboard() {
           <span>{toast.msg}</span>
         </div>
       )}
+
+      {/* ── Collapsible Right Arrow Tab for Next Client ── */}
+      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 animate-in fade-in duration-300">
+        <button
+          onClick={() => setShowNextClient(true)}
+          className="bg-[#3E362E] hover:bg-[#2D2620] text-[#C5A059] border border-[#C5A059]/40 border-r-0 hover:border-[#C5A059] p-3 rounded-l-2xl shadow-lg cursor-pointer transition-all flex flex-col items-center gap-1.5 hover:pr-4"
+          title="View Next Client"
+        >
+          <ChevronLeft className="w-5 h-5 animate-pulse" />
+          <span className="text-[9px] font-black tracking-widest writing-mode-vertical uppercase [writing-mode:vertical-lr] rotate-180 font-sans">
+            Next Client
+          </span>
+        </button>
+      </div>
+
+      {/* ── Slide-Over Sidebar / Popup for Next Client ── */}
+      <AnimatePresence>
+        {showNextClient && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowNextClient(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50"
+            />
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-0 bottom-0 w-[340px] bg-[#FAF6F0] border-l border-[#E6D5C3] shadow-2xl z-50 p-6 flex flex-col justify-between text-left"
+              onClick={e => e.stopPropagation()}
+            >
+              <div>
+                {/* Header */}
+                <div className="flex justify-between items-center border-b border-[#E6D5C3]/60 pb-4 mb-6">
+                  <div>
+                    <h3 className="font-serif font-black text-[#4A3E3D] text-lg uppercase">Next Queue Target</h3>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-[#A37B58] mt-0.5">Next Client up for service</p>
+                  </div>
+                  <button
+                    onClick={() => setShowNextClient(false)}
+                    className="w-8 h-8 rounded-xl border border-stone-200 bg-white text-stone-400 hover:text-stone-800 flex items-center justify-center cursor-pointer transition-all shadow-3xs"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+
+                {/* Body */}
+                {queue.length > 0 ? (
+                  <div className="space-y-6">
+                    {/* Customer Info Card */}
+                    <div className="bg-white border border-[#E6D5C3]/80 rounded-2xl p-5 shadow-3xs">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#A06D3B] to-[#8B5A2B] text-white flex items-center justify-center font-serif text-lg font-black shrink-0">
+                          {queue[0].customer[0]}
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full text-[#8B5A2B] bg-[#8B5A2B]/10 border border-[#8B5A2B]/20">
+                            NEXT UP
+                          </span>
+                          <h4 className="font-serif font-black text-stone-900 text-base mt-1">{queue[0].customer}</h4>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 pt-3 border-t border-stone-50 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-stone-400 font-bold uppercase tracking-wider text-[10px]">Service</span>
+                          <span className="font-extrabold text-stone-800">{queue[0].service}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-400 font-bold uppercase tracking-wider text-[10px]">Est. Wait Time</span>
+                          <span className="font-extrabold text-[#8B5A2B]">{queue[0].wait}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-400 font-bold uppercase tracking-wider text-[10px]">Time Slot</span>
+                          <span className="font-extrabold text-stone-800">{queue[0].time}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-stone-400 font-bold uppercase tracking-wider text-[10px]">Phone Number</span>
+                          <span className="font-extrabold text-stone-800">{queue[0].mobile}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Alert banner */}
+                    <div className="flex gap-2.5 bg-[#FFFBF4] border border-[#C5A059]/30 rounded-xl p-4 text-[11px] text-stone-600 font-medium leading-relaxed">
+                      <Clock size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
+                      <div>
+                        Please prepare the barber chair and set tools ready. Click <strong>Start Service</strong> below to pull the client into your active slot.
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-16 text-stone-400 text-xs font-black uppercase tracking-widest border border-dashed border-[#E6D5C3] rounded-2xl bg-white/40">
+                    📭 Queue is currently empty.
+                  </div>
+                )}
+              </div>
+
+              {/* Footer CTA */}
+              {queue.length > 0 && (
+                <button
+                  onClick={() => {
+                    const nextUp = queue[0];
+                    if (currentSvc) {
+                      showToast("Please complete your current service first!", "error");
+                      return;
+                    }
+                    setCurrentSvc({
+                      id: nextUp.id,
+                      customer: nextUp.customer,
+                      service: nextUp.service,
+                      amount: nextUp.amount,
+                      startedAt: new Date(),
+                      mobile: nextUp.mobile
+                    });
+                    setGlobalQueue(prev => prev.filter(e => e.id !== nextUp.id));
+                    setShowNextClient(false);
+                    showToast(`Started service for ${nextUp.customer}`, "success");
+                  }}
+                  className="w-full bg-[#3E362E] hover:bg-[#2D2620] text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all cursor-pointer border-none shadow-md font-sans"
+                >
+                  Start Service Now
+                </button>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

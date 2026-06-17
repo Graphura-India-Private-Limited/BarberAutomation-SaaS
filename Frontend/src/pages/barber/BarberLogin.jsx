@@ -54,7 +54,7 @@ export default function BarberLogin() {
         localStorage.setItem("email",      data.barber?.email || "");
         syncAuth();
         setSuccess("Login successful! Redirecting to dashboard...");
-        setTimeout(() => navigate("/barber/dashboard"), 1200);
+        setTimeout(() => navigate("/barber/overview"), 1200);
       } else {
         setError(data.message || "Login failed");
       }

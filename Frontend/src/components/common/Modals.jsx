@@ -103,11 +103,19 @@ export function SourceTag({ src }) {
 
 // ─── ADD CUSTOMER MODAL ───────────────────────────────────────────────────────
 export function AddCustomerModal({ onClose, onAdd }) {
+  const loggedInBarberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "";
+  const currentBarberId = loggedInBarberName ? loggedInBarberName.split(" ")[0].toLowerCase() : "";
+  const isBarber = localStorage.getItem("role") === "barber";
+
+  const initialBarberId = isBarber && currentBarberId && BARBERS.some(b => b.id === currentBarberId)
+    ? currentBarberId
+    : BARBERS[0].id;
+
   const [mode,    setMode]    = React.useState('queue');
   const [name,    setName]    = React.useState('');
   const [phone,   setPhone]   = React.useState('');
   const [service, setService] = React.useState(SERVICES[0].id);
-  const [barber,  setBarber]  = React.useState(BARBERS[0].id);
+  const [barber,  setBarber]  = React.useState(initialBarberId);
   const [slot,    setSlot]    = React.useState(SLOTS[0]);
 
   const handleSubmit = () => {
@@ -201,7 +209,9 @@ export function AddCustomerModal({ onClose, onAdd }) {
           <div className="space-y-1.5">
             <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Calendar size={11} color="#C5A059" /> Barber</label>
             <select className="input-field-custom h-[48px] cursor-pointer" value={barber} onChange={e=>setBarber(e.target.value)}>
-              {BARBERS.map(b => <option key={b.id} value={b.id}>{b.emoji} {b.name}</option>)}
+              {(isBarber && currentBarberId && BARBERS.some(b => b.id === currentBarberId)
+                ? BARBERS.filter(b => b.id === currentBarberId)
+                : BARBERS).map(b => <option key={b.id} value={b.id}>{b.emoji} {b.name}</option>)}
             </select>
           </div>
 

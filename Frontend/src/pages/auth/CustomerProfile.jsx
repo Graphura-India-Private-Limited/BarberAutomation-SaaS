@@ -278,50 +278,10 @@ export default function CustomerProfile() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const compileNotifications = (uProfile, uAppts, uQueue = null) => {
-    const list = [];
-    let idCounter = 1;
-
-    // Inject Live Queue notification if active
-    if (uQueue) {
-      if (uQueue.status === "in-progress") {
-        list.push({
-          id: idCounter++,
-          type: "status",
-          title: "Queue Status: Active",
-          message: `Your grooming session is now in progress with ${uQueue.barber?.name || "your stylist"}. Please take your seat!`,
-          date: "Now",
-          read: false
-        });
-      } else if (uQueue.position === 1) {
-        list.push({
-          id: idCounter++,
-          type: "status",
-          title: "Queue Status: Next Up!",
-          message: `You are next in line! Please make your way to the styling chair.`,
-          date: "Now",
-          read: false
-        });
-      } else if (uQueue.status === "delayed") {
-        list.push({
-          id: idCounter++,
-          type: "status",
-          title: "Queue Status: Delayed",
-          message: `Your session has been slightly delayed. Current position: ${uQueue.position}.`,
-          date: "Update",
-          read: false
-        });
-      } else {
-        list.push({
-          id: idCounter++,
-          type: "status",
-          title: "Queue Status: In Line",
-          message: `You are currently at position ${uQueue.position} in the queue (${uQueue.peopleAhead} people ahead). Est. wait: ${uQueue.estimated_wait} mins.`,
-          date: "Update",
-          read: false
-        });
-      }
-    }
+  const compileNotifications = (uProfile, uAppts, dbNotifs = []) => {
+    const list = [...dbNotifs];
+    let idCounter = list.length > 0 ? Math.max(...list.map(l => typeof l.id === 'number' ? l.id : 0)) + 1 : 1;
+    if (isNaN(idCounter) || idCounter === -Infinity || idCounter === Infinity) idCounter = 1;
 
     const upcoming = uAppts.filter(a => a.status === "Upcoming" || a.status === "Pending" || a.status === "Confirmed" || a.status === "In-progress");
     if (upcoming.length > 0) {
@@ -341,8 +301,8 @@ export default function CustomerProfile() {
     list.push({ id: idCounter++, type: "announcement", title: "Festive Discount Active", message: "Special styling discount: 15% off all premium haircut packages and styling treatments this weekend!", date: "1 day ago", read: false });
     setNotifications(prev => {
       const readMap = {};
-      prev.forEach(n => { if (n.read) readMap[n.title] = true; });
-      return list.map(item => ({ ...item, read: readMap[item.title] || false }));
+      prev.forEach(n => { if (n.read) readMap[n.id || n.title] = true; });
+      return list.map(item => ({ ...item, read: item.read || readMap[item.id || item.title] || false }));
     });
   };
 
@@ -351,9 +311,9 @@ export default function CustomerProfile() {
     setLoading(true);
     let currentProfile = { ...profile };
     let currentAppts = [...appointments];
-    let activeQueueVal = null;
+    let dbNotifs = [];
     if (!token) {
-      compileNotifications(currentProfile, currentAppts, null);
+      compileNotifications(currentProfile, currentAppts, dbNotifs);
       setLoading(false);
       return;
     }
@@ -398,29 +358,31 @@ export default function CustomerProfile() {
           await fetch(`${API}/auth/profile`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ total_visits: completedVisits }) });
         }
       }
-
-      // Fetch active queue status
-      try {
-        const queueRes = await fetch(`${API}/queue/customer/active`, { headers: { Authorization: `Bearer ${token}` } });
-        const queueData = await queueRes.json();
-        if (queueData.success && queueData.active) {
-          activeQueueVal = queueData.queue;
-          setActiveQueue(queueData.queue);
-        } else {
-          setActiveQueue(null);
-        }
-      } catch (e) {
-        console.error("Queue active fetch error:", e);
+      const notifRes = await fetch(`${API}/auth/notifications`, { headers: { Authorization: `Bearer ${token}` } });
+      const notifData = await notifRes.json();
+      if (notifData.success && notifData.notifications) {
+        dbNotifs = notifData.notifications.map(n => ({
+          id: n._id,
+          type: n.type || "status",
+          title: n.title,
+          message: n.message,
+          date: new Date(n.created_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) + " " + new Date(n.created_at).toLocaleDateString("en-IN"),
+          read: n.read
+        }));
       }
     } catch (err) {
       console.log("Offline local data fallback active.", err.message);
     } finally {
-      compileNotifications(currentProfile, currentAppts, activeQueueVal);
+      compileNotifications(currentProfile, currentAppts, dbNotifs);
       setLoading(false);
     }
   };
 
-  useEffect(() => { syncData(); }, []);
+  useEffect(() => {
+    syncData();
+    const interval = setInterval(syncData, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleToggleNewsletter = async () => {
     const newVal = !profile.newsletter_opt_in;
@@ -431,6 +393,22 @@ export default function CustomerProfile() {
       try {
         await fetch(`${API}/auth/profile`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ newsletter_opt_in: newVal }) });
       } catch (err) { console.error(err); }
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+    triggerToast("All alerts marked as read!");
+    const token = getToken();
+    if (token) {
+      try {
+        await fetch(`${API}/auth/notifications/mark-read`, {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.error("Failed to mark notifications read:", err);
+      }
     }
   };
 
@@ -1357,7 +1335,7 @@ export default function CustomerProfile() {
                       <h2 className="text-lg font-black uppercase tracking-wider text-[#3D3126]">System Alerts Feed</h2>
                       <p className="text-xs text-[#8A7A6A]">Real-time reminders, status confirms, and general announcements.</p>
                     </div>
-                    <button onClick={() => { setNotifications(notifications.map(n => ({ ...n, read: true }))); triggerToast("All alerts marked as read!"); }} className="px-4 py-2 bg-[#FAF6F0] hover:bg-stone-100 rounded-xl text-[9px] font-black uppercase tracking-wider text-[#B58B67] border border-[#EADBCE] cursor-pointer">Mark all read</button>
+                    <button onClick={handleMarkAllRead} className="px-4 py-2 bg-[#FAF6F0] hover:bg-stone-100 rounded-xl text-[9px] font-black uppercase tracking-wider text-[#B58B67] border border-[#EADBCE] cursor-pointer">Mark all read</button>
                   </div>
                   <div className="space-y-3">
                     {notifications.map(n => (

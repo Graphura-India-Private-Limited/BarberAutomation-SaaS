@@ -154,17 +154,28 @@ export default function BarberEarnings() {
                   {/* <Download size={14} className="text-stone-400 hover:text-stone-900 transition-colors cursor-pointer" /> */}
                   <button
                     onClick={() => {
-                      const data = JSON.stringify(payouts, null, 2);
+                      const headers = ["Payout ID", "Date", "Amount (INR)", "Type", "Status"];
+                      const rows = payouts.map(pay => [
+                        pay.id,
+                        pay.date,
+                        pay.amount,
+                        pay.type,
+                        pay.status
+                      ]);
+                      const csvContent = [
+                        headers.join(","),
+                        ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))
+                      ].join("\n");
 
-                      const blob = new Blob([data], {
-                        type: "application/json",
+                      const blob = new Blob([csvContent], {
+                        type: "text/csv;charset=utf-8;",
                       });
 
                       const url = URL.createObjectURL(blob);
 
                       const a = document.createElement("a");
                       a.href = url;
-                      a.download = "payout-history.json";
+                      a.download = "payout-history.csv";
                       a.click();
 
                       URL.revokeObjectURL(url);
