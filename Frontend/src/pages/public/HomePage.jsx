@@ -150,6 +150,10 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    localStorage.removeItem("selectedSalonId");
+    localStorage.removeItem("selectedSalonName");
+    localStorage.removeItem("pendingBooking");
+
     if (!API) {
       console.error("API base URL configuration is missing.");
       return;

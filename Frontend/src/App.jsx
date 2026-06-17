@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 /* ── Pages ── */
 import HomePage from "./pages/public/HomePage";
@@ -112,6 +113,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
 
         {/* --- HOME --- */}
@@ -131,19 +133,24 @@ function App() {
         <Route path="/rate-limit" element={<RateLimit />} />
         <Route path="/payment" element={<Payment />} />
 
-        {/* --- CUSTOMER BOOKING & DASHBOARD (RESTRICTED BY RBAC) --- */}
-        <Route path="/customer" element={<ProtectedRoute allowedRoles={["customer"]}><Outlet /></ProtectedRoute>}>
+        {/* --- CUSTOMER BOOKING & DASHBOARD --- */}
+        <Route path="/customer" element={<Outlet />}>
+          {/* Public customer booking paths */}
           <Route path="services" element={<ServiceCategories />} />
           <Route path="services/men" element={<MenServices />} />
           <Route path="services/women" element={<WomenServices />} />
           <Route path="services/addon" element={<AddonServices />} />
           <Route path="services/addons" element={<AddonServices />} />
           <Route path="barber" element={<BarberSelection />} />
-          <Route path="look" element={<SelectLook />} />
-          <Route path="details" element={<CustomerDetails />} />
-          <Route path="booking" element={<CustomerBookingFlow />} />
-          <Route path="history" element={<BookingHistory />} />
-          <Route path="flow" element={<CustomerBookingFlow />} />
+
+          {/* Protected customer booking paths */}
+          <Route element={<ProtectedRoute allowedRoles={["customer"]}><Outlet /></ProtectedRoute>}>
+            <Route path="look" element={<SelectLook />} />
+            <Route path="details" element={<CustomerDetails />} />
+            <Route path="booking" element={<CustomerBookingFlow />} />
+            <Route path="history" element={<BookingHistory />} />
+            <Route path="flow" element={<CustomerBookingFlow />} />
+          </Route>
         </Route>
 
         {/* --- DISCOVERY & REVIEWS --- */}

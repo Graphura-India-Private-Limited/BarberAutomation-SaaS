@@ -300,6 +300,9 @@ export default function Wrapper() {
   };
 
   const handleResetFlow = () => {
+    localStorage.removeItem("selectedSalonId");
+    localStorage.removeItem("selectedSalonName");
+    localStorage.removeItem("pendingBooking");
     setBookingData({
       service: 'Haircut & Styling',
       price: 500,

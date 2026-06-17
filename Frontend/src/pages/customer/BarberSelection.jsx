@@ -567,7 +567,22 @@ export default function BarberSelection() {
                     </div>
                   </div>
                   <button
-                    onClick={() => navigate("/customer/look", { state: { service: selectedService, barber: selectedBarber, gender } })}
+                    onClick={() => {
+                      const token = localStorage.getItem("token");
+                      const role = localStorage.getItem("role");
+                      if (!token || role !== "customer") {
+                        navigate("/login", {
+                          state: {
+                            from: {
+                              pathname: "/customer/look",
+                              state: { service: selectedService, barber: selectedBarber, gender }
+                            }
+                          }
+                        });
+                      } else {
+                        navigate("/customer/look", { state: { service: selectedService, barber: selectedBarber, gender } });
+                      }
+                    }}
                     style={{ background: "#C5A059", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s", display: "flex", alignItems: "center", gap: 8 }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "#2C241E"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "#C5A059"; }}

@@ -211,12 +211,12 @@ const NearbyBarbers = () => {
   const location = useLocation();
   const isStandalone = location.pathname === "/nearby" || location.pathname === "/barbers";
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(location.state?.step || 1);
   const [salons, setSalons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState(null);
-  const [selectedSalon, setSelectedSalon] = useState(null);
-  const [selectedService, setSelectedService] = useState(null);
+  const [selectedSalon, setSelectedSalon] = useState(location.state?.selectedSalon || null);
+  const [selectedService, setSelectedService] = useState(location.state?.selectedService || null);
   const [bookingDone, setBookingDone] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [services, setServices] = useState([]);
@@ -226,6 +226,87 @@ const NearbyBarbers = () => {
   const [selectedCity, setSelectedCity] = useState("");
   const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState("");
+
+  const [userAddress, setUserAddress] = useState("");
+  const [userCoords, setUserCoords] = useState(null);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+
+  const getDistanceInKm = (lat1, lon1, lat2, lon2) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+    const R = 6371; // Radius of earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+  };
+
+  const getSalonDistanceStr = (salon) => {
+    if (userCoords && salon.latitude && salon.longitude) {
+      const dist = getDistanceInKm(
+        userCoords.latitude,
+        userCoords.longitude,
+        salon.latitude,
+        salon.longitude
+      );
+      if (dist !== null) {
+        return `${dist.toFixed(1)} km away`;
+      }
+    }
+    return salon.distance || "Nearby";
+  };
+
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported");
+      return;
+    }
+    setIsDetectingLocation(true);
+    setLocationError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserCoords({ latitude, longitude });
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await res.json();
+          if (data && data.display_name) {
+            setUserAddress(data.display_name);
+          } else {
+            setUserAddress(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          }
+        } catch (err) {
+          setUserAddress(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      (error) => {
+        console.error(error);
+        setLocationError("Location permission denied");
+        setIsDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
+  useEffect(() => {
+    detectLocation();
+  }, []);
+
+  useEffect(() => {
+    if (location.state?.selectedSalon) {
+      handleSalonSelect(location.state.selectedSalon);
+    }
+  }, [location.state?.selectedSalon]);
 
   /* fetch salons */
  useEffect(() => {
@@ -300,6 +381,19 @@ const handleSalonSelect = async (salon) => {
   };
 
 const handleBook = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    navigate("/login", {
+      state: {
+        from: {
+          pathname: "/nearby",
+          state: { step: 3, selectedSalon, selectedService }
+        }
+      }
+    });
+    return;
+  }
+
   try {
     setBookingLoading(true);
 
@@ -307,14 +401,16 @@ const handleBook = async () => {
       import.meta.env.VITE_API_URL ||
       "http://localhost:5000/api";
 
-    const response = await fetch(`${API}/booking/create`, {
+    const response = await fetch(`${API}/booking`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        salonId: selectedSalon.id,
-        serviceId: selectedService.id,
+        salon_id: selectedSalon.id || selectedSalon._id,
+        booking_type: "slot",
+        services: [{ service_id: selectedService.id || selectedService._id, member_name: "Self" }],
       }),
     });
 
@@ -322,9 +418,12 @@ const handleBook = async () => {
 
     if (data.success) {
       setBookingDone(true);
+    } else {
+      alert(data.message || "Booking failed.");
     }
   } catch (error) {
     console.error(error);
+    alert("An error occurred during booking. Please try again.");
   } finally {
     setBookingLoading(false);
   }
@@ -366,6 +465,11 @@ const handleBook = async () => {
       return matchesSearch && matchesCity && matchesRating;
     })
     .sort((a, b) => {
+      if (sortBy === "distance" && userCoords && a.latitude && a.longitude && b.latitude && b.longitude) {
+        const distA = getDistanceInKm(userCoords.latitude, userCoords.longitude, a.latitude, a.longitude);
+        const distB = getDistanceInKm(userCoords.latitude, userCoords.longitude, b.latitude, b.longitude);
+        return distA - distB;
+      }
       if (sortBy === "rating") {
         return b.rating - a.rating;
       }
@@ -398,6 +502,20 @@ const handleBook = async () => {
                 ? "Select the service you'd like to book."
                 : "Review and confirm your appointment."}
             </p>
+            {userAddress && (
+              <div className="mt-3 flex items-center gap-2 text-stone-600 text-xs font-semibold bg-white/60 border border-[#E8DCCB] px-3.5 py-2 rounded-xl w-fit">
+                <Icons.MapPin size={12} className="text-[#C5A059] flex-shrink-0" />
+                <span className="truncate max-w-md sm:max-w-xl">Searching near: <strong className="text-[#3E362E]">{userAddress}</strong></span>
+                <button
+                  onClick={detectLocation}
+                  disabled={isDetectingLocation}
+                  className="text-[#C5A059] hover:text-[#3E362E] transition-colors ml-2 bg-transparent border-none cursor-pointer p-0 font-bold"
+                  title="Refresh Location"
+                >
+                  <Icons.RefreshCw size={11} className={isDetectingLocation ? "animate-spin" : ""} />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* location pill */}
@@ -520,6 +638,7 @@ const handleBook = async () => {
                       className="pl-8 pr-8 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-xs font-black uppercase tracking-wider text-[#3E362E] focus:outline-none focus:border-[#C5A059] appearance-none cursor-pointer w-full min-w-[140px]"
                     >
                       <option value="">Sort By</option>
+                      {userCoords && <option value="distance">Distance (Closest)</option>}
                       <option value="rating">Rating (High to Low)</option>
                       <option value="name">Name (A-Z)</option>
                     </select>
@@ -548,6 +667,7 @@ const handleBook = async () => {
                         reviews: salon.reviews,
                         openNow: salon.openNow,
                         tags: salon.tags,
+                        distance: getSalonDistanceStr(salon),
                       }}
                       selected={selectedSalon}
                       onSelect={handleSalonSelect}

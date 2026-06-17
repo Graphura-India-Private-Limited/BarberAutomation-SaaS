@@ -310,9 +310,15 @@ export default function SalonRegistration() {
 }
 
 function Field({ label, children }) {
+  const parts = label.split("*");
+  const hasAsterisk = label.includes("*");
+
   return (
     <label className="block space-y-1.5">
-      <span className="ml-0.5 text-[11px] font-extrabold uppercase tracking-widest text-stone-400 font-sans">{label}</span>
+      <span className="ml-0.5 text-[11px] font-extrabold uppercase tracking-widest text-stone-400 font-sans">
+        {parts[0]}
+        {hasAsterisk && <span className="text-red-500 font-bold ml-0.5">*</span>}
+      </span>
       {children}
     </label>
   );
