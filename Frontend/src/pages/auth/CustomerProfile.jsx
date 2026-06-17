@@ -61,9 +61,134 @@ const BarberAvatar = ({ name, sizeClass = "w-12 h-12", iconSize = 20 }) => {
   );
 };
 
+const LiveVisualQueue = ({ activeQueue }) => {
+  const peopleAhead = activeQueue.peopleAhead || 0;
+  const status = activeQueue.status;
+
+  return (
+    <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-2xs text-left overflow-hidden">
+      <h4 className="text-xs font-black uppercase tracking-wider text-stone-400 mb-4 font-sans">
+        Live Queue Visualizer
+      </h4>
+      
+      <div className="relative flex items-center justify-start gap-6 py-8 px-4 overflow-x-auto min-h-[140px] bg-[#FAF6F0]/50 rounded-2xl border border-[#FAF6F0] scrollbar-thin">
+        {/* Styling Chair Area (Target Spot) */}
+        <div className="flex flex-col items-center shrink-0 relative z-10">
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 ${
+            status === "in-progress" 
+              ? "bg-[#B58B67] border-[#B58B67] text-white shadow-[0_0_20px_rgba(181,139,103,0.4)]" 
+              : "bg-white border-[#EADBCE] text-[#B58B67]"
+          }`}>
+            <motion.div
+              animate={status === "in-progress" ? { rotate: [0, -10, 10, -10, 0] } : {}}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+            >
+              <Scissors size={28} />
+            </motion.div>
+          </div>
+          <span className="text-[10px] font-black uppercase mt-2 text-[#3D3126]">
+            {status === "in-progress" ? "You're In Chair" : "Styling Chair"}
+          </span>
+          <span className="text-[9px] text-[#8A7A6A] leading-none mt-1">
+            {status === "in-progress" ? "Active Session" : "Being Served"}
+          </span>
+        </div>
+
+        {/* Connecting dotted line */}
+        <div className="absolute left-20 right-10 h-0.5 border-t-2 border-dashed border-[#EADBCE] top-[60px] -z-0" />
+
+        {/* Queue line items */}
+        <div className="flex items-center gap-10 pl-6 z-10 relative">
+          <AnimatePresence>
+            {/* If someone else is in the chair and we are waiting, render a placeholder person representing 'Current Client' */}
+            {status !== "in-progress" && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center shrink-0"
+              >
+                <div className="w-12 h-12 rounded-xl bg-stone-200 border border-stone-300 flex items-center justify-center text-stone-500">
+                  <User size={18} />
+                </div>
+                <span className="text-[9px] font-bold text-stone-500 mt-2">Active Client</span>
+                <span className="text-[8px] text-stone-400">In Chair</span>
+              </motion.div>
+            )}
+
+            {/* People Ahead list */}
+            {Array.from({ length: peopleAhead }).map((_, idx) => (
+              <motion.div
+                key={`ahead-${idx}`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ delay: idx * 0.1 }}
+                className="flex flex-col items-center shrink-0"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#FEF9EE] border border-[#EADBCE] flex items-center justify-center text-[#B58B67] relative">
+                  <User size={18} />
+                  <span className="absolute -top-1.5 -right-1.5 bg-[#B58B67] text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {idx + 1}
+                  </span>
+                </div>
+                <span className="text-[9px] font-bold text-stone-600 mt-2">Client Ahead</span>
+                <span className="text-[8px] text-[#8A7A6A]">Waiting</span>
+              </motion.div>
+            ))}
+
+            {/* YOU (Customer themselves) */}
+            {status !== "in-progress" && (
+              <motion.div
+                key="customer-self"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1.05,
+                  y: [0, -4, 0]
+                }}
+                transition={{ 
+                  y: { repeat: Infinity, duration: 1.5, ease: "easeInOut" },
+                  scale: { duration: 0.3 }
+                }}
+                className="flex flex-col items-center shrink-0"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-[#B58B67] border-2 border-white text-white flex items-center justify-center shadow-[0_4px_12px_rgba(181,139,103,0.3)] relative ring-2 ring-[#B58B67]/40">
+                  <User size={22} className="text-white" />
+                  <span className="absolute -top-2 bg-emerald-500 text-white text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full border border-white tracking-wider">
+                    YOU
+                  </span>
+                </div>
+                <span className="text-[10px] font-black text-[#B58B67] mt-2 font-sans">Your Turn</span>
+                <span className="text-[8px] text-[#8A7A6A] font-bold uppercase tracking-wider">
+                  Pos #{activeQueue.position}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function CustomerProfile() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [activeQueue, setActiveQueue] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  // Auto-poll active queue status when queue tab is open
+  useEffect(() => {
+    let intervalId;
+    if (activeTab === "queue") {
+      // Poll every 15 seconds
+      intervalId = setInterval(() => {
+        syncData();
+      }, 15000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [activeTab]);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedApptDetails, setSelectedApptDetails] = useState(null);
 
@@ -153,9 +278,51 @@ export default function CustomerProfile() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const compileNotifications = (uProfile, uAppts) => {
+  const compileNotifications = (uProfile, uAppts, uQueue = null) => {
     const list = [];
     let idCounter = 1;
+
+    // Inject Live Queue notification if active
+    if (uQueue) {
+      if (uQueue.status === "in-progress") {
+        list.push({
+          id: idCounter++,
+          type: "status",
+          title: "Queue Status: Active",
+          message: `Your grooming session is now in progress with ${uQueue.barber?.name || "your stylist"}. Please take your seat!`,
+          date: "Now",
+          read: false
+        });
+      } else if (uQueue.position === 1) {
+        list.push({
+          id: idCounter++,
+          type: "status",
+          title: "Queue Status: Next Up!",
+          message: `You are next in line! Please make your way to the styling chair.`,
+          date: "Now",
+          read: false
+        });
+      } else if (uQueue.status === "delayed") {
+        list.push({
+          id: idCounter++,
+          type: "status",
+          title: "Queue Status: Delayed",
+          message: `Your session has been slightly delayed. Current position: ${uQueue.position}.`,
+          date: "Update",
+          read: false
+        });
+      } else {
+        list.push({
+          id: idCounter++,
+          type: "status",
+          title: "Queue Status: In Line",
+          message: `You are currently at position ${uQueue.position} in the queue (${uQueue.peopleAhead} people ahead). Est. wait: ${uQueue.estimated_wait} mins.`,
+          date: "Update",
+          read: false
+        });
+      }
+    }
+
     const upcoming = uAppts.filter(a => a.status === "Upcoming" || a.status === "Pending" || a.status === "Confirmed" || a.status === "In-progress");
     if (upcoming.length > 0) {
       list.push({ id: idCounter++, type: "status", title: "Booking Active", message: `Your appointment for ${upcoming[0].service} with ${upcoming[0].barberName} is scheduled for ${upcoming[0].date} at ${upcoming[0].time}.`, date: "Active", read: false });
@@ -184,8 +351,9 @@ export default function CustomerProfile() {
     setLoading(true);
     let currentProfile = { ...profile };
     let currentAppts = [...appointments];
+    let activeQueueVal = null;
     if (!token) {
-      compileNotifications(currentProfile, currentAppts);
+      compileNotifications(currentProfile, currentAppts, null);
       setLoading(false);
       return;
     }
@@ -230,10 +398,24 @@ export default function CustomerProfile() {
           await fetch(`${API}/auth/profile`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ total_visits: completedVisits }) });
         }
       }
+
+      // Fetch active queue status
+      try {
+        const queueRes = await fetch(`${API}/queue/customer/active`, { headers: { Authorization: `Bearer ${token}` } });
+        const queueData = await queueRes.json();
+        if (queueData.success && queueData.active) {
+          activeQueueVal = queueData.queue;
+          setActiveQueue(queueData.queue);
+        } else {
+          setActiveQueue(null);
+        }
+      } catch (e) {
+        console.error("Queue active fetch error:", e);
+      }
     } catch (err) {
       console.log("Offline local data fallback active.", err.message);
     } finally {
-      compileNotifications(currentProfile, currentAppts);
+      compileNotifications(currentProfile, currentAppts, activeQueueVal);
       setLoading(false);
     }
   };
@@ -371,6 +553,7 @@ export default function CustomerProfile() {
                 <p className="px-3 text-[9px] font-bold text-[#78716C] uppercase tracking-[0.18em] mb-2.5">Navigation</p>
                 {[
                   { id: "overview", label: "Dashboard Hub", icon: Sparkles },
+                  { id: "queue", label: "Live Queue Tracker", icon: Clock },
                   { id: "studios", label: "Our Studios", icon: Compass },
                   { id: "history", label: "Appointments Registry", icon: Calendar },
                   { id: "dummy_services", label: "Grooming Menu", icon: ShoppingBag },
@@ -428,6 +611,7 @@ export default function CustomerProfile() {
                 {/* ✅ FIX: NearbyBarbers removed from h1 — only text titles here */}
                 <h1 className="text-2xl font-black font-serif text-[#3D3126]">
                   {activeTab === "overview" && "Dashboard"}
+                  {activeTab === "queue" && "Live Queue Tracker"}
                   {activeTab === "studios" && "Our Studios"}
                   {activeTab === "history" && "Appointments Registry"}
                   {activeTab === "dummy_services" && "Grooming Menu"}
@@ -512,6 +696,194 @@ export default function CustomerProfile() {
 
             {/* ── CORE PANEL BODY ── */}
             <div className="p-6 md:p-8 space-y-8 flex-grow">
+
+              {/* TAB: LIVE QUEUE TRACKER */}
+              {activeTab === "queue" && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300 text-left">
+                  {!activeQueue ? (
+                    <div className="bg-white border border-[#EADBCE] rounded-3xl p-8 text-center max-w-xl mx-auto shadow-2xs">
+                      <div className="w-16 h-16 rounded-2xl bg-[#FEF9EE] border border-[#EADBCE] flex items-center justify-center mx-auto mb-6 text-[#B58B67]">
+                        <Clock size={28} />
+                      </div>
+                      <h2 className="text-2xl font-black font-serif text-[#3D3126] tracking-tight mb-2">No Active Queue Reservation</h2>
+                      <p className="text-stone-500 text-xs leading-relaxed max-w-md mx-auto mb-8 font-sans">
+                        You are not currently waiting in the live queue. Secure a grooming slot or register for walk-in timelines to view your live position, estimated wait counter, and stylist chair status here.
+                      </p>
+                      <button 
+                        onClick={() => setActiveTab("dummy_services")}
+                        className="bg-[#B58B67] hover:bg-[#9E7452] text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-xs inline-flex items-center gap-2 border-none outline-none font-sans"
+                      >
+                        <Scissors size={14} /> Join Salon Queue Pipeline
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                      
+                      {/* Main Live Queue Status Cards */}
+                      <div className="lg:col-span-2 space-y-6">
+                        
+                        {/* Live Header Status */}
+                        <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-2xs">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[#FAF6F0] mb-4">
+                            <div>
+                              <span className="text-[9px] font-black uppercase tracking-widest text-[#B58B67] bg-[#FEF9EE] px-2.5 py-1 rounded-md border border-[#EADBCE]">
+                                Live Queue Status
+                              </span>
+                              <h3 className="text-xl font-black font-serif text-[#3D3126] mt-2">
+                                {activeQueue.status === "in-progress" ? "You are on the Styling Chair!" : `Position #${activeQueue.position} in Line`}
+                              </h3>
+                            </div>
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                              activeQueue.status === "in-progress"
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                                : activeQueue.status === "delayed" || activeQueue.status === "paused"
+                                  ? "bg-amber-50 text-amber-700 border border-amber-100"
+                                  : "bg-amber-50 text-amber-700 border border-amber-100"
+                            }`}>
+                              {activeQueue.status === "in-progress" ? "In Progress" : activeQueue.status === "delayed" ? "Delayed" : activeQueue.status === "paused" ? "Paused" : "Waiting"}
+                            </span>
+                          </div>
+
+                          {/* Stepper View */}
+                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 py-6 px-2">
+                            {[
+                              { label: "Joined Line", active: true, completed: true },
+                              { label: "Waiting in Queue", active: activeQueue.status === "waiting" || activeQueue.status === "paused" || activeQueue.status === "delayed", completed: activeQueue.status === "in-progress" || (activeQueue.status === "waiting" && activeQueue.position === 1) },
+                              { label: "Next in Chair", active: activeQueue.status === "waiting" && activeQueue.position === 1, completed: activeQueue.status === "in-progress" },
+                              { label: "Grooming Session", active: activeQueue.status === "in-progress", completed: false }
+                            ].map((step, idx) => (
+                              <React.Fragment key={idx}>
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                    step.active 
+                                      ? "bg-[#B58B67] text-white ring-4 ring-[#B58B67]/20" 
+                                      : step.completed 
+                                        ? "bg-emerald-500 text-white" 
+                                        : "bg-stone-100 text-stone-400 border border-stone-200"
+                                  }`}>
+                                    {step.completed ? "✓" : idx + 1}
+                                  </div>
+                                  <div className="text-left">
+                                    <p className={`text-xs font-bold leading-none ${step.active || step.completed ? "text-stone-900" : "text-stone-400"}`}>
+                                      {step.label}
+                                    </p>
+                                    <p className="text-[10px] text-stone-400 mt-1">
+                                      {idx === 0 && "Registered"}
+                                      {idx === 1 && activeQueue.status === "waiting" && `Pos #${activeQueue.position}`}
+                                      {idx === 1 && (activeQueue.status === "delayed" || activeQueue.status === "paused") && "Queue On Hold"}
+                                      {idx === 2 && activeQueue.status === "waiting" && activeQueue.position === 1 && "Arrived next!"}
+                                      {idx === 2 && activeQueue.position > 1 && "Waiting turn"}
+                                      {idx === 3 && activeQueue.status === "in-progress" && "In Chair"}
+                                      {idx === 3 && activeQueue.status !== "in-progress" && "Upcoming"}
+                                    </p>
+                                  </div>
+                                </div>
+                                {idx < 3 && (
+                                  <div className="hidden md:block flex-1 h-[2px] bg-stone-200 min-w-[30px]" />
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Live Visual Queue Animation Card */}
+                        <LiveVisualQueue activeQueue={activeQueue} />
+
+                        {/* Booking & Service parameters */}
+                        <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-2xs text-left relative overflow-hidden">
+                          <h3 className="font-serif text-lg font-bold text-[#3D3126] mb-4">Service Overview</h3>
+                          <div className="space-y-3">
+                            <div className="flex justify-between border-b border-[#FAF6F0] pb-2 text-xs">
+                              <span className="text-stone-400 font-medium">Studio Branch</span>
+                              <span className="font-bold text-[#3D3126]">{activeQueue.salon?.salon_name || "Style Studio"}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-[#FAF6F0] pb-2 text-xs">
+                              <span className="text-stone-400 font-medium">Stylist Assigned</span>
+                              <span className="font-bold text-[#3D3126]">{activeQueue.barber?.name || "Any Stylist"}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-[#FAF6F0] pb-2 text-xs">
+                              <span className="text-stone-400 font-medium">Services Requested</span>
+                              <span className="font-bold text-[#3D3126]">
+                                {activeQueue.services?.map(s => s.service_name).join(", ") || "Premium Grooming Cut"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-xs pt-1">
+                              <span className="text-stone-400 font-medium">Booking Reference</span>
+                              <span className="font-mono font-bold text-[#B58B67]">
+                                {activeQueue.booking?._id || activeQueue.booking || "BKG-QUEUE"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Interactive Queue Information Alert Tip */}
+                        <div className="bg-[#FEF9EE] border border-[#EADBCE] rounded-3xl p-6 text-xs text-stone-600 space-y-3">
+                          <h4 className="font-serif font-bold text-[#9E7452] text-sm flex items-center gap-1.5">
+                            <HelpCircle size={16} /> How the queue works:
+                          </h4>
+                          <p className="leading-relaxed">
+                            Our Smart Queue monitors barber speed and active session times to give you a dynamic, real-time wait estimation. 
+                            As previous clients complete their sessions or get marked as no-show, your position will automatically move forward.
+                          </p>
+                          <p className="leading-relaxed font-bold text-[#3D3126]">
+                            * Important: Please ensure you are physically present at the studio location once your position reaches #1 or #2.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Right Countdown Panel */}
+                      <div className="space-y-6">
+                        
+                        {/* Countdown Wait Card */}
+                        <div className="bg-[#3D3126] text-white rounded-[2.2rem] p-8 shadow-md border border-[#B58B67]/20 text-center relative overflow-hidden">
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#B58B67]/10 to-transparent rounded-full blur-2xl" />
+                          <span className="text-[8px] font-black uppercase tracking-[0.25em] bg-[#B58B67]/20 text-[#B58B67] border border-[#B58B67]/30 px-3 py-1 rounded-full mb-5 inline-block">
+                            Estimated Wait Counter
+                          </span>
+
+                          <div className="my-6">
+                            <h2 className="text-5xl font-serif font-black tracking-tight text-[#B58B67] font-mono">
+                              {activeQueue.status === "in-progress" ? "0" : activeQueue.estimated_wait}
+                              <span className="text-lg font-sans font-bold ml-1 text-white">mins</span>
+                            </h2>
+                            <p className="text-[10px] text-stone-400 uppercase tracking-widest font-black mt-2">Time Remaining</p>
+                          </div>
+
+                          <div className="border-t border-white/10 pt-5 mt-5 text-left space-y-3.5 text-[11px]">
+                            <div className="flex justify-between items-center text-stone-300">
+                              <span>Entered Line At:</span>
+                              <span className="font-mono text-white font-bold">
+                                {new Date(activeQueue.joined_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center text-stone-300">
+                              <span>Estimated Turn:</span>
+                              <span className="font-mono text-[#B58B67] font-bold">
+                                {new Date(new Date(activeQueue.joined_at).getTime() + activeQueue.estimated_wait * 60000).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center text-stone-300">
+                              <span>Clients Ahead:</span>
+                              <span className="font-mono text-white font-bold">{activeQueue.peopleAhead}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Manual refresh button */}
+                        <button
+                          onClick={syncData}
+                          disabled={loading}
+                          className="w-full py-4 rounded-2xl bg-white border border-[#EADBCE] text-stone-600 text-xs font-black uppercase tracking-wider hover:bg-stone-50 transition flex items-center justify-center gap-2 cursor-pointer shadow-3xs hover:scale-102 border-none outline-none font-sans"
+                        >
+                          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+                          Sync Live Metrics
+                        </button>
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* ✅ FIX: TAB: OUR STUDIOS — NearbyBarbers correctly in main content */}
               {activeTab === "studios" && (

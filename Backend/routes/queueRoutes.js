@@ -4,6 +4,7 @@ const queueController = require("../controllers/queueController");
 const { protect } = require("../middleware/authMiddleware");
 const { requireRoles } = require("../middleware/roleMiddleware");
 
+router.get("/customer/active", protect, requireRoles("customer"), queueController.getActiveCustomerQueue);
 router.get("/:salon_id", protect, requireRoles("owner", "admin", "barber", "customer"), queueController.getSalonQueue);
 router.put("/:queue_id/status", protect, requireRoles("owner", "admin", "barber"), queueController.updateQueueStatus);
 
