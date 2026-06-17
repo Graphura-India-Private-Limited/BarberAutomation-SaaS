@@ -62,7 +62,7 @@ function FaqPage() {
         </div>
 
         {/* Content Container */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
 
           {/* Header */}
           <div className="text-center mb-14 sm:mb-20 pt-10 sm:pt-4">
@@ -84,8 +84,8 @@ function FaqPage() {
             </p>
           </div>
 
-          {/* DUAL COLUMN FAQ GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+          {/* FULL-WIDTH FAQ GRID */}
+          <div className="grid grid-cols-1 gap-5 items-start">
             {FAQS.map((faq, index) => {
               const isOpen = openFaq === index;
 
@@ -100,9 +100,9 @@ function FaqPage() {
                 >
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left cursor-pointer select-none"
+                    className="w-full flex items-center justify-between gap-4 p-4 sm:p-5 text-left cursor-pointer select-none min-w-0"
                   >
-                    <h3 className="font-black text-xs sm:text-[13px] text-[#3E362E] uppercase tracking-wider leading-relaxed">
+                    <h3 className="font-black text-xs sm:text-[13px] text-[#3E362E] uppercase tracking-wider leading-relaxed flex-1 min-w-0">
                       {faq.q}
                     </h3>
 
@@ -124,12 +124,13 @@ function FaqPage() {
 
                   {/* Smooth Content Expansion */}
                   <div
-                    className={`grid transition-all duration-500 ease-in-out ${
-                      isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                    className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                      isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
                     }`}
+                    aria-hidden={!isOpen}
                   >
                     <div className="overflow-hidden">
-                      <div className="px-5 sm:px-6 pb-6 text-xs sm:text-sm leading-relaxed text-stone-600 font-light border-t border-stone-50 pt-4 mt-1">
+                      <div className="px-4 sm:px-5 pb-4 text-xs sm:text-sm leading-relaxed text-stone-600 font-light border-t border-stone-50 pt-3 mt-1">
                         {faq.a}
                       </div>
                     </div>

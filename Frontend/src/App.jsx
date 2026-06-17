@@ -86,14 +86,10 @@ import NoShowDelayPage from "./components/queue/NoShowDelayPage";
 import MembershipSection from "./components/membership/MembershipSection";
 import LiveQueue from "./pages/owner/LiveQueue";
 
+
 function WriteReviewRoute() {
   const { state } = useLocation();
-  const navigate = useNavigate();
-  if (!state) {
-    navigate("/customer/services");
-    return null;
-  }
-  return <ReviewSystem bookingData={state} />;
+  return <ReviewSystem bookingData={state || {}} />;
 }
 
 function App() {
