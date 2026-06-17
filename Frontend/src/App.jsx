@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
+// import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ScrollToTop from "./components/common/ScrollToTop";
 
@@ -85,7 +86,15 @@ import NoShowDelayPage from "./components/queue/NoShowDelayPage";
 import MembershipSection from "./components/membership/MembershipSection";
 import LiveQueue from "./pages/owner/LiveQueue";
 
-const demoBooking = { status: "completed", barberName: "Rahul" };
+function WriteReviewRoute() {
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  if (!state) {
+    navigate("/customer/services");
+    return null;
+  }
+  return <ReviewSystem bookingData={state} />;
+}
 
 function App() {
   const ticketState = useTickets();
@@ -159,7 +168,7 @@ function App() {
         <Route path="/barbers" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
-        <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><ReviewSystem bookingData={demoBooking} /></ProtectedRoute>} />
+       <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteReviewRoute /></ProtectedRoute>} />
         <Route path="/membership" element={<MembershipSection />} />
 
         {/* --- BARBER PROFILE & ACTIONS (RESTRICTED BY RBAC) --- */}
