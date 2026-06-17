@@ -303,13 +303,8 @@ export default function CustomerProfile() {
     triggerToast("Feedback received! Review confirmed.");
   };
 
-  const handleCancelBooking = async (id) => {
-    const token = getToken();
-    if (token) {
-      try { await fetch(`${API}/booking/${id}/cancel`, { method: "PUT", headers: { Authorization: `Bearer ${token}` } }); } catch (err) {}
-    }
-    setAppointments(appointments.map(a => a._id === id ? { ...a, status: "Cancelled" } : a));
-    triggerToast("Appointment successfully cancelled.");
+  const handleCancelBooking = (id) => {
+    window.location.href = `/customer/refund/${id}`;
   };
 
   const handleUpgradeMembership = async (tier) => {

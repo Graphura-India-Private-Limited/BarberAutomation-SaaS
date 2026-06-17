@@ -27,13 +27,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Final Payload for Razorpay & Backend:", { 
-      ...bookingData, 
-      mobile, 
-      attendees,
-      totalTokenAmount: tokenTotal
-    });
-    onConfirm(); 
+    onConfirm({ mobile, attendees }); 
   };
 
   return (
@@ -121,7 +115,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
           type="submit" 
           className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 mt-8 cursor-pointer"
         >
-          Confirm & Pay ₹{tokenTotal}
+          Proceed to Checkout
         </button>
       </form>
     </div>

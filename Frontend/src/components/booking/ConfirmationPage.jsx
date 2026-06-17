@@ -16,7 +16,12 @@ export default function ConfirmationPage({ bookingData = {}, onReset }) {
       </div>
 
       <h2 className="text-3xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
-      <p className="text-gray-500 mb-8 text-sm">Your token payment of ₹50 was successful.</p>
+      <p className="text-gray-500 mb-8 text-sm">
+        {bookingData?.paymentType === "FULL" 
+          ? `Your full payment of ₹${bookingData?.amountPaid || 500} was successful.`
+          : `Your token payment of ₹${bookingData?.amountPaid || 50} was successful.`
+        }
+      </p>
 
       {/* 🧾 Digital Receipt (FIXED: Replaced bg-salonBg with premium luxury cream theme combo) */}
       <div className="bg-[#FEF3E2] bg-opacity-40 p-6 rounded-2xl text-left border border-[#FEF3E2] mb-8">
@@ -42,7 +47,17 @@ export default function ConfirmationPage({ bookingData = {}, onReset }) {
           </div>
           <div className="flex justify-between items-center">
             <span className="text-stone-500 font-medium">Time</span> 
-            <span className="font-bold text-stone-900">{bookingData?.timeSlot || "11:00 AM"}</span>
+            <span className="font-bold text-stone-900">{bookingData?.time || bookingData?.timeSlot || "11:00 AM"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-stone-500 font-medium">Payment Option</span> 
+            <span className="font-bold text-stone-900">
+              {bookingData?.paymentType === "FULL" ? "Full Payment" : "Partial Token"}
+            </span>
+          </div>
+          <div className="flex justify-between items-center pt-2 border-t border-stone-200/50">
+            <span className="text-[#3E362E] font-bold">Paid Amount</span> 
+            <span className="font-extrabold text-emerald-600 font-mono text-base">₹{bookingData?.amountPaid}</span>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Home } from 'lucide-react';
 import SlotSelection from '../../components/booking/SlotSelection';
 import BookingForm from '../../components/booking/BookingForm';
+import CheckoutPage from '../../components/booking/CheckoutPage';
 import ConfirmationPage from '../../components/booking/ConfirmationPage';
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
@@ -77,17 +78,27 @@ export default function Wrapper() {
     setCurrentStep(4);
   };
 
-  const handleBookingConfirmed = async (updatedDetails) => {
-    let finalBookingData = { ...bookingData };
-    if (updatedDetails) {
-      finalBookingData = { ...finalBookingData, ...updatedDetails };
-      setBookingData(finalBookingData);
-    }
+  const handleBookingFormSubmitted = (details) => {
+    setBookingData(prev => ({
+      ...prev,
+      mobile: details.mobile,
+      attendees: details.attendees
+    }));
+    setCurrentStep(5);
+  };
+
+  const handleCheckoutComplete = async (paymentType, amountPaid) => {
+    const finalBookingData = {
+      ...bookingData,
+      paymentType,
+      amountPaid
+    };
+    setBookingData(finalBookingData);
 
     const token = localStorage.getItem("token");
     if (!token) {
       console.log("No authorization token found. Proceeding with dummy confirmation.");
-      setCurrentStep(5);
+      setCurrentStep(6);
       return;
     }
 
@@ -265,8 +276,13 @@ export default function Wrapper() {
         salon_id: salonId,
         barber_id: matchedBarberId,
         booking_type: "slot",
-        services: [{ service_id: matchedServiceId, member_name: "Self" }],
-        slot_time: formattedSlot
+        services: (finalBookingData.attendees || [{ name: "Self" }]).map(member => ({
+          service_id: matchedServiceId,
+          member_name: member.name || "Self"
+        })),
+        slot_time: formattedSlot,
+        payment_type: paymentType,
+        attendees: finalBookingData.attendees || [{ name: "Self", type: "Primary" }]
       };
 
       console.log("Submitting online booking payload:", payload);
@@ -285,6 +301,7 @@ export default function Wrapper() {
         // Inject DB-created booking values to state for confirmation page
         setBookingData(prev => ({
           ...prev,
+          ...finalBookingData,
           _id: bookingResult.booking._id,
           bookingId: bookingResult.booking._id,
           price: matchedPrice
@@ -295,7 +312,7 @@ export default function Wrapper() {
     } catch (err) {
       console.error("Booking API pipeline error. Falling back to local offline mode.", err.message);
     } finally {
-      setCurrentStep(5);
+      setCurrentStep(6);
     }
   };
 
@@ -322,6 +339,8 @@ export default function Wrapper() {
     } else if (currentStep === 4) {
       setCurrentStep(3);
     } else if (currentStep === 5) {
+      setCurrentStep(4);
+    } else if (currentStep === 6) {
       handleResetFlow();
     }
   };
@@ -349,13 +368,13 @@ export default function Wrapper() {
                 onClick={handleHeaderBackAction} 
                 className="flex items-center gap-2 text-xs font-extrabold tracking-wider uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white cursor-pointer select-none font-sans outline-none"
               >
-                {currentStep === 3 || currentStep === 5 ? (
+                {currentStep === 3 || currentStep === 6 ? (
                   <Home size={14} className="transition-transform group-hover:scale-110 text-[#C5A059]" />
                 ) : (
                   <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1 text-[#C5A059]" />
                 )}
                 <span>
-                  {currentStep === 3 ? "Exit Booking" : currentStep === 5 ? "Home" : "Back"}
+                  {currentStep === 3 ? "Exit Booking" : currentStep === 6 ? "Home" : "Back"}
                 </span>
               </button>
             </div>
@@ -392,6 +411,17 @@ export default function Wrapper() {
               )}
               {currentStep === 5 && (
                 <>
+                  <span className="mb-3 inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full shadow-sm">
+                    Step 05 — Secure Checkout
+                  </span>
+                  <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+                    <span className="font-bold uppercase">Payment</span>
+                    <span className="italic text-[#C5A059] normal-case font-medium">Checkout</span>
+                  </h2>
+                </>
+              )}
+              {currentStep === 6 && (
+                <>
                   <span className="mb-3 inline-block text-[11px] font-extrabold uppercase tracking-widest text-emerald-800 font-sans bg-emerald-50 border border-emerald-200 px-4 py-1.5 rounded-full shadow-sm">
                     Allocation Successful
                   </span>
@@ -420,11 +450,19 @@ export default function Wrapper() {
                 <BookingForm 
                   bookingData={bookingData} 
                   onBack={() => setCurrentStep(3)} 
-                  onConfirm={handleBookingConfirmed}
+                  onConfirm={handleBookingFormSubmitted}
                 />
               )}
 
               {currentStep === 5 && (
+                <CheckoutPage 
+                  bookingData={bookingData}
+                  onBack={() => setCurrentStep(4)}
+                  onComplete={handleCheckoutComplete}
+                />
+              )}
+
+              {currentStep === 6 && (
                 <ConfirmationPage 
                   bookingData={bookingData} 
                   onReset={handleResetFlow}

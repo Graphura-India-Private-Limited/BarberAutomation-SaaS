@@ -8,5 +8,7 @@ router.get("/my", protect, bookingController.getMyBookings);
 router.get("/salon/:id", protect, bookingController.getSalonBookings);
 router.put("/:id/status", protect, bookingController.updateBookingStatus);
 router.put("/:id/cancel", protect, bookingController.cancelBooking);
+router.get("/:id/refund-estimation", protect, bookingController.getRefundEstimation);
+router.post("/:id/cancel-with-refund", protect, bookingController.cancelWithRefund);
 
 module.exports = router;

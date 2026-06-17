@@ -75,6 +75,7 @@ import TermsPage from "./pages/public/TermsPage";
 import PrivacyPolicy from "./pages/public/PrivacyPolicy";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ContactSupport from "./pages/customer/ContactSupport";
+import RefundPage from "./pages/customer/RefundPage";
 
 /* ── Components ── */
 import ReviewSystem from "./components/reviews/ReviewSystem";
@@ -142,7 +143,6 @@ function App() {
           <Route path="services/addon" element={<AddonServices />} />
           <Route path="services/addons" element={<AddonServices />} />
           <Route path="barber" element={<BarberSelection />} />
-
           {/* Protected customer booking paths */}
           <Route element={<ProtectedRoute allowedRoles={["customer"]}><Outlet /></ProtectedRoute>}>
             <Route path="look" element={<SelectLook />} />
@@ -150,6 +150,7 @@ function App() {
             <Route path="booking" element={<CustomerBookingFlow />} />
             <Route path="history" element={<BookingHistory />} />
             <Route path="flow" element={<CustomerBookingFlow />} />
+            <Route path="refund/:bookingId" element={<RefundPage />} />
           </Route>
         </Route>
 
