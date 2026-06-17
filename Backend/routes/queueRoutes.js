@@ -6,5 +6,7 @@ const { requireRoles } = require("../middleware/roleMiddleware");
 
 router.get("/:salon_id", protect, requireRoles("owner", "admin", "barber", "customer"), queueController.getSalonQueue);
 router.put("/:queue_id/status", protect, requireRoles("owner", "admin", "barber"), queueController.updateQueueStatus);
+router.post("/notify", protect, requireRoles("owner", "admin", "barber"), queueController.notifyCustomer);
+
 
 module.exports = router;

@@ -26,7 +26,7 @@ export const CUSTOMERS = [
     status: 'Waiting',
     arrivalTime: '10:30 AM',
     duration: '30 min',
-    barber: 'Suresh P.',
+    barber: 'Ali',
     notes: '',
     loyaltyPts: 120,
     visits: 6,

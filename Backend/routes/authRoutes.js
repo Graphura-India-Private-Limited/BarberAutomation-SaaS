@@ -3,6 +3,9 @@ const router = express.Router();
 const authController = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 const { requireRoles } = require("../middleware/roleMiddleware");
+const Notification = require("../models/Notification");
+const Barber = require("../models/Barber");
+
 
 /* ══════════════════════════════════════
     CUSTOMER AUTH — OTP Based
@@ -21,6 +24,35 @@ router.get("/profile", protect, requireRoles("customer"), authController.getProf
 router.put("/profile", protect, requireRoles("customer"), authController.updateProfile);
 router.post("/family-member", protect, requireRoles("customer"), authController.addFamilyMember);
 router.delete("/family-member/:id", protect, requireRoles("customer"), authController.deleteFamilyMember);
+
+/* ── Customer Notifications ── */
+router.get("/notifications", protect, requireRoles("customer"), async (req, res) => {
+  try {
+    const notifications = await Notification.find({ customer_id: req.user._id }).sort({ created_at: -1 }).limit(30);
+    res.json({ success: true, notifications });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.put("/notifications/mark-read", protect, requireRoles("customer"), async (req, res) => {
+  try {
+    await Notification.updateMany({ customer_id: req.user._id, read: false }, { read: true });
+    res.json({ success: true, message: "Notifications marked as read." });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.delete("/notifications", protect, requireRoles("customer"), async (req, res) => {
+  try {
+    await Notification.deleteMany({ customer_id: req.user._id });
+    res.json({ success: true, message: "Notifications cleared." });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 
 /* ══════════════════════════════════════
     OWNER AUTH
@@ -53,27 +85,25 @@ router.post("/admin/create", authController.createAdmin);
 /* ── ✅ GET: Fetch current profile values on page refresh ── */
 router.get("/barber/profile", protect, requireRoles("barber", "owner", "admin"), async (req, res) => {
   try {
-    // req.user is hydrated cleanly by your protect middleware
     const barberId = req.user?.id;
     if (!barberId) {
       return res.status(401).json({ success: false, message: "Unauthorized. Missing tracking identifier." });
     }
 
-    /* 
-      Once your database controller structures are completely finalized, you will query your DB model like this:
-      const barber = await Barber.findById(barberId).populate("salon_id");
-    */
+    const barber = await Barber.findById(barberId).populate("salon_id");
+    if (!barber) {
+      return res.status(404).json({ success: false, barber: { name: req.user.name, mobile_number: req.user.mobile, experience_years: req.user.experience || 5, specialization: req.user.specialization || "Haircut & Beard", salon_id: { salon_name: "Elite Cuts & Spa - Downtown" } } });
+    }
 
-    // Returning structural layout sync block to support frontend components
     return res.status(200).json({
       success: true,
       barber: {
-        name: req.user.name || "Arjun Sharma",
-        mobile_number: req.user.mobile || "9876543210",
-        experience_years: req.user.experience || 5, // Hydrates your counter field cleanly!
-        specialization: req.user.specialization || "Haircut & Beard",
+        name: barber.name,
+        mobile_number: barber.mobile,
+        experience_years: barber.experience,
+        specialization: barber.specialization,
         salon_id: {
-          salon_name: "Elite Cuts & Spa - Downtown"
+          salon_name: barber.salon_id?.salon_name || "Elite Cuts & Spa - Downtown"
         }
       }
     });
@@ -91,20 +121,30 @@ router.put("/barber/update-profile", protect, requireRoles("barber", "owner", "a
     }
 
     const { mobile_number, experience_years, specialization } = req.body;
-    console.log(`Synchronizing state changes for Barber ${barberId}:`, { mobile_number, experience_years, specialization });
 
-    /*
-      When ready to plug into MongoDB:
-      const updatedBarber = await Barber.findByIdAndUpdate(
-        barberId,
-        { mobile_number, experience_years: Number(experience_years), specialization },
-        { new: true }
-      );
-    */
+    const updateData = {};
+    if (req.user.role === "barber") {
+      updateData.mobile = mobile_number;
+    } else {
+      updateData.mobile = mobile_number;
+      if (experience_years !== undefined) updateData.experience = Number(experience_years);
+      if (specialization !== undefined) updateData.specialization = specialization;
+    }
+
+    const updatedBarber = await Barber.findByIdAndUpdate(
+      barberId,
+      updateData,
+      { new: true }
+    );
+
+    if (!updatedBarber) {
+      return res.status(404).json({ success: false, message: "Barber not found." });
+    }
 
     return res.status(200).json({
       success: true,
-      message: "Professional profile details synchronized successfully!"
+      message: "Professional profile details synchronized successfully!",
+      barber: updatedBarber
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

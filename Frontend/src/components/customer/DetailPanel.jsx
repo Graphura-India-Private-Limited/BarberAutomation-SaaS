@@ -14,7 +14,7 @@ function StatBox({ label, value, accent }) {
   return (
     <div className="bg-card-warm border border-border/60 rounded-xl px-3.5 py-3 shadow-inner">
       <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted mb-1">{label}</div>
-      <div className={`font-display font-bold text-[22px] leading-none ${accent ? 'text-accent' : 'text-primary'}`}>
+      <div className={`font-display font-bold text-[22px] leading-none ${accent ? 'text-[#C5A059]' : 'text-primary'}`}>
         {value}
       </div>
     </div>

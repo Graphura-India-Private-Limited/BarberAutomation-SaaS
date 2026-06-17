@@ -5,18 +5,34 @@ import { ArrowLeft, Sparkles, Layers, Users, Clock, ShieldCheck } from "lucide-r
 
 export default function HomeOverview() {
   const { currentUser, canViewFinance } = useAuth();
-  const { queue } = useQueue();
+  const { queue, servedCount } = useQueue();
   const navigate = useNavigate();
+
+  const SERVICE_MAP = {
+    haircut: 'Haircut',
+    shave: 'Shave',
+    beard: 'Beard Trim',
+    combo: 'Haircut + Shave',
+    color: 'Hair Color',
+    kids: "Kids' Cut"
+  };
 
   const activeCount = queue.filter(q => q.status !== "done").length;
   const myQueue = currentUser?.role === "barber"
-    ? queue.filter(q => q.barber === currentUser.name && q.status !== "done")
+    ? queue.filter(q => {
+        if (q.status === "done" || q.status === "Completed") return false;
+        const qBarber = (q.barber || "").toLowerCase();
+        const curBarber = (currentUser.name || "").toLowerCase();
+        const firstWordCur = curBarber.split(" ")[0].replace(/[^a-zA-Z]/g, "");
+        const firstWordQ = qBarber.split(" ")[0].replace(/[^a-zA-Z]/g, "");
+        return firstWordCur === firstWordQ || curBarber.includes(qBarber) || qBarber.includes(curBarber);
+      })
     : queue;
 
   const stats = [
     { label: "Your Queue", value: myQueue.length, color: "bg-white", icon: Clock },
     { label: "Active Customers", value: activeCount, color: "bg-white", icon: Users },
-    { label: "Completed Today", value: queue.filter(q => q.status === "done").length, color: "bg-white", icon: ShieldCheck },
+    { label: "Completed Today", value: servedCount, color: "bg-white", icon: ShieldCheck },
     ...(canViewFinance()
       ? [{ label: "Today's Revenue", value: `₹${financeData.todayRevenue.toLocaleString()}`, color: "bg-white", icon: Sparkles }]
       : []),
@@ -83,8 +99,10 @@ export default function HomeOverview() {
                   {myQueue.slice(0, 4).map(item => (
                     <div key={item.id} className="flex items-center justify-between bg-stone-50/40 rounded-xl px-4 py-3 border border-stone-200/60 transition-all hover:bg-white hover:border-[#C5A059]/40 shadow-3xs">
                       <div>
-                        <p className="font-extrabold text-stone-900 text-sm tracking-tight">{item.customer}</p>
-                        <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mt-0.5">{item.service} · {item.time}</p>
+                        <p className="font-extrabold text-stone-900 text-sm tracking-tight">{item.customer || item.name}</p>
+                        <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mt-0.5">
+                          {(SERVICE_MAP[item.service] || item.service)} · {item.time || (item.slot || new Date(item.joinedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
+                        </p>
                       </div>
                       <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded border shadow-3xs ${
                         item.status === "in-progress" ? "bg-emerald-50 text-emerald-700 border-emerald-200"

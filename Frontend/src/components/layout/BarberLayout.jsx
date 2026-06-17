@@ -118,26 +118,26 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
           <div className="mt-3 relative">
             <button 
               onClick={() => setStatusOpen(!statusOpen)} 
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider bg-white border border-[#E6D5C3] text-stone-700 cursor-pointer h-9"
+              className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#FFFBF4] hover:bg-[#FFF8EE] border border-[#C5A059]/40 hover:border-[#C5A059] text-[#3E362E] transition-all cursor-pointer h-10 shadow-3xs"
             >
               <span className="flex items-center gap-2">
-                <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
+                <span className={`w-2 h-2 rounded-full ${sc.dot} ring-4 ${status === 'available' ? 'ring-emerald-500/20' : status === 'busy' ? 'ring-amber-500/20' : 'ring-rose-500/20'} animate-pulse`} />
                 <span>{sc.label}</span>
               </span>
-              <ChevronDown className={`w-3.5 h-3.5 text-stone-500 transition-transform ${statusOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-[#C5A059] transition-transform duration-300 ${statusOpen ? "rotate-180" : ""}`} />
             </button>
             
             {statusOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-50 bg-white border border-[#E6D5C3] shadow-lg">
+              <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl overflow-hidden z-50 bg-white border border-[#C5A059]/30 shadow-md animate-in fade-in slide-in-from-top-1 duration-150">
                 {Object.entries(STATUS_CFG).map(([key, cfg]) => (
                   <button 
                     key={key} 
                     onClick={() => { setStatus(key); setStatusOpen(false); }} 
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs border-b border-[#E6D5C3]/20 last:border-0 hover:bg-[#FDFBF7] transition-colors text-left cursor-pointer font-bold"
+                    className="w-full flex items-center gap-2.5 px-3.5 py-3 text-[10px] uppercase tracking-wider border-b border-stone-100 last:border-0 hover:bg-[#FAF6F0] transition-colors text-left cursor-pointer font-black text-[#3E362E]"
                   >
                     <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                    <span className="font-sans uppercase tracking-wider">{cfg.label}</span>
-                    {status === key && <Check className="w-3 h-3 ml-auto text-[#8B5A2B]" />}
+                    <span className="font-sans">{cfg.label}</span>
+                    {status === key && <Check className="w-3.5 h-3.5 ml-auto text-[#C5A059] stroke-[3px]" />}
                   </button>
                 ))}
               </div>
@@ -249,37 +249,37 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
               {showProfileDropdown && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowProfileDropdown(false)} />
-                  <div className="absolute right-0 mt-2.5 w-48 bg-white border border-[#E6D5C3] rounded-2xl p-3 shadow-xl z-50 text-left text-xs font-bold uppercase tracking-wider text-[#4A3E3D] animate-in fade-in slide-in-from-top-1 duration-200">
-                    <div className="border-b border-[#E6D5C3]/40 pb-2.5 mb-2.5 px-2 text-left">
-                      <p className="font-serif font-black text-[#2C211A] text-sm tracking-normal capitalize">{barberName.split(" ")[0]}</p>
-                      <p className="text-[9px] text-[#C5A059] font-black tracking-widest mt-0.5">{specialization}</p>
+                  <div className="absolute right-0 mt-2.5 w-52 bg-white border border-[#C5A059]/30 rounded-2xl p-4 shadow-xl z-50 text-left text-[10px] font-black uppercase tracking-wider text-[#3E362E] animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="border-b border-[#EADDCA]/50 pb-3 mb-3 px-1 text-left">
+                      <p className="font-serif font-black text-[#3E362E] text-sm tracking-normal capitalize">{barberName.split(" ")[0]}</p>
+                      <p className="text-[9px] text-[#C5A059] font-black tracking-widest mt-1">{specialization}</p>
                     </div>
                     
-                    <div className="space-y-0.5">
+                    <div className="space-y-1">
                       <button 
                         onClick={() => { navigate("/barber/profile"); setShowProfileDropdown(false); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#8B5A2B]/5 hover:text-[#8B5A2B] rounded-xl transition-colors cursor-pointer text-left uppercase tracking-wider text-[10px]"
+                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#FAF6F0] hover:text-[#8B5A2B] rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
                       >
                         My Profile
                       </button>
                       <button 
                         onClick={() => { navigate("/barber/service-console"); setShowProfileDropdown(false); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#8B5A2B]/5 hover:text-[#8B5A2B] rounded-xl transition-colors cursor-pointer text-left uppercase tracking-wider text-[10px]"
+                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#FAF6F0] hover:text-[#8B5A2B] rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
                       >
                         Live Console
                       </button>
                       <button 
                         onClick={() => { navigate("/barber/settings"); setShowProfileDropdown(false); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#8B5A2B]/5 hover:text-[#8B5A2B] rounded-xl transition-colors cursor-pointer text-left uppercase tracking-wider text-[10px]"
+                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#FAF6F0] hover:text-[#8B5A2B] rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
                       >
                         Settings
                       </button>
                     </div>
 
-                    <div className="border-t border-[#E6D5C3]/40 pt-2 mt-2">
+                    <div className="border-t border-[#EADDCA]/50 pt-2.5 mt-2.5">
                       <button 
                         onClick={() => { localStorage.clear(); navigate("/barber/login"); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer text-left uppercase tracking-wider text-[10px]"
+                        className="w-full flex items-center gap-2 px-2.5 py-2 text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
                       >
                         Logout
                       </button>

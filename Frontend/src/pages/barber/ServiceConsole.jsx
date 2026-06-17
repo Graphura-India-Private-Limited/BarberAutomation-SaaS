@@ -100,7 +100,7 @@ export default function ServiceConsole() {
     setStatus("available");
 
     setTimeout(() => {
-      navigate("/barber/dashboard");
+      navigate("/barber/overview");
     }, 1000);
   };
 
@@ -110,10 +110,10 @@ export default function ServiceConsole() {
         <div className="w-full max-w-xl text-left mb-4">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/barber/overview")}
             className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer"
           >
-            <ArrowLeft size={14} className="stroke-[2.5px]" /> Return to Dashboard
+            <ArrowLeft size={14} className="stroke-[2.5px]" /> Return to Overview
           </button>
         </div>
         <div className="max-w-xl w-full bg-white border border-[#EADDCA] rounded-[24px] p-6 sm:p-8 shadow-sm space-y-8 relative">

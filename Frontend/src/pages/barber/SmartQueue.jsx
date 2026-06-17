@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueue } from "../../contexts/AppContext";
+
 
 import {
   SERVICES,
@@ -35,7 +37,7 @@ const ScissorIcon = ({ className }) => (
 function QueueRow({ entry, idx, onClick, onServe }) {
   const barber  = BARBERS.find(b => b.id === entry.barber);
   const svc     = SERVICES.find(s => s.id === entry.service);
-  const isFirst = entry.position === 1;
+  const isFirst = idx === 0;
 
   return (
     <div
@@ -54,7 +56,7 @@ function QueueRow({ entry, idx, onClick, onServe }) {
           color: isFirst ? '#FFF' : '#3E362E',
         }}
       >
-        #{entry.position}
+        #{idx + 1}
       </div>
 
       {/* Info context */}
@@ -149,12 +151,17 @@ function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
 function StatsPanel({ queue, bookings, servedCount, liveActive }) {
   const totalWait = queue.reduce((acc, e) => acc + (SERVICES.find(s => s.id === e.service)?.mins ?? AVG_CUT), 0);
 
+  const loggedInBarberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "";
+  const currentBarberId = loggedInBarberName ? loggedInBarberName.split(" ")[0].toLowerCase() : "";
+  const isBarber = localStorage.getItem("role") === "barber";
+  const displayBarbers = isBarber && currentBarberId ? BARBERS.filter(b => b.id === currentBarberId) : BARBERS;
+
   return (
     <div className="flex flex-col gap-4 animate-slide-up text-left">
       <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1">Barber Workload</p>
       
       <div className="flex flex-col gap-3">
-        {BARBERS.map(b => {
+        {displayBarbers.map(b => {
           const assigned = queue.filter(e => e.barber === b.id).length;
           const pct = Math.min(100, queue.length > 0 ? (assigned / queue.length) * 100 : 0);
           return (
@@ -213,17 +220,36 @@ function StatsPanel({ queue, bookings, servedCount, liveActive }) {
 // ─── MAIN APP VIEW PANEL ──────────────────────────────────────────────────────
 export default function SmartQueue() {
   const navigate = useNavigate();
-  const [queue,       setQueue]       = useState(initQueue);
-  const [bookings,    setBookings]    = useState(() => initBookings());
+  const {
+    queue,
+    setQueue,
+    bookings,
+    setBookings,
+    servedCount,
+    setServedCount
+  } = useQueue();
   const [tab,         setTab]         = useState('queue');
   const [showAdd,     setShowAdd]     = useState(false);
   const [detail,      setDetail]      = useState(null);
   const [notif,       setNotif]       = useState(null);
   const [liveActive,  setLiveActive]  = useState(true);
-  const [servedCount, setServedCount] = useState(0);
   const notifRef = useRef();
 
+  const loggedInBarberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "";
+  const currentBarberId = loggedInBarberName ? loggedInBarberName.split(" ")[0].toLowerCase() : "";
+
+  const myQueue = queue.filter(e => {
+    if (!currentBarberId) return true;
+    return e.barber === currentBarberId;
+  });
+
+  const myBookings = bookings.filter(e => {
+    if (!currentBarberId) return true;
+    return e.barber === currentBarberId;
+  });
+
   const toast = useCallback((msg, type='info') => {
+
     setNotif({ msg, type });
     clearTimeout(notifRef.current);
     notifRef.current = setTimeout(() => setNotif(null), 3500);
@@ -311,7 +337,7 @@ export default function SmartQueue() {
     });
   };
 
-  const totalWaitMins = queue.reduce((acc, e) => acc + (SERVICES.find(s => s.id === e.service)?.mins ?? AVG_CUT), 0);
+  const totalWaitMins = myQueue.reduce((acc, e) => acc + (SERVICES.find(s => s.id === e.service)?.mins ?? AVG_CUT), 0);
   const tabs = [['queue', 'Active Queue'], ['bookings', 'Live Bookings'], ['stats', 'Analytics Stats']];
 
   return (
@@ -322,11 +348,12 @@ export default function SmartQueue() {
       <div className="bg-white border-b border-stone-200/40 shadow-2xs py-4 px-4">
         <div className="max-w-lg mx-auto grid grid-cols-4 gap-3">
           {[
-            { v: queue.length,                                             l: 'In Queue',   c: 'text-[#3E362E]' },
-            { v: bookings.filter(b => b.status === 'confirmed').length,    l: 'Bookings',   c: 'text-blue-600' },
+            { v: myQueue.length,                                           l: 'In Queue',   c: 'text-[#3E362E]' },
+            { v: myBookings.filter(b => b.status === 'confirmed').length,  l: 'Bookings',   c: 'text-blue-600' },
             { v: servedCount,                                              l: 'Served',     c: 'text-emerald-700' },
             { v: `${totalWaitMins}m`,                                      l: 'Total Wait', c: 'text-[#A37B58]' },
           ].map(({ v, l, c }) => (
+
             <div key={l} className="text-center rounded-xl py-3 px-1 bg-[#FAF7F2] border border-stone-200/50 shadow-2xs">
               <p className={`font-black text-xl leading-none m-0 ${c}`}>{v}</p>
               <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mt-1.5 leading-none">{l}</p>
@@ -360,7 +387,7 @@ export default function SmartQueue() {
         {/* QUEUE PIPELINE ACTION CONTENT */}
         {tab === 'queue' && (
           <div className="flex flex-col gap-3">
-            {queue.length === 0 ? (
+            {myQueue.length === 0 ? (
               <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
                 <p className="font-extrabold text-stone-900 text-xl tracking-tight mb-1">Queue container empty</p>
                 <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-6">No walk-in lines active</p>
@@ -373,7 +400,7 @@ export default function SmartQueue() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {queue.map((entry, i) => (
+                {myQueue.map((entry, i) => (
                   <QueueRow 
                     key={entry.id} 
                     entry={entry} 
@@ -405,13 +432,13 @@ export default function SmartQueue() {
                 + Create Slot
               </button>
             </div>
-            {bookings.length === 0 ? (
+            {myBookings.length === 0 ? (
               <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
                 <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider">No appointment logs active</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {bookings.map((entry, i) => (
+                {myBookings.map((entry, i) => (
                   <BookingRow 
                     key={entry.id} 
                     entry={entry} 
@@ -427,7 +454,7 @@ export default function SmartQueue() {
 
         {/* ANALYTICS WORKLOAD TAB */}
         {tab === 'stats' && (
-          <StatsPanel queue={queue} bookings={bookings} servedCount={servedCount} liveActive={liveActive} />
+          <StatsPanel queue={myQueue} bookings={myBookings} servedCount={servedCount} liveActive={liveActive} />
         )}
       </div>
 
