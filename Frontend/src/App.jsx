@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-// import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
+
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ScrollToTop from "./components/common/ScrollToTop";
@@ -86,14 +86,10 @@ import NoShowDelayPage from "./components/queue/NoShowDelayPage";
 import MembershipSection from "./components/membership/MembershipSection";
 import LiveQueue from "./pages/owner/LiveQueue";
 
+
 function WriteReviewRoute() {
   const { state } = useLocation();
-  const navigate = useNavigate();
-  if (!state) {
-    navigate("/customer/services");
-    return null;
-  }
-  return <ReviewSystem bookingData={state} />;
+  return <ReviewSystem bookingData={state || {}} />;
 }
 
 function App() {

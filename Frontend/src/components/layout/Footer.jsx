@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -19,6 +20,41 @@ const Footer = () => {
     { label: "Men Services", path: "/customer/services/men" },
     { label: "Women Services", path: "/customer/services/women" },
     { label: "Addons", path: "/customer/services/addons" },
+  ];
+
+  // ✅ CONTACT ITEMS — ALL THREE ARE CLICKABLE BUTTONS
+  // Phone & Email: styled as buttons, no action wired up yet (placeholder for later).
+  // Location: opens Google Maps directly to this address in a new tab.
+  const CONTACT_ITEMS = [
+    {
+      icon: Phone,
+      text: "+91 98765 43210",
+      onClick: () => {
+        // TODO: hook this up later (e.g. open WhatsApp, dialer, or a contact modal)
+        console.log("Phone button clicked — no action set yet");
+      },
+    },
+    {
+      icon: Mail,
+      text: "hello@barberpro.com",
+      onClick: () => {
+        // TODO: hook this up later (e.g. mailto: link or a contact modal)
+        console.log("Email button clicked — no action set yet");
+      },
+    },
+    {
+      icon: MapPin,
+      text: "Pune, Maharashtra, India",
+      onClick: () => {
+        // Opens Google Maps directly to this location
+        const address = encodeURIComponent("Pune, Maharashtra, India");
+        window.open(
+          `https://www.google.com/maps/search/?api=1&query=${address}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      },
+    },
   ];
 
   const SocialLinks = [
@@ -278,6 +314,7 @@ const Footer = () => {
               ["Booking History", "/customer/history"],
               ["Nearby Salons", "/nearby"],
               ["Write Review", "/write-review"],
+              // ["Write Review", "/customer/history"],
               ["All Reviews", "/reviews"],
               ["FAQs", "/faq"],
             ].map(([label, path]) => (
@@ -334,48 +371,69 @@ const Footer = () => {
 
           <div className="space-y-4">
 
-            {[
-              [Phone, "+91 98765 43210"],
-              [Mail, "hello@barberpro.com"],
-              [MapPin, "Pune, Maharashtra, India"],
-            ].map(([Icon, text], i) => (
-              <div
-                key={i}
-                className="
-                  flex items-center gap-3
+            {CONTACT_ITEMS.map(({ icon: Icon, text, onClick }, i) => {
+              const sharedClasses = `
+                w-full
+                flex items-center gap-3
 
-                  bg-white/[0.04]
-                  backdrop-blur-xl
+                bg-white/[0.04]
+                backdrop-blur-xl
 
-                  border border-white/[0.06]
+                border border-white/[0.06]
 
-                  px-4 py-3
+                px-4 py-3
 
-                  rounded-2xl
+                rounded-2xl
 
-                  hover:border-[#C5A059]/30
-                  hover:bg-white/[0.06]
+                hover:border-[#C5A059]/40
+                hover:bg-white/[0.07]
+                hover:-translate-y-0.5
 
-                  transition-all duration-300
-                "
-              >
-                <div className="
-                  w-9 h-9
-                  rounded-xl
+                active:translate-y-0
+                active:scale-[0.98]
 
-                  bg-[#C5A059]/10
-                  border border-[#C5A059]/20
+                transition-all duration-300
 
-                  flex items-center justify-center
-                ">
-                  <Icon className="w-4 h-4 text-[#C5A059]" />
-                </div>
+                cursor-pointer
 
-                <span className="text-sm text-stone-300">
-                  {text}
-                </span>
-              </div>
-            ))}
+                text-left
+              `;
+
+              const content = (
+                <>
+                  <div className="
+                    w-9 h-9
+                    rounded-xl
+
+                    bg-[#C5A059]/10
+                    border border-[#C5A059]/20
+
+                    flex items-center justify-center
+
+                    transition-all duration-300
+
+                    group-hover:bg-[#C5A059]/20
+                  ">
+                    <Icon className="w-4 h-4 text-[#C5A059]" />
+                  </div>
+
+                  <span className="text-sm text-stone-300 group-hover:text-stone-100 transition-colors duration-300">
+                    {text}
+                  </span>
+                </>
+              );
+
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={onClick}
+                  className={`group ${sharedClasses}`}
+                >
+                  {content}
+                </button>
+              );
+            })}
 
           </div>
 
