@@ -63,10 +63,7 @@ const SalonCard = ({ salon, selected, onSelect }) => {
       }`}
     >
       {/* Clickable Card Body for Selection */}
-      <div 
-        onClick={() => onSelect(salon)}
-        className="cursor-pointer flex-grow"
-      >
+      <div className="cursor-pointer flex-grow" onClick={() => onSelect(salon)}>
         {/* Image */}
         <div className="relative h-36 overflow-hidden bg-stone-100">
           <img
@@ -134,7 +131,10 @@ const SalonCard = ({ salon, selected, onSelect }) => {
       <div className="px-3 pb-3 pt-2 border-t border-stone-100 flex items-center justify-between">
         <button
           type="button"
-          onClick={() => onSelect(salon)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(salon);
+          }}
           className={`text-[10px] font-black uppercase tracking-widest ${
             isSelected ? "text-[#C5A059]" : "text-[#8A7B6A] hover:text-[#3E362E]"
           } transition-colors cursor-pointer`}
@@ -143,7 +143,10 @@ const SalonCard = ({ salon, selected, onSelect }) => {
         </button>
         <button
           type="button"
-          onClick={() => navigate(`/salon/${salon.id}`)}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/salon/${salon.id}`);
+          }}
           className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] hover:text-[#a07f3f] transition-colors cursor-pointer flex items-center gap-1"
         >
           <Icons.Info size={11} className="stroke-[2.5px]" />
@@ -220,6 +223,7 @@ const NearbyBarbers = () => {
   const [bookingDone, setBookingDone] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [services, setServices] = useState([]);
+  const [barbers, setBarbers] = useState([]);
   const sectionRef = useRef(null);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -344,27 +348,12 @@ if (data.success) {
 
   fetchSalons();
 }, []);
-const handleSalonSelect = async (salon) => {
+const handleSalonSelect = (salon) => {
   setSelectedSalon(salon);
   setSelectedService(null);
-
-  try {
-    const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-    const response = await fetch(`${API}/services/${salon._id || salon.id}`);
-    const data = await response.json();
-
-    if (data.success) {
-      const mapped = data.services.map(s => ({
-        ...s,
-        id: s._id,
-        duration: `${s.duration} min`,
-        popular: false,
-      }));
-      setServices(mapped);
-    }
-  } catch (error) {
-    console.error("Failed to fetch services:", error);
-  }
+  localStorage.setItem("selectedSalonId", salon.id || salon._id);
+  localStorage.setItem("selectedSalonName", salon.name || salon.salon_name || "Selected Salon");
+  navigate("/customer/services", { state: { selectedSalon: salon } });
 };
 
 
@@ -758,6 +747,41 @@ const handleBook = async () => {
                 onSelect={setSelectedService}
               />
             ))}
+          </div>
+
+          {/* Salon Barber Details */}
+          <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 mb-6 shadow-sm">
+            <div className="mb-5 flex items-center justify-between border-b border-stone-100 pb-4">
+              <h3 className="font-serif text-xl tracking-normal text-[#3E362E]">
+                <span className="font-bold uppercase text-[17px]">Salon</span>
+                <span className="italic text-[#C5A059] normal-case font-medium"> Barbers</span>
+              </h3>
+              <Users className="text-[#C5A059]" size={18} />
+            </div>
+            {barbers.length === 0 ? (
+              <p className="text-sm text-stone-500">No barber details are available for this salon yet.</p>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {barbers.map((barber) => (
+                  <div key={barber.id} className="rounded-2xl border border-[#E8DCCB] bg-[#FAF6F0]/80 p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-full bg-white border border-[#E8DCCB] flex items-center justify-center text-[#C5A059] shadow-sm">
+                        <Users size={20} />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-[#3E362E] text-sm truncate">{barber.name}</h4>
+                        <p className="text-[10px] uppercase tracking-widest text-[#B58B67] font-black mt-1">{barber.specialization}</p>
+                        <p className="text-[11px] text-stone-500 mt-2">{barber.experience} yrs experience</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between text-[10px] uppercase tracking-[0.28em] font-black">
+                      <span className="px-3 py-1 rounded-full border border-[#E8DCCB] bg-white text-[#3E362E]">{barber.status}</span>
+                      <span className="text-[#C5A059]">Rating {barber.rating || 4.5}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* CTAs */}
