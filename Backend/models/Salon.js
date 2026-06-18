@@ -12,6 +12,7 @@ const salonSchema = new mongoose.Schema({
   opening_time:       { type:String, default:"09:00" },
   closing_time:       { type:String, default:"21:00" },
   services_offered:   { type:[String], default:[] },
+  service_prices:     { type: Map, of: Number, default: {} },
   basic_pricing:      { type:Number, default:0 },
   number_of_barbers:  { type:Number, default:0 },
   support_number:     { type:String, default:"" },

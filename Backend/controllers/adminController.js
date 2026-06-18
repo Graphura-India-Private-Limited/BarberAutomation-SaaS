@@ -167,6 +167,61 @@ exports.updateSalonStatus = async (req, res) => {
       approved_at: status === "approved" ? new Date() : null,
     };
     const salon = await Salon.findByIdAndUpdate(req.params.id, updates, { new: true });
+    
+    if (status === "approved" && salon) {
+      // Check if services are already created for this salon
+      const existingServices = await Service.find({ salon_id: salon._id });
+      if (existingServices.length === 0) {
+        const defaultMins = {
+          'haircut': 20,
+          'shave': 15,
+          'beard': 10,
+          'combo': 35,
+          'color': 60,
+          'kids': 15,
+        };
+        const categories = {
+          'haircut': 'men',
+          'shave': 'men',
+          'beard': 'men',
+          'combo': 'men',
+          'color': 'men',
+          'kids': 'men',
+        };
+        
+        for (const serviceName of salon.services_offered) {
+          const lower = serviceName.toLowerCase();
+          let key = 'haircut';
+          if (lower.includes('shave') && lower.includes('haircut')) key = 'combo';
+          else if (lower.includes('shave')) key = 'shave';
+          else if (lower.includes('beard')) key = 'beard';
+          else if (lower.includes('color')) key = 'color';
+          else if (lower.includes('kids') || lower.includes('child')) key = 'kids';
+
+          let price = 0;
+          if (salon.service_prices) {
+            if (typeof salon.service_prices.get === "function") {
+              price = salon.service_prices.get(serviceName) || salon.service_prices.get(serviceName.toLowerCase()) || 0;
+            } else {
+              price = salon.service_prices[serviceName] || salon.service_prices[serviceName.toLowerCase()] || 0;
+            }
+          }
+          if (!price) {
+            price = salon.basic_pricing || 150;
+          }
+          
+          await Service.create({
+            salon_id: salon._id,
+            name: serviceName,
+            category: categories[key] || 'men',
+            price: Number(price),
+            duration: defaultMins[key] || 30,
+            is_active: true
+          });
+        }
+      }
+    }
+
     res.json({ success: true, salon });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

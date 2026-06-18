@@ -50,17 +50,12 @@ const StepBar = ({ step }) => (
 /* ─────────────────────────────────────────────
    SALON CARD
 ───────────────────────────────────────────── */
-const SalonCard = ({ salon, selected, onSelect }) => {
-  const isSelected = selected?.id === salon.id;
+const SalonCard = ({ salon, onSelect }) => {
   const navigate = useNavigate();
 
   return (
     <div
-      className={`group w-full text-left rounded-2xl overflow-hidden border transition-all duration-300 bg-white flex flex-col justify-between ${
-        isSelected
-          ? "border-[#C5A059] shadow-[0_0_0_3px_rgba(197,160,89,0.18)] scale-[1.01]"
-          : "border-[#E8DCCB] hover:border-[#C5A059]/60 hover:shadow-lg"
-      }`}
+      className="group w-full text-left rounded-2xl overflow-hidden border border-[#E8DCCB] hover:border-[#C5A059]/60 hover:shadow-lg transition-all duration-300 bg-white flex flex-col justify-between"
     >
       {/* Clickable Card Body for Selection */}
       <div 
@@ -94,30 +89,69 @@ const SalonCard = ({ salon, selected, onSelect }) => {
             <span className="text-[11px] font-black text-stone-900">{salon.rating}</span>
             <span className="text-[9px] text-stone-400">({salon.reviews})</span>
           </div>
-          {/* Selected overlay tick */}
-          {isSelected && (
-            <div className="absolute inset-0 bg-[#3E362E]/20 flex items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-[#C5A059] flex items-center justify-center shadow-lg">
-                <Icons.Check size={22} className="text-white stroke-[3px]" />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Body */}
-        <div className="p-3">
-          <h3 className="text-sm font-extrabold text-[#3E362E] tracking-tight leading-tight mb-1">
-            {salon.name}
-          </h3>
-          <div className="flex items-center gap-1.5 text-stone-400 text-[10px] font-semibold mb-2">
-            <Icons.MapPin size={10} className="text-[#C5A059] stroke-[2.5px] flex-shrink-0" />
-            <span className="truncate">{salon.address}</span>
-            <span className="text-[#C5A059] font-black ml-auto flex-shrink-0">
-              {salon.distance}
-            </span>
+        <div className="p-3.5 space-y-3">
+          <div>
+            <h3 className="text-sm font-extrabold text-[#3E362E] tracking-tight leading-tight mb-1 group-hover:text-[#C5A059] transition-colors">
+              {salon.name}
+            </h3>
+            <div className="flex items-center gap-1.5 text-stone-400 text-[10px] font-semibold">
+              <Icons.MapPin size={10} className="text-[#C5A059] stroke-[2.5px] flex-shrink-0" />
+              <span className="truncate">{salon.address}</span>
+              <span className="text-[#C5A059] font-black ml-auto flex-shrink-0">
+                {salon.distance}
+              </span>
+            </div>
           </div>
+
+          {/* Salon Bio/About Snippet */}
+          {salon.about && (
+            <p className="text-[10px] text-[#8A7B6A] font-medium leading-relaxed line-clamp-2 bg-stone-50/50 p-2 rounded-lg border border-stone-100">
+              {salon.about}
+            </p>
+          )}
+
+          {/* Grid of details */}
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 pt-2 text-[9px] font-semibold text-stone-500 border-t border-stone-100">
+            {/* Hours */}
+            <div className="flex items-center gap-1.5">
+              <Icons.Clock size={9} className="text-[#C5A059] flex-shrink-0" />
+              <span className="truncate">
+                {salon.opening_time && salon.closing_time 
+                  ? `${salon.opening_time} - ${salon.closing_time}` 
+                  : "09:00 - 21:00"}
+              </span>
+            </div>
+            
+            {/* Base Price */}
+            <div className="flex items-center gap-1.5 justify-end">
+              <Icons.Scissors size={9} className="text-[#C5A059] flex-shrink-0" />
+              <span>
+                Min: ₹{salon.basic_pricing || "200"}
+              </span>
+            </div>
+
+            {/* Active Barbers/Chairs */}
+            <div className="flex items-center gap-1.5">
+              <Icons.Users size={9} className="text-[#C5A059] flex-shrink-0" />
+              <span>
+                {salon.number_of_barbers || salon.max_barbers_limit || "3"} Stylists
+              </span>
+            </div>
+
+            {/* Support Phone */}
+            <div className="flex items-center gap-1.5 justify-end">
+              <Icons.Phone size={9} className="text-[#C5A059] flex-shrink-0" />
+              <span className="truncate">
+                {salon.support_number || salon.mobile || "No Contact"}
+              </span>
+            </div>
+          </div>
+
           {/* Tags */}
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1 pt-2 border-t border-stone-100">
             {salon.tags.map((t) => (
               <span
                 key={t}
@@ -135,11 +169,9 @@ const SalonCard = ({ salon, selected, onSelect }) => {
         <button
           type="button"
           onClick={() => onSelect(salon)}
-          className={`text-[10px] font-black uppercase tracking-widest ${
-            isSelected ? "text-[#C5A059]" : "text-[#8A7B6A] hover:text-[#3E362E]"
-          } transition-colors cursor-pointer`}
+          className="text-[10px] font-black uppercase tracking-widest text-[#8A7B6A] hover:text-[#C5A059] transition-colors cursor-pointer"
         >
-          {isSelected ? "Selected" : "Select"}
+          Select
         </button>
         <button
           type="button"
@@ -347,24 +379,9 @@ if (data.success) {
 const handleSalonSelect = async (salon) => {
   setSelectedSalon(salon);
   setSelectedService(null);
-
-  try {
-    const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-    const response = await fetch(`${API}/services/${salon._id || salon.id}`);
-    const data = await response.json();
-
-    if (data.success) {
-      const mapped = data.services.map(s => ({
-        ...s,
-        id: s._id,
-        duration: `${s.duration} min`,
-        popular: false,
-      }));
-      setServices(mapped);
-    }
-  } catch (error) {
-    console.error("Failed to fetch services:", error);
-  }
+  localStorage.setItem("selectedSalonId", salon.id || salon._id);
+  localStorage.setItem("selectedSalonName", salon.name);
+  navigate("/customer/services");
 };
 
 
@@ -659,42 +676,14 @@ const handleBook = async () => {
                     <SalonCard
                       key={salon.id}
                       salon={{
-                        id: salon.id,
-                        name: salon.name,
-                        address: salon.address,
-                        image: salon.image,
-                        rating: salon.rating,
-                        reviews: salon.reviews,
-                        openNow: salon.openNow,
-                        tags: salon.tags,
+                        ...salon,
                         distance: getSalonDistanceStr(salon),
                       }}
-                      selected={selectedSalon}
                       onSelect={handleSalonSelect}
                     />
                   ))}
                 </div>
               )}
-
-              {/* CTA */}
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleConfirmSalon}
-                  disabled={!selectedSalon}
-                  className={`flex items-center gap-2.5 px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all duration-300 ${
-                    selectedSalon
-                      ? "bg-[#3E362E] text-[#C5A059] hover:bg-[#2A241F] shadow-md active:scale-[0.98] cursor-pointer"
-                      : "bg-[#E8DCCB] text-[#B0A090] cursor-not-allowed"
-                  }`}
-                >
-                  <Icons.Scissors size={13} className="stroke-[2.5px]" />
-                  {selectedSalon
-                    ? `Continue with ${selectedSalon.name}`
-                    : "Select a Studio First"}
-                  <Icons.ChevronRight size={14} />
-                </button>
-              </div>
             </>
           )}
         </>

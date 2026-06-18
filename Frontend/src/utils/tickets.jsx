@@ -29,12 +29,12 @@ export const mockTickets = [
     customer: 'Priya Sharma',
     email: 'priya.sharma@email.com',
     phone: '+91 98765 43210',
-    assignee: 'Rahul Verma',
+    assignee: 'Graphura',
     createdAt: '2026-05-15T09:30:00',
     updatedAt: '2026-05-15T11:00:00',
     tags: ['payment', 'booking'],
     notes: [
-      { author: 'Rahul Verma', text: 'Investigating the payment gateway logs.', timestamp: '2026-05-15T11:00:00' },
+      { author: 'Graphura', text: 'Investigating the payment gateway logs.', timestamp: '2026-05-15T11:00:00' },
     ],
   },
   {
@@ -47,12 +47,12 @@ export const mockTickets = [
     customer: 'Glamour Studio',
     email: 'manager@glamourstudio.in',
     phone: '+91 87654 32109',
-    assignee: 'Sneha Kapoor',
+    assignee: 'Graphura',
     createdAt: '2026-05-14T14:20:00',
     updatedAt: '2026-05-15T08:45:00',
     tags: ['login', 'authentication', 'email'],
     notes: [
-      { author: 'Sneha Kapoor', text: 'Email SMTP config checked — issue found with domain whitelist.', timestamp: '2026-05-15T08:45:00' },
+      { author: 'Graphura', text: 'Email SMTP config checked — issue found with domain whitelist.', timestamp: '2026-05-15T08:45:00' },
     ],
   },
   {
@@ -65,12 +65,12 @@ export const mockTickets = [
     customer: 'Ananya Mehta',
     email: 'ananya.m@gmail.com',
     phone: '+91 76543 21098',
-    assignee: 'Arjun Singh',
+    assignee: 'Graphura',
     createdAt: '2026-05-13T10:00:00',
     updatedAt: '2026-05-14T16:30:00',
     tags: ['appointment', 'stylist', 'refund'],
     notes: [
-      { author: 'Arjun Singh', text: 'Escalated to billing team for refund approval.', timestamp: '2026-05-14T16:30:00' },
+      { author: 'Graphura', text: 'Escalated to billing team for refund approval.', timestamp: '2026-05-14T16:30:00' },
     ],
   },
   {
@@ -83,12 +83,12 @@ export const mockTickets = [
     customer: 'Silk & Scissors',
     email: 'info@silkscissors.in',
     phone: '+91 65432 10987',
-    assignee: 'Rahul Verma',
+    assignee: 'Graphura',
     createdAt: '2026-05-12T09:15:00',
     updatedAt: '2026-05-13T12:00:00',
     tags: ['upload', 'media', 'profile'],
     notes: [
-      { author: 'Rahul Verma', text: 'Increased server upload limit from 2MB to 10MB. Issue resolved.', timestamp: '2026-05-13T12:00:00' },
+      { author: 'Graphura', text: 'Increased server upload limit from 2MB to 10MB. Issue resolved.', timestamp: '2026-05-13T12:00:00' },
     ],
   },
   {
@@ -117,12 +117,12 @@ export const mockTickets = [
     customer: 'Bliss Beauty Lounge',
     email: 'accounts@blisslounge.in',
     phone: '+91 54321 09876',
-    assignee: 'Sneha Kapoor',
+    assignee: 'Graphura',
     createdAt: '2026-05-11T13:45:00',
     updatedAt: '2026-05-14T10:20:00',
     tags: ['billing', 'earnings', 'dashboard'],
     notes: [
-      { author: 'Sneha Kapoor', text: 'Found discrepancy in payout calculation logic for cancelled and rescheduled bookings.', timestamp: '2026-05-14T10:20:00' },
+      { author: 'Graphura', text: 'Found discrepancy in payout calculation logic for cancelled and rescheduled bookings.', timestamp: '2026-05-14T10:20:00' },
     ],
   },
   {
@@ -135,12 +135,12 @@ export const mockTickets = [
     customer: 'Rohan Desai',
     email: 'rohan.d@yahoo.com',
     phone: '+91 43210 98765',
-    assignee: 'Arjun Singh',
+    assignee: 'Graphura',
     createdAt: '2026-05-10T16:00:00',
     updatedAt: '2026-05-11T09:30:00',
     tags: ['email', 'notification', 'confirmation'],
     notes: [
-      { author: 'Arjun Singh', text: 'Resent confirmation manually. Notified dev team about email queue delay.', timestamp: '2026-05-11T09:30:00' },
+      { author: 'Graphura', text: 'Resent confirmation manually. Notified dev team about email queue delay.', timestamp: '2026-05-11T09:30:00' },
     ],
   },
   {
@@ -153,17 +153,17 @@ export const mockTickets = [
     customer: 'Radiance Salon & Spa',
     email: 'owner@radiancespa.in',
     phone: '+91 32109 87654',
-    assignee: 'Rahul Verma',
+    assignee: 'Graphura',
     createdAt: '2026-05-09T11:30:00',
     updatedAt: '2026-05-12T15:00:00',
     tags: ['feature-request', 'schedule', 'salon'],
     notes: [
-      { author: 'Rahul Verma', text: 'Escalated to product team for roadmap consideration.', timestamp: '2026-05-12T15:00:00' },
+      { author: 'Graphura', text: 'Escalated to product team for roadmap consideration.', timestamp: '2026-05-12T15:00:00' },
     ],
   },
 ]
 
-export const mockAgents = ['Rahul Verma', 'Sneha Kapoor', 'Arjun Singh', 'Pooja Nair', 'Unassigned']
+export const mockAgents = ['Graphura', 'Unassigned']
 
 export const getStats = (tickets) => {
   return {

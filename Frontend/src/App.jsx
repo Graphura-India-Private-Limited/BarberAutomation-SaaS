@@ -2,6 +2,7 @@ import React, { useState } from "react";
 // import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminActivityTracker from "./components/auth/AdminActivityTracker";
 import ScrollToTop from "./components/common/ScrollToTop";
 
 /* ── Pages ── */
@@ -45,6 +46,8 @@ import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import AnalyticsDashboard from "./pages/owner/AnalyticsDashboard";
 import OwnerLayout from "./components/layout/OwnerLayout";
 import BarberTeam from "./pages/owner/BarberTeam";
+import OwnerLiveMonitoring from "./pages/owner/OwnerLiveMonitoring";
+import AddBarber from "./pages/owner/AddBarber";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import { DashboardPage } from "./pages/admin/DashboardPage";
@@ -203,18 +206,18 @@ function App() {
           <Route path="finance" element={<FinancePage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="queue" element={<LiveQueue />} />
+          <Route path="live" element={<OwnerLiveMonitoring />} />
           <Route path="barbers" element={<BarberTeam />} />
+          <Route path="add-barber" element={<AddBarber />} />
           <Route path="customers" element={<CustomerManagement />} />
         </Route>
 
         {/* --- SUPER ADMIN CENTRAL PANEL (RESTRICTED BY RBAC) --- */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><Outlet /></ProtectedRoute>}>
+        <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminActivityTracker /></ProtectedRoute>}>
           <Route path="requests" element={<AdminOnboarding />} />
           <Route path="customers" element={<AdminOnboarding />} />
           <Route path="salon-management" element={<AdminOnboarding />} />
-          <Route path="barbers" element={<AdminOnboarding />} />
-          <Route path="add-barber" element={<AdminOnboarding />} />
           <Route path="appointments" element={<AdminOnboarding />} />
           <Route path="services" element={<AdminOnboarding />} />
           <Route path="payments" element={<AdminOnboarding />} />

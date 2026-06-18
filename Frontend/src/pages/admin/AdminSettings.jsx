@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { Settings, Bell, Users, Shield, Globe, X, Check, UserPlus } from 'lucide-react'
-import { Button, Modal } from '../../components/admin/UIComponents.jsx'
-
-const DEFAULT_AGENTS = ['Rahul Verma', 'Sneha Kapoor', 'Arjun Singh', 'Pooja Nair']
+import { Settings, Bell, Users, Shield, Globe, X, Check } from 'lucide-react'
+import { Button } from '../../components/admin/UIComponents.jsx'
 
 const NOTIFICATION_PREFS = [
   { key: 'emailNewTicket',  label: 'Email on new ticket',   defaultChecked: true },
@@ -16,27 +14,20 @@ const SECURITY_PREFS = [
 ]
 
 export function AdminSettings() {
-  const [agents, setAgents]                   = useState(DEFAULT_AGENTS)
-  const [showInviteModal, setShowInviteModal] = useState(false)
-  const [inviteName, setInviteName]           = useState('')
-  const [inviteEmail, setInviteEmail]         = useState('')
-  const [inviteError, setInviteError]         = useState('')
   const [platformName, setPlatformName]       = useState('Support & Escalation System')
   const [timezone, setTimezone]               = useState('Asia/Kolkata (IST +5:30)')
   const [saveToast, setSaveToast]             = useState(false)
   const [notifPrefs, setNotifPrefs]           = useState(() =>
     Object.fromEntries(NOTIFICATION_PREFS.map(p => [p.key, p.defaultChecked]))
   )
-  const [securityPrefs, setSecurityPrefs]     = useState(() =>
-    Object.fromEntries(SECURITY_PREFS.map(p => [p.key, p.defaultChecked]))
-  )
-
-  const handleInvite = () => {
-    if (!inviteName.trim()) { setInviteError('Name is required.'); return }
-    if (!inviteEmail.trim() || !inviteEmail.includes('@')) { setInviteError('Enter a valid email.'); return }
-    setAgents(prev => [...prev, inviteName.trim()])
-    setInviteName(''); setInviteEmail(''); setInviteError(''); setShowInviteModal(false)
-  }
+  const [securityPrefs, setSecurityPrefs]     = useState(() => {
+    const saved2FA = localStorage.getItem('security_twoFactor') === 'true';
+    const savedTimeout = localStorage.getItem('security_sessionTimeout') !== 'false'; // default true
+    return {
+      twoFactor: saved2FA,
+      sessionTimeout: savedTimeout
+    };
+  })
 
   const handleSave = () => {
     setSaveToast(true)
@@ -44,7 +35,11 @@ export function AdminSettings() {
   }
 
   const toggleNotif    = key => setNotifPrefs(p => ({ ...p, [key]: !p[key] }))
-  const toggleSecurity = key => setSecurityPrefs(p => ({ ...p, [key]: !p[key] }))
+  const toggleSecurity = key => setSecurityPrefs(p => {
+    const nextVal = !p[key];
+    localStorage.setItem(`security_${key}`, nextVal ? "true" : "false");
+    return { ...p, [key]: nextVal };
+  })
 
   return (
     <div className="p-6 space-y-6 relative">
@@ -55,39 +50,6 @@ export function AdminSettings() {
         </div>
       )}
 
-      <Modal isOpen={showInviteModal} onClose={() => { setShowInviteModal(false); setInviteError('') }} title="Invite New Agent" size="sm">
-        <div className="space-y-4">
-          <div>
-            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block mb-1">Full Name</label>
-            <input
-              value={inviteName}
-              onChange={e => setInviteName(e.target.value)}
-              placeholder="e.g. Kiran Desai"
-              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 font-sans text-sm font-normal text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#B58B67] placeholder:text-stone-400"
-            />
-          </div>
-          <div>
-            <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block mb-1">Work Email</label>
-            <input
-              value={inviteEmail}
-              onChange={e => setInviteEmail(e.target.value)}
-              placeholder="e.g. kiran@platform.in"
-              type="email"
-              className="w-full border border-[#E8DDD0] rounded-xl px-3 py-2 font-sans text-sm font-normal text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#B58B67] placeholder:text-stone-400"
-            />
-          </div>
-          {inviteError && <p className="font-sans text-sm font-normal leading-relaxed text-red-600">{inviteError}</p>}
-          <div className="flex gap-2 pt-1">
-            <Button variant="primary" onClick={handleInvite} className="flex-1 font-sans text-xs font-extrabold uppercase tracking-wider">
-              <UserPlus size={14} /> Send Invite
-            </Button>
-            <Button variant="ghost" onClick={() => { setShowInviteModal(false); setInviteError('') }} className="font-sans text-xs font-extrabold uppercase tracking-wider">
-              Cancel
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
       <Section icon={Bell} title="Notifications" desc="Configure email and in-app notification preferences for ticket updates.">
         <div className="space-y-3">
           {NOTIFICATION_PREFS.map(item => (
@@ -96,22 +58,17 @@ export function AdminSettings() {
         </div>
       </Section>
 
-      <Section icon={Users} title="Agent Management" desc="Manage support agents and their access levels.">
+      <Section icon={Users} title="Admin Management" desc="Sole administrator for the platform.">
         <div className="space-y-2">
-          {agents.map(agent => (
-            <div key={agent} className="flex items-center justify-between p-3 bg-[#FAF6F0] rounded-xl border border-[#E8DDD0]">
-              <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-[#E8DDD0] flex items-center justify-center font-sans font-black text-xs text-[#9E7452]">
-                  {agent[0]}
-                </div>
-                <span className="font-sans text-sm font-normal leading-relaxed text-stone-700">{agent}</span>
+          <div className="flex items-center justify-between p-3 bg-[#FAF6F0] rounded-xl border border-[#E8DDD0]">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-full bg-[#E8DDD0] flex items-center justify-center font-sans font-black text-xs text-[#9E7452]">
+                G
               </div>
-              <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] border border-[#E8DDD0] px-2 py-0.5 rounded-full bg-white">Agent</span>
+              <span className="font-sans text-sm font-normal leading-relaxed text-stone-700">Graphura</span>
             </div>
-          ))}
-          <Button variant="outline" size="sm" onClick={() => setShowInviteModal(true)} className="font-sans text-xs font-extrabold uppercase tracking-wider">
-            <UserPlus size={14} /> Invite Agent
-          </Button>
+            <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] border border-[#E8DDD0] px-2 py-0.5 rounded-full bg-white">Admin</span>
+          </div>
         </div>
       </Section>
 

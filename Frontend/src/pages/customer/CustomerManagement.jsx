@@ -140,81 +140,96 @@ export default function CustomerManagement() {
 
       </div>
 
-      {/* 👥 CUSTOMER DETAIL CARD PIPELINE GRID */}
-      <div className="max-w-7xl mx-auto w-full px-4 md:px-8 grid grid-cols-1 xl:grid-cols-2 gap-6 z-10 relative">
-        {filtered.map((customer) => (
-          <div
-            key={customer.id}
-            className="bg-white/90 backdrop-blur-md rounded-[24px] p-6 border border-[#EADDCA] shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(62,54,46,0.06)] hover:-translate-y-0.5 transition-all duration-300 text-left flex flex-col justify-between"
-          >
-            <div>
-              {/* Top Alignment Header */}
-              <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-start">
-                <div className="flex items-center gap-4">
-                  {/* Monogram Circle Badge */}
-                  <div className="w-12 h-12 rounded-full bg-[#3E362E] text-white flex items-center justify-center font-serif font-black text-lg border border-[#2A241F] shadow-sm flex-shrink-0">
+      {/* 👥 CUSTOMER DETAIL TABLE LIST */}
+      <div className="max-w-7xl mx-auto w-full px-4 md:px-8 z-10 relative">
+        <div className="bg-white/90 backdrop-blur-md border border-[#EADDCA] rounded-[24px] overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(62,54,46,0.04)] transition-all duration-300">
+          
+          {/* Table Header */}
+          <div className="hidden md:grid grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr_1fr] border-b border-stone-100 bg-stone-50/50 px-6 py-4 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">
+            <span>Customer Details</span>
+            <span>Bookings</span>
+            <span>Visits Logged</span>
+            <span>Rating Given</span>
+            <span>Gross Revenue Spent</span>
+            <span className="text-right">Status Tier</span>
+          </div>
+
+          {/* Table Body */}
+          <div className="divide-y divide-stone-100">
+            {filtered.map((customer) => (
+              <div 
+                key={customer.id} 
+                className="grid gap-3 p-6 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr_1fr] md:items-center hover:bg-stone-50/30 transition-colors group text-left"
+              >
+                {/* Monogram, Name & Email */}
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-full bg-[#3E362E] text-white flex items-center justify-center font-serif font-black text-sm border border-[#2A241F] shadow-sm flex-shrink-0">
                     {customer.name.charAt(0)}
                   </div>
-
                   <div className="min-w-0">
-                    <h4 className="font-serif font-bold text-[#3E362E] text-xl tracking-tight leading-none mb-1.5">
+                    <h4 className="font-serif font-bold text-[#3E362E] text-base tracking-tight leading-tight mb-1">
                       {customer.name}
                     </h4>
                     <div className="flex items-center gap-1.5 text-stone-400">
                       <Mail className="w-3 h-3 flex-shrink-0" />
-                      <p className="text-xs font-medium font-mono truncate tracking-tight">
+                      <p className="text-[11px] font-medium font-mono truncate tracking-tight">
                         {customer.email}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Status Badge Custom Tags */}
-                <span className={`inline-flex items-center justify-center text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-md border self-start ${
-                  customer.status === "VIP"
-                    ? "bg-amber-50 text-amber-800 border-amber-200"
-                    : "bg-blue-50 text-blue-800 border-blue-200"
-                }`}>
-                  {customer.status}
-                </span>
-              </div>
+                {/* Bookings */}
+                <div className="md:block flex justify-between items-center">
+                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Bookings</span>
+                  <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none">{customer.bookings}</p>
+                </div>
 
-              {/* Structured Metric Fields */}
-              <div className="grid grid-cols-3 mt-6 pt-5 border-t border-[#FAF6F0] gap-4">
-                <div>
-                  <span className="text-[9px] text-stone-400 uppercase font-black tracking-wider block mb-1">Bookings</span>
-                  <h5 className="font-serif font-black text-[#3E362E] text-xl leading-none">{customer.bookings}</h5>
+                {/* Visits */}
+                <div className="md:block flex justify-between items-center">
+                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Visits Logged</span>
+                  <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none">{customer.visits}</p>
                 </div>
-                <div>
-                  <span className="text-[9px] text-stone-400 uppercase font-black tracking-wider block mb-1">Visits Logged</span>
-                  <h5 className="font-serif font-black text-[#3E362E] text-xl leading-none">{customer.visits}</h5>
-                </div>
-                <div>
-                  <span className="text-[9px] text-stone-400 uppercase font-black tracking-wider block mb-1">Rating Given</span>
-                  <h5 className="font-serif font-black text-[#3E362E] text-xl leading-none flex items-center gap-1">
+
+                {/* Rating */}
+                <div className="md:block flex justify-between items-center">
+                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Rating Given</span>
+                  <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none flex items-center gap-1">
                     {customer.rating.toFixed(1)} <Star className="w-3.5 h-3.5 text-[#C5A059] fill-[#C5A059]" />
-                  </h5>
+                  </p>
                 </div>
-              </div>
-            </div>
 
-            {/* Custom Expense Progress Canvas */}
-            <div className="mt-6 pt-5 border-t border-[#FAF6F0]">
-              <div className="flex justify-between items-center mb-2.5 text-[10px] font-black uppercase tracking-wider text-stone-400">
-                <p className="flex items-center gap-1"><Zap className="w-3 h-3 text-[#C5A059]" /> Gross Revenue Spent</p>
-                <p className="font-black text-[#3E362E] font-mono text-sm bg-[#FAF6F0] px-2.5 py-1 rounded-md border border-[#EADDCA]/50">₹{customer.amount}</p>
-              </div>
+                {/* Revenue / Progress bar */}
+                <div className="md:block flex flex-col gap-1.5 justify-start">
+                  <div className="flex justify-between items-center mb-1 md:mb-0">
+                    <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Revenue</span>
+                    <p className="font-mono font-black text-xs text-[#3E362E] bg-[#FAF6F0] px-2 py-0.5 rounded border border-[#EADDCA]/40">₹{customer.amount}</p>
+                  </div>
+                  <div className="hidden md:block w-3/4 h-1.5 rounded-full bg-[#FAF6F0] border border-[#EADDCA]/40 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#3E362E] to-[#C5A059]"
+                      style={{ width: `${Math.min(100, (customer.amount / 70000) * 100)}%` }}
+                    />
+                  </div>
+                </div>
 
-              <div className="h-2 rounded-full bg-[#FAF6F0] border border-[#EADDCA]/60 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#3E362E] to-[#C5A059] transition-all duration-500"
-                  style={{ width: `${Math.min(100, (customer.amount / 70000) * 100)}%` }}
-                />
-              </div>
-            </div>
+                {/* Status Tier */}
+                <div className="md:block flex justify-between items-center md:text-right">
+                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Status Tier</span>
+                  <span className={`inline-flex items-center justify-center text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${
+                    customer.status === "VIP"
+                      ? "bg-amber-50 text-amber-800 border-amber-200"
+                      : "bg-blue-50 text-blue-800 border-blue-200"
+                  }`}>
+                    {customer.status}
+                  </span>
+                </div>
 
+              </div>
+            ))}
           </div>
-        ))}
+
+        </div>
       </div>
 
       {/* 📈 INSIGHTS METRICS FOOTER CHARTS */}
