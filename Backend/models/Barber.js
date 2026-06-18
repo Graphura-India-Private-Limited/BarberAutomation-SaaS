@@ -7,7 +7,14 @@ const barberSchema = new mongoose.Schema({
   experience:{type:Number,default:0},
   status:{type:String,default:"available",enum:["available","busy","break","offline"]},
   rating:{type:Number,default:0}, is_active:{type:Boolean,default:true},
+  email: { type: String, default: "" },
+  aadhaar: { type: String, default: "" },
+  pan: { type: String, default: "" },
+  photo: { type: String, default: "" },
+  document: { type: String, default: "" },
+  documentName: { type: String, default: "" },
   created_at:{type:Date,default:Date.now}
 });
 barberSchema.methods.matchPassword = async function(p){ return bcrypt.compare(p,this.password_hash); };
 module.exports = mongoose.model("Barber", barberSchema);
+
