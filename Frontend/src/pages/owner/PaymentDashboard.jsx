@@ -264,13 +264,22 @@ function FilterSelect({ label, value, onChange, options, objectOptions = false }
   );
 }
 function PaymentRow({ payment, onOpen, onRetry }) {
+  const servicesList = payment.booking_id?.services?.map(s => s.service_name).join(", ") 
+    || payment.service_ids?.map(s => s.name).join(", ") 
+    || "—";
+
   return (
     <div className="grid gap-3 p-6 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr_0.8fr] md:items-center hover:bg-stone-50/30 transition-colors group text-left font-sans">
       <div>
         <p className="font-bold font-serif text-stone-900 text-sm truncate max-w-[200px]">{payment.razorpay_order_id || "Pending order intent"}</p>
         <p className="mt-1 text-[11px] text-stone-400 font-medium font-sans">{fmtDate(payment.created_at)}</p>
       </div>
-      <p className="text-sm font-bold text-stone-900 tracking-tight">{payment.customer_id?.name || "Customer Walk-in"}</p>
+      <div>
+        <p className="text-sm font-bold text-stone-900 tracking-tight">{payment.customer_id?.name || "Customer Walk-in"}</p>
+        <p className="mt-0.5 text-xs font-semibold text-[#C5A059] truncate max-w-[160px]" title={servicesList}>
+          {servicesList}
+        </p>
+      </div>
       <p className="text-xs font-bold text-stone-500 tracking-wide">{payment.barber_id?.name || "Unassigned"}</p>
       <div>
         <p className="font-black text-stone-900 font-mono text-sm">{money(payment.amount)}</p>
@@ -289,6 +298,10 @@ function PaymentRow({ payment, onOpen, onRetry }) {
 }
 
 function TransactionModal({ payment, onClose }) {
+  const servicesList = payment.booking_id?.services?.map(s => s.service_name).join(", ") 
+    || payment.service_ids?.map(s => s.name).join(", ") 
+    || "—";
+
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-stone-900/40 backdrop-blur-sm p-0 md:items-center md:justify-center md:p-6 animate-in fade-in duration-200">
       <div className="w-full max-w-xl rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-2xl border border-stone-200 flex flex-col justify-start text-left">
@@ -312,6 +325,7 @@ function TransactionModal({ payment, onClose }) {
           <Detail label="Payment Type" value={payment.payment_type} />
           <Detail label="Booking Mode" value={payment.booking_type} />
           <Detail label="Client Profile" value={payment.customer_id?.name || "-"} />
+          <Detail label="Services Taken" value={servicesList} />
           <Detail label="Assigned Stylist" value={payment.barber_id?.name || "Unassigned"} />
           <Detail label="Razorpay Order ID" value={payment.razorpay_order_id || "-"} />
           <Detail label="Timestamp Logged" value={fmtDate(payment.created_at)} />

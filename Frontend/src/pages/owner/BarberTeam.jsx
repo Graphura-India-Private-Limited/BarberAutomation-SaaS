@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Users, Scissors, Phone, Award, ShieldCheck, 
   Trash2, Coffee, Sparkles, Check, Star, RefreshCw, Plus
@@ -9,21 +10,12 @@ const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
 export default function BarberTeam() {
+  const navigate = useNavigate();
   const [barbers, setBarbers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [busyId, setBusyId] = useState(null);
   
-  const [isAddingBarber, setIsAddingBarber] = useState(false);
-  const [newBarber, setNewBarber] = useState({
-    name: "",
-    mobile: "",
-    password: "",
-    specialization: "",
-    experience: ""
-  });
-  const [addError, setAddError] = useState("");
-
   const salonId = localStorage.getItem("salonId");
   const token = localStorage.getItem("token");
 
@@ -77,7 +69,6 @@ export default function BarberTeam() {
       const data = await res.json();
       if (data.success) {
         showToast(`Barber status updated to ${nextStatus === "break" ? "On Break" : "Available"}`);
-        // Update local state directly
         setBarbers(prev => prev.map(b => b._id === barberId ? { ...b, status: nextStatus } : b));
       } else {
         showToast(data.message || "Failed to update status", "error");
@@ -111,54 +102,6 @@ export default function BarberTeam() {
     }
   };
 
-  const handleAddBarber = async (e) => {
-    e.preventDefault();
-    setAddError("");
-    
-    if (!salonId) {
-      setAddError("Salon ID missing. Please log in again.");
-      return;
-    }
-    
-    if (newBarber.mobile.length !== 10) {
-      setAddError("Enter a valid 10-digit mobile number.");
-      return;
-    }
-    
-    try {
-      const res = await fetch(`${API}/barber`, {
-        method: "POST",
-        headers: headers(),
-        body: JSON.stringify({
-          salon_id: salonId,
-          name: newBarber.name,
-          mobile: newBarber.mobile,
-          password: newBarber.password,
-          specialization: newBarber.specialization,
-          experience: Number(newBarber.experience) || 0
-        })
-      });
-      
-      const data = await res.json();
-      if (data.success) {
-        showToast("Barber added successfully!");
-        setBarbers(prev => [...prev, data.barber]);
-        setIsAddingBarber(false);
-        setNewBarber({
-          name: "",
-          mobile: "",
-          password: "",
-          specialization: "",
-          experience: ""
-        });
-      } else {
-        setAddError(data.message || "Failed to add barber");
-      }
-    } catch (err) {
-      setAddError("Network error adding barber");
-    }
-  };
-
   const getStatusBadge = (status) => {
     switch (status) {
       case "available":
@@ -185,7 +128,7 @@ export default function BarberTeam() {
   };
 
   return (
-    <div className="min-h-screen p-6 md:p-10 font-sans text-stone-800 text-left" style={{ background: "#FAF6F0" }}>
+    <div className="min-h-screen p-6 md:p-10 font-sans text-stone-800 text-left animate-fade-in" style={{ background: "#FAF6F0" }}>
       <style>{`
         .card { 
           background: #FFFFFF; 
@@ -214,7 +157,7 @@ export default function BarberTeam() {
         </div>
         <div className="flex gap-3">
           <button 
-            onClick={() => setIsAddingBarber(true)}
+            onClick={() => navigate("/owner/add-barber")}
             className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white shadow-sm hover:opacity-90 cursor-pointer transition-all active:scale-95"
             style={{ background: GOLD }}
           >
@@ -248,7 +191,7 @@ export default function BarberTeam() {
               </div>
               <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold uppercase mb-2">No Barbers Seeded</h2>
               <p className="mx-auto max-w-xs text-sm text-stone-400 font-sans leading-relaxed">
-                Ask the platform administrator to add barbers to your salon, or add them from your admin dashboard console.
+                Add barbers to build your team catalog.
               </p>
             </div>
           ) : (
@@ -259,8 +202,6 @@ export default function BarberTeam() {
                 
                 return (
                   <div key={barber._id} className="card p-6 flex flex-col justify-between relative bg-white">
-                    
-                    {/* Top row */}
                     <div>
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex items-center gap-3.5">
@@ -273,7 +214,6 @@ export default function BarberTeam() {
                           </div>
                         </div>
 
-                        {/* Soft-Delete Button */}
                         <button 
                           onClick={() => deactivateBarber(barber._id)}
                           disabled={busyId === barber._id}
@@ -284,7 +224,6 @@ export default function BarberTeam() {
                         </button>
                       </div>
 
-                      {/* Details segment */}
                       <div className="space-y-2.5 py-4 border-t border-b border-stone-100/60 my-4 text-xs font-medium">
                         <div className="flex items-center gap-3 text-stone-600">
                           <Phone size={14} className="text-[#C5A059]" />
@@ -296,7 +235,6 @@ export default function BarberTeam() {
                         </div>
                         <div className="flex items-center gap-3 text-stone-600">
                           <ShieldCheck size={14} className="text-[#C5A059]" />
-                          {/* Aadhaar Number MOCKED for privacy */}
                           <span>Aadhaar: XXXX-XXXX-4932</span>
                         </div>
                         <div className="flex items-center gap-3 text-stone-600">
@@ -306,7 +244,6 @@ export default function BarberTeam() {
                       </div>
                     </div>
 
-                    {/* Bottom Status Toggles */}
                     <div className="mt-2 flex items-center justify-between gap-4">
                       <span className={`px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider ${statusMeta.style}`}>
                         {statusMeta.label}
@@ -336,118 +273,12 @@ export default function BarberTeam() {
                         </button>
                       )}
                     </div>
-
                   </div>
                 );
               })}
             </div>
           )}
         </>
-      )}
-
-      {/* Add Barber Modal */}
-      {isAddingBarber && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#FDFBF7] border border-[#EADBCE] rounded-3xl p-6 max-w-md w-full shadow-2xl relative animate-in fade-in zoom-in-95 duration-200 text-left font-sans">
-            <h3 className="font-serif text-xl font-bold text-stone-900 border-b pb-3 mb-4 flex justify-between items-center">
-              <span>Add Barber Technician</span>
-              <button 
-                onClick={() => { setIsAddingBarber(false); setAddError(""); }}
-                className="text-stone-400 hover:text-stone-900 font-sans font-bold text-sm cursor-pointer border border-stone-200 rounded-lg px-2 py-0.5 hover:bg-stone-50 transition"
-              >
-                Cancel
-              </button>
-            </h3>
-            
-            {addError && (
-              <p className="mb-4 rounded-xl bg-red-50 border border-red-200 p-3 text-center text-xs font-bold text-red-600 font-sans">
-                {addError}
-              </p>
-            )}
-
-            <form onSubmit={handleAddBarber} className="space-y-4">
-              <div>
-                <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1 block">Full Name</label>
-                <input 
-                  required 
-                  placeholder="e.g., John Doe" 
-                  value={newBarber.name} 
-                  onChange={e => setNewBarber(prev => ({ ...prev, name: e.target.value }))} 
-                  className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1 block">Mobile (10-digit)</label>
-                  <input 
-                    required 
-                    type="tel" 
-                    maxLength={10} 
-                    placeholder="9876543210" 
-                    value={newBarber.mobile} 
-                    onChange={e => setNewBarber(prev => ({ ...prev, mobile: e.target.value.replace(/\D/g, "") }))} 
-                    className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1 block">Password</label>
-                  <input 
-                    required 
-                    type="password" 
-                    placeholder="••••••••" 
-                    value={newBarber.password} 
-                    onChange={e => setNewBarber(prev => ({ ...prev, password: e.target.value }))} 
-                    className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1 block">Specialization</label>
-                  <input 
-                    required 
-                    placeholder="e.g., Fade Expert" 
-                    value={newBarber.specialization} 
-                    onChange={e => setNewBarber(prev => ({ ...prev, specialization: e.target.value }))} 
-                    className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1 block">Experience (Years)</label>
-                  <input 
-                    required 
-                    type="number" 
-                    min={0} 
-                    max={50} 
-                    placeholder="e.g., 5" 
-                    value={newBarber.experience} 
-                    onChange={e => setNewBarber(prev => ({ ...prev, experience: e.target.value }))} 
-                    className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-3 border-t border-stone-100">
-                <button 
-                  type="submit" 
-                  className="rounded-xl px-5 py-3 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer flex-1" 
-                  style={{ background: CHARCOAL }}
-                >
-                  Create Profile
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => { setIsAddingBarber(false); setAddError(""); }} 
-                  className="rounded-xl bg-stone-100 border border-stone-200 text-stone-500 hover:bg-stone-200 font-extrabold text-xs uppercase tracking-wider px-5 py-3 transition-all cursor-pointer"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
       )}
 
       {/* Toast Alert */}
@@ -458,7 +289,6 @@ export default function BarberTeam() {
           {toast.msg}
         </div>
       )}
-
     </div>
   );
 }

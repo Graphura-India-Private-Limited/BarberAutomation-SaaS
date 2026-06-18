@@ -53,6 +53,7 @@ const pickSalonProfile = (body) => ({
         .split(",")
         .map(s => s.trim())
         .filter(Boolean),
+  service_prices: body.service_prices || {},
   basic_pricing: Number(body.basic_pricing ?? body.pricing ?? 0) || 0,
   number_of_barbers: Number(body.number_of_barbers ?? body.numBarbers ?? 0) || 0,
   support_number: body.support_number || body.supportNumber || "",
@@ -373,6 +374,9 @@ exports.updateOwnerProfile = async (req, res) => {
     if (req.user.role !== "owner") {
       return res.status(403).json({ success: false, message: "Owner access only" });
     }
+    const currentSalon = await Salon.findById(req.user.id);
+    if (!currentSalon) return res.status(404).json({ success: false, message: "Salon not found" });
+
     const updates = pickSalonProfile(req.body);
     delete updates.mobile;
     Object.keys(updates).forEach(key => {
@@ -380,9 +384,26 @@ exports.updateOwnerProfile = async (req, res) => {
         delete updates[key];
       }
     });
+
+    // Check if address or coordinates changed
+    const addressChanged = (updates.address && updates.address !== currentSalon.address) ||
+                           (updates.latitude !== undefined && Number(updates.latitude) !== currentSalon.latitude) ||
+                           (updates.longitude !== undefined && Number(updates.longitude) !== currentSalon.longitude);
+
+    if (addressChanged) {
+      updates.status = "pending";
+      updates.approved_at = null;
+      updates.rejection_reason = "";
+    }
+
     const salon = await Salon.findByIdAndUpdate(req.user.id, updates, { new: true });
-    if (!salon) return res.status(404).json({ success: false, message: "Salon not found" });
-    res.json({ success: true, salon, message: "Salon profile updated" });
+    res.json({ 
+      success: true, 
+      salon, 
+      message: addressChanged 
+        ? "Address updated. Reset to pending approval by admin." 
+        : "Salon profile updated" 
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

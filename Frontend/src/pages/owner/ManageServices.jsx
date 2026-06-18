@@ -228,11 +228,63 @@ export default function ManageServices() {
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Image URL</label>
-                  <input placeholder="e.g., https://example.com/image.jpg" value={newService.image} onChange={e => setNewService(prev => ({ ...prev, image: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
+                  <div className="flex gap-2">
+                    <input 
+                      placeholder="e.g., https://example.com/image.jpg" 
+                      value={newService.image} 
+                      onChange={e => setNewService(prev => ({ ...prev, image: e.target.value }))} 
+                      className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" 
+                    />
+                    <div className="relative shrink-0">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setNewService(prev => ({ ...prev, image: reader.result }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }} 
+                        className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full" 
+                      />
+                      <button 
+                        type="button" 
+                        className="rounded-xl border border-[#C5A059] text-[#C5A059] hover:bg-stone-50 font-extrabold text-xs uppercase tracking-wider px-4 py-3.5 transition-all cursor-pointer font-sans h-full flex items-center justify-center bg-white"
+                      >
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+                  {newService.image && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <img src={newService.image} className="w-8 h-8 rounded object-cover border border-stone-200 shadow-3xs" alt="Preview" />
+                      <button 
+                        type="button" 
+                        onClick={() => setNewService(prev => ({ ...prev, image: "" }))} 
+                        className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
+                      >
+                        Remove Image
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="md:col-span-3">
-                  <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Description</label>
-                  <input placeholder="e.g., Premium style and custom grooming detailing..." value={newService.description} onChange={e => setNewService(prev => ({ ...prev, description: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block font-sans">Service Description</label>
+                    <span className="text-[10px] text-stone-400 font-semibold">{newService.description.length}/500</span>
+                  </div>
+                  <textarea 
+                    maxLength={500} 
+                    placeholder="e.g., Premium style and custom grooming detailing..." 
+                    value={newService.description} 
+                    onChange={e => setNewService(prev => ({ ...prev, description: e.target.value }))} 
+                    className="w-full rounded-xl border border-stone-200 bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans resize-none min-h-[50px]" 
+                    rows={1}
+                  />
                 </div>
                 <div className="flex gap-3 md:col-span-5 pt-2 border-t border-stone-100 mt-2 font-sans">
                   {/* Rule 4 Inside form data trigger action submission keys */}

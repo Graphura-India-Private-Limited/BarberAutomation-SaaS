@@ -1,5 +1,5 @@
 import { getStats, TICKET_STATUS, TICKET_PRIORITY, mockAgents } from '../../utils/tickets.jsx'
-import { TrendingUp, Award, Users } from 'lucide-react'
+import { TrendingUp, Award, Users, Building } from 'lucide-react'
 
 export function ReportsPage({ tickets }) {
   const stats = getStats(tickets)
@@ -50,18 +50,18 @@ export function ReportsPage({ tickets }) {
           </div>
         </div>
 
-        {/* Agent Performance */}
+        {/* Company Resolution Stats */}
         <div className="bg-white rounded-2xl border border-[#E8DDD0] shadow-sm p-5">
           <div className="flex items-center gap-2 mb-4">
             <Award size={18} className="text-[#B58B67]" />
-            <h3 className="font-sans font-black uppercase text-base tracking-tight text-stone-900">Agent Performance</h3>
+            <h3 className="font-sans font-black uppercase text-base tracking-tight text-stone-900">Company Resolution Stats</h3>
           </div>
           <div className="space-y-3">
             {agentStats.sort((a, b) => b.total - a.total).map(agent => (
               <div key={agent.name} className="flex items-center justify-between p-3 bg-[#FAF6F0] rounded-xl border border-[#E8DDD0]">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#E8DDD0] flex items-center justify-center font-sans font-black text-xs uppercase text-[#9E7452]">
-                    {agent.name[0]}
+                  <div className="w-8 h-8 rounded-full bg-[#E8DDD0] flex items-center justify-center text-[#9E7452]">
+                    <Building size={15} />
                   </div>
                   <div>
                     <p className="font-sans font-black text-sm uppercase tracking-wide text-stone-900">{agent.name}</p>

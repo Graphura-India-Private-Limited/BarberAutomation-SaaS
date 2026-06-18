@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { 
   Scissors, LayoutDashboard, Clock, Calendar, Coffee, 
   CreditCard, DollarSign, BarChart2, IndianRupee, Settings, 
-  LogOut, Menu, X, Users
+  LogOut, Menu, X, Users, Activity, UserPlus
 } from "lucide-react";
 
 export default function OwnerLayout() {
@@ -18,16 +18,18 @@ export default function OwnerLayout() {
   const NAV = [
     { id: "dashboard", label: "Console Home", icon: LayoutDashboard, route: "/owner/dashboard" },
     { id: "queue", label: "Live Queue", icon: Clock, route: "/owner/queue" },
+    { id: "live", label: "Live Monitoring", icon: Activity, route: "/owner/live" },
     { id: "bookings", label: "Bookings & Slots", icon: Calendar, route: "/owner/bookings" },
     { id: "services", label: "Services Catalog", icon: Scissors, route: "/owner/manage-services" },
     { id: "barbers", label: "Barber Team", icon: Users, route: "/owner/barbers" },
+    { id: "addbarber", label: "Add Barber", icon: UserPlus, route: "/owner/add-barber" },
     { id: "customers", label: "Customer Registry", icon: Users, route: "/owner/customers" },
     { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
     { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
     { id: "revenue", label: "Revenue Stream", icon: DollarSign, route: "/owner/revenue" },
     { id: "analytics", label: "Analytics Metrics", icon: BarChart2, route: "/owner/dashboard/analytics" },
     { id: "finance", label: "Finance Overview", icon: IndianRupee, route: "/owner/finance" },
-    { id: "settings", label: "Salon Settings", icon: Settings, route: "/owner/settings" },
+    { id: "settings", label: "Profile ", icon: Settings, route: "/owner/settings" },
   ];
 
   return (

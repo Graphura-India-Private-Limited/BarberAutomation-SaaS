@@ -328,11 +328,7 @@ export default function LiveQueue() {
                   <span className="text-[#8B6B3E] font-medium">Barber:</span>
                   <span className="font-bold text-stone-900">{q.barber_id?.name || "—"}</span>
                 </div>
-                <button onClick={() => completeServ(q)} disabled={busyId === q._id}
-                  className="w-full bg-[#8B6B3E] hover:bg-[#735A32] text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-sm disabled:opacity-50">
-                  <Check className="w-4 h-4"/>
-                  {busyId === q._id ? "Completing..." : "Mark Complete"}
-                </button>
+                <p className="text-[11px] text-zinc-500 text-center font-medium mt-2">Service Managed by Barber</p>
               </QueueCard>
             ))}
           </div>

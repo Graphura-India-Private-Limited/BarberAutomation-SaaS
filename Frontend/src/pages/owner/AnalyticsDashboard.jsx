@@ -66,10 +66,10 @@ const AnalyticsDashboard = () => {
   const performanceMetrics = [
     { title: 'Total Customers', value: '1,245', icon: Users, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
     { title: 'Active Queue', value: '12', icon: Activity, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
-    { title: 'Avg Wait Time', value: '18 mins', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
+    { title: 'Avg Wait Time (per day)', value: '18 mins', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
     { title: 'Peak Hours', value: '4PM - 6PM', icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
     { title: 'Average Rating', value: '4.8', icon: Star, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
-    { title: 'Total Revenue', value: '₹48,500', icon: Layers, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
+    { title: 'Total Revenue (per day)', value: '₹48,500', icon: Layers, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
     { title: 'Drop-offs', value: '14', icon: UserX, color: 'text-red-600', bg: 'bg-red-50 border border-red-200/50' },
     { title: 'Staff Active', value: '6', icon: Scissors, color: 'text-amber-600', bg: 'bg-amber-50 border border-amber-200/50' },
   ];

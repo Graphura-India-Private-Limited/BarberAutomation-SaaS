@@ -108,13 +108,10 @@ const NAV = [
   { k: "dashboard", label: "Dashboard" },
   { k: "salons", label: "Salon Management" },
   { k: "customers", label: "Customers" },
-  { k: "barbers", label: "Barbers" },
-  { k: "addbarber", label: "Add Barber" },
   { k: "appointments", label: "Appointments" },
   { k: "services", label: "Services" },
   { k: "payments", label: "Payments" },
   { k: "reviews", label: "Reviews" },
-  { k: "live", label: "Live Monitoring" },
   { k: "settings", label: "Settings" },
 ];
 
@@ -146,9 +143,6 @@ export default function AdminOnboarding() {
     "/admin/salons": "salons",
     "/admin/salon-management": "salons",
     "/admin/customers": "customers",
-    "/admin/barbers": "barbers",
-    "/admin/add-barber": "addbarber",
-    "/admin/addbarber": "addbarber",
     "/admin/appointments": "appointments",
     "/admin/services": "services",
     "/admin/payments": "payments",
@@ -177,8 +171,6 @@ export default function AdminOnboarding() {
       navigate("/admin");
     } else if (tabKey === "salons") {
       navigate("/admin/salon-management");
-    } else if (tabKey === "addbarber") {
-      navigate("/admin/add-barber");
     } else if (tabKey === "settings") {
       navigate("/admin/platform-settings");
     } else {
@@ -189,6 +181,8 @@ export default function AdminOnboarding() {
   const [stats,      setStats]     = useState(null);
   const [loading,    setLoading]   = useState(true);
   const [customers,  setCustomers] = useState([]);
+  const [custPage,   setCustPage]  = useState(1);
+  const [custPerPage, setCustPerPage] = useState(10);
   const [barbers,    setBarbers]   = useState([]);
   const [bookings,   setBookings]  = useState([]);
   const [services,   setServices]  = useState([]);
@@ -264,6 +258,26 @@ export default function AdminOnboarding() {
       } else pop(d.message||"Failed","error");
     } catch { pop("Server error","error"); }
     finally { setBusy(false); }
+  };
+
+  const updateSalonCapacity = async (id, limit) => {
+    try {
+      const r = await fetch(`${API}/admin/salon-limit/${id}`, {
+        method: "PUT",
+        headers: h(),
+        body: JSON.stringify({ max_barbers_limit: limit }),
+      });
+      const d = await r.json();
+      if (d.success) {
+        setSalons(p => p.map(s => s._id === id ? { ...s, max_barbers_limit: limit } : s));
+        pop("Salon capacity limit updated successfully!");
+      } else {
+        pop(d.message || "Failed to update capacity limit", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      pop("Server error updating capacity limit", "error");
+    }
   };
 
   const blockCustomer = async (id, blocked) => {
@@ -469,15 +483,20 @@ export default function AdminOnboarding() {
           </div>
         </div>
 
+        {/* Nav label */}
+        <div style={{ padding: "0 28px 6px" }}>
+          <span style={{ fontSize: 9, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.18em" }}>Navigation</span>
+        </div>
+
         {/* Nav */}
-        <nav style={{ padding: "8px 16px", flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+        <nav style={{ padding: "0 16px 8px", flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
           {NAV.map((n, i) => {
             const isActive = tab === n.k;
             const Icon = NAV_ICONS[n.k] || LayoutDashboard;
             return (
               <React.Fragment key={n.k}>
-                {(i === 5 || i === 8 || i === 10) && (
-                  <div style={{ height: 1, background: "#6B4C2A", margin: "10px 0", opacity: 0.4 }} />
+                {(i === 3 || i === 6 || i === 7) && (
+                  <div style={{ height: 1, background: C.border, margin: "10px 0" }} />
                 )}
                 <button
                   className={isActive ? "" : "nav-btn"}
@@ -641,90 +660,115 @@ export default function AdminOnboarding() {
               <StatCard label="Revenue"         value={loading?"—":`₹${((stats?.revenue||totalRevenue)/100||0).toLocaleString("en-IN")}`} sub="Total collected" color={C.orange} icon={CreditCard} iconBg={C.orangeLight} iconColor={C.orange}/>
             </div>
 
-            {/* ══ DASHBOARD ══ */}
-            {tab==="dashboard" && (
-              <div className="fade-in">
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-
-                  {/* Recent Bookings */}
-                  <SectionCard title="Recent Bookings" actionLabel="View All →" onAction={()=>handleTabChange("appointments")}>
-                    {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
-                    : bookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No bookings yet</div>
-                    : bookings.slice(0,4).map((b,i) => (
-                      <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<3?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                          <Avatar name={b.customer_id?.name||"C"} size={32} color={C.blue} bg={C.blueLight}/>
-                          <div>
-                            <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{b.customer_id?.name||"Customer"}</div>
-                            <div style={{ fontSize:11, color:C.muted }}>{b.services?.[0]?.service_name||"Service"} · {b.salon_id?.salon_name||"Salon"}</div>
-                          </div>
-                        </div>
-                        <div style={{ textAlign:"right" }}>
-                          <div style={{ fontSize:13, fontWeight:700, color:C.ink, marginBottom:4 }}>₹{b.total_amount}</div>
-                          <Badge label={b.status} color={bkStatus(b.status)}/>
-                        </div>
-                      </div>
-                    ))}
-                  </SectionCard>
-
-                  {/* Barber Status */}
-                  <SectionCard title="Barber Status" actionLabel="Live View →" onAction={()=>handleTabChange("live")}>
-                    {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
-                    : barbers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers added yet</div>
-                    : barbers.slice(0,4).map((b,i) => (
-                      <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<3?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                          <img src={barberImg(i)} alt={b.name} style={{ width:34, height:34, borderRadius:8, objectFit:"cover", border:`1px solid ${C.border}` }}/>
-                          <div>
-                            <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{b.name}</div>
-                            <div style={{ fontSize:11, color:C.muted }}>{b.specialization} · {b.salon_id?.salon_name||"—"}</div>
-                          </div>
-                        </div>
-                        <Badge label={b.status} color={bStatus(b.status)}/>
-                      </div>
-                    ))}
-                  </SectionCard>
-
-                  {/* Pending Salon Requests */}
-                  <SectionCard title="Pending Salon Requests" actionLabel="View All →" onAction={()=>handleTabChange("salons")}>
-                    {salons.filter(s=>s.status==="pending").length===0
-                      ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No pending requests — all caught up!</div>
-                      : salons.filter(s=>s.status==="pending").slice(0,3).map((s,i) => (
-                      <div key={s._id} style={{ padding:"12px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                          <img src={salonImg(i)} alt={s.salon_name} style={{ width:36, height:36, borderRadius:8, objectFit:"cover" }}/>
-                          <div>
-                            <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.salon_name}</div>
-                            <div style={{ fontSize:11, color:C.muted }}>{s.owner_name} · {s.mobile}</div>
-                          </div>
-                        </div>
-                        <div style={{ display:"flex", gap:6 }}>
-                          <button type="button" className="action-btn" onClick={()=>updateSalonStatus(s._id,"approved")} style={btnStyle(`${C.green}15`, C.green, `1px solid ${C.green}30`)}>Approve</button>
-                          <button type="button" className="action-btn" onClick={()=>setModal({type:"reject",salon:s})} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Reject</button>
-                        </div>
-                      </div>
-                    ))}
-                  </SectionCard>
-
-                  {/* Barber Credentials */}
-                  <SectionCard title="Barber Credentials (This Session)">
-                    {addedBarbers.length===0
-                      ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers added this session</div>
-                      : addedBarbers.map((b,i) => (
-                      <div key={i} style={{ padding:"12px 20px", borderBottom:`1px solid ${C.border}` }}>
-                        <div style={{ fontSize:13, fontWeight:600, color:C.ink, marginBottom:4 }}>{b.name}</div>
-                        <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-                          <span style={{ fontSize:11, color:C.muted }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
-                          <span style={{ fontSize:11, color:C.muted }}>Pass: <strong style={{ color:C.red }}>{b.password}</strong></span>
-                          <span style={{ fontSize:11, color:C.muted }}>Salon: <strong style={{ color:C.gold }}>{b.salon}</strong></span>
-                        </div>
-                        <div style={{ fontSize:10, color:C.muted, marginTop:3 }}>Added: {b.addedAt}</div>
-                      </div>
-                    ))}
-                  </SectionCard>
-                </div>
-              </div>
-            )}
+             {/* ══ DASHBOARD ══ */}
+             {tab==="dashboard" && (
+               <div className="fade-in">
+                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+ 
+                   {/* Recent Bookings */}
+                   <SectionCard title="Recent Bookings" actionLabel="View All →" onAction={()=>handleTabChange("appointments")}>
+                     {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
+                     : bookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No bookings yet</div>
+                     : bookings.slice(0,4).map((b,i) => (
+                       <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(bookings.length, 4)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                           <Avatar name={b.customer_id?.name||"C"} size={32} color={C.blue} bg={C.blueLight}/>
+                           <div>
+                             <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{b.customer_id?.name||"Customer"}</div>
+                             <div style={{ fontSize:11, color:C.muted }}>{b.services?.[0]?.service_name||"Service"} · {b.salon_id?.salon_name||"Salon"}</div>
+                           </div>
+                         </div>
+                         <div style={{ textAlign:"right" }}>
+                           <div style={{ fontSize:13, fontWeight:700, color:C.ink, marginBottom:4 }}>₹{b.total_amount}</div>
+                           <Badge label={b.status} color={bkStatus(b.status)}/>
+                         </div>
+                       </div>
+                     ))}
+                   </SectionCard>
+ 
+                   {/* Barber Status */}
+                   <SectionCard title="Barber Status" actionLabel="Live View →" onAction={()=>handleTabChange("live")}>
+                     {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
+                     : barbers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers added yet</div>
+                     : barbers.slice(0,4).map((b,i) => (
+                       <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(barbers.length, 4)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                           <img src={barberImg(i)} alt={b.name} style={{ width:34, height:34, borderRadius:8, objectFit:"cover", border:`1px solid ${C.border}` }}/>
+                           <div>
+                             <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{b.name}</div>
+                             <div style={{ fontSize:11, color:C.muted }}>{b.specialization} · {b.salon_id?.salon_name||"—"}</div>
+                           </div>
+                         </div>
+                         <Badge label={b.status} color={bStatus(b.status)}/>
+                       </div>
+                     ))}
+                   </SectionCard>
+ 
+                   {/* Pending Salon Requests */}
+                   <SectionCard title="Pending Salon Requests" actionLabel="View All →" onAction={()=>handleTabChange("salons")}>
+                     {salons.filter(s=>s.status==="pending").length===0
+                       ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No pending requests — all caught up!</div>
+                       : salons.filter(s=>s.status==="pending").slice(0,3).map((s,i) => (
+                       <div key={s._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(salons.filter(s=>s.status==="pending").length, 3)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                           <img src={salonImg(i)} alt={s.salon_name} style={{ width:36, height:36, borderRadius:8, objectFit:"cover" }}/>
+                           <div>
+                             <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.salon_name}</div>
+                             <div style={{ fontSize:11, color:C.muted }}>{s.owner_name} · {s.mobile}</div>
+                           </div>
+                         </div>
+                         <div style={{ display:"flex", gap:6 }}>
+                           <button type="button" className="action-btn" onClick={()=>updateSalonStatus(s._id,"approved")} style={btnStyle(`${C.green}15`, C.green, `1px solid ${C.green}30`)}>Approve</button>
+                           <button type="button" className="action-btn" onClick={()=>setModal({type:"reject",salon:s})} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Reject</button>
+                         </div>
+                       </div>
+                     ))}
+                   </SectionCard>
+ 
+                   {/* Registered Salons (Live) */}
+                   <SectionCard title="Registered Salons (Live)" actionLabel="View All →" onAction={()=>handleTabChange("salons")}>
+                     {salons.filter(s=>s.status==="approved").length===0
+                       ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No approved salons yet</div>
+                       : salons.filter(s=>s.status==="approved").slice(0,3).map((s,i) => (
+                       <div key={s._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(salons.filter(s=>s.status==="approved").length, 3)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                           <img src={s.images?.[0]||salonImg(i)} alt={s.salon_name} style={{ width:36, height:36, borderRadius:8, objectFit:"cover", border:`1px solid ${C.border}` }}/>
+                           <div>
+                             <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.salon_name}</div>
+                             <div style={{ fontSize:11, color:C.muted }}>{s.owner_name} · {s.mobile} · {s.address||"No address"}</div>
+                           </div>
+                         </div>
+                         <Badge label="Active" color={C.green}/>
+                       </div>
+                     ))}
+                   </SectionCard>
+ 
+                   {/* Barber Credentials */}
+                   <div style={{ gridColumn: "span 2" }}>
+                     <SectionCard title="Barber Credentials">
+                       {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
+                       : barbers.length===0
+                         ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers in system</div>
+                         : (
+                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, padding: "10px 20px" }}>
+                             {barbers.slice(0, 4).map((b,i) => (
+                               <div key={b._id} style={{ padding: 12, border: `1px solid ${C.border}`, borderRadius: 12, background: C.goldLight }}>
+                                 <div style={{ fontSize:13, fontWeight:700, color:C.ink, marginBottom:6 }}>{b.name}</div>
+                                 <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                                   <span style={{ fontSize:11, color:C.muted }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
+                                   <span style={{ fontSize:11, color:C.muted }}>Password: <strong style={{ color:C.red }}>••••••••</strong></span>
+                                   <span style={{ fontSize:11, color:C.muted }}>Salon: <strong style={{ color:C.gold }}>{b.salon_id?.salon_name || "—"}</strong></span>
+                                 </div>
+                                 <div style={{ fontSize:10, color:C.muted, marginTop:8, borderTop: `1px solid ${C.border}`, paddingTop: 6 }}>Registered: {b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—"}</div>
+                               </div>
+                             ))}
+                           </div>
+                         )}
+                     </SectionCard>
+                   </div>
+                 </div>
+               </div>
+             )}
 
             {/* ══ SALON MANAGEMENT ══ */}
             {tab==="salons" && (
@@ -760,7 +804,7 @@ export default function AdminOnboarding() {
                         <div style={{ padding:"14px 16px" }}>
                           <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.owner_name}</div>
                           <div style={{ fontSize:11, color:C.muted, marginBottom:8 }}>{s.mobile} · {s.address||"No address"}</div>
-                          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginBottom:10 }}>
+                          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:6, marginBottom:10 }}>
                             <div style={{ background:C.bg, borderRadius:8, padding:"7px 8px" }}>
                               <div style={{ fontSize:9, color:C.muted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em" }}>Pricing</div>
                               <div style={{ fontSize:13, color:C.ink, fontWeight:700 }}>₹{s.basic_pricing||0}+</div>
@@ -768,6 +812,40 @@ export default function AdminOnboarding() {
                             <div style={{ background:C.bg, borderRadius:8, padding:"7px 8px" }}>
                               <div style={{ fontSize:9, color:C.muted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em" }}>Barbers</div>
                               <div style={{ fontSize:13, color:C.ink, fontWeight:700 }}>{s.number_of_barbers||0}</div>
+                            </div>
+                             <div style={{ background:C.bg, borderRadius:8, padding:"5px 6px" }}>
+                              <div style={{ fontSize:9, color:C.muted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom: 2 }}>Limit</div>
+                              <input
+                                type="number"
+                                min="1"
+                                value={s.max_barbers_limit !== undefined ? s.max_barbers_limit : 3}
+                                onChange={(e) => {
+                                  const val = e.target.value === "" ? "" : Number(e.target.value);
+                                  setSalons(p => p.map(salon => salon._id === s._id ? { ...salon, max_barbers_limit: val } : salon));
+                                }}
+                                onBlur={(e) => {
+                                  const val = Number(e.target.value) || 3;
+                                  updateSalonCapacity(s._id, val);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.target.blur();
+                                  }
+                                }}
+                                style={{
+                                  width: "100%",
+                                  border: `1px solid ${C.gold}60`,
+                                  background: "#fff",
+                                  borderRadius: 6,
+                                  fontSize: 12,
+                                  color: C.ink,
+                                  fontWeight: 700,
+                                  outline: "none",
+                                  padding: "3px 4px",
+                                  margin: 0,
+                                  textAlign: "center"
+                                }}
+                              />
                             </div>
                           </div>
                           {salonTab==="rejected" && s.rejection_reason && (
@@ -796,193 +874,163 @@ export default function AdminOnboarding() {
             )}
 
             {/* ══ CUSTOMERS ══ */}
-            {tab==="customers" && (
-              <div className="fade-in">
-                <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                  <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                    <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>{customers.length} Customers</span>
-                    <input className="inp" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name or mobile..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
-                  </div>
-                  {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
-                  : customers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No customers yet</div>
-                  : (
-                    <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                      <thead><tr>{["Customer","Mobile","Email","Loyalty Points","Joined","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                      <tbody>
-                        {customers.filter(c=>!search||c.name?.toLowerCase().includes(search.toLowerCase())||c.mobile?.includes(search)).map(c=>(
-                          <tr key={c._id} className="tr">
-                            <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={c.name||"C"} size={30} color={C.blue} bg={C.blueLight}/><span style={{ fontSize:13, fontWeight:600, color:C.ink }}>{c.name||"—"}</span></div></TD>
-                            <TD style={{ fontSize:12, color:C.muted, fontFamily:"monospace" }}>{c.mobile}</TD>
-                            <TD style={{ fontSize:12, color:C.muted }}>{c.email||"—"}</TD>
-                            <TD style={{ fontSize:13, fontWeight:700, color:C.gold }}>{c.loyalty_points||0}</TD>
-                            <TD style={{ fontSize:12, color:C.muted }}>{c.created_at?new Date(c.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}):"—"}</TD>
-                            <TD><Badge label={c.blocked?"Blocked":"Active"} color={c.blocked?C.red:C.green}/></TD>
-                            <TD>
-                              <button className="action-btn" onClick={()=>blockCustomer(c._id,!c.blocked)}
-                                style={btnStyle(c.blocked?`${C.green}15`:`${C.red}10`, c.blocked?C.green:C.red, `1px solid ${c.blocked?C.green:C.red}30`)}>
-                                {c.blocked?"Unblock":"Block"}
-                              </button>
-                            </TD>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              </div>
-            )}
+            {tab==="customers" && (() => {
+              const filtered = customers.filter(c=>!search||c.name?.toLowerCase().includes(search.toLowerCase())||c.mobile?.includes(search));
+              const totalPages = Math.ceil(filtered.length / custPerPage) || 1;
+              const startIndex = (custPage - 1) * custPerPage;
+              const paginated = filtered.slice(startIndex, startIndex + custPerPage);
 
-            {/* ══ BARBERS ══ */}
-            {tab==="barbers" && (
-              <div className="fade-in">
-                {barbers.length===0 && !loading
-                  ? <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No barbers added yet. Go to "Add Barber" to add one!</div>
-                  : (
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
-                    {barbers.map((b,i)=>(
-                      <div key={b._id} style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                        <div style={{ height:160, overflow:"hidden", position:"relative" }}>
-                          <img src={barberImg(i)} alt={b.name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
-                          <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,.6),transparent)" }}/>
-                          <div style={{ position:"absolute", bottom:10, left:12 }}>
-                            <div style={{ fontSize:15, fontWeight:700, color:"#fff", fontFamily:"Georgia, serif" }}>{b.name}</div>
-                            <div style={{ fontSize:11, color:"rgba(255,255,255,.7)" }}>{b.specialization}</div>
-                          </div>
-                          <div style={{ position:"absolute", top:10, right:10 }}>
-                            <Badge label={b.status} color={bStatus(b.status)}/>
-                          </div>
-                        </div>
-                        <div style={{ padding:"14px 16px" }}>
-                          <div style={{ fontSize:12, color:C.muted, marginBottom:4 }}>{b.mobile} · {b.salon_id?.salon_name||"—"}</div>
-                          <div style={{ fontSize:12, color:C.muted, marginBottom:10 }}>{b.experience} yrs exp · Rating: ⭐{b.rating||"N/A"}</div>
-                          <div style={{ display:"flex", gap:6, marginBottom:8 }}>
-                            {["available","break","offline"].map(s=>(
-                              <button key={s} className="action-btn" disabled={b.status===s}
-                                onClick={()=>changeBarberStatus(b._id,s)}
-                                style={{ flex:1, padding:"6px 4px", fontSize:10, fontWeight:700, borderRadius:6, cursor:"pointer", border:`1px solid ${b.status===s?bStatus(s)+"50":C.border}`, background:b.status===s?`${bStatus(s)}20`:"#F7F5F2", color:b.status===s?bStatus(s):C.muted, fontFamily:"inherit", textAlign:"center", textTransform:"capitalize" }}>
-                                {s}
-                              </button>
+              return (
+                <div className="fade-in">
+                  <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                    <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>{filtered.length} Customers</span>
+                      <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setCustPage(1); }} placeholder="Search by name or mobile..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                    </div>
+                    {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
+                    : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No customers yet</div>
+                    : (
+                      <>
+                        <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                          <thead><tr>{["Customer","Mobile","Email","Loyalty Points","Joined","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
+                          <tbody>
+                            {paginated.map(c=>(
+                              <tr key={c._id} className="tr">
+                                <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={c.name||"C"} size={30} color={C.blue} bg={C.blueLight}/><span style={{ fontSize:13, fontWeight:600, color:C.ink }}>{c.name||"—"}</span></div></TD>
+                                <TD style={{ fontSize:12, color:C.muted, fontFamily:"monospace" }}>{c.mobile}</TD>
+                                <TD style={{ fontSize:12, color:C.muted }}>{c.email||"—"}</TD>
+                                <TD style={{ fontSize:13, fontWeight:700, color:C.gold }}>{c.loyalty_points||0}</TD>
+                                <TD style={{ fontSize:12, color:C.muted }}>{c.created_at?new Date(c.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}):"—"}</TD>
+                                <TD><Badge label={c.blocked?"Blocked":"Active"} color={c.blocked?C.red:C.green}/></TD>
+                                <TD>
+                                  <button className="action-btn" onClick={()=>blockCustomer(c._id,!c.blocked)}
+                                    style={btnStyle(c.blocked?`${C.green}15`:`${C.red}10`, c.blocked?C.green:C.red, `1px solid ${c.blocked?C.green:C.red}30`)}>
+                                    {c.blocked?"Unblock":"Block"}
+                                  </button>
+                                </TD>
+                              </tr>
                             ))}
+                          </tbody>
+                        </table>
+                        
+                        {/* Premium Pagination Control Footer */}
+                        <div style={{
+                          padding: "12px 20px",
+                          borderTop: `1px solid ${C.border}`,
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                          gap: 12,
+                          background: "#FAFAF8"
+                        }}>
+                          <div style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>
+                            Showing {filtered.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + custPerPage, filtered.length)} of {filtered.length} customers
                           </div>
-                          <button className="action-btn" onClick={()=>removeBarber(b._id)}
-                            style={{ ...btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`), width:"100%", justifyContent:"center" }}>
-                            Remove Barber
-                          </button>
+                          
+                          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                            {/* Page size dropdown */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
+                              <select 
+                                value={custPerPage} 
+                                onChange={(e) => {
+                                  setCustPerPage(Number(e.target.value));
+                                  setCustPage(1);
+                                }}
+                                style={{
+                                  padding: "4px 8px",
+                                  borderRadius: 8,
+                                  border: `1px solid ${C.border}`,
+                                  background: "#fff",
+                                  fontSize: 12,
+                                  color: C.ink,
+                                  cursor: "pointer",
+                                  outline: "none",
+                                  fontWeight: 600
+                                }}
+                              >
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                              </select>
+                            </div>
+
+                            {/* Page selection dropdown */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
+                              <select
+                                value={custPage}
+                                onChange={(e) => setCustPage(Number(e.target.value))}
+                                style={{
+                                  padding: "4px 8px",
+                                  borderRadius: 8,
+                                  border: `1px solid ${C.border}`,
+                                  background: "#fff",
+                                  fontSize: 12,
+                                  color: C.ink,
+                                  cursor: "pointer",
+                                  outline: "none",
+                                  fontWeight: 600
+                                }}
+                              >
+                                {Array.from({ length: totalPages }, (_, idx) => (
+                                  <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                                ))}
+                              </select>
+                              <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
+                            </div>
+
+                            {/* Prev / Next buttons */}
+                            <div style={{ display: "flex", gap: 6 }}>
+                              <button
+                                disabled={custPage === 1}
+                                onClick={() => setCustPage(p => Math.max(p - 1, 1))}
+                                style={{
+                                  padding: "5px 12px",
+                                  borderRadius: 8,
+                                  border: `1px solid ${C.border}`,
+                                  background: custPage === 1 ? "#F5F5F4" : "#fff",
+                                  color: custPage === 1 ? "#A8A29E" : C.ink,
+                                  fontSize: 12,
+                                  fontWeight: 650,
+                                  cursor: custPage === 1 ? "not-allowed" : "pointer",
+                                  transition: "all 0.2s",
+                                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                }}
+                              >
+                                Prev
+                              </button>
+                              <button
+                                disabled={custPage >= totalPages}
+                                onClick={() => setCustPage(p => Math.min(p + 1, totalPages))}
+                                style={{
+                                  padding: "5px 12px",
+                                  borderRadius: 8,
+                                  border: `1px solid ${C.border}`,
+                                  background: custPage >= totalPages ? "#F5F5F4" : "#fff",
+                                  color: custPage >= totalPages ? "#A8A29E" : C.ink,
+                                  fontSize: 12,
+                                  fontWeight: 650,
+                                  cursor: custPage >= totalPages ? "not-allowed" : "pointer",
+                                  transition: "all 0.2s",
+                                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                }}
+                              >
+                                Next
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      </>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* ══ ADD BARBER ══ */}
-            {tab==="addbarber" && (
-              <div className="fade-in" style={{ maxWidth:640 }}>
-                <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:28, boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                  <div style={{ fontSize:22, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif", marginBottom:4 }}>Add New Barber</div>
-                  <div style={{ fontSize:13, color:C.muted, marginBottom:20, lineHeight:1.6 }}>Credentials will be saved and barber can login to their dashboard</div>
-
-                  <div style={{ background:C.blueLight, border:`1px solid ${C.blue}30`, borderRadius:10, padding:"10px 14px", marginBottom:20 }}>
-                    <div style={{ fontSize:12, color:C.blue, fontWeight:600 }}>After adding barber, they can login at /barber/login with:</div>
-                    <div style={{ fontSize:12, color:C.ink, marginTop:4 }}>Mobile number + Password you set below</div>
-                  </div>
-
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14, marginBottom:20 }}>
-                    <div>
-                      <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:8 }}>Profile Photo</label>
-                      <div className="upload-box" onClick={()=>photoRef.current?.click()}>
-                        {newBarber.photoPreview ? (
-                          <div style={{ position:"relative" }}>
-                            <img src={newBarber.photoPreview} style={{ width:"100%", height:120, objectFit:"cover", borderRadius:8 }}/>
-                            <button onClick={e=>{e.stopPropagation();setNewBarber(p=>({...p,photo:null,photoPreview:null}))}}
-                              style={{ position:"absolute", top:4, right:4, background:"rgba(239,68,68,0.9)", color:"#fff", borderRadius:"50%", width:22, height:22, fontSize:12, display:"flex", alignItems:"center", justifyContent:"center", border:"none", cursor:"pointer" }}>✕</button>
-                          </div>
-                        ) : (
-                          <div>
-                            <div style={{ fontSize:28, marginBottom:6 }}>📷</div>
-                            <div style={{ fontSize:12, fontWeight:500, color:C.muted }}>Click to upload photo</div>
-                            <div style={{ fontSize:10, color:C.border }}>JPG, PNG up to 5MB</div>
-                          </div>
-                        )}
-                      </div>
-                      <input ref={photoRef} type="file" accept="image/*" style={{ display:"none" }} onChange={handlePhotoChange}/>
-                    </div>
-                    <div>
-                      <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:8 }}>ID / Document</label>
-                      <div className="upload-box" onClick={()=>docRef.current?.click()} style={{ height:newBarber.documentName?"auto":164, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-                        {newBarber.documentName ? (
-                          <div style={{ width:"100%", padding:12, background:C.greenLight, borderRadius:8, border:`1px solid ${C.green}30` }}>
-                            <div style={{ fontSize:20, marginBottom:4 }}>📄</div>
-                            <div style={{ fontSize:11, fontWeight:700, color:C.green }}>{newBarber.documentName}</div>
-                            <button onClick={e=>{e.stopPropagation();setNewBarber(p=>({...p,document:null,documentName:""}))}}
-                              style={{ marginTop:6, fontSize:10, color:C.red, fontWeight:700, background:"none", border:"none", cursor:"pointer" }}>Remove</button>
-                          </div>
-                        ) : (
-                          <div style={{ textAlign:"center" }}>
-                            <div style={{ fontSize:28, marginBottom:6 }}>📄</div>
-                            <div style={{ fontSize:12, fontWeight:500, color:C.muted }}>Upload ID/Aadhar</div>
-                            <div style={{ fontSize:10, color:C.border }}>PDF, JPG, PNG</div>
-                          </div>
-                        )}
-                      </div>
-                      <input ref={docRef} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display:"none" }} onChange={handleDocChange}/>
-                    </div>
-                  </div>
-
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-                    {[
-                      { key:"name",           label:"Full Name *",      placeholder:"Rahul Sharma",       type:"text" },
-                      { key:"mobile",         label:"Mobile Number *",  placeholder:"10 digit mobile",    type:"tel" },
-                      { key:"password",       label:"Password *",       placeholder:"Set login password", type:"password" },
-                      { key:"specialization", label:"Specialization",   placeholder:"Haircut & Fade",     type:"text" },
-                      { key:"experience",     label:"Experience (yrs)", placeholder:"5",                  type:"number" },
-                      { key:"email",          label:"Email (Optional)", placeholder:"barber@email.com",   type:"email" },
-                    ].map(f=>(
-                      <div key={f.key}>
-                        <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:6 }}>{f.label}</label>
-                        <input className="inp" type={f.type} placeholder={f.placeholder}
-                          value={newBarber[f.key]} onChange={e=>setNewBarber(p=>({...p,[f.key]:e.target.value}))}
-                          style={inputStyle}/>
-                      </div>
-                    ))}
-                    <div>
-                      <label style={{ display:"block", fontSize:10, fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:1.2, marginBottom:6 }}>Assign Salon *</label>
-                      <select className="inp" value={newBarber.salon_id} onChange={e=>setNewBarber(p=>({...p,salon_id:e.target.value}))} style={inputStyle}>
-                        <option value="">Select approved salon...</option>
-                        {salons.filter(s=>s.status==="approved").map(s=>(<option key={s._id} value={s._id}>{s.salon_name}</option>))}
-                      </select>
-                      {salons.filter(s=>s.status==="approved").length===0 && (
-                        <div style={{ fontSize:11, color:C.red, marginTop:4 }}>No approved salons! Approve a salon first.</div>
-                      )}
-                    </div>
-                  </div>
-
-                  <button type="button" className="action-btn" disabled={!newBarber.name||!newBarber.mobile||!newBarber.password||busy}
-                    onClick={addBarber}
-                    style={{ marginTop:22, width:"100%", padding:13, background:`linear-gradient(135deg,${C.gold},${C.goldD})`, color:"#fff", fontSize:13, fontWeight:700, justifyContent:"center", borderRadius:10, border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center" }}>
-                    {busy?"Adding Barber...":"Add Barber to Platform"}
-                  </button>
                 </div>
+              );
+            })()}
 
-                {addedBarbers.length>0 && (
-                  <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:20, marginTop:16, boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:C.ink, marginBottom:12, textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"Georgia, serif" }}>Added Barbers — Login Credentials</div>
-                    {addedBarbers.map((b,i)=>(
-                      <div key={i} style={{ background:C.greenLight, border:`1px solid ${C.green}30`, borderRadius:10, padding:"12px 14px", marginBottom:8 }}>
-                        <div style={{ fontSize:13, fontWeight:700, color:C.ink, marginBottom:6 }}>{b.name} · {b.salon}</div>
-                        <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
-                          <span style={{ fontSize:12, color:C.muted }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
-                          <span style={{ fontSize:12, color:C.muted }}>Password: <strong style={{ color:C.red, fontFamily:"monospace" }}>{b.password}</strong></span>
-                          <span style={{ fontSize:12, color:C.muted }}>Login at: <strong style={{ color:C.blue }}>/barber/login</strong></span>
-                        </div>
-                        <div style={{ fontSize:10, color:C.muted, marginTop:4 }}>Added: {b.addedAt}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+
 
             {/* ══ APPOINTMENTS ══ */}
             {tab==="appointments" && (
@@ -1026,25 +1074,6 @@ export default function AdminOnboarding() {
             {/* ══ SERVICES ══ */}
             {tab==="services" && (
               <div className="fade-in">
-                <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:18, marginBottom:14, boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                  <div style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif", marginBottom:14 }}>Add New Service</div>
-                  <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-                    <input className="inp" placeholder="Service name" value={newService.name} onChange={e=>setNewService(p=>({...p,name:e.target.value}))} style={{ ...inputStyle, flex:2, minWidth:150 }}/>
-                    <select className="inp" value={newService.category} onChange={e=>setNewService(p=>({...p,category:e.target.value}))} style={{ ...inputStyle, flex:1, minWidth:100 }}>
-                      <option value="men">Men</option><option value="women">Women</option><option value="addon">Addon</option>
-                    </select>
-                    <input className="inp" placeholder="Price ₹" type="number" value={newService.price} onChange={e=>setNewService(p=>({...p,price:e.target.value}))} style={{ ...inputStyle, flex:1, minWidth:80 }}/>
-                    <input className="inp" placeholder="Duration (min)" type="number" value={newService.duration} onChange={e=>setNewService(p=>({...p,duration:e.target.value}))} style={{ ...inputStyle, flex:1, minWidth:100 }}/>
-                    <select className="inp" value={newService.salon_id} onChange={e=>setNewService(p=>({...p,salon_id:e.target.value}))} style={{ ...inputStyle, flex:1, minWidth:120 }}>
-                      <option value="">Select salon...</option>
-                      {salons.filter(s=>s.status==="approved").map(s=>(<option key={s._id} value={s._id}>{s.salon_name}</option>))}
-                    </select>
-                    <button className="action-btn" disabled={!newService.name||!newService.price} onClick={addService}
-                      style={{ ...btnStyle(`linear-gradient(135deg,${C.gold},${C.goldD})`, "#fff", "none"), padding:"9px 20px" }}>
-                      Add Service
-                    </button>
-                  </div>
-                </div>
                 <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
                   {services.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No services yet</div>
                   : (
@@ -1180,7 +1209,7 @@ export default function AdminOnboarding() {
 
             {/* ══ SETTINGS ══ */}
             {tab==="settings" && (
-              <div className="fade-in" style={{ maxWidth:560 }}>
+              <div className="fade-in" style={{ maxWidth:560, margin:"0 auto" }}>
                 <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
                   <div style={{ padding:"16px 20px", borderBottom:`1px solid ${C.border}` }}>
                     <span style={{ fontSize:18, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>System Settings</span>
@@ -1200,9 +1229,9 @@ export default function AdminOnboarding() {
                       <input className="inp" type={f.type} placeholder={f.placeholder} style={{ ...inputStyle, flex:1 }}/>
                     </div>
                   ))}
-                  <div style={{ padding:"16px 20px" }}>
+                  <div style={{ padding:"16px 20px", display:"flex", justifyContent:"center" }}>
                     <button className="action-btn" onClick={()=>pop("Settings saved!")}
-                      style={{ width:"100%", padding:13, background:`linear-gradient(135deg,${C.gold},${C.goldD})`, color:"#fff", fontSize:13, fontWeight:700, justifyContent:"center", borderRadius:10, border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center" }}>
+                      style={{ width:"auto", minWidth:200, padding:"13px 32px", background:`linear-gradient(135deg,${C.gold},${C.goldD})`, color:"#fff", fontSize:13, fontWeight:700, justifyContent:"center", borderRadius:10, border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center" }}>
                       Save Settings
                     </button>
                   </div>

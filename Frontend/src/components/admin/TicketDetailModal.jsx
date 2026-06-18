@@ -78,11 +78,11 @@ export function TicketDetailModal({ ticket, isOpen, onClose, onResolve, onEscala
           </div>
         </div>
 
-        {/* Assign Agent */}
+        {/* Assign Admin */}
         <div className="border-t border-orange-100 pt-4">
           <p className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">Assignment</p>
           <Select
-            label="Assign to Agent"
+            label="Assign to Admin"
             value={ticket.assignee}
             onChange={(val) => onAssign(ticket.id, val)}
             options={mockAgents}

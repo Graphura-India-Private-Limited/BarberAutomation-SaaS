@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, CheckCircle, Clock, RotateCcw, XCircle, DollarSign, Sparkles, TrendingUp, ArrowLeft } from 'lucide-react'; 
-import { useNavigate } from 'react-router-dom'; 
+import { Calendar, CheckCircle, Clock, RotateCcw, XCircle, DollarSign, Sparkles, TrendingUp, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 
@@ -9,7 +9,7 @@ const GOLD = "#C5A059";
 
 export default function BookingHistory() {
   const [activeTab, setActiveTab] = useState('upcoming');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -61,13 +61,13 @@ export default function BookingHistory() {
     <>
       <Navbar />
       <div className="bg-[#FAF6F0] min-h-screen font-sans text-[#3E362E] selection:bg-[#C5A059] selection:text-white relative overflow-hidden flex flex-col">
-        
+
         <div className="absolute top-20 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
         <div className="absolute bottom-1/3 right-10 w-[700px] h-[500px] bg-[#EADDCA]/30 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 relative z-50 flex justify-start">
-          <button 
+          <button
             onClick={() => navigate('/customer/booking')}
             className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white"
           >
@@ -78,7 +78,7 @@ export default function BookingHistory() {
 
         <div className="relative h-[180px] sm:h-[220px] flex items-center justify-center overflow-hidden mb-2">
           <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
-          
+
           <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-2">
             <span className="text-[10px] font-black uppercase tracking-[0.4em] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full text-[#C5A059] shadow-sm inline-block mb-4">
               Dashboard Overview
@@ -93,7 +93,7 @@ export default function BookingHistory() {
         </div>
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
-          
+
           <div className="grid grid-cols-3 gap-4 mb-8">
             <div className="bg-white/80 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-4 shadow-[0_8px_25px_rgba(0,0,0,0.01)] flex flex-col justify-between">
               <div className="flex items-center justify-between mb-1">
@@ -126,22 +126,20 @@ export default function BookingHistory() {
             <button
               type="button"
               onClick={() => setActiveTab('upcoming')}
-              className={`flex-1 py-3 px-4 rounded-xl font-black text-[11px] tracking-[0.15em] uppercase transition-all duration-300 cursor-pointer select-none ${
-                activeTab === 'upcoming'
+              className={`flex-1 py-3 px-4 rounded-xl font-black text-[11px] tracking-[0.15em] uppercase transition-all duration-300 cursor-pointer select-none ${activeTab === 'upcoming'
                   ? 'bg-[#3E362E] text-white shadow-md'
                   : 'text-stone-500 hover:text-[#3E362E] hover:bg-[#FAF6F0]'
-              }`}
+                }`}
             >
               Upcoming
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('completed')}
-              className={`flex-1 py-3 px-4 rounded-xl font-black text-[11px] tracking-[0.15em] uppercase transition-all duration-300 cursor-pointer select-none ${
-                activeTab === 'completed'
+              className={`flex-1 py-3 px-4 rounded-xl font-black text-[11px] tracking-[0.15em] uppercase transition-all duration-300 cursor-pointer select-none ${activeTab === 'completed'
                   ? 'bg-[#3E362E] text-white shadow-md'
                   : 'text-stone-500 hover:text-[#3E362E] hover:bg-[#FAF6F0]'
-              }`}
+                }`}
             >
               Completed History
             </button>
@@ -154,11 +152,10 @@ export default function BookingHistory() {
               </div>
             ) : (
               displayedBookings.map((booking) => (
-                <div 
-                  key={booking.id} 
-                  className={`bg-white/90 backdrop-blur-md rounded-[24px] border border-[#EADDCA] shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_15px_35px_rgba(62,54,46,0.05)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden text-left ${
-                    activeTab === 'completed' ? 'border-l-4 border-l-[#C5A059]' : 'border-l-4 border-l-[#3E362E]'
-                  }`}
+                <div
+                  key={booking.id}
+                  className={`bg-white/90 backdrop-blur-md rounded-[24px] border border-[#EADDCA] shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_15px_35px_rgba(62,54,46,0.05)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden text-left ${activeTab === 'completed' ? 'border-l-4 border-l-[#C5A059]' : 'border-l-4 border-l-[#3E362E]'
+                    }`}
                 >
                   <div className="p-6 flex flex-col sm:flex-row justify-between items-start gap-4">
                     <div>
@@ -168,7 +165,7 @@ export default function BookingHistory() {
                       <h3 className="text-xl font-serif font-bold text-[#3E362E] mt-1">{booking.salon}</h3>
                       <p className="text-[9px] text-stone-400 font-mono mt-1 uppercase tracking-wider">ID: {booking.id}</p>
                     </div>
-                    
+
                     <div className="sm:text-right flex sm:flex-col items-start sm:items-end justify-between w-full sm:w-auto gap-2 border-t sm:border-none border-[#FAF6F0] pt-3 sm:pt-0">
                       <div>
                         <div className="text-[9px] text-stone-400 uppercase tracking-wider font-black mb-0.5">Amount Transacted</div>
@@ -188,7 +185,7 @@ export default function BookingHistory() {
                   </div>
 
                   <div className="border-t border-[#FAF6F0]" />
-                  
+
                   <div className="bg-[#FAF6F0]/50 px-6 py-4 flex justify-between items-center text-stone-600 gap-4">
                     <div className="flex items-center gap-2 min-w-0">
                       {booking.status === 'completed' ? (
@@ -200,18 +197,37 @@ export default function BookingHistory() {
                         Ritual Allocation: <strong className="text-[#3E362E] font-bold">{booking.service}</strong>
                       </span>
                     </div>
-                    
+
                     {activeTab === 'upcoming' ? (
-                      <button 
+                      <button
                         type="button"
                         onClick={() => handleCancelVisit(booking.id)}
-                        className="flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors cursor-pointer select-none"
+                        // className="flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors cursor-pointer select-none"
+                        className="
+flex-shrink-0
+inline-flex items-center justify-center gap-2
+px-5 py-3
+rounded-xl
+bg-[#3E362E]
+text-white
+font-black
+text-[11px]
+tracking-[0.15em]
+uppercase
+cursor-pointer
+select-none
+shadow-md
+transition-all duration-300
+hover:bg-[#2F2923]
+hover:shadow-lg
+active:scale-95
+"
                       >
                         <XCircle className="w-3.5 h-3.5" />
                         <span>Cancel Visit</span>
                       </button>
                     ) : (
-                      <button 
+                      <button
                         type="button"
                         onClick={handleRebook}
                         className="flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#3E362E] hover:text-[#C5A059] transition-colors cursor-pointer group select-none"

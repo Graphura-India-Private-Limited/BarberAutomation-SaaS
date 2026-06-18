@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AppContext";
-import { Scissors } from "lucide-react";
+import { Scissors, Edit, MapPin, Image as ImageIcon } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const GOLD = "#C5A059";
+const CHARCOAL = "#3E362E";
 
 export default function SettingsPage() {
   const { currentUser } = useAuth();
@@ -14,6 +16,27 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
+  // Salon Profile Editing States
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [form, setForm] = useState({
+    salon_name: "",
+    owner_name: "",
+    email: "",
+    address: "",
+    latitude: 0,
+    longitude: 0,
+    opening_time: "09:00",
+    closing_time: "21:00",
+    services_offered: "",
+    basic_pricing: "",
+    number_of_barbers: "",
+    support_number: "",
+    images: [],
+    about: ""
+  });
+
   const salonId = localStorage.getItem("salonId");
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role") || currentUser?.role;
@@ -22,6 +45,26 @@ export default function SettingsPage() {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`
   });
+
+  const syncSalon = (nextSalon) => {
+    setSalon(nextSalon);
+    setForm({
+      salon_name: nextSalon?.salon_name || "",
+      owner_name: nextSalon?.owner_name || "",
+      email: nextSalon?.email || "",
+      address: nextSalon?.address || "",
+      latitude: nextSalon?.latitude || 0,
+      longitude: nextSalon?.longitude || 0,
+      opening_time: nextSalon?.opening_time || "09:00",
+      closing_time: nextSalon?.closing_time || "21:00",
+      services_offered: (nextSalon?.services_offered || []).join(", "),
+      basic_pricing: nextSalon?.basic_pricing || "",
+      number_of_barbers: nextSalon?.number_of_barbers || "",
+      support_number: nextSalon?.support_number || "",
+      images: nextSalon?.images || [],
+      about: nextSalon?.about || "",
+    });
+  };
 
   const loadSettingsData = async () => {
     if (role !== "owner") {
@@ -38,6 +81,7 @@ export default function SettingsPage() {
         setSalon(profile.salon);
         setSalaryModel(profile.salon.salary_model || "commission");
         setCommissionPercent(String(profile.salon.commission_percent ?? 10));
+        syncSalon(profile.salon);
       }
       
       if (salonId) {
@@ -59,6 +103,142 @@ export default function SettingsPage() {
     loadSettingsData();
   }, []);
 
+  const setField = (name, value) => {
+    setForm(prev => ({ ...prev, [name]: value }));
+    setMessage("");
+    setError("");
+  };
+
+  const handleAddressBlur = async () => {
+    if (!form.address || form.address.trim().length < 5) return;
+    try {
+      setMessage("Looking up coordinates for manual address...");
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(form.address)}`, {
+        headers: { "User-Agent": "BarberPro-App/1.0" }
+      });
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const newLat = parseFloat(data[0].lat);
+        const newLon = parseFloat(data[0].lon);
+        setForm(prev => ({
+          ...prev,
+          latitude: newLat,
+          longitude: newLon
+        }));
+        setMessage("Coordinates updated based on manual address.");
+        setError("");
+        setTimeout(() => setMessage(""), 3000);
+      } else {
+        setError("Could not resolve coordinates for manual address. Please check address spelling or tag via GPS.");
+        setTimeout(() => setError(""), 4000);
+      }
+    } catch (err) {
+      console.error("Geocoding failed", err);
+    }
+  };
+
+  const tagLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by this browser.");
+      return;
+    }
+    setError("");
+    setMessage("Acquiring GPS fix... please check browser prompt.");
+    
+    const geoOptions = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        setField("latitude", latitude);
+        setField("longitude", longitude);
+        setMessage("Coordinates tagged. Fetching physical address details...");
+        
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, {
+          headers: {
+            "User-Agent": "BarberPro-App/1.0"
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.display_name) {
+              setField("address", data.display_name);
+              setMessage("Location and physical address successfully linked.");
+            } else {
+              setMessage("Location coordinates successfully linked.");
+            }
+            setTimeout(() => setMessage(""), 3000);
+          })
+          .catch(err => {
+            console.error("Reverse geocode lookup error:", err);
+            setMessage("Location coordinates successfully linked.");
+            setTimeout(() => setMessage(""), 3000);
+          });
+      },
+      err => {
+        setMessage("");
+        if (err.code === 1) {
+          setError("Location permission denied! Please allow access in browser URL bar.");
+        } else {
+          setError("GPS signal timeout. Please try clicking the button again.");
+        }
+        setTimeout(() => setError(""), 4000);
+      },
+      geoOptions
+    );
+  };
+
+  const addImages = async (event) => {
+    const files = Array.from(event.target.files || []).slice(0, 5);
+    const encoded = await Promise.all(
+      files.map(file => new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      }))
+    );
+    setField("images", [...form.images, ...encoded].slice(0, 5));
+  };
+
+  const saveProfile = async (resubmit = false) => {
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      const payload = {
+        ...form,
+        services_offered: form.services_offered.split(",").map(s => s.trim()).filter(Boolean),
+        basic_pricing: Number(form.basic_pricing) || 0,
+        number_of_barbers: Number(form.number_of_barbers) || 0,
+      };
+
+      const res = await fetch(`${API}/auth/owner/${resubmit ? "resubmit" : "profile"}`, {
+        method: "PUT",
+        headers: headers(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || "Update failed");
+      const statusChangedToPending = data.salon?.status === "pending" && salon?.status === "approved";
+      syncSalon(data.salon);
+      setEditing(false);
+      if (statusChangedToPending) {
+        setMessage("Address changed! Reset to pending verification for admin approval.");
+      } else {
+        setMessage(resubmit ? "Profile resubmitted for approval." : "Profile details saved successfully.");
+      }
+      setTimeout(() => setMessage(""), 5000);
+    } catch (err) {
+      setError(err.message || "Update failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleSavePreferences = async (e) => {
     e.preventDefault();
     setError("");
@@ -75,6 +255,7 @@ export default function SettingsPage() {
       const data = await res.json();
       if (data.success) {
         setSaved(true);
+        setSalon(data.salon);
         setTimeout(() => setSaved(false), 3000);
       } else {
         setError(data.message || "Failed to save settings");
@@ -84,7 +265,6 @@ export default function SettingsPage() {
     }
   };
 
-  // ── NON-OWNER ACCESS RESTRICTION BANNER ──
   if (role !== "owner") {
     return (
       <div className="p-6 md:p-10 font-sans text-stone-800 text-left min-h-screen" style={{ background: "#FAF6F0" }}>
@@ -170,6 +350,72 @@ export default function SettingsPage() {
             {error}
           </p>
         )}
+        {message && (
+          <p className="mb-6 rounded-xl bg-green-50 border border-green-200 p-4 text-center text-xs font-bold text-green-700 font-sans">
+            {message}
+          </p>
+        )}
+
+        {/* Salon Profile Identity Card (Move from home to settings page) */}
+        <div className="card p-6 mb-6 bg-white text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4 border-stone-100 mb-6">
+            <div>
+              <h3 className="text-lg font-bold font-serif text-zinc-900 flex items-center gap-2">
+                🏛️ Salon Profile Information
+              </h3>
+              <p className="text-xs text-stone-500 font-sans mt-0.5">
+                View and edit your business metadata, address, contact, and gallery details.
+              </p>
+            </div>
+            <button 
+              onClick={() => setEditing(prev => !prev)} 
+              className="flex items-center gap-2 px-5 py-3 rounded-xl font-extrabold text-xs tracking-wider text-white uppercase shadow-sm transition-all active:scale-95 cursor-pointer font-sans"
+              style={{ background: CHARCOAL }}
+            >
+              <Edit size={14} color="#C5A059" />
+              {editing ? "Close Profile Editor" : "Modify Salon Profile"}
+            </button>
+          </div>
+
+          {editing ? (
+            <ProfileEditor 
+              form={form} 
+              setField={setField} 
+              addImages={addImages} 
+              tagLocation={tagLocation} 
+              saveProfile={saveProfile} 
+              busy={busy} 
+              canResubmit={salon?.status === "rejected"} 
+              handleAddressBlur={handleAddressBlur}
+            />
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 text-xs font-medium">
+              <Info label="Business Name" value={salon?.salon_name} />
+              <Info label="Primary Owner" value={salon?.owner_name} />
+              <Info label="Contact Email" value={salon?.email || "No email registered"} />
+              <Info label="Support Contact" value={salon?.support_number || "No support number"} />
+              <Info label="Opening Hours" value={`${salon?.opening_time || "09:00"} — ${salon?.closing_time || "21:00"}`} />
+              <Info label="Base Haircut Pricing" value={salon?.basic_pricing ? `₹${salon.basic_pricing}` : "₹0"} />
+              <div className="sm:col-span-2">
+                <Info label="Physical Studio Address" value={salon?.address} />
+              </div>
+              <div className="sm:col-span-2">
+                <Info label="About / Bio" value={salon?.about || "No description set"} />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block mb-2 font-sans">Storefront Gallery</label>
+                <div className="grid grid-cols-5 gap-2">
+                  {(salon?.images || []).map((url, i) => (
+                    <img key={i} src={url} alt={`Gallery ${i}`} className="aspect-square rounded-xl object-cover border border-[#EADBCE]" />
+                  ))}
+                  {(salon?.images || []).length === 0 && (
+                    <p className="text-stone-400 italic text-[11px] uppercase tracking-wider font-bold">No gallery photos added.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Compensation & Commission Model Card */}
         <div className="card p-6 mb-6 bg-white">
@@ -195,18 +441,25 @@ export default function SettingsPage() {
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-2">COMMISSION PERCENT (%)</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-2">
+                  {salaryModel === "salary" ? "SALARY BASE (₹)" : "COMMISSION PERCENT (%)"}
+                </label>
                 <div className="flex border border-zinc-200 rounded-xl overflow-hidden bg-white hover:border-[#C5A059]/50 focus-within:border-[#C5A059] transition">
+                  {salaryModel === "salary" && (
+                    <span className="flex items-center px-4 bg-zinc-50 border-r border-zinc-200 text-zinc-400 font-bold select-none">₹</span>
+                  )}
                   <input
                     type="number"
                     min="0"
-                    max="100"
-                    placeholder="15"
+                    max={salaryModel === "salary" ? undefined : "100"}
+                    placeholder={salaryModel === "salary" ? "e.g. 15000" : "15"}
                     value={commissionPercent}
                     onChange={e => setCommissionPercent(e.target.value)}
                     className="w-full bg-white px-4 py-3.5 text-sm font-semibold text-zinc-800 outline-none"
                   />
-                  <span className="flex items-center px-4 bg-zinc-50 border-l border-zinc-200 text-zinc-400 font-bold select-none">%</span>
+                  {salaryModel !== "salary" && (
+                    <span className="flex items-center px-4 bg-zinc-50 border-l border-zinc-200 text-zinc-400 font-bold select-none">%</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -283,6 +536,80 @@ export default function SettingsPage() {
             </ul>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function Info({ label, value }) {
+  return (
+    <div className="border-b last:border-0 pb-2.5 last:pb-0 text-left border-stone-50">
+      <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block font-sans">{label}</label>
+      <p className="font-bold text-stone-900 mt-0.5 text-sm font-sans">{value || "Value entry missing"}</p>
+    </div>
+  );
+}
+
+function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, busy, canResubmit, handleAddressBlur }) {
+  const inputClass = "w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400 font-sans shadow-3xs";
+  return (
+    <div className="card p-6 shadow-xs border border-[#EADBCE] bg-white text-left animate-in fade-in duration-200">
+      <h2 className="font-serif text-lg tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5 border-b pb-3 border-stone-100">
+        <span className="font-bold uppercase">Edit Workspace</span>
+        <span className="italic text-[#C5A059] normal-case font-medium">Profile Details</span>
+      </h2>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Salon Name</label>
+          <input className={inputClass} value={form.salon_name} onChange={e => setField("salon_name", e.target.value)} placeholder="Salon Name" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Owner Name</label>
+          <input className={inputClass} value={form.owner_name} onChange={e => setField("owner_name", e.target.value)} placeholder="Owner Full Name" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Email Address</label>
+          <input className={inputClass} value={form.email} onChange={e => setField("email", e.target.value)} placeholder="Business Email" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Support Phone</label>
+          <input className={inputClass} value={form.support_number} onChange={e => setField("support_number", e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder="10-digit Help Desk line" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Opening Time</label>
+          <input type="time" className={inputClass} value={form.opening_time} onChange={e => setField("opening_time", e.target.value)} />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Closing Time</label>
+          <input type="time" className={inputClass} value={form.closing_time} onChange={e => setField("closing_time", e.target.value)} />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Services Offered (comma separated)</label>
+          <input className={inputClass} value={form.services_offered} onChange={e => setField("services_offered", e.target.value)} placeholder="Services, comma separated" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Base Haircut Pricing (₹)</label>
+          <input type="number" className={inputClass} value={form.basic_pricing} onChange={e => setField("basic_pricing", e.target.value)} placeholder="Base Rate (₹)" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Latitude</label>
+          <input type="number" step="any" className={inputClass} value={form.latitude} onChange={e => setField("latitude", parseFloat(e.target.value) || 0)} placeholder="Latitude" />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Longitude</label>
+          <input type="number" step="any" className={inputClass} value={form.longitude} onChange={e => setField("longitude", parseFloat(e.target.value) || 0)} placeholder="Longitude" />
+        </div>
+      </div>
+      
+      <div className="mt-4">
+        <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Physical Address</label>
+        <textarea className={`${inputClass} min-h-16 resize-none`} value={form.address} onChange={e => setField("address", e.target.value)} onBlur={handleAddressBlur} placeholder="Physical Destination Address" />
+      </div>
+      
+      <div className="mt-5 flex flex-wrap gap-3 pt-4 border-t border-stone-50">
+        <button type="button" onClick={tagLocation} className="rounded-xl border border-[#C5A059] text-[#C5A059] px-5 py-3 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer font-sans bg-white hover:bg-stone-50 transition"><MapPin size={14} /> Tag GPS Geolocation</button>
+        <button type="button" onClick={() => saveProfile(false)} disabled={busy} className="rounded-xl bg-stone-900 text-white px-6 py-3 text-xs font-extrabold uppercase tracking-wider hover:bg-stone-800 disabled:opacity-40 shadow-sm cursor-pointer font-sans transition">Save Staged Changes</button>
+        {canResubmit && <button type="button" onClick={() => saveProfile(true)} disabled={busy} className="rounded-xl px-6 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-sm cursor-pointer font-sans transition" style={{ background: GOLD }}>Resubmit Request</button>}
       </div>
     </div>
   );

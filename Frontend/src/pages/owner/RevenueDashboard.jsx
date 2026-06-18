@@ -221,12 +221,6 @@ export default function RevenueDashboard() {
                   </ChartPanel>
                 </div>
               </section>
-
-              <section className="w-full">
-                <ChartPanel title="Service-wise Revenue" subtitle="Top generating active operational layout service metrics overview.">
-                  <RevenueList rows={services.map(item => ({ name: item.serviceName, value: item.revenue, count: item.transactions }))} />
-                </ChartPanel>
-              </section>
             </>
           )}
         </div>

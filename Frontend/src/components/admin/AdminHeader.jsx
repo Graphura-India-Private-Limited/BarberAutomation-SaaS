@@ -46,8 +46,6 @@ const PAGE_TITLES = {
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: 'Dashboard',       page: 'dashboard' },
   { icon: Ticket,          label: 'All Tickets',     page: 'tickets' },
-  { icon: Users,           label: 'Customer Issues', page: 'customer' },
-  { icon: HeadphonesIcon,  label: 'Salon Issues',    page: 'salon' },
   { icon: BarChart2,       label: 'Reports',         page: 'reports' },
   { icon: TrendingUp,      label: 'Platform Analytics', page: 'analytics' },
   { icon: User,            label: 'User Management', page: 'users' },
@@ -206,17 +204,6 @@ export function Header({ activePage, setActivePage, unreadCount = 0, onBellClick
                     <span style={{ fontWeight: 500, color: C.ink }}>SLA Breach Center</span>
                   </button>
 
-                  {/* Customer Issues Shortcut */}
-                  <button
-                    type="button"
-                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('customer'); }}
-                    style={dropdownItemStyle}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <Users size={15} color={C.gold} />
-                    <span style={{ fontWeight: 500, color: C.ink }}>Customer Approvals</span>
-                  </button>
 
                   {/* Reports Shortcut */}
                   <button

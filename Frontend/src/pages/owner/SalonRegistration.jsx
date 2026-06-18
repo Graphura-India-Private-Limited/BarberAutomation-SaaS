@@ -1,11 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Upload, AlertTriangle, ShieldCheck } from "lucide-react";
+import { ArrowLeft, MapPin, Upload, AlertTriangle, ShieldCheck, ChevronDown, X } from "lucide-react";
 import shopImage from "../../assets/shop.jpg";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
+
+const AVAILABLE_SERVICES = [
+  "Haircut",
+  "Shave",
+  "Beard Trim",
+  "Haircut + Shave",
+  "Hair Color",
+  "Kids' Cut",
+];
 
 const emptyForm = {
   salon_name: "",
@@ -18,7 +27,8 @@ const emptyForm = {
   longitude: 0,
   opening_time: "09:00",
   closing_time: "21:00",
-  services_offered: "",
+  services_offered: [], // Array for dropdown selection
+  service_prices: {}, // Map of service_name -> price
   basic_pricing: "",
   number_of_barbers: "",
   support_number: "",
@@ -32,10 +42,76 @@ export default function SalonRegistration() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [timeError, setTimeError] = useState("");
 
   const setField = (name, value) => {
     setForm(prev => ({ ...prev, [name]: value }));
     setError("");
+  };
+
+  const handleAddressBlur = async () => {
+    if (!form.address || form.address.trim().length < 5) return;
+    try {
+      setMessage("Looking up coordinates for manual address...");
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(form.address)}`, {
+        headers: { "User-Agent": "BarberPro-App/1.0" }
+      });
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const newLat = parseFloat(data[0].lat);
+        const newLon = parseFloat(data[0].lon);
+        setForm(prev => ({
+          ...prev,
+          latitude: newLat,
+          longitude: newLon
+        }));
+        setMessage("Coordinates updated based on manual address.");
+        setError("");
+      } else {
+        setError("Could not resolve coordinates for manual address. Please check address spelling or tag via GPS.");
+      }
+    } catch (err) {
+      console.error("Geocoding failed", err);
+    }
+  };
+
+  const validateTimes = (open, close) => {
+    if (!open || !close) return true;
+    const [oH, oM] = open.split(":").map(Number);
+    const [cH, cM] = close.split(":").map(Number);
+    const openMins = oH * 60 + oM;
+    const closeMins = cH * 60 + cM;
+    return closeMins > openMins;
+  };
+
+  const handleTimeChange = (field, val) => {
+    const nextForm = { ...form, [field]: val };
+    setForm(nextForm);
+    if (!validateTimes(nextForm.opening_time, nextForm.closing_time)) {
+      setTimeError("Closing hour must be later than opening hour.");
+    } else {
+      setTimeError("");
+    }
+  };
+
+  const toggleService = (service) => {
+    let nextServices = [...form.services_offered];
+    let nextPrices = { ...form.service_prices };
+    
+    if (nextServices.includes(service)) {
+      nextServices = nextServices.filter(s => s !== service);
+      delete nextPrices[service];
+    } else {
+      nextServices.push(service);
+      nextPrices[service] = "";
+    }
+    
+    setForm(prev => ({
+      ...prev,
+      services_offered: nextServices,
+      service_prices: nextPrices
+    }));
   };
 
   // ── 📍 OPTIMIZED GEOLOCATION DETECTION ENGINE ──
@@ -56,13 +132,36 @@ export default function SalonRegistration() {
 
     navigator.geolocation.getCurrentPosition(
       position => {
+        const { latitude, longitude } = position.coords;
         setForm(prev => ({
           ...prev,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude,
+          longitude,
         }));
         setError("");
-        setMessage("Location coordinates successfully linked.");
+        setMessage("Coordinates tagged. Fetching physical address details...");
+        
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, {
+          headers: {
+            "User-Agent": "BarberPro-App/1.0"
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.display_name) {
+              setForm(prev => ({
+                ...prev,
+                address: data.display_name,
+              }));
+              setMessage("Location and physical address successfully linked.");
+            } else {
+              setMessage("Location coordinates successfully linked.");
+            }
+          })
+          .catch(err => {
+            console.error("Reverse geocode lookup error:", err);
+            setMessage("Location coordinates successfully linked.");
+          });
       },
       err => {
         setMessage("");
@@ -95,17 +194,36 @@ export default function SalonRegistration() {
       return;
     }
     
-    // ── ✅ FIXED runtime crash: changed loading(true) to setLoading(true) ──
+    if (form.services_offered.length === 0) {
+      setError("Please select at least one service offered.");
+      return;
+    }
+
+    if (!validateTimes(form.opening_time, form.closing_time)) {
+      setError("Closing hour must be later than opening hour.");
+      return;
+    }
+
+    const emptyPrices = form.services_offered.filter(s => !form.service_prices[s] || Number(form.service_prices[s]) <= 0);
+    if (emptyPrices.length > 0) {
+      setError(`Please specify a valid price for: ${emptyPrices.join(", ")}`);
+      return;
+    }
+    
     setLoading(true);
     setError("");
     setMessage("");
     try {
+      const haircutPrice = form.service_prices["Haircut"] || form.service_prices["Haircut + Shave"] || Object.values(form.service_prices)[0] || 0;
+
       const payload = {
         ...form,
-        services_offered: form.services_offered.split(",").map(s => s.trim()).filter(Boolean),
-        basic_pricing: Number(form.basic_pricing),
+        services_offered: form.services_offered,
+        service_prices: form.service_prices,
+        basic_pricing: Number(haircutPrice),
         number_of_barbers: Number(form.number_of_barbers),
       };
+      
       const res = await fetch(`${API}/auth/owner/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -190,45 +308,188 @@ export default function SalonRegistration() {
         <form onSubmit={handleSubmit} className="card-premium p-6 sm:p-10 space-y-6 text-left">
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Salon Name *">
-              <input required minLength={3} placeholder="e.g. Royal Razor Studio" value={form.salon_name} onChange={e => setField("salon_name", e.target.value)} className={inputClass} />
+              <div className="relative">
+                <input required minLength={3} maxLength={40} placeholder="e.g. Royal Razor Studio" value={form.salon_name} onChange={e => setField("salon_name", e.target.value.slice(0, 40))} className={inputClass} />
+                <div className="flex justify-between items-center mt-1 px-1">
+                  <span className="text-[10px] text-stone-400">Min 3 characters</span>
+                  <span className="text-[10px] text-stone-400 font-semibold">{form.salon_name.length}/40</span>
+                </div>
+              </div>
             </Field>
             
             <Field label="Owner Name *">
-              <input required placeholder="e.g. Mayur K." value={form.owner_name} onChange={e => setField("owner_name", e.target.value)} className={inputClass} />
+              <div className="relative">
+                <input required maxLength={30} placeholder="e.g. Mayur K." value={form.owner_name} onChange={e => setField("owner_name", e.target.value.slice(0, 30))} className={inputClass} />
+                <div className="flex justify-end mt-1 px-1">
+                  <span className="text-[10px] text-stone-400 font-semibold">{form.owner_name.length}/30</span>
+                </div>
+              </div>
             </Field>
             
             <Field label="Mobile Number *">
-              <input required maxLength={10} placeholder="e.g. 9876543210" value={form.mobile} onChange={e => setField("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))} className={inputClass} />
+              <div className="relative">
+                <input required maxLength={10} placeholder="e.g. 9876543210" value={form.mobile} onChange={e => setField("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))} className={inputClass} />
+                <div className="flex justify-between items-center mt-1 px-1">
+                  <span className="text-[10px] text-stone-400">10 digits</span>
+                  <span className="text-[10px] text-stone-400 font-semibold">{form.mobile.length}/10</span>
+                </div>
+              </div>
             </Field>
             
             <Field label="Email Address">
-              <input type="email" placeholder="e.g. contact@studio.com" value={form.email} onChange={e => setField("email", e.target.value)} className={inputClass} />
+              <div className="relative">
+                <input type="email" maxLength={50} placeholder="e.g. contact@studio.com" value={form.email} onChange={e => setField("email", e.target.value.slice(0, 50))} className={inputClass} />
+                <div className="flex justify-end mt-1 px-1">
+                  <span className="text-[10px] text-stone-400 font-semibold">{form.email.length}/50</span>
+                </div>
+              </div>
             </Field>
             
             <Field label="Security Password *">
-              <input required type="password" minLength={6} placeholder="Minimum 6 characters" value={form.password} onChange={e => setField("password", e.target.value)} className={inputClass} />
+              <div className="relative">
+                <input required type="password" minLength={6} maxLength={25} placeholder="Minimum 6 characters" value={form.password} onChange={e => setField("password", e.target.value.slice(0, 25))} className={inputClass} />
+                <div className="flex justify-between items-center mt-1 px-1">
+                  <span className="text-[10px] text-stone-400">Min 6 characters</span>
+                  <span className="text-[10px] text-stone-400 font-semibold">{form.password.length}/25</span>
+                </div>
+              </div>
             </Field>
             
             <Field label="Customer Support Number *">
-              <input required maxLength={10} placeholder="e.g. 9123456789" value={form.support_number} onChange={e => setField("support_number", e.target.value.replace(/\D/g, "").slice(0, 10))} className={inputClass} />
+              <div className="relative">
+                <input required maxLength={10} placeholder="e.g. 9123456789" value={form.support_number} onChange={e => setField("support_number", e.target.value.replace(/\D/g, "").slice(0, 10))} className={inputClass} />
+                <div className="flex justify-between items-center mt-1 px-1">
+                  <span className="text-[10px] text-stone-400">10 digits</span>
+                  <span className="text-[10px] text-stone-400 font-semibold">{form.support_number.length}/10</span>
+                </div>
+              </div>
             </Field>
             
             <Field label="Opening Hours">
-              <input type="time" value={form.opening_time} onChange={e => setField("opening_time", e.target.value)} className={inputClass} />
+              <input type="time" value={form.opening_time} onChange={e => handleTimeChange("opening_time", e.target.value)} className={inputClass} />
             </Field>
             
             <Field label="Closing Hours">
-              <input type="time" value={form.closing_time} onChange={e => setField("closing_time", e.target.value)} className={inputClass} />
+              <input type="time" value={form.closing_time} onChange={e => handleTimeChange("closing_time", e.target.value)} className={inputClass} />
             </Field>
-            
-            <Field label="Services Offered * (Comma Separated)">
-              <input required placeholder="e.g. Haircut, Beard Trim, Hair Color, Facial" value={form.services_offered} onChange={e => setField("services_offered", e.target.value)} className={inputClass} />
-            </Field>
-            
-            <Field label="Basic Haircut Price * (₹)">
-              <input required type="number" min="1" placeholder="₹ 150" value={form.basic_pricing} onChange={e => setField("basic_pricing", e.target.value)} className={inputClass} />
-            </Field>
-            
+
+            {/* Premium Custom Services Offered Dropdown */}
+            <div className="relative md:col-span-2">
+              <Field label="Services Offered *">
+                <div 
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="w-full bg-white border border-[#EADBCE] rounded-2xl p-4 flex items-center justify-between text-[#3E362E] text-sm font-medium font-sans shadow-3xs cursor-pointer hover:border-[#C5A059] transition-all"
+                >
+                  <span className={form.services_offered.length === 0 ? "text-stone-400" : "text-[#3E362E]"}>
+                    {form.services_offered.length === 0 
+                      ? "Select services offered..." 
+                      : `${form.services_offered.length} services selected`}
+                  </span>
+                  <ChevronDown size={16} className={`transition-transform duration-300 text-[#C5A059] ${dropdownOpen ? "rotate-180" : ""}`} />
+                </div>
+              </Field>
+
+              {dropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-20" onClick={() => setDropdownOpen(false)} />
+                  <div className="absolute left-0 right-0 top-[85px] mt-1 bg-white border border-[#EADBCE] rounded-2xl shadow-xl z-30 p-2 space-y-1 max-h-60 overflow-y-auto">
+                    {AVAILABLE_SERVICES.map(service => {
+                      const isSelected = form.services_offered.includes(service);
+                      return (
+                        <div 
+                          key={service} 
+                          onClick={() => toggleService(service)}
+                          className={`flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer select-none text-xs font-bold uppercase tracking-wider ${
+                            isSelected 
+                              ? "bg-[#FAF6F0] text-[#C5A059]" 
+                              : "hover:bg-stone-50 text-[#3E362E]"
+                          }`}
+                        >
+                          <span>{service}</span>
+                          <input 
+                            type="checkbox" 
+                            checked={isSelected}
+                            readOnly
+                            className="accent-[#C5A059] h-4 w-4 rounded cursor-pointer"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {form.services_offered.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {form.services_offered.map(service => (
+                    <span 
+                      key={service} 
+                      className="inline-flex items-center gap-1 bg-[#FAF6F0] border border-[#EADBCE] text-[#3E362E] px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider animate-in fade-in zoom-in-95"
+                    >
+                      {service}
+                      <button 
+                        type="button" 
+                        onClick={() => toggleService(service)}
+                        className="text-[#C5A059] hover:text-red-500 transition-colors ml-1 cursor-pointer"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Dynamic Service Pricing Inputs */}
+            <div className="md:col-span-2">
+              {form.services_offered.length > 0 ? (
+                <div className="bg-[#FAF6F0]/50 border border-[#EADBCE] rounded-3xl p-5 md:p-6 space-y-4">
+                  <div>
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
+                      Service Price Configuration *
+                    </span>
+                    <p className="text-stone-500 text-xs mt-1 font-sans">
+                      Please specify the price (in ₹) for each service you offer.
+                    </p>
+                  </div>
+                  
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {form.services_offered.map(serviceName => (
+                      <Field key={serviceName} label={`Price for ${serviceName} *`}>
+                        <div className="relative">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 text-sm font-semibold">₹</span>
+                          <input 
+                            required 
+                            type="number" 
+                            min="1" 
+                            placeholder="e.g. 150" 
+                            value={form.service_prices[serviceName] || ""} 
+                            onChange={e => {
+                              const val = e.target.value;
+                              setForm(prev => ({
+                                ...prev,
+                                service_prices: {
+                                  ...prev.service_prices,
+                                  [serviceName]: val
+                                }
+                              }));
+                            }} 
+                            className={`${inputClass} pl-8`} 
+                          />
+                        </div>
+                      </Field>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white border border-dashed border-[#EADBCE] rounded-3xl p-8 text-center">
+                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-stone-400 font-sans">
+                    Please select services above to configure pricing.
+                  </span>
+                </div>
+              )}
+            </div>
+
             <Field label="Total Active Chairs / Barbers *">
               <input required type="number" min="1" placeholder="e.g. 3" value={form.number_of_barbers} onChange={e => setField("number_of_barbers", e.target.value)} className={inputClass} />
             </Field>
@@ -247,9 +508,15 @@ export default function SalonRegistration() {
           {/* Address with MapPin Geotag integration layout */}
           <div className="grid gap-5 md:grid-cols-[1fr_auto] items-end">
             <Field label="Physical Studio Address *">
-              <textarea required minLength={10} placeholder="Complete shop address details..." value={form.address} onChange={e => setField("address", e.target.value)} className={`${inputClass} min-h-24 resize-none`} />
+              <div className="relative w-full">
+                <textarea required minLength={10} maxLength={150} placeholder="Complete shop address details..." value={form.address} onChange={e => setField("address", e.target.value.slice(0, 150))} onBlur={handleAddressBlur} className={`${inputClass} min-h-24 resize-none`} />
+                <div className="flex justify-between items-center mt-1 px-1">
+                  <span className="text-[10px] text-stone-400">Min 10 characters</span>
+                  <span className="text-[10px] text-stone-400 font-semibold">{form.address.length}/150</span>
+                </div>
+              </div>
             </Field>
-            <div className="pt-2">
+            <div className="pt-2 pb-5">
               <button 
                 type="button" 
                 onClick={handleGeoTag} 
@@ -265,26 +532,67 @@ export default function SalonRegistration() {
             </div>
           </div>
 
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Latitude *">
+              <input required type="number" step="any" placeholder="Latitude" value={form.latitude || ""} onChange={e => setField("latitude", parseFloat(e.target.value) || 0)} className={inputClass} />
+            </Field>
+            <Field label="Longitude *">
+              <input required type="number" step="any" placeholder="Longitude" value={form.longitude || ""} onChange={e => setField("longitude", parseFloat(e.target.value) || 0)} className={inputClass} />
+            </Field>
+          </div>
+
           <Field label="About Studio / Bio">
-            <textarea placeholder="Describe your shop atmosphere, specialization details..." value={form.about} onChange={e => setField("about", e.target.value)} className={`${inputClass} min-h-24 resize-none`} />
+            <div className="relative w-full">
+              <textarea maxLength={300} placeholder="Describe your shop atmosphere, specialization details..." value={form.about} onChange={e => setField("about", e.target.value.slice(0, 300))} className={`${inputClass} min-h-24 resize-none`} />
+              <div className="flex justify-end mt-1 px-1">
+                <span className="text-[10px] text-stone-400 font-semibold">{form.about.length}/300</span>
+              </div>
+            </div>
           </Field>
 
-          {/* Images preview stream layer */}
+          {/* Images preview stream layer with Delete Buttons */}
           {form.images.length > 0 && (
-            <div className="grid grid-cols-3 gap-3 md:grid-cols-5 pt-2">
+            <div className="grid grid-cols-3 gap-4 md:grid-cols-5 pt-2">
               {form.images.map((image, index) => (
-                <img key={index} src={image} alt={`Salon upload ${index + 1}`} className="aspect-square rounded-2xl border border-[#EADBCE] object-cover shadow-3xs animate-in fade-in zoom-in-95" />
+                <div key={index} className="relative group aspect-square">
+                  <img 
+                    src={image} 
+                    alt={`Salon upload ${index + 1}`} 
+                    className="w-full h-full rounded-2xl border border-[#EADBCE] object-cover shadow-3xs transition-all duration-200 group-hover:brightness-95 animate-in fade-in zoom-in-95" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        images: prev.images.filter((_, idx) => idx !== index)
+                      }));
+                    }}
+                    className="absolute -top-1.5 -right-1.5 bg-[#3E362E] hover:bg-[#C5A059] text-white rounded-full p-1.5 shadow-md transition-all duration-200 border border-[#EADBCE] cursor-pointer flex items-center justify-center"
+                    title="Remove Image"
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
               ))}
             </div>
           )}
 
           {/* Dialog message status monitors */}
+          {timeError && (
+            <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-2 text-amber-800 text-xs font-semibold font-sans animate-in fade-in duration-200">
+              <AlertTriangle size={14} className="shrink-0 text-amber-600" />
+              <span>{timeError}</span>
+            </div>
+          )}
+          
           {error && (
             <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-2 text-rose-700 text-xs font-medium font-sans animate-in fade-in duration-200">
               <AlertTriangle size={14} className="shrink-0" />
               <span>{error}</span>
             </div>
           )}
+          
           {message && (
             <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2 text-emerald-800 text-xs font-medium font-sans animate-in fade-in duration-200">
               <ShieldCheck size={14} className="shrink-0" />
