@@ -584,10 +584,10 @@ export default function CustomerProfile() {
           <main className="flex-1 flex flex-col bg-[#FAF6F0] overflow-auto">
 
             {/* ── HEADER ── */}
-            <header className="bg-[#FFFDF9] border-b border-[#EADBCE] px-6 py-4.5 flex items-center justify-between sticky top-0 z-10 text-left shrink-0 shadow-2xs">
-              <div>
+            <header className="bg-[#FFFDF9] border-b border-[#EADBCE] px-6 py-5 flex items-center justify-between sticky top-0 z-10 text-left shrink-0 shadow-2xs">
+              <div className="flex flex-col justify-center">
                 {/* ✅ FIX: NearbyBarbers removed from h1 — only text titles here */}
-                <h1 className="text-2xl font-black font-serif text-[#3D3126]">
+                <h1 className="text-2xl font-black font-serif text-[#3D3126] leading-tight">
                   {activeTab === "overview" && "Dashboard"}
                   {activeTab === "queue" && "Live Queue Tracker"}
                   {activeTab === "studios" && "Our Studios"}
@@ -597,7 +597,7 @@ export default function CustomerProfile() {
                   {activeTab === "preferences" && "Profile Settings"}
                   {activeTab === "alerts" && "Live System Alerts"}
                 </h1>
-                <p className="text-xs text-[#8A7A6A] mt-0.5">Welcome back, {profile.name}!</p>
+                <p className="text-xs text-[#8A7A6A] mt-1.5">Welcome back, {profile.name}!</p>
               </div>
 
               <div className="flex items-center gap-3">
