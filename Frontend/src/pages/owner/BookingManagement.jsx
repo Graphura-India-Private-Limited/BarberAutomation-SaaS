@@ -27,7 +27,7 @@ const GOLD = "#C5A059";
 export default function BookingManagement() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [selectedTypeFilter, setSelectedTypeFilter] = useState("ALL"); // ALL, Queue, Slot, Priority
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState("ALL"); // ALL, Queue, Slot
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
@@ -44,12 +44,12 @@ export default function BookingManagement() {
     { id: 1, name: "wdwdw", type: "Queue", slot: "10:00 AM", status: "Approved" },
     { id: 2, name: "Rahul Sharma", type: "Queue", slot: "10:00 AM", status: "Rejected" },
     { id: 3, name: "Amit Patil", type: "Slot", slot: "11:00 AM", status: "Approved" },
-    { id: 4, name: "Priya Deshmukh", type: "Priority", slot: "12:00 PM", status: "Pending" },
+    { id: 4, name: "Priya Deshmukh", type: "Queue", slot: "12:00 PM", status: "Pending" },
   ]);
 
   const [activities] = useState([
     { id: 1, text: "Rahul booked haircut", time: "2 sec ago" },
-    { id: 2, text: "Priya upgraded to premium", time: "1 min ago" },
+    { id: 2, text: "Priya completed checkout", time: "1 min ago" },
     { id: 3, text: "Amit cancelled appointment", time: "3 min ago" },
   ]);
 
@@ -232,11 +232,10 @@ export default function BookingManagement() {
         </div>
 
         {/* ── INTERACTIVE FILTER SEGMENTS ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-left">
           {[
             { filterKey: "Queue", title: "Queue Bookings", icon: Clock3, desc: "On-demand routing slot entries" },
             { filterKey: "Slot", title: "Slot Bookings", icon: Calendar, desc: "Pre-arranged appointment times" },
-            { filterKey: "Priority", title: "Priority Bookings", icon: Crown, desc: "VIP fast-track checkout nodes" },
           ].map((item) => {
             const isTargetActive = selectedTypeFilter === item.filterKey;
             return (
@@ -295,7 +294,7 @@ export default function BookingManagement() {
                     <tr key={booking.id} className="hover:bg-stone-50/60 transition-colors group">
                       <td className="py-4.5 pr-4 whitespace-nowrap font-bold text-stone-900 text-sm">{booking.name}</td>
                       <td className="pr-4 whitespace-nowrap">
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${booking.type === 'Priority' ? 'bg-purple-50 text-purple-700' : booking.type === 'Slot' ? 'bg-blue-50 text-blue-700' : 'bg-stone-100 text-stone-700'}`}>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${booking.type === 'Slot' ? 'bg-blue-50 text-blue-700' : 'bg-stone-100 text-stone-700'}`}>
                           {booking.type}
                         </span>
                       </td>
@@ -381,7 +380,6 @@ export default function BookingManagement() {
                 >
                   <option value="Queue">Queue Booking</option>
                   <option value="Slot">Slot Booking</option>
-                  <option value="Priority">Priority Booking</option>
                 </select>
               </div>
 

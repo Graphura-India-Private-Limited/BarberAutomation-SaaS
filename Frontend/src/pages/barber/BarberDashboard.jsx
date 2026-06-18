@@ -17,21 +17,6 @@ import {
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
 
-/* ── NAV ITEMS ── */
-const NAV = [
-  { id: "dashboard",   label: "Dashboard",       icon: BarChart2 },
-  { id: "queue",       label: "My Queue",         icon: Users },
-  { id: "bookings",    label: "Bookings",         icon: Calendar },
-  { id: "earnings",    label: "Earnings",         icon: IndianRupee },
-  { id: "reviews",     label: "Reviews",          icon: Star },
-  { id: "breaks",      label: "Break Requests",   icon: Coffee,    badge: 1 },
-  { id: "noshow",      label: "No-Show / Late",   icon: AlertCircle },
-  { id: "services",    label: "Services",         icon: Scissors },
-  {id: "console", label: "Live Console",    icon: PlayCircle },
-  { id: "profile",     label: "My Profile",       icon: User },
-  { id: "settings",    label: "Settings",         icon: Settings },
-];
-
 const STATUS_CFG = {
   available: { dot: "bg-emerald-400", text: "text-emerald-400", label: "Available",   ring: "ring-emerald-400/30" },
   busy:      { dot: "bg-amber-400",   text: "text-amber-400",   label: "Busy",        ring: "ring-amber-400/30" },
@@ -454,15 +439,14 @@ export default function BarberDashboard() {
   </div>
 </div>
 
-    
 
   {/* ── QUICK ACTIONS STRIP ── */}
   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
     {[
       { label: "Request Break",   icon: Coffee,      color: "#8B5A2B", route: "/barber/breaks" },
       { label: "View Profile",    icon: User,        color: "#4A3E3D", route: "/barber/profile" },
-      { label: "Manage Services", icon: Scissors,    color: "#8B5A2B", route: "/barber/live-session" },
-      { label: "Handle No-Show",  icon: AlertCircle, color: "#D9534F", route: "/barber/noshow-delay" },
+      { label: "Live Console",    icon: PlayCircle,  color: "#8B5A2B", route: "/barber/service-console" },
+      { label: "Barber Services", icon: Scissors,    color: "#D9534F", route: "/barber/services" },
     ].map((a, i) => (
       <button key={i}
         onClick={() => { if (a.route) navigate(a.route); else showToast(`${a.label} — coming soon`); }}

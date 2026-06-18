@@ -39,10 +39,10 @@ const Footer = () => {
   const CONTACT_ITEMS = [
     {
       icon: Phone,
-      text: "+91 98765 43210",
+      text: "+91 73780 21327",
       onClick: () => {
         // Opens the device's default phone dialer
-        const phone = "+919876543210";
+        const phone = "+917378021327";
         const link = document.createElement("a");
         link.href = `tel:${phone}`;
         link.style.display = "none";
@@ -53,10 +53,10 @@ const Footer = () => {
     },
     {
       icon: Mail,
-      text: "hello@barberpro.com",
+      text: "support@graphura.in",
       onClick: () => {
         // Opens the user's default email client (Gmail, Outlook, Apple Mail, etc.)
-        window.location.href = "mailto:hello@barberpro.com";
+        window.location.href = "mailto:support@graphura.in";
       },
     },
     {

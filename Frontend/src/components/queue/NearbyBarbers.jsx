@@ -916,12 +916,98 @@ const handleBook = async () => {
     </div>
   );
 
+  const locationGateContent = (
+    <div className="max-w-2xl mx-auto text-center py-16 px-6 bg-white border border-[#EADDCA] rounded-[32px] shadow-sm relative overflow-hidden my-8">
+      {/* Shine Effect */}
+      <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-[#C5A059]/5 to-transparent rotate-12 pointer-events-none" />
+      
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="w-16 h-16 rounded-full bg-[#FAF6F0] border border-[#EADDCA] flex items-center justify-center mb-6 shadow-xs relative">
+          <Icons.MapPin className="w-8 h-8 text-[#C5A059] animate-bounce" />
+          <div className="absolute inset-0 rounded-full border-2 border-[#C5A059]/30 animate-ping opacity-75" />
+        </div>
+
+        <h3 className="text-xl font-black uppercase tracking-wider text-[#3E362E] mb-3">
+          Location Permission Required
+        </h3>
+        
+        <p className="text-[#8A7B6A] text-sm leading-relaxed max-w-md mb-8 font-medium">
+          To browse grooming studios, view real-time queue lengths, and book slots with nearby stylists, please allow location access.
+        </p>
+
+        <button
+          type="button"
+          onClick={detectLocation}
+          disabled={isDetectingLocation}
+          className="px-8 py-4 bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black uppercase text-xs tracking-widest rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none flex items-center gap-2"
+        >
+          {isDetectingLocation ? (
+            <>
+              <Icons.Loader2 className="w-4 h-4 animate-spin" />
+              Requesting...
+            </>
+          ) : (
+            <>
+              <Icons.MapPin className="w-4 h-4" />
+              Allow Location Access
+            </>
+          )}
+        </button>
+
+        {locationError && (
+          <div className="mt-6 p-4 bg-amber-50/60 border border-amber-200/50 rounded-2xl max-w-md text-left flex items-start gap-3">
+            <Icons.AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-extrabold text-amber-800 uppercase tracking-wider mb-1">
+                Permission Blocked
+              </p>
+              <p className="text-stone-600 text-xs leading-normal">
+                It looks like location permission is disabled or blocked. Please click the settings/lock icon next to the URL in your browser address bar and enable Location for this site.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (isDetectingLocation && !userCoords) {
+    const loadingContent = (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Icons.Loader2 size={40} className="text-[#C5A059] animate-spin mb-4" />
+        <p className="text-sm font-bold text-[#3E362E] uppercase tracking-widest animate-pulse">
+          Detecting location...
+        </p>
+      </div>
+    );
+
+    if (isStandalone) {
+      return (
+        <div className="min-h-screen bg-[#FAF6F0] text-[#1A1612] font-sans antialiased flex flex-col">
+          <Navbar />
+          <div ref={sectionRef} className="flex-grow max-w-[1450px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 flex items-center justify-center">
+            {loadingContent}
+          </div>
+          <Footer />
+        </div>
+      );
+    }
+
+    return (
+      <div ref={sectionRef} className="w-full flex items-center justify-center py-12">
+        {loadingContent}
+      </div>
+    );
+  }
+
+  const displayContent = userCoords ? content : locationGateContent;
+
   if (isStandalone) {
     return (
       <div className="min-h-screen bg-[#FAF6F0] text-[#1A1612] font-sans antialiased flex flex-col">
         <Navbar />
         <div ref={sectionRef} className="flex-grow max-w-[1450px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
-          {content}
+          {displayContent}
         </div>
         <Footer />
       </div>
@@ -932,7 +1018,7 @@ const handleBook = async () => {
     <div ref={sectionRef} className="w-full">
       {/* ── SECTION WRAPPER ── */}
       <section className="py-6">
-        {content}
+        {displayContent}
       </section>
     </div>
   );

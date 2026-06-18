@@ -51,7 +51,6 @@ const HISTORY_SEED = [
   { id:11, read:true,  type:"booking_reminder", title:"Slot Tomorrow at 11 AM",  body:"Don't forget your appointment at BarberPro Bandra.",        action:"View",        group:"Yesterday", timeLabel:"Yesterday 2 PM" },
   { id:12, read:true,  type:"loyalty",          title:"+20 Points Earned",       body:"Great visit! Balance: 150 pts.",                             action:"View Points", group:"Yesterday", timeLabel:"Yesterday 10 AM" },
   { id:13, read:true,  type:"haircut_reminder", title:"Time for a Trim?",        body:"It's been 20 days since your last visit. Raj has slots!",   action:"Book Now",    group:"Earlier",   timeLabel:"3 days ago" },
-  { id:14, read:true,  type:"offer",            title:"Gold Membership Upgrade", body:"Priority booking + 15% off every visit. Upgrade now!",      action:"Explore",     group:"Earlier",   timeLabel:"5 days ago" },
   { id:15, read:true,  type:"booking_confirmed",title:"Booking Confirmed",       body:"Last week's slot at Elite Cuts was confirmed.",              action:null,          group:"Earlier",   timeLabel:"1 week ago" },
 ];
 
@@ -399,8 +398,8 @@ function StatCard({ icon, label, value, accent }) {
 // ─── Upcoming booking card ───────────────────────────────────────────────────
 function BookingCard({ salon, service, time, barber, type }) {
   const typeStyle = {
-    Priority: { bg:C.goldDim, color:C.gold, border:`${C.gold}44` },
     Slot:     { bg:C.blueDim, color:C.blue, border:`${C.blue}40` },
+    Queue:    { bg:C.goldDim, color:C.gold, border:`${C.gold}44` },
   }[type] || {};
   return (
     <div style={{
@@ -541,25 +540,12 @@ export default function UserProfile() {
               fontSize:26, fontWeight:700, color:C.goldLt, fontFamily:"sans-serif",
               boxShadow:`0 4px 20px ${C.goldGlow}`,
             }}>AS</div>
-            <div style={{
-              position:"absolute", bottom:-4, right:-4,
-              width:20, height:20, borderRadius:6,
-              background:"linear-gradient(135deg,#C9A84C,#a07620)",
-              display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize:11, border:`2px solid ${C.bg}`,
-            }}>👑</div>
           </div>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:20, fontWeight:700, color:C.cream, letterSpacing:"0.02em", marginBottom:3 }}>
               Arjun Sharma
             </div>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <span style={{
-                fontSize:10, fontFamily:"sans-serif", fontWeight:800,
-                letterSpacing:"0.1em", textTransform:"uppercase",
-                padding:"3px 10px", borderRadius:20,
-                background:C.goldDim, color:C.gold, border:`1px solid ${C.gold}40`,
-              }}>Gold Member</span>
               <span style={{ fontSize:12, color:C.muted, fontFamily:"sans-serif" }}>
                 +91 98765 43210
               </span>
@@ -587,7 +573,7 @@ export default function UserProfile() {
             }}>Upcoming Bookings</span>
             <span style={{ fontSize:11, color:C.muted, fontFamily:"sans-serif", cursor:"pointer" }}>View all →</span>
           </div>
-          <BookingCard salon="BarberPro Andheri" service="Haircut + Beard" time="Today, 4:30 PM" barber="Barber Raj" type="Priority" />
+          <BookingCard salon="BarberPro Andheri" service="Haircut + Beard" time="Today, 4:30 PM" barber="Barber Raj" type="Queue" />
           <BookingCard salon="Elite Cuts & Spa"  service="Haircut"          time="Sat, 11:00 AM"  barber="Barber Aryan" type="Slot" />
         </div>
 

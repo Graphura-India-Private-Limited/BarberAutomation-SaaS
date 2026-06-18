@@ -29,7 +29,11 @@ const salonSchema = new mongoose.Schema({
   created_at:         { type:Date, default:Date.now },
   max_barbers_limit: { type: Number, default: 3 },
   gstin:             { type: String, default: "" },
-  license_number:    { type: String, default: "" }
+  license_number:    { type: String, default: "" },
+  shop_establishment_certificate: { type: String, default: "" },
+  trade_license:                 { type: String, default: "" },
+  gst_certificate:               { type: String, default: "" },
+  aadhaar_card:                  { type: String, default: "" }
 });
 
 module.exports = mongoose.model("Salon", mongoose.modelNames().includes("Salon") ? mongoose.model("Salon").schema : salonSchema);

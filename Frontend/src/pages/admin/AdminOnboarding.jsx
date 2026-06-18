@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Store, Users, UserSquare2, UserPlus2, 
   CalendarCheck, Scissors, CreditCard, Star, Activity, Settings, LogOut,
-  Bell, RefreshCw, ChevronDown
+  Bell, RefreshCw, ChevronDown, X, Eye
 } from "lucide-react";  
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -116,7 +116,13 @@ const NAV = [
 ];
 
 const salonImg = (i) => ["https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&q=80","https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&q=80","https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=400&q=80","https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=400&q=80"][i%4];
-const barberImg = (i) => ["https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=200&q=80","https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=200&q=80","https://images.unsplash.com/photo-1621605815841-aa33c5447a33?w=200&q=80"][i%3];
+const barberImg = (i) => [
+  "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=200&q=80",
+  "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=200&q=80",
+  "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=200&q=80",
+  "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=200&q=80",
+  "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=80"
+][i % 5];
 
 const bStatus  = s => s === "available" ? C.green : s === "busy" ? C.amber : s === "break" ? C.blue : "#9CA3AF";
 const bkStatus = s => s === "completed" ? C.green : s === "pending" ? C.purple : s === "cancelled" ? C.red : C.blue;
@@ -127,6 +133,48 @@ const NAV_ICONS = {
   barbers: UserSquare2, addbarber: UserPlus2, appointments: CalendarCheck,
   services: Scissors, payments: CreditCard, reviews: Star,
   live: Activity, settings: Settings
+};
+
+const DocumentPreview = ({ label, data }) => {
+  if (!data) {
+    return (
+      <div style={{ border: "1px dashed #EADBCE", borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#FAF6F0", height: 110 }}>
+        <span style={{ color: "#78716C", fontSize: 11, fontWeight: 700, textAlign: "center" }}>{label}</span>
+        <span style={{ fontSize: 9, color: "#78716C", marginTop: 4 }}>Not Uploaded</span>
+      </div>
+    );
+  }
+
+  const isPdf = data.startsWith("data:application/pdf");
+
+  return (
+    <div style={{ border: "1px solid #EADBCE", borderRadius: 12, padding: 12, display: "flex", flexDirection: "column", justifyContent: "between", backgroundColor: "#FFFFFF", height: 130, boxShadow: "0 1px 2px rgba(0,0,0,.03)" }}>
+      <div>
+        <span style={{ color: "#1C1917", fontSize: 11, fontWeight: 700, display: "block", marginBottom: 6 }}>{label}</span>
+        {isPdf ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#DC2626", background: "#FEF2F2", border: "1px solid #FEF2F2", borderRadius: 6, padding: 6, marginTop: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 900 }}>PDF</span>
+            <span style={{ fontSize: 9, color: "#78716C", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 100 }}>Document.pdf</span>
+          </div>
+        ) : (
+          <div style={{ width: "100%", height: 50, borderRadius: 4, overflow: "hidden", border: "1px solid #E7E5E4" }}>
+            <img src={data} alt={label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </div>
+        )}
+      </div>
+      <a
+        href={data}
+        download={`${label.replace(/\s+/g, "_")}_doc${isPdf ? ".pdf" : ".png"}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          marginTop: 8, display: "block", textAlign: "center", bg: "#C5A059", background: "#C5A059", color: "#FFFFFF", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, padding: "5px 0", borderRadius: 6, textDecoration: "none", cursor: "pointer"
+        }}
+      >
+        View / Download
+      </a>
+    </div>
+  );
 };
 
 export default function AdminOnboarding() {
@@ -196,6 +244,7 @@ export default function AdminOnboarding() {
   const [busy,       setBusy]      = useState(false);
   const [addedBarbers, setAddedBarbers] = useState([]);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const [viewingSalon, setViewingSalon] = useState(null);
 
   const [newBarber, setNewBarber] = useState({
     name:"", mobile:"", password:"", specialization:"", experience:"", salon_id:"",
@@ -856,6 +905,32 @@ export default function AdminOnboarding() {
                           <div style={{ fontSize:11, color:C.muted, marginBottom:12 }}>
                             Registered: {s.created_at ? new Date(s.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}) : "—"}
                           </div>
+                          <button 
+                            type="button" 
+                            className="action-btn" 
+                            onClick={() => setViewingSalon(s)} 
+                            style={{ 
+                              display: "inline-flex", 
+                              alignItems: "center", 
+                              justifyContent: "center", 
+                              gap: 5, 
+                              padding: "8px 14px", 
+                              borderRadius: 8, 
+                              fontSize: 12, 
+                              fontWeight: 700, 
+                              cursor: "pointer", 
+                              background: `${C.gold}15`, 
+                              color: C.gold, 
+                              border: `1px solid ${C.gold}30`, 
+                              width: "100%", 
+                              marginBottom: 8, 
+                              fontFamily: "inherit",
+                              transition: "all 0.18s"
+                            }}
+                          >
+                            <Eye size={13} style={{ color: C.gold }} />
+                            View Details & Docs
+                          </button>
                           {salonTab==="requests" && (
                             <div style={{ display:"flex", gap:8 }}>
                               <button className="action-btn" disabled={busy} onClick={()=>updateSalonStatus(s._id,"approved")} style={{ ...btnStyle(`${C.green}15`, C.green, `1px solid ${C.green}30`), flex:1, justifyContent:"center" }}>Approve</button>
@@ -1259,6 +1334,93 @@ export default function AdminOnboarding() {
                 style={{ flex:2, padding:10, background:reason.trim()?C.red:"#FCA5A5", color:"#fff", borderRadius:8, fontSize:13, fontWeight:700, border:"none", cursor:"pointer", fontFamily:"inherit" }}>
                 {busy?"Processing...":"Confirm Rejection"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ VIEW DETAILS MODAL ══ */}
+      {viewingSalon && (
+        <div style={{ position:"fixed", inset:0, zIndex:50, display:"flex", alignItems:"center", justifyContent:"center", padding:16, background:"rgba(0,0,0,.5)", backdropFilter:"blur(4px)" }}
+          onClick={() => setViewingSalon(null)}>
+          <div style={{ background:C.card, border:`1px solid ${C.border}`, width:"100%", maxWidth:650, borderRadius:16, padding:24, boxShadow:"0 20px 60px rgba(0,0,0,.15)", display:"flex", flexDirection:"column", maxHeight:"90vh" }}
+            onClick={e=>e.stopPropagation()}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:`1px solid ${C.border}`, paddingBottom:12, marginBottom:16 }}>
+              <div>
+                <div style={{ fontSize:22, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>{viewingSalon.salon_name}</div>
+                <div style={{ fontSize:11, color:C.muted, marginTop:2 }}>Submitted by {viewingSalon.owner_name}</div>
+              </div>
+              <button type="button" onClick={() => setViewingSalon(null)} style={{ background:"none", border:"none", cursor:"pointer", color:C.muted }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ flex:1, overflowY:"auto", paddingRight:6, display:"flex", flexDirection:"column", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                <div>
+                  <h4 style={{ fontSize:12, fontWeight:700, color:C.gold, borderBottom:`1px solid ${C.border}`, paddingBottom:4, marginBottom:8 }}>General Info</h4>
+                  <div style={{ display:"flex", flexDirection:"column", gap:6, fontSize:12 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>Mobile:</span> <strong>{viewingSalon.mobile || "—"}</strong></div>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>Email:</span> <strong>{viewingSalon.owner_email || viewingSalon.email || "—"}</strong></div>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>Support Hotline:</span> <strong>{viewingSalon.support_number || "—"}</strong></div>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>Opening Hours:</span> <strong>{viewingSalon.opening_time} - {viewingSalon.closing_time}</strong></div>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>Active Barbers:</span> <strong>{viewingSalon.number_of_barbers}</strong></div>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>Salary Model:</span> <strong style={{ textTransform:"capitalize" }}>{viewingSalon.salary_model}</strong></div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 style={{ fontSize:12, fontWeight:700, color:C.gold, borderBottom:`1px solid ${C.border}`, paddingBottom:4, marginBottom:8 }}>Legal Identifiers</h4>
+                  <div style={{ display:"flex", flexDirection:"column", gap:6, fontSize:12 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>GSTIN:</span> <strong>{viewingSalon.gstin || "—"}</strong></div>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}><span style={{ color:C.muted }}>License No:</span> <strong>{viewingSalon.license_number || "—"}</strong></div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:2, marginTop:4 }}>
+                      <span style={{ color:C.muted }}>Address:</span>
+                      <strong style={{ lineHeight:1.4 }}>{viewingSalon.address || "—"}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {viewingSalon.about && (
+                <div>
+                  <h4 style={{ fontSize:12, fontWeight:700, color:C.gold, borderBottom:`1px solid ${C.border}`, paddingBottom:4, marginBottom:6 }}>About</h4>
+                  <p style={{ fontSize:12, color:C.ink, margin:0, lineHeight:1.5 }}>{viewingSalon.about}</p>
+                </div>
+              )}
+
+              {viewingSalon.images && viewingSalon.images.length > 0 && (
+                <div>
+                  <h4 style={{ fontSize:12, fontWeight:700, color:C.gold, borderBottom:`1px solid ${C.border}`, paddingBottom:4, marginBottom:8 }}>Studio Gallery</h4>
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:8 }}>
+                    {viewingSalon.images.map((img, idx) => (
+                      <div key={idx} style={{ height:64, borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}` }}>
+                        <img src={img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h4 style={{ fontSize:12, fontWeight:700, color:C.gold, borderBottom:`1px solid ${C.border}`, paddingBottom:4, marginBottom:8 }}>Verification Documents</h4>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:10 }}>
+                  <DocumentPreview label="Shop & Establishment Certificate" data={viewingSalon.shop_establishment_certificate} />
+                  <DocumentPreview label="Trade License" data={viewingSalon.trade_license} />
+                  <DocumentPreview label="GST Certificate" data={viewingSalon.gst_certificate} />
+                  <DocumentPreview label="Aadhaar Card" data={viewingSalon.aadhaar_card} />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display:"flex", gap:8, borderTop:`1px solid ${C.border}`, paddingTop:12, marginTop:16 }}>
+              <button type="button" onClick={() => setViewingSalon(null)} style={{ flex:1, padding:10, border:`1px solid ${C.border}`, borderRadius:8, color:C.muted, fontSize:13, background:"#fff", cursor:"pointer", fontFamily:"inherit" }}>Close</button>
+              {viewingSalon.status !== "approved" && (
+                <button type="button" className="action-btn" onClick={() => { updateSalonStatus(viewingSalon._id, "approved"); setViewingSalon(null); }}
+                  style={{ flex:2, padding:10, background:C.green, color:"#fff", borderRadius:8, fontSize:13, fontWeight:700, border:"none", cursor:"pointer", fontFamily:"inherit" }}>
+                  Approve Salon
+                </button>
+              )}
             </div>
           </div>
         </div>

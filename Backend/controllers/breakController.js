@@ -1,5 +1,6 @@
 const BreakRequest = require("../models/BreakRequest");
 const Barber = require("../models/Barber");
+const Queue = require("../models/Queue");
 
 // @desc    Get all pending break requests (Owner view)
 // @route   GET /api/breaks/pending
@@ -31,12 +32,13 @@ exports.handleBreakAction = async (req, res) => {
     request.owner_note = owner_note || "";
     await request.save();
 
-    // If approved, update Barber's status to block queue
+    // If approved, update Barber's status to block queue and pause queue items
     if (status === "approved") {
-      await Barber.findByIdAndUpdate(request.barber_id, {
-        is_on_break: true,
-        current_break_id: request._id
-      });
+      await Barber.findByIdAndUpdate(request.barber_id, { status: "break" });
+      await Queue.updateMany(
+        { barber_id: request.barber_id, status: "waiting" },
+        { status: "paused" }
+      );
     }
 
     res.json({

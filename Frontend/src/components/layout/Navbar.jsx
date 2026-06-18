@@ -163,7 +163,6 @@ const Navbar = () => {
       { label: "My Profile", icon: User, path: "/customerprofile" },
       { label: "My Appointments", icon: Calendar, path: "/customer/history" },
       { label: "Book Appointment", icon: Sparkles, path: "/customer/booking" },
-      { label: "Rewards & Points", icon: Star, path: "/membership" },
     ];
   };
 

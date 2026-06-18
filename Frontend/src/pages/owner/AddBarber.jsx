@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
@@ -160,10 +160,14 @@ export default function AddBarber() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-2">Profile Photo</label>
-                <div className="upload-box" onClick={() => photoRef.current?.click()}>
+                <div 
+                  className="upload-box flex flex-col justify-center items-center h-[172px]" 
+                  onClick={() => photoRef.current?.click()}
+                  style={newBarber.photoPreview ? { padding: 0 } : {}}
+                >
                   {newBarber.photoPreview ? (
-                    <div className="relative">
-                      <img src={newBarber.photoPreview} alt="Preview" className="w-full h-32 object-cover rounded-xl" />
+                    <div className="relative w-full h-full">
+                      <img src={newBarber.photoPreview} alt="Preview" className="w-full h-full object-cover rounded-xl" />
                       <button 
                         type="button"
                         onClick={e => { e.stopPropagation(); setNewBarber(p => ({ ...p, photo: null, photoPreview: null })); }}
@@ -174,7 +178,7 @@ export default function AddBarber() {
                     </div>
                   ) : (
                     <div className="py-2">
-                      <div className="text-3xl mb-2">📷</div>
+                      <Upload className="w-8 h-8 text-[#C5A059] mb-2 stroke-[2.5px] mx-auto" />
                       <p className="text-xs font-semibold text-stone-600 font-sans">Click to upload photo</p>
                       <p className="text-[10px] text-stone-400 font-sans mt-0.5">JPG, PNG up to 5MB</p>
                     </div>
@@ -188,7 +192,7 @@ export default function AddBarber() {
                 <div className="upload-box flex flex-col justify-center items-center h-[172px]" onClick={() => docRef.current?.click()}>
                   {newBarber.documentName ? (
                     <div className="w-full p-3 bg-emerald-50/50 border border-emerald-200/50 rounded-xl text-center">
-                      <div className="text-3xl mb-1">📄</div>
+                      <Upload className="w-8 h-8 text-emerald-600 mb-2 stroke-[2.5px] mx-auto" />
                       <p className="text-xs font-bold text-emerald-800 truncate px-2">{newBarber.documentName}</p>
                       <button 
                         type="button"
@@ -200,7 +204,7 @@ export default function AddBarber() {
                     </div>
                   ) : (
                     <div className="py-2">
-                      <div className="text-3xl mb-2">📄</div>
+                      <Upload className="w-8 h-8 text-[#C5A059] mb-2 stroke-[2.5px] mx-auto" />
                       <p className="text-xs font-semibold text-stone-600 font-sans">Upload ID/Aadhar</p>
                       <p className="text-[10px] text-stone-400 font-sans mt-0.5">PDF, JPG, PNG</p>
                     </div>

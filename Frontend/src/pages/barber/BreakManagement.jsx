@@ -47,9 +47,14 @@ function CustomDropdown({ label, value, onChange, options }) {
   );
 }
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 export default function BreakManagement() {
   const navigate = useNavigate();
   const isBarber = localStorage.getItem("role") === "barber";
+  const barberId = localStorage.getItem("barberId");
+  const salonId = localStorage.getItem("salonId");
+  const token = localStorage.getItem("token");
 
   // --- स्टेट्स ---
   const [lunchStart, setLunchStart] = useState('');
@@ -60,80 +65,151 @@ export default function BreakManagement() {
   const [duration, setDuration] = useState('15');
   const [reason, setReason] = useState('');
 
-  const [requests, setRequests] = useState([
-    { id: 1, type: 'Lunch Schedule', details: '01:00 PM - 02:00 PM', status: 'Approved' }
-  ]);
+  const [requests, setRequests] = useState([]);
+  const [breakRequests, setBreakRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const [breakRequests, setBreakRequests] = useState([
-    { id: 101, name: "Rahul S.", type: "Coffee Break", time: "02:00 PM", duration: "15m", status: "pending" },
-    { id: 102, name: "Anita K.", type: "Short Break", time: "03:30 PM", duration: "10m", status: "approved" }
-  ]);
+  const headers = () => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`
+  });
+
+  const fetchBreaks = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      if (isBarber) {
+        if (!barberId) return;
+        const res = await fetch(`${API}/barber/${barberId}/breaks`, { headers: headers() });
+        const data = await res.json();
+        if (data.success) {
+          const mapped = (data.requests || []).map(r => ({
+            id: r._id,
+            type: r.break_type,
+            details: `${r.duration_mins} mins (${new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})` + (r.reason ? ` - Reason: ${r.reason}` : ''),
+            status: r.status.charAt(0).toUpperCase() + r.status.slice(1)
+          }));
+          setRequests(mapped);
+        }
+      } else {
+        if (!salonId) return;
+        const res = await fetch(`${API}/owner/salon/${salonId}/break-requests`, { headers: headers() });
+        const data = await res.json();
+        if (data.success) {
+          const mapped = (data.requests || []).map(r => ({
+            id: r._id,
+            name: r.barber_id?.name || "Barber",
+            type: r.break_type,
+            time: new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            duration: `${r.duration_mins}m`,
+            status: r.status
+          }));
+          setBreakRequests(mapped);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch break history");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBreaks();
+  }, [isBarber, barberId, salonId]);
 
   // --- हैंडल्स ---
-  const handleLunchSubmit = (e) => {
+  const handleLunchSubmit = async (e) => {
     e.preventDefault();
     if (!lunchStart || !lunchEnd) return;
-    const formatTime = (timeStr) => {
-      const [hour, minute] = timeStr.split(':');
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const formattedHour = hour % 12 || 12;
-      return `${formattedHour}:${minute} ${ampm}`;
-    };
-    const newRequest = { id: Date.now(), type: 'Lunch Update', details: `${formatTime(lunchStart)} - ${formatTime(lunchEnd)}`, status: 'Pending' };
-    setRequests([newRequest, ...requests]);
-    setLunchStart(''); setLunchEnd('');
+    
+    const startHour = parseInt(lunchStart.split(":")[0]);
+    const startMin = parseInt(lunchStart.split(":")[1]);
+    const endHour = parseInt(lunchEnd.split(":")[0]);
+    const endMin = parseInt(lunchEnd.split(":")[1]);
+    
+    let durationMins = (endHour - startHour) * 60 + (endMin - startMin);
+    if (durationMins < 0) durationMins += 24 * 60; // handle wrap around
+
+    const startTimeObj = new Date();
+    startTimeObj.setHours(startHour, startMin, 0, 0);
+
+    try {
+      const res = await fetch(`${API}/barber/${barberId}/break-request`, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({
+          break_type: "lunch",
+          start_time: startTimeObj.toISOString(),
+          duration_mins: durationMins,
+          reason: "Scheduled Lunch Break"
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setLunchStart(''); setLunchEnd('');
+        fetchBreaks();
+      } else {
+        alert(data.message || "Failed to submit lunch request");
+      }
+    } catch (err) {
+      alert("Network error submitting lunch request");
+    }
   };
 
-  const handleBreakSubmit = (e) => {
+  const handleBreakSubmit = async (e) => {
     e.preventDefault();
     const durationVal = parseInt(duration);
-    const isPendingApproval = durationVal > 30;
 
-    const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const barberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "Ali (Master Stylist)";
-
-    const newHistoryReq = {
-      id: Date.now(),
-      type: breakType,
-      details: `${duration} mins (${timeString})` + (isPendingApproval ? ` - Reason: ${reason}` : ''),
-      status: isPendingApproval ? 'Pending' : 'Approved'
-    };
-
-    setRequests([newHistoryReq, ...requests]);
-
-    // Add to owner feed state
-    const newBreakReq = {
-      id: Date.now(),
-      name: barberName.split(" ")[0],
-      type: breakType,
-      time: timeString,
-      duration: `${duration}m`,
-      status: isPendingApproval ? "pending" : "approved"
-    };
-    setBreakRequests([newBreakReq, ...breakRequests]);
-
-    // Reset fields
-    setReason('');
+    try {
+      const res = await fetch(`${API}/barber/${barberId}/break-request`, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({
+          break_type: breakType,
+          start_time: new Date().toISOString(),
+          duration_mins: durationVal,
+          reason: reason || ""
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReason('');
+        fetchBreaks();
+      } else {
+        alert(data.message || "Failed to submit break request");
+      }
+    } catch (err) {
+      alert("Network error submitting break request");
+    }
   };
 
-  const handleApprove = (id) => {
-    setBreakRequests(prev =>
-      prev.map(req =>
-        req.id === id
-          ? { ...req, status: "approved" }
-          : req
-      )
-    );
+  const handleApprove = async (id) => {
+    try {
+      const res = await fetch(`${API}/owner/break-request/${id}`, {
+        method: "PUT",
+        headers: headers(),
+        body: JSON.stringify({ status: "approved" })
+      });
+      if (res.ok) fetchBreaks();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleReject = (id) => {
-    setBreakRequests(prev =>
-      prev.map(req =>
-        req.id === id
-          ? { ...req, status: "rejected" }
-          : req
-      )
-    );
+  const handleReject = async (id) => {
+    try {
+      const res = await fetch(`${API}/owner/break-request/${id}`, {
+        method: "PUT",
+        headers: headers(),
+        body: JSON.stringify({ status: "rejected" })
+      });
+      if (res.ok) fetchBreaks();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const getStatusBadge = (status) => {

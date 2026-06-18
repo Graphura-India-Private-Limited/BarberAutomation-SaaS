@@ -98,7 +98,7 @@ export default function ContactSupport() {
                 </div>
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-wider text-stone-400">Direct Email Support</p>
-                  <p className="text-sm font-extrabold text-stone-900 mt-0.5">hello@barberpro.com</p>
+                  <p className="text-sm font-extrabold text-stone-900 mt-0.5">support@graphura.in</p>
                 </div>
               </div>
 
@@ -108,7 +108,7 @@ export default function ContactSupport() {
                 </div>
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-wider text-stone-400">Executive Concierge Line</p>
-                  <p className="text-sm font-extrabold text-stone-900 mt-0.5">+91 98765 43210</p>
+                  <p className="text-sm font-extrabold text-stone-900 mt-0.5">+91 73780 21327</p>
                 </div>
               </div>
 

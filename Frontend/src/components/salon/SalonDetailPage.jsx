@@ -86,12 +86,34 @@ export default function SalonDetailPage() {
       try {
         setLoading(true);
         const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        let targetId = id || localStorage.getItem("selectedSalonId");
 
-        // Fetch Salon details
-        const salonRes = await fetch(`${API}/salon/${id}`);
-        const salonData = await salonRes.json();
+        let salonData = null;
+        if (targetId) {
+          try {
+            const salonRes = await fetch(`${API}/salon/${targetId}`);
+            salonData = await salonRes.json();
+          } catch (e) {
+            console.error("Failed fetching specific salon:", e);
+          }
+        }
 
-        if (salonData.success) {
+        // If specific salon was not found/provided, fallback to the first approved salon in the database
+        if (!salonData || !salonData.success) {
+          try {
+            const salonsRes = await fetch(`${API}/salon`);
+            const salonsData = await salonsRes.json();
+            if (salonsData.success && salonsData.salons && salonsData.salons.length > 0) {
+              targetId = salonsData.salons[0]._id;
+              const fallbackRes = await fetch(`${API}/salon/${targetId}`);
+              salonData = await fallbackRes.json();
+            }
+          } catch (e) {
+            console.error("Failed fetching approved salons fallback:", e);
+          }
+        }
+
+        if (salonData && salonData.success) {
           const s = salonData.salon;
           const mappedSalon = {
             id: s._id,
@@ -111,22 +133,22 @@ export default function SalonDetailPage() {
           };
           setSalon(mappedSalon);
           setActiveImage(mappedSalon.image);
+
+          // Fetch Salon services
+          const servicesRes = await fetch(`${API}/services/${targetId}`);
+          const servicesData = await servicesRes.json();
+          if (servicesData.success) {
+            setServicesList(servicesData.services);
+          }
+
+          // Fetch Salon barbers
+          const barbersRes = await fetch(`${API}/barber/salon/${targetId}`);
+          const barbersData = await barbersRes.json();
+          if (barbersData.success) {
+            setBarbers(barbersData.barbers);
+          }
         } else {
-          setError(salonData.message || "Failed to load salon details");
-        }
-
-        // Fetch Salon services
-        const servicesRes = await fetch(`${API}/services/${id}`);
-        const servicesData = await servicesRes.json();
-        if (servicesData.success) {
-          setServicesList(servicesData.services);
-        }
-
-        // Fetch Salon barbers
-        const barbersRes = await fetch(`${API}/barber/salon/${id}`);
-        const barbersData = await barbersRes.json();
-        if (barbersData.success) {
-          setBarbers(barbersData.barbers);
+          setError("No approved salons are currently live.");
         }
       } catch (err) {
         console.error("Error fetching salon details:", err);
@@ -136,9 +158,7 @@ export default function SalonDetailPage() {
       }
     };
 
-    if (id) {
-      fetchSalonData();
-    }
+    fetchSalonData();
   }, [id]);
 
   const handleBookVisit = () => {

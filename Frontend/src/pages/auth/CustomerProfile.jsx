@@ -197,8 +197,6 @@ export default function CustomerProfile() {
     mobile: "9876543210",
     email: "rahul@example.com",
     profile_picture: "",
-    membership_tier: "Standard",
-    membership_renewal_date: null,
     total_visits: 0,
     marketing_emails: true,
     monthly_reminders: true,
@@ -287,12 +285,7 @@ export default function CustomerProfile() {
     if (upcoming.length > 0) {
       list.push({ id: idCounter++, type: "status", title: "Booking Active", message: `Your appointment for ${upcoming[0].service} with ${upcoming[0].barberName} is scheduled for ${upcoming[0].date} at ${upcoming[0].time}.`, date: "Active", read: false });
     } else {
-      list.push({ id: idCounter++, type: "announcement", title: "Ready to Refresh?", message: "No active appointment scheduled. Browse our Premium Grooming Catalog and secure a priority slot today!", date: "Now", read: false });
-    }
-    if (uProfile.membership_tier === "Standard") {
-      list.push({ id: idCounter++, type: "announcement", title: "Upgrade to VIP Bronze/Gold", message: "Unlock free monthly haircuts, styling product discounts, and premium queue slots today!", date: "Today", read: false });
-    } else {
-      list.push({ id: idCounter++, type: "status", title: `${uProfile.membership_tier} Perks Active`, message: `Your premium membership tier is active. Enjoy exclusive styling benefits!${uProfile.membership_renewal_date ? ` Next renewal scheduled on ${uProfile.membership_renewal_date}.` : ""}`, date: "Active", read: false });
+      list.push({ id: idCounter++, type: "announcement", title: "Ready to Refresh?", message: "No active appointment scheduled. Browse our Premium Grooming Catalog and secure a booking slot today!", date: "Now", read: false });
     }
     const stampsCount = uProfile.total_visits % 10;
     if (stampsCount > 0) {
@@ -325,8 +318,6 @@ export default function CustomerProfile() {
         currentProfile = {
           name: u.name || "", mobile: u.mobile || "", email: u.email || "",
           profile_picture: u.profile_picture || "",
-          membership_tier: u.membership_tier || "Standard",
-          membership_renewal_date: u.membership_renewal_date ? new Date(u.membership_renewal_date).toLocaleDateString("en-IN") : null,
           total_visits: u.total_visits ?? 0,
           marketing_emails: u.marketing_emails ?? true, monthly_reminders: u.monthly_reminders ?? true,
           new_services_alerts: u.new_services_alerts ?? true, newsletter_opt_in: u.newsletter_opt_in ?? true,
@@ -467,20 +458,7 @@ export default function CustomerProfile() {
     window.location.href = `/customer/refund/${id}`;
   };
 
-  const handleUpgradeMembership = async (tier) => {
-    const token = getToken();
-    const renewalDate = new Date(); renewalDate.setMonth(renewalDate.getMonth() + 1);
-    const updateData = { membership_tier: tier, membership_renewal_date: renewalDate };
-    if (token) {
-      try {
-        const res = await fetch(`${API}/auth/profile`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(updateData) });
-        const data = await res.json();
-        if (data.success) { triggerToast(`Plan successfully upgraded to ${tier}!`); syncData(); return; }
-      } catch (err) {}
-    }
-    setProfile(prev => ({ ...prev, membership_tier: tier, membership_renewal_date: renewalDate.toLocaleDateString("en-IN") }));
-    triggerToast(`Plan upgraded to ${tier} (Offline Mode)`);
-  };
+
 
   const handleLogout = () => {
     localStorage.clear(); triggerToast("Signing out of system console...");
@@ -535,7 +513,6 @@ export default function CustomerProfile() {
                   { id: "studios", label: "Our Studios", icon: Compass },
                   { id: "history", label: "Appointments Registry", icon: Calendar },
                   { id: "dummy_services", label: "Grooming Menu", icon: ShoppingBag },
-                  { id: "membership", label: "Membership Perks", icon: Award },
                   { id: "preferences", label: "Profile Settings", icon: User },
                   { id: "alerts", label: "Live System Alerts", icon: Bell, count: notifications.filter(n => !n.read).length }
                 ].map(item => {
@@ -646,14 +623,10 @@ export default function CustomerProfile() {
                           <div className="border-b border-[#EADBCE] pb-3 mb-2.5">
                             <p className="text-xs font-black text-[#3D3126]">{profile.name}</p>
                             <p className="text-[10px] text-[#8A7A6A] font-semibold mt-0.5 truncate">{profile.email || profile.mobile}</p>
-                            <p className="text-[9px] text-[#B58B67] font-black uppercase tracking-wider mt-1">{profile.membership_tier} Tier</p>
                           </div>
                           <div className="space-y-1">
                             <button onClick={() => { setActiveTab("preferences"); setShowUserDropdown(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-black uppercase text-[#8A7A6A] hover:bg-[#FAF6F0] hover:text-[#3D3126] transition-colors cursor-pointer text-left">
                               <Settings size={13} className="text-[#B58B67]" /><span>Profile Settings</span>
-                            </button>
-                            <button onClick={() => { setActiveTab("membership"); setShowUserDropdown(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-black uppercase text-[#8A7A6A] hover:bg-[#FAF6F0] hover:text-[#3D3126] transition-colors cursor-pointer text-left">
-                              <Award size={13} className="text-[#B58B67]" /><span>Membership Perks</span>
                             </button>
                             <button onClick={() => { setActiveTab("alerts"); setShowUserDropdown(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-black uppercase text-[#8A7A6A] hover:bg-[#FAF6F0] hover:text-[#3D3126] transition-colors cursor-pointer text-left">
                               <Bell size={13} className="text-[#B58B67]" /><span>System Alerts</span>
@@ -920,7 +893,7 @@ export default function CustomerProfile() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div onClick={() => { setActiveTab("history"); setApptSubTab("past"); }} className="bg-white rounded-2xl border border-[#EADBCE] hover:border-[#B58B67] p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all text-left cursor-pointer hover:scale-102">
                       <div className="w-12 h-12 rounded-xl bg-[#FEF9EE] border border-[#F5E6D3] flex items-center justify-center shrink-0 text-[#9E7452]"><Scissors size={20} /></div>
                       <div className="flex-1 min-w-0">
@@ -938,14 +911,6 @@ export default function CustomerProfile() {
                         ) : (
                           <><p className="text-lg font-black text-[#8A7A6A] mt-1">No Active Booking</p><p className="text-[9px] text-[#8A7A6A] font-black uppercase tracking-wider mt-1.5">Schedule a session anytime</p></>
                         )}
-                      </div>
-                    </div>
-                    <div onClick={() => setActiveTab("membership")} className="bg-white rounded-2xl border border-[#EADBCE] hover:border-emerald-300 p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all text-left cursor-pointer hover:scale-102">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100/60 flex items-center justify-center shrink-0 text-[#137333]"><Award size={20} /></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-[#8A7A6A] font-medium">Membership Tier</p>
-                        <p className="text-2xl font-black text-[#3D3126] mt-0.5">{profile.membership_tier}</p>
-                        <p className="text-[9px] text-[#8A7A6A] font-black uppercase tracking-wider mt-1.5">{profile.membership_tier === "Standard" ? "Upgrade to save more" : "Premium Tier unlocked"}</p>
                       </div>
                     </div>
                     <div onClick={() => { setActiveTab("overview"); triggerToast(`You are ${(10 - (profile.total_visits % 10))} visits away from a free haircut reward!`); }} className="bg-white rounded-2xl border border-[#EADBCE] hover:border-amber-300 p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all text-left cursor-pointer hover:scale-102">
@@ -1051,7 +1016,7 @@ export default function CustomerProfile() {
                             <div className="border border-dashed border-[#EADBCE] rounded-2xl p-6 text-center">
                               <HelpCircle size={24} className="mx-auto text-stone-300 mb-2" />
                               <p className="text-xs font-black uppercase tracking-wider text-stone-400">No active support inquiries</p>
-                              <p className="text-[10px] text-stone-400 mt-1 max-w-md mx-auto">If you faced any issues regarding your bookings, stylists, payments, or membership tiers, file a support ticket to get help.</p>
+                              <p className="text-[10px] text-stone-400 mt-1 max-w-md mx-auto">If you faced any issues regarding your bookings, stylists, or payments, file a support ticket to get help.</p>
                             </div>
                           ) : (
                             supportTickets.slice(0, 3).map(ticket => (
@@ -1214,58 +1179,7 @@ export default function CustomerProfile() {
                 </div>
               )}
 
-              {/* TAB: MEMBERSHIP PERKS */}
-              {activeTab === "membership" && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300 text-left">
-                  <div>
-                    <h2 className="text-lg font-black uppercase tracking-wider text-[#3D3126]">Fidelity Membership Systems</h2>
-                    <p className="text-xs text-[#8A7A6A]">Verify active perks, renewal schedules, or upgrade tier benefits.</p>
-                  </div>
-                  <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
-                    <div className="space-y-2">
-                      <span className="bg-[#B58B67]/10 text-[#9E7452] text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider border border-[#EADBCE]">ACTIVE PERK SCHEDULE</span>
-                      <h3 className="text-2xl font-black font-serif text-[#3D3126] mt-2">{profile.membership_tier} Membership Tier</h3>
-                      <div className="text-xs text-[#8A7A6A] space-y-1 mt-3 font-medium">
-                        {profile.membership_tier === "Standard" && <p>• Standard access to scheduling, basic stamps collection perks.</p>}
-                        {profile.membership_tier === "VIP Bronze" && <p>• VIP Bronze: 1 Free Fade/month, 5% off styling products.</p>}
-                        {profile.membership_tier === "VIP Gold" && <p>• VIP Gold: 2 Free Fades/month, 10% off products, custom priority slots.</p>}
-                        {profile.membership_renewal_date && <p className="font-bold text-[#3D3126] mt-2 font-mono text-[11px]">Renewal Date: {profile.membership_renewal_date}</p>}
-                      </div>
-                    </div>
-                    <div className="bg-[#FEF9EE] border border-[#EADBCE] rounded-2xl p-5 shrink-0 text-center shadow-3xs w-full md:w-auto">
-                      <Award size={32} className="text-[#9E7452] mx-auto mb-2" />
-                      <p className="text-[10px] font-black uppercase tracking-wider text-[#8A7A6A]">Current Status</p>
-                      <span className="inline-block mt-1 font-mono text-xs font-black text-[#9E7452] bg-[#FFFDF9] border border-[#EADBCE] px-3 py-1 rounded-full uppercase tracking-wider">{profile.membership_tier} Tier</span>
-                    </div>
-                  </div>
-                  {profile.membership_tier !== "VIP Gold" && (
-                    <div className="bg-white border border-[#EADBCE] p-6 rounded-2xl shadow-xs">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-[#B58B67] border-b pb-1.5 mb-4 font-serif">Upgrade Memberships</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {profile.membership_tier === "Standard" && (
-                          <div className="p-5 border border-[#EADBCE] rounded-xl flex flex-col justify-between bg-[#FAF6F0]/20">
-                            <div>
-                              <h4 className="text-sm font-black text-[#3D3126]">VIP Bronze Plan</h4>
-                              <p className="text-xs text-[#8A7A6A] mt-1">Unlock standard saves and free fades.</p>
-                              <ul className="text-[10px] text-[#8A7A6A] space-y-1 mt-3"><li>• 1 Free Fade monthly</li><li>• 5% off styling waxes</li></ul>
-                            </div>
-                            <button onClick={() => handleUpgradeMembership("VIP Bronze")} className="mt-4 w-full py-2 bg-[#B58B67] hover:bg-[#9E7452] text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors cursor-pointer">Upgrade to Bronze</button>
-                          </div>
-                        )}
-                        <div className="p-5 border border-[#B58B67] rounded-xl flex flex-col justify-between bg-[#FEF9EE]/30">
-                          <div>
-                            <span className="bg-[#B58B67] text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">RECOMMENDED</span>
-                            <h4 className="text-sm font-black text-[#3D3126] mt-1">VIP Gold Plan</h4>
-                            <p className="text-xs text-[#8A7A6A] mt-1">Unmatched priority scheduling and premium savings.</p>
-                            <ul className="text-[10px] text-[#8A7A6A] space-y-1 mt-3"><li>• 2 Free Fades monthly</li><li>• 10% off styling waxes</li><li>• Priority booking menu</li></ul>
-                          </div>
-                          <button onClick={() => handleUpgradeMembership("VIP Gold")} className="mt-4 w-full py-2 bg-[#3D3126] hover:bg-[#4E443A] text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors cursor-pointer">Upgrade to Gold</button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+
 
               {/* TAB: PROFILE SETTINGS */}
               {activeTab === "preferences" && (

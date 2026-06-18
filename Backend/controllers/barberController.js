@@ -211,3 +211,17 @@ exports.deactivateBarber = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Get break requests for a specific barber
+// @route   GET /api/barber/:id/breaks
+// @access  Private (Barber/Owner/Admin)
+exports.getBarberBreaks = async (req, res) => {
+  try {
+    const requests = await BreakRequest.find({ barber_id: req.params.id })
+      .populate("barber_id", "name mobile")
+      .sort({ created_at: -1 });
+    res.json({ success: true, requests });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

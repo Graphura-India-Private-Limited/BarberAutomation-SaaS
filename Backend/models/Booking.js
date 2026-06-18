@@ -7,7 +7,7 @@ const bookingSchema = new mongoose.Schema({
   customer_id:{type:mongoose.Schema.Types.ObjectId,ref:"Customer",required:true},
   salon_id:{type:mongoose.Schema.Types.ObjectId,ref:"Salon",required:true},
   barber_id:{type:mongoose.Schema.Types.ObjectId,ref:"Barber",default:null},
-  booking_type:{type:String,default:"queue",enum:["queue","slot","priority"]},
+  booking_type:{type:String,default:"queue",enum:["queue","slot"]},
   status:{type:String,default:"pending",enum:["pending","confirmed","in-progress","completed","cancelled","noshow"]},
   total_amount:{type:Number,default:0}, services:[bsSchema],
   slot_time:{type:String,default:null}, rating:{type:Number,default:null},

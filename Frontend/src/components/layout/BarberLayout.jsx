@@ -39,9 +39,8 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
     { id: "earnings", label: "Earnings", icon: IndianRupee, route: "/barber/earnings" },
     { id: "reviews", label: "Reviews", icon: Star, route: "/barber/reviews" },
     { id: "breaks", label: "Break Requests", icon: Coffee, route: "/barber/breaks", badge: 1 }, 
-    { id: "noshow", label: "No-Show / Late", icon: AlertCircle, route: "/barber/noshow-delay" },
     { id: "services", label: "Services", icon: ServicesIcon, route: "/barber/services" },
-    {id: "console", label: "Live Console", icon: Play, route: "/barber/service-console" },
+    { id: "console", label: "Live Console", icon: Play, route: "/barber/service-console" },
     { id: "profile", label: "My Profile", icon: User, route: "/barber/profile" },
     { id: "settings", label: "Settings", icon: Settings, route: "/barber/settings" },
   ];
@@ -64,10 +63,15 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
     if (matched) return matched.label;
     
     // Fallbacks
-    if (pathname.includes("live-session") || pathname.includes("service-console")) return "Live Console";
-    if (pathname.includes("service-handler")) return "Service Handler";
-    if (pathname.includes("noshow-delay")) return "No-Show Delay";
-    if (pathname.includes("noshow-handle")) return "No-Show / Late";
+    if (
+      pathname.includes("live-session") || 
+      pathname.includes("service-console") ||
+      pathname.includes("service-handler") ||
+      pathname.includes("noshow-delay") ||
+      pathname.includes("noshow-handle")
+    ) {
+      return "Live Console";
+    }
     if (pathname.includes("breaks")) return "Break Requests";
     
     return "Barber Console";
@@ -149,7 +153,13 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-4">
           {NAV.map((n) => {
             const isActive = location.pathname === n.route || 
-                             (n.id === "noshow" && (location.pathname === "/barber/noshow-delay" || location.pathname === "/barber/noshow-handle"));
+                             (n.id === "console" && (
+                               location.pathname === "/barber/noshow-delay" || 
+                               location.pathname === "/barber/noshow-handle" || 
+                               location.pathname === "/barber/live-session" || 
+                               location.pathname === "/barber/service-handler" || 
+                               location.pathname === "/barber/service-console"
+                             ));
             return (
               <button 
                 key={n.id} 

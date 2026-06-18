@@ -15,6 +15,7 @@ export default function ManageServices() {
   const [services, setServices] = useState([]);
   const [newService, setNewService] = useState({ name: "", price: "", duration: "30", category: "men", description: "", image: "" });
   const [isAdding, setIsAdding] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
@@ -218,13 +219,52 @@ export default function ManageServices() {
                   <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Session Minutes</label>
                   <input type="number" min="5" placeholder="Duration" value={newService.duration} onChange={e => setNewService(prev => ({ ...prev, duration: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
                 </div>
-                <div>
+                <div className="relative">
                   <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Category Slot</label>
-                  <select value={newService.category} onChange={e => setNewService(prev => ({ ...prev, category: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-700 cursor-pointer font-sans">
-                    <option value="men">Men</option>
-                    <option value="women">Women</option>
-                    <option value="addon">Addon</option>
-                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                    className="w-full flex items-center justify-between rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none hover:border-[#C5A059] focus:border-[#C5A059] transition-all text-stone-700 cursor-pointer font-sans"
+                  >
+                    <span className="capitalize">{newService.category}</span>
+                    <svg
+                      className={`w-4 h-4 text-stone-500 transition-transform duration-200 ${categoryDropdownOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </button>
+                  {categoryDropdownOpen && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setCategoryDropdownOpen(false)} />
+                      <div className="absolute left-0 right-0 mt-1 z-20 rounded-xl border border-[#EADBCE] bg-white shadow-lg overflow-hidden animate-fade-in font-sans">
+                        {[
+                          { value: "men", label: "Men" },
+                          { value: "women", label: "Women" },
+                          { value: "addon", label: "Addon" }
+                        ].map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => {
+                              setNewService(prev => ({ ...prev, category: opt.value }));
+                              setCategoryDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors cursor-pointer block ${
+                              newService.category === opt.value
+                                ? "bg-[#FEF9F0] text-[#C5A059] font-bold"
+                                : "text-stone-700 hover:bg-stone-50 hover:text-stone-900"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Image URL</label>

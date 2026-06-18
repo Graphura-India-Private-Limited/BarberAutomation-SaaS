@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   Users, User, UserPlus, UserSquare, UserX, Calendar, CalendarDays, Scissors,
   CreditCard, Star, Radio, Store, Eye, MoreHorizontal, Trash2,
-  IndianRupee, CheckCircle, Clock, Search, Filter, ChevronDown, Plus, X,
+  IndianRupee, CheckCircle, Clock, Search, Filter, ChevronDown, Plus, X, Upload,
 } from "lucide-react";
 import {
   ADMIN_C as C,
@@ -35,10 +35,12 @@ const isThisMonth = (value) => {
 
 const barberActive = (b) => b.status === "available" || b.status === "busy";
 const barberImg = (i) => [
-  "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=200&q=80",
-  "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=200&q=80",
-  "https://images.unsplash.com/photo-1621605815841-aa33c5447a33?w=200&q=80",
-][i % 3];
+  "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80",
+  "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=400&q=80",
+  "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=400&q=80",
+  "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=400&q=80",
+  "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80"
+][i % 5];
 
 const salonStatusColor = (s) =>
   s === "approved" ? C.green : s === "pending" ? C.orange : s === "rejected" ? C.red : C.muted;
@@ -272,6 +274,46 @@ export function CustomersModule({ customers: initialCustomers, loading, customer
     </AdminPageShell>
   );
 }
+const DocumentPreview = ({ label, data }) => {
+  if (!data) {
+    return (
+      <div className="border border-dashed rounded-xl p-4 flex flex-col items-center justify-center bg-stone-50/50 h-32 border-[#EADBCE]">
+        <span className="text-stone-400 text-xs font-semibold text-center">{label}</span>
+        <span className="text-[10px] text-stone-400 mt-1">Not Uploaded</span>
+      </div>
+    );
+  }
+
+  const isPdf = data.startsWith("data:application/pdf");
+
+  return (
+    <div className="border rounded-xl p-4 flex flex-col justify-between bg-stone-50/30 h-36 border-[#EADBCE] shadow-3xs relative group">
+      <div>
+        <span className="text-stone-700 text-xs font-bold block mb-2">{label}</span>
+        {isPdf ? (
+          <div className="flex items-center gap-2 text-rose-600 bg-rose-50 border border-rose-100 rounded-lg p-2 mt-1">
+            <span className="text-xs font-black">PDF</span>
+            <span className="text-[10px] text-stone-600 font-semibold truncate max-w-[120px]">Document.pdf</span>
+          </div>
+        ) : (
+          <div className="w-full h-16 rounded overflow-hidden border border-stone-200">
+            <img src={data} alt={label} className="w-full h-full object-cover" />
+          </div>
+        )}
+      </div>
+      <a
+        href={data}
+        download={`${label.replace(/\s+/g, "_")}_doc${isPdf ? ".pdf" : ".png"}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 block text-center bg-[#C5A059] hover:bg-[#3E362E] text-white text-[10px] font-bold uppercase tracking-wider py-1.5 rounded-lg transition-colors cursor-pointer"
+      >
+        View / Download
+      </a>
+    </div>
+  );
+};
+
 /* ── SALON MANAGEMENT ── */
 export function SalonsModule({
   salons, customers, bookings, stats, loading, pendingBookings, revenueDisplay, updateSalonStatus, addSalon, deleteSalon,
@@ -282,6 +324,7 @@ export function SalonsModule({
   const [showCityFilter, setShowCityFilter] = useState(false);
   const [selectedCity, setSelectedCity] = useState("all");
   const [adding, setAdding] = useState(false);
+  const [viewingSalon, setViewingSalon] = useState(null);
   const [newSalon, setNewSalon] = useState({
     salon_name: "",
     owner_name: "",
@@ -592,6 +635,14 @@ export function SalonsModule({
                   </select>
                   <button
                     type="button"
+                    onClick={() => setViewingSalon(s)}
+                    className="p-2 rounded-full text-stone-600 hover:bg-stone-50 transition-colors"
+                    title="View Details"
+                  >
+                    <Eye size={16} />
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => deleteSalon(s._id)}
                     className="p-2 rounded-full text-red-600 hover:bg-red-50 transition-colors"
                     title="Delete"
@@ -604,6 +655,108 @@ export function SalonsModule({
           ))
         )}
       </AdminDataTable>
+
+      {viewingSalon && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs select-none">
+          <div className="bg-white rounded-2xl border shadow-2xl p-6 w-full max-w-3xl mx-4 text-left animate-fade-in flex flex-col max-h-[90vh]" style={{ borderColor: C.border }}>
+            <div className="flex justify-between items-center pb-4 border-b mb-4 shrink-0" style={{ borderColor: C.border }}>
+              <div>
+                <h3 className="font-sans text-xl font-bold uppercase tracking-wide text-stone-900">{viewingSalon.salon_name}</h3>
+                <p className="text-[11px] font-medium mt-0.5" style={{ color: C.muted }}>Submitted by {viewingSalon.owner_name} on {formatJoined(viewingSalon.requested_on || viewingSalon.createdAt || viewingSalon.created_at)}</p>
+              </div>
+              <button type="button" onClick={() => setViewingSalon(null)} className="p-1.5 rounded-full hover:bg-stone-100 transition-colors" style={{ color: C.muted }}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-6 overflow-y-auto flex-1 pr-2">
+              {/* General Information Section */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b mb-3" style={{ color: C.gold, borderColor: `${C.gold}30` }}>General Info</h4>
+                  <div className="space-y-2 text-xs font-medium">
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Mobile:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.mobile || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Email:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.owner_email || viewingSalon.email || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Support Hotline:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.support_number || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Opening Time:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.opening_time || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Closing Time:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.closing_time || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Active Chairs/Barbers:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.number_of_barbers || viewingSalon.numBarbers || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Salary Model:</span> <span className="text-stone-850 capitalize font-sans font-semibold">{viewingSalon.salary_model || "—"}</span></div>
+                    {viewingSalon.salary_model === "commission" && (
+                      <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Commission Percent:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.commission_percent}%</span></div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b mb-3" style={{ color: C.gold, borderColor: `${C.gold}30` }}>Legal Identifiers</h4>
+                  <div className="space-y-2 text-xs font-medium">
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">GSTIN:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.gstin || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Trade License No:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.license_number || "—"}</span></div>
+                    <div className="flex flex-col gap-1 mt-2">
+                      <span className="text-stone-400 uppercase tracking-wider">Address:</span>
+                      <span className="text-stone-850 leading-normal font-sans font-semibold">{viewingSalon.address || "—"}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description Bio */}
+              {viewingSalon.about && (
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b mb-2" style={{ color: C.gold, borderColor: `${C.gold}30` }}>About Studio</h4>
+                  <p className="text-stone-600 text-xs leading-relaxed font-sans font-medium">{viewingSalon.about}</p>
+                </div>
+              )}
+
+              {/* Gallery Images */}
+              {viewingSalon.images && viewingSalon.images.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b mb-3" style={{ color: C.gold, borderColor: `${C.gold}30` }}>Studio Gallery</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {viewingSalon.images.map((img, idx) => (
+                      <div key={idx} className="h-24 rounded-lg overflow-hidden border border-stone-200 shadow-3xs">
+                        <img src={img} alt={`Studio ${idx + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Documents Section */}
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-widest pb-1 border-b mb-3" style={{ color: C.gold, borderColor: `${C.gold}30` }}>Verification Documents</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                  <DocumentPreview label="Shop & Establishment Certificate" data={viewingSalon.shop_establishment_certificate} />
+                  <DocumentPreview label="Trade License" data={viewingSalon.trade_license} />
+                  <DocumentPreview label="GST Certificate" data={viewingSalon.gst_certificate} />
+                  <DocumentPreview label="Aadhaar Card" data={viewingSalon.aadhaar_card} />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t flex justify-end gap-3 shrink-0" style={{ borderColor: C.border }}>
+              <button 
+                type="button" 
+                onClick={() => setViewingSalon(null)} 
+                className="px-5 py-2.5 rounded-lg border font-sans text-xs font-extrabold uppercase tracking-wider hover:bg-stone-50 transition-colors" 
+                style={{ borderColor: C.border, color: C.ink }}
+              >
+                Close
+              </button>
+              {viewingSalon.status !== "approved" && (
+                <button 
+                  type="button" 
+                  onClick={() => { updateSalonStatus(viewingSalon._id, "approved"); setViewingSalon(null); }} 
+                  className="px-5 py-2.5 rounded-lg text-white font-sans text-xs font-extrabold uppercase tracking-wider bg-green-650 hover:bg-green-700 transition-colors"
+                >
+                  Approve Salon
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </AdminPageShell>
   );
 }
@@ -782,21 +935,35 @@ export function AddBarberModule({ salons, newBarber, setNewBarber, addBarber, bu
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>Profile Photo</label>
-            <div className="border border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50" style={{ borderColor: C.border }}
-              onClick={() => photoRef.current?.click()}>
+            <div className="border border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 h-32 flex flex-col justify-center items-center" 
+              onClick={() => photoRef.current?.click()}
+              style={{ borderColor: C.border, ...(newBarber.photoPreview ? { padding: 0 } : {}) }}>
               {newBarber.photoPreview ? (
-                <img src={newBarber.photoPreview} alt="" className="h-28 w-full object-cover rounded-lg" />
+                <img src={newBarber.photoPreview} alt="" className="h-full w-full object-cover rounded-lg" />
               ) : (
-                <p className="font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>Click to upload photo</p>
+                <div className="flex flex-col items-center">
+                  <Upload className="w-6 h-6 text-[#C5A059] mb-1.5 stroke-[2px]" />
+                  <p className="font-sans text-xs font-normal leading-relaxed" style={{ color: C.muted }}>Click to upload photo</p>
+                </div>
               )}
             </div>
             <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
           </div>
           <div>
             <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-2 block" style={{ color: C.muted }}>ID / Document</label>
-            <div className="border border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 min-h-[120px] flex items-center justify-center" style={{ borderColor: C.border }}
+            <div className="border border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 h-32 flex flex-col justify-center items-center" style={{ borderColor: C.border }}
               onClick={() => docRef.current?.click()}>
-              <p className="font-sans text-sm font-normal leading-relaxed" style={{ color: C.muted }}>{newBarber.documentName || "Upload ID / Aadhar"}</p>
+              {newBarber.documentName ? (
+                <div className="flex flex-col items-center">
+                  <Upload className="w-6 h-6 text-emerald-600 mb-1" />
+                  <p className="font-sans text-xs font-bold truncate max-w-[180px]">{newBarber.documentName}</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <Upload className="w-6 h-6 text-[#C5A059] mb-1.5 stroke-[2px]" />
+                  <p className="font-sans text-xs font-normal leading-relaxed" style={{ color: C.muted }}>Upload ID / Aadhar</p>
+                </div>
+              )}
             </div>
             <input ref={docRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={handleDocChange} />
           </div>
