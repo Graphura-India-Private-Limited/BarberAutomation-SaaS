@@ -26,9 +26,7 @@ export default function OwnerLayout() {
     { id: "customers", label: "Customer Registry", icon: Users, route: "/owner/customers" },
     { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
     { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
-    { id: "revenue", label: "Revenue Stream", icon: DollarSign, route: "/owner/revenue" },
-    { id: "analytics", label: "Analytics Metrics", icon: BarChart2, route: "/owner/dashboard/analytics" },
-    { id: "finance", label: "Finance Overview", icon: IndianRupee, route: "/owner/finance" },
+    { id: "financial-analytics", label: "Financial Analytics", icon: BarChart2, route: "/owner/financial-analytics" },
     { id: "settings", label: "Profile ", icon: Settings, route: "/owner/settings" },
   ];
 

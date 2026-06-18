@@ -72,7 +72,7 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
     ) {
       return "Live Console";
     }
-    if (pathname.includes("breaks")) return "Break Requests";
+    if (pathname.includes("break")) return "Break Requests";
     
     return "Barber Console";
   };
@@ -153,6 +153,10 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-4">
           {NAV.map((n) => {
             const isActive = location.pathname === n.route || 
+                             (n.id === "breaks" && (
+                               location.pathname === "/barber/breaks" || 
+                               location.pathname === "/barber/break"
+                             )) ||
                              (n.id === "console" && (
                                location.pathname === "/barber/noshow-delay" || 
                                location.pathname === "/barber/noshow-handle" || 

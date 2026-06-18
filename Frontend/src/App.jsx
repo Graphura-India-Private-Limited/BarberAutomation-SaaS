@@ -36,12 +36,10 @@ import SalonRegistration from "./pages/owner/SalonRegistration";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import ManageServices from "./pages/owner/ManageServices";
 import HomeOverview from "./pages/barber/HomeOverview";
-import FinancePage from "./pages/owner/FinancePage";
 import PaymentDashboard from "./pages/owner/PaymentDashboard";
-import RevenueDashboard from "./pages/owner/RevenueDashboard";
 import SettingsPage from "./pages/owner/SettingsPage";
 import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
-import AnalyticsDashboard from "./pages/owner/AnalyticsDashboard";
+import FinancialAnalytics from "./pages/owner/FinancialAnalytics";
 import OwnerLayout from "./components/layout/OwnerLayout";
 import BarberTeam from "./pages/owner/BarberTeam";
 import OwnerLiveMonitoring from "./pages/owner/OwnerLiveMonitoring";
@@ -173,6 +171,7 @@ function App() {
           <Route path="overview" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><HomeOverview /></BarberLayout>} />
           <Route path="profile" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberProfile /></BarberLayout>} />
           <Route path="breaks" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout>} />
+          <Route path="break" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout>} />
           <Route path="live-session" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
           <Route path="service-handler" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
           <Route path="service-console" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
@@ -192,13 +191,14 @@ function App() {
         <Route path="/register-salon" element={<SalonRegistration />} />
         <Route path="/owner" element={<ProtectedRoute allowedRoles={["owner"]}><OwnerLayout /></ProtectedRoute>}>
           <Route path="dashboard" element={<OwnerDashboard />} />
-          <Route path="dashboard/analytics" element={<AnalyticsDashboard />} />
+          <Route path="dashboard/analytics" element={<FinancialAnalytics />} />
+          <Route path="financial-analytics" element={<FinancialAnalytics />} />
           <Route path="payments" element={<PaymentDashboard />} />
-          <Route path="revenue" element={<RevenueDashboard />} />
+          <Route path="revenue" element={<FinancialAnalytics />} />
           <Route path="manage-services" element={<ManageServices />} />
           <Route path="approvals" element={<BreakApprovalDashboard />} />
           <Route path="bookings" element={<BookingManagement />} />
-          <Route path="finance" element={<FinancePage />} />
+          <Route path="finance" element={<FinancialAnalytics />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="queue" element={<LiveQueue />} />
           <Route path="live" element={<OwnerLiveMonitoring />} />
