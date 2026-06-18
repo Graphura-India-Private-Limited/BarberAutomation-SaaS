@@ -16,6 +16,8 @@ export default function AddBarber() {
     specialization: "",
     experience: "",
     email: "",
+    aadhaar: "",
+    pan: "",
     photo: null,
     photoPreview: null,
     document: null,
@@ -45,7 +47,9 @@ export default function AddBarber() {
 
   const handleDocChange = (e) => {
     const file = e.target.files[0]; if (!file) return;
-    setNewBarber(p => ({ ...p, document: file, documentName: file.name }));
+    const reader = new FileReader();
+    reader.onload = (ev) => setNewBarber(p => ({ ...p, document: ev.target.result, documentName: file.name }));
+    reader.readAsDataURL(file);
   };
 
   const handleAddBarber = async (e) => {
@@ -64,6 +68,12 @@ export default function AddBarber() {
       setBusy(false);
       return;
     }
+
+    if (newBarber.aadhaar && newBarber.aadhaar.length !== 12) {
+      setAddError("Aadhaar Number must be exactly 12 digits.");
+      setBusy(false);
+      return;
+    }
     
     try {
       const res = await fetch(`${API}/barber`, {
@@ -75,7 +85,13 @@ export default function AddBarber() {
           mobile: newBarber.mobile,
           password: newBarber.password,
           specialization: newBarber.specialization,
-          experience: Number(newBarber.experience) || 0
+          experience: Number(newBarber.experience) || 0,
+          email: newBarber.email,
+          aadhaar: newBarber.aadhaar,
+          pan: newBarber.pan,
+          photo: newBarber.photoPreview || "",
+          document: newBarber.document || "",
+          documentName: newBarber.documentName || ""
         })
       });
       
@@ -83,8 +99,8 @@ export default function AddBarber() {
       if (data.success) {
         setSuccess(true);
         setTimeout(() => {
-          navigate("/owner/barbers");
-        }, 1500);
+          navigate("/owner/barbers", { state: { highlightBarberId: data.barber._id } });
+        }, 1200);
       } else {
         setAddError(data.message || "Failed to add barber");
       }
@@ -130,7 +146,7 @@ export default function AddBarber() {
           Back to Team List
         </button>
 
-        <div className="card p-8 bg-white shadow-lg text-left">
+        <div className="card p-8 bg-white shadow-lg text-left relative overflow-hidden">
           <h2 className="font-serif text-2xl tracking-normal text-stone-900 font-bold uppercase mb-1">
             Add New Barber
           </h2>
@@ -150,9 +166,19 @@ export default function AddBarber() {
           )}
 
           {success && (
-            <p className="mb-4 rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-center text-xs font-bold text-emerald-600 font-sans animate-bounce">
-              Barber created successfully! Redirecting...
-            </p>
+            <div className="absolute inset-0 bg-[#FAF6F0] z-20 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-300">
+              <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-4xl mb-4 shadow-sm animate-bounce">
+                🎉
+              </div>
+              <h3 className="font-serif text-2xl text-stone-900 font-bold uppercase mb-2">Profile Created Successfully!</h3>
+              <p className="text-stone-500 text-sm max-w-xs font-sans leading-relaxed mb-6">
+                Saving credentials and setting up the barber dashboard...
+              </p>
+              <div className="flex items-center gap-2 text-stone-400 text-xs font-semibold animate-pulse">
+                <span className="w-2 h-2 rounded-full bg-[#C5A059] animate-ping inline-block mr-1"></span>
+                Redirecting to details page...
+              </div>
+            </div>
           )}
 
           <form onSubmit={handleAddBarber} className="space-y-6">
@@ -283,6 +309,28 @@ export default function AddBarber() {
                   placeholder="barber@email.com" 
                   value={newBarber.email} 
                   onChange={e => setNewBarber(prev => ({ ...prev, email: e.target.value }))} 
+                  className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Aadhaar Number (Optional)</label>
+                <input 
+                  maxLength={12}
+                  placeholder="12 digit Aadhaar" 
+                  value={newBarber.aadhaar} 
+                  onChange={e => setNewBarber(prev => ({ ...prev, aadhaar: e.target.value.replace(/\D/g, "") }))} 
+                  className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">PAN Card Number (Optional)</label>
+                <input 
+                  maxLength={10}
+                  placeholder="ABCDE1234F" 
+                  value={newBarber.pan} 
+                  onChange={e => setNewBarber(prev => ({ ...prev, pan: e.target.value.toUpperCase() }))} 
                   className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
                 />
               </div>
