@@ -7,6 +7,7 @@ import {
   Trash2, Bell, Phone, Award, Layers, HelpCircle, Send
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
@@ -42,6 +43,9 @@ const StatusBadge = ({ status, small }) => {
 };
 
 export default function NoShowDelayPage() {
+
+  const navigate = useNavigate();
+
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usingDemo, setUsingDemo] = useState(false);
@@ -228,10 +232,18 @@ export default function NoShowDelayPage() {
               ) : queue.map((c, i) => (
                 <div
                   key={c.id}
-                  onClick={() => { setSelected(i); startTimer(15 * 60); }}
+                  // onClick={() => { setSelected(i); startTimer(15 * 60); }}
+                  onClick={() => {
+                    setSelected(i);
+                    startTimer(15 * 60);
+
+                    navigate("/barber/service-console", {
+                      state: c,
+                    });
+                  }}
                   className={`flex items-center gap-3.5 p-4 rounded-xl border transition-all cursor-pointer text-left ${i === selected
-                      ? 'bg-[#FAF6F0] border-stone-400 ring-1 ring-stone-900/5 shadow-3xs'
-                      : 'bg-white border-stone-200/60 hover:border-stone-400'
+                    ? 'bg-[#FAF6F0] border-stone-400 ring-1 ring-stone-900/5 shadow-3xs'
+                    : 'bg-white border-stone-200/60 hover:border-stone-400'
                     }`}
                 >
                   <div className="w-9 h-9 rounded-xl bg-[#3E362E] text-[#C5A059] flex items-center justify-center font-black text-xs shrink-0 shadow-3xs">
@@ -297,7 +309,7 @@ export default function NoShowDelayPage() {
               {/* DYNAMIC ACTION TRIGGER MATRIX PANELS */}
               <div className="bg-white border border-stone-200/60 rounded-[2rem] p-6 shadow-3xs text-left w-full">
                 <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 border-b border-stone-50 pb-2 mb-4">Execute Exception Override Rules</p>
-                <div className="grid grid-cols-2 gap-3 mb-3">
+                {/* <div className="grid grid-cols-2 gap-3 mb-3">
                   <button type="button" onClick={() => setModal({ type: "delayed", customer: currentCustomer })} className="inline-flex items-center justify-center gap-1.5 p-3.5 border border-amber-200 hover:border-amber-400 bg-amber-50/20 rounded-xl text-xs font-black uppercase tracking-wider text-amber-900 transition-colors cursor-pointer">
                     <Clock size={12} className="text-[#A37B58]" /> Delay Log
                   </button>
@@ -310,7 +322,7 @@ export default function NoShowDelayPage() {
                   <button type="button" onClick={handleComplete} className="inline-flex items-center justify-center gap-1.5 p-3.5 border border-emerald-200 hover:border-emerald-400 bg-emerald-50/20 rounded-xl text-xs font-black uppercase tracking-wider text-emerald-900 transition-colors cursor-pointer">
                     <CheckCircle size={12} className="text-emerald-700" /> Completed
                   </button>
-                </div>
+                </div> */}
                 <div className="flex flex-col gap-2 border-t border-stone-50 pt-3">
                   <button type="button" onClick={() => setModal({ type: "rejoin", customer: currentCustomer })} className="w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest text-[#C5A059] bg-[#3E362E] hover:bg-[#2A241F] transition-colors cursor-pointer shadow-3xs">
                     Rejoin Queue Pipeline
