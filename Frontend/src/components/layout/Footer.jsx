@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Scissors,
@@ -10,11 +10,21 @@ import {
   ArrowUpRight,
   Clock,
   ShieldCheck,
-  Award
+  Award,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 
 const Footer = () => {
   const navigate = useNavigate();
+
+  // ✅ TOAST NOTIFICATION STATE — replaces ugly browser alert() popups
+  const [toast, setToast] = useState(null); // { type: 'success' | 'error', message: string }
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   const SERVICE_LINKS = [
     { label: "Men Services", path: "/customer/services/men" },
@@ -23,23 +33,30 @@ const Footer = () => {
   ];
 
   // ✅ CONTACT ITEMS — ALL THREE ARE CLICKABLE BUTTONS
-  // Phone & Email: styled as buttons, no action wired up yet (placeholder for later).
+  // Phone: opens the device's phone dialer with the number pre-filled.
+  // Email: opens the user's default mail client with the address pre-filled.
   // Location: opens Google Maps directly to this address in a new tab.
   const CONTACT_ITEMS = [
     {
       icon: Phone,
       text: "+91 98765 43210",
       onClick: () => {
-        // TODO: hook this up later (e.g. open WhatsApp, dialer, or a contact modal)
-        console.log("Phone button clicked — no action set yet");
+        // Opens the device's default phone dialer
+        const phone = "+919876543210";
+        const link = document.createElement("a");
+        link.href = `tel:${phone}`;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       },
     },
     {
       icon: Mail,
       text: "hello@barberpro.com",
       onClick: () => {
-        // TODO: hook this up later (e.g. mailto: link or a contact modal)
-        console.log("Email button clicked — no action set yet");
+        // Opens the user's default email client (Gmail, Outlook, Apple Mail, etc.)
+        window.location.href = "mailto:hello@barberpro.com";
       },
     },
     {
@@ -94,6 +111,106 @@ const Footer = () => {
   id="contact"
   className="relative mt-20 mx-4 mb-5 overflow-hidden rounded-[32px] bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
 >
+  {/* ✅ TOAST NOTIFICATION — on-brand, matches footer's gold/glass theme */}
+  {toast && (
+    <div
+      className="
+        fixed bottom-6 left-1/2 -translate-x-1/2
+        z-[999]
+        w-[min(420px,90vw)]
+        animate-[toastIn_0.4s_cubic-bezier(0.16,1,0.3,1)]
+      "
+      role="status"
+    >
+      <div
+        className="
+          relative
+          flex items-center gap-3.5
+          px-5 py-4
+          rounded-2xl
+          overflow-hidden
+          bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E]
+          border border-white/[0.08]
+          shadow-[0_20px_50px_rgba(0,0,0,0.6)]
+          backdrop-blur-xl
+        "
+      >
+        {/* glow accent matching footer's premium glow effects */}
+        <div
+          className="absolute -top-10 -left-10 w-32 h-32 blur-[60px] rounded-full pointer-events-none"
+          style={{
+            background:
+              toast.type === "success"
+                ? "rgba(34,197,94,0.35)"
+                : toast.type === "error"
+                ? "rgba(239,68,68,0.35)"
+                : "rgba(197,160,89,0.35)",
+          }}
+        />
+
+        {/* shiny top line, same treatment as the footer card */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#FFE6A7]/70 to-transparent" />
+
+        <div
+          className="
+            relative z-10
+            w-10 h-10 shrink-0
+            rounded-xl
+            flex items-center justify-center
+            border
+          "
+          style={{
+            background:
+              toast.type === "success"
+                ? "rgba(34,197,94,0.12)"
+                : toast.type === "error"
+                ? "rgba(239,68,68,0.12)"
+                : "rgba(197,160,89,0.12)",
+            borderColor:
+              toast.type === "success"
+                ? "rgba(34,197,94,0.3)"
+                : toast.type === "error"
+                ? "rgba(239,68,68,0.3)"
+                : "rgba(197,160,89,0.3)",
+          }}
+        >
+          {toast.type === "success" && (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+          )}
+          {toast.type === "error" && (
+            <XCircle className="w-5 h-5 text-red-400" />
+          )}
+        </div>
+
+        <p className="relative z-10 text-[13px] font-medium text-stone-200 leading-snug tracking-wide flex-1">
+          {toast.message}
+        </p>
+
+        <button
+          onClick={() => setToast(null)}
+          className="relative z-10 shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-stone-500 hover:text-[#FFE6A7] hover:bg-white/[0.06] transition-all duration-300 text-base leading-none"
+          aria-label="Dismiss"
+        >
+          ×
+        </button>
+
+        {/* countdown progress bar in brand gold */}
+        <div className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#C5A059] via-[#FFE6A7] to-[#C5A059] animate-[toastProgress_3.5s_linear_forwards]" />
+      </div>
+
+      <style>{`
+        @keyframes toastIn {
+          from { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
+          to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        }
+        @keyframes toastProgress {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
+    </div>
+  )}
+
   {/* PREMIUM GLOW EFFECTS */}
   <div className="absolute top-[-120px] left-[-120px] w-[340px] h-[340px] bg-[#C5A059]/20 blur-[140px] rounded-full animate-pulse" />
 
@@ -444,7 +561,7 @@ const Footer = () => {
         <form onSubmit={async (e) => {
           e.preventDefault();
           if (!e.target.elements.footerEmail.value.trim().includes("@")) {
-            alert("Please enter a valid email address signature.");
+            showToast("error", "Please enter a valid email address.");
             return;
           }
           
@@ -458,13 +575,13 @@ const Footer = () => {
             });
             const data = await res.json();
             if (res.ok && data.success) {
-              alert(data.message || "Successfully subscribed to our newsletter!");
+              showToast("success", data.message || "Successfully subscribed to our newsletter!");
               e.target.reset();
             } else {
-              alert(data.message || "Subscription failed. Please try again.");
+              showToast("error", data.message || "Subscription failed. Please try again.");
             }
           } catch {
-            alert("Network transmission mismatch. Is your server API pipeline online?");
+            showToast("error", "Couldn't reach the server. Please try again later.");
           }
         }} className="flex items-center w-full">
           
@@ -735,3 +852,5 @@ const Footer = () => {
 };
 
 export default Footer;
+
+
