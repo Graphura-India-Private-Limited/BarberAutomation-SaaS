@@ -235,6 +235,7 @@ export default function AdminOnboarding() {
   const [bookings,   setBookings]  = useState([]);
   const [services,   setServices]  = useState([]);
   const [reviews,    setReviews]   = useState([]);
+  const [bookingFeedbacks, setBookingFeedbacks] = useState([]);
   const [payments,   setPayments]  = useState([]);
   const [modal,      setModal]     = useState(null);
   const [toast,      setToast]     = useState(null);
@@ -288,7 +289,10 @@ export default function AdminOnboarding() {
       if (bookR?.success)     setBookings(bookR.bookings||[]);
       if (servR?.success)     setServices(servR.services||[]);
       if (payR?.success)      setPayments(payR.payments||[]);
-      if (revR?.success)      setReviews(revR.reviews||[]);
+      if (revR?.success) {
+        setReviews(revR.reviews||[]);
+        setBookingFeedbacks(revR.bookingFeedbacks||[]);
+      }
     } catch(e) { pop("Failed to load data","error"); }
     finally { setLoading(false); }
   };
@@ -413,6 +417,15 @@ export default function AdminOnboarding() {
       const r = await fetch(`${API}/admin/review/${id}`, { method:"DELETE", headers:h() });
       const d = await r.json();
       if (d.success) { setReviews(p => p.filter(x => x._id!==id)); pop("Review deleted!"); }
+      else pop(d.message||"Failed","error");
+    } catch { pop("Server error","error"); }
+  };
+
+  const deleteBookingFeedback = async (id) => {
+    try {
+      const r = await fetch(`${API}/admin/booking-feedback/${id}`, { method:"DELETE", headers:h() });
+      const d = await r.json();
+      if (d.success) { setBookingFeedbacks(p => p.filter(x => x._id!==id)); pop("Booking feedback deleted!"); }
       else pop(d.message||"Failed","error");
     } catch { pop("Server error","error"); }
   };
@@ -1212,30 +1225,104 @@ export default function AdminOnboarding() {
             {/* ══ REVIEWS ══ */}
             {tab==="reviews" && (
               <div className="fade-in">
-                {reviews.length===0 ? <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No reviews yet</div>
-                : (
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
-                    {reviews.map(r=>(
-                      <div key={r._id} style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:18, boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:10 }}>
-                          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                            <Avatar name={r.customer_id?.name||"C"} size={32} color={C.purple} bg={C.purpleLight}/>
-                            <div>
-                              <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{r.customer_id?.name||"Customer"}</div>
-                              <div style={{ fontSize:11, color:C.muted }}>{r.salon_id?.salon_name||"—"}</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+                  {/* Left Column: Booking Feedback */}
+                  <div>
+                    <div style={{ borderBottom: `2px solid ${C.gold}`, paddingBottom: 10, marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, fontFamily: "Georgia, serif", color: C.ink }}>Booking Feedback</h3>
+                      <Badge label={`${bookingFeedbacks.length} Feedback`} color={C.gold} />
+                    </div>
+                    {bookingFeedbacks.length === 0 ? (
+                      <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 40, textAlign: "center", color: C.muted, fontSize: 13 }}>No booking feedback yet</div>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                        {bookingFeedbacks.map((fb) => (
+                          <div key={fb._id} style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 18, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <Avatar name={fb.customer_id?.name || "C"} size={32} color={C.blue} bg={C.blueLight} />
+                                <div>
+                                  <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{fb.customer_id?.name || "Customer"}</div>
+                                  <div style={{ fontSize: 11, color: C.muted }}>{fb.customer_id?.mobile || "No Mobile"}</div>
+                                </div>
+                              </div>
+                              <button className="action-btn" onClick={() => deleteBookingFeedback(fb._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
+                            </div>
+                            
+                            {/* Ratings metrics */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: 11, color: C.muted, margin: "8px 0" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `1px dashed ${C.border}`, paddingBottom: 4 }}>
+                                <span>Booking Process:</span>
+                                <span style={{ color: C.gold, fontWeight: 700 }}>
+                                  {"★".repeat(fb.booking_process_rating || 5)}{"☆".repeat(5 - (fb.booking_process_rating || 5))}
+                                </span>
+                              </div>
+                              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `1px dashed ${C.border}`, padding: "4px 0" }}>
+                                <span>Payment Flow:</span>
+                                <span style={{ color: C.gold, fontWeight: 700 }}>
+                                  {"★".repeat(fb.payment_process_rating || 5)}{"☆".repeat(5 - (fb.payment_process_rating || 5))}
+                                </span>
+                              </div>
+                              <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 4 }}>
+                                <span>Web Usability:</span>
+                                <span style={{ color: C.gold, fontWeight: 700 }}>
+                                  {"★".repeat(fb.website_usability_rating || 5)}{"☆".repeat(5 - (fb.website_usability_rating || 5))}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div style={{ fontSize: 13, color: C.ink, lineHeight: 1.6, marginTop: 8, fontStyle: fb.feedback_text ? "normal" : "italic" }}>
+                              {fb.feedback_text || "No text feedback provided"}
+                            </div>
+                            <div style={{ fontSize: 10, color: C.muted, marginTop: 10, textAlign: "right" }}>
+                              {fb.created_at ? new Date(fb.created_at).toLocaleDateString("en-IN") : "—"}
                             </div>
                           </div>
-                          <button className="action-btn" onClick={()=>deleteReview(r._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
-                        </div>
-                        <div style={{ display:"flex", gap:2, marginBottom:8 }}>
-                          {[1,2,3,4,5].map(s=>(<span key={s} style={{ fontSize:14, color:s<=r.rating?C.gold:"#D1C5BA" }}>★</span>))}
-                        </div>
-                        <div style={{ fontSize:13, color:C.muted, lineHeight:1.6 }}>{r.review_text||"No comment"}</div>
-                        <div style={{ fontSize:10, color:C.border, marginTop:8 }}>{r.created_at?new Date(r.created_at).toLocaleDateString("en-IN"):"—"}</div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
+
+                  {/* Right Column: Personal Reviews */}
+                  <div>
+                    <div style={{ borderBottom: `2px solid ${C.gold}`, paddingBottom: 10, marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, fontFamily: "Georgia, serif", color: C.ink }}>Personal Reviews</h3>
+                      <Badge label={`${reviews.length} Reviews`} color={C.purple} />
+                    </div>
+                    {reviews.length === 0 ? (
+                      <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 40, textAlign: "center", color: C.muted, fontSize: 13 }}>No personal reviews yet</div>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                        {reviews.map((r) => {
+                          const displayStars = r.rating || r.salon_rating || r.barber_rating || 5;
+                          return (
+                            <div key={r._id} style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 18, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <Avatar name={r.customer_id?.name || "C"} size={32} color={C.purple} bg={C.purpleLight} />
+                                  <div>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{r.customer_id?.name || "Customer"}</div>
+                                    <div style={{ fontSize: 11, color: C.muted }}>
+                                      {r.salon_id?.salon_name || "—"} {r.barber_id?.name ? `(Stylist: ${r.barber_id.name})` : ""}
+                                    </div>
+                                  </div>
+                                </div>
+                                <button className="action-btn" onClick={() => deleteReview(r._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
+                              </div>
+                              <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                  <span key={s} style={{ fontSize: 14, color: s <= displayStars ? C.gold : "#D1C5BA" }}>★</span>
+                                ))}
+                              </div>
+                              <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>{r.review_text || "No comment"}</div>
+                              <div style={{ fontSize: 10, color: C.border, marginTop: 8 }}>{r.created_at ? new Date(r.created_at).toLocaleDateString("en-IN") : "—"}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

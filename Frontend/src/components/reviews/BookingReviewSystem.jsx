@@ -1,77 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle, AlertCircle, ArrowLeft, Calendar, CreditCard, Monitor } from 'lucide-react';
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const ScissorIcon = ({ className }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="none" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="6" cy="6" r="3" stroke="currentColor" />
-    <circle cx="6" cy="18" r="3" stroke="currentColor" />
-    <line x1="20" y1="4" x2="8.12" y2="15.88" stroke="currentColor" />
-    <line x1="14.47" y1="14.48" x2="20" y2="20" stroke="currentColor" />
-    <line x1="8.12" y1="8.12" x2="12" y2="12" stroke="currentColor" />
-  </svg>
-);
-
-const ReviewSystem = ({ bookingData }) => {
+const BookingReviewSystem = ({ bookingData }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   /* ── State ── */
-  const [salonRating, setSalonRating] = useState(0);
-  const [barberRating, setBarberRating] = useState(0);
-  const [salonHover, setSalonHover] = useState(0);
-  const [barberHover, setBarberHover] = useState(0);
+  const [bookingRating, setBookingRating] = useState(0);
+  const [paymentRating, setPaymentRating] = useState(0);
+  const [websiteRating, setWebsiteRating] = useState(0);
+
+  const [bookingHover, setBookingHover] = useState(0);
+  const [paymentHover, setPaymentHover] = useState(0);
+  const [websiteHover, setWebsiteHover] = useState(0);
+
   const [reviewText, setReviewText] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
-  /* ── Pull context from URL query params OR booking prop OR localStorage ── */
-  const salonId = searchParams.get("salonId") || bookingData?.salonId || localStorage.getItem("lastSalonId") || null;
-  const barberId = searchParams.get("barberId") || bookingData?.barberId || localStorage.getItem("lastBarberId") || null;
   const bookingId = searchParams.get("bookingId") || bookingData?.bookingId || null;
-  const barberName = searchParams.get("barberName") || bookingData?.barberName || "Your Barber";
-
   const token = localStorage.getItem("token");
 
-  /* ── Redirect to login if not authenticated ── */
+  /* ── Redirect if not authenticated ── */
   useEffect(() => {
     if (!token) {
-      setError("Please login to write a review");
+      setError("Please login to submit feedback.");
       setTimeout(() => navigate("/login"), 1500);
     }
   }, [token, navigate]);
 
   /* ── Submit handler ── */
   const handleSubmit = async () => {
-    if (!salonRating && !barberRating && !reviewText.trim()) {
-      setError("Please add a rating or write something");
+    if (!bookingRating || !paymentRating || !websiteRating) {
+      setError("Please provide a rating for all three categories.");
       return;
     }
     if (!token) {
-      setError("Please login first");
+      setError("Please login first.");
       return;
     }
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${API}/review`, {
+      const res = await fetch(`${API}/booking-feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          salon_id: salonId,
-          barber_id: barberId,
           booking_id: bookingId,
-          salon_rating: salonRating,
-          barber_rating: barberRating,
-          review_text: reviewText.trim(),
+          booking_process_rating: bookingRating,
+          payment_process_rating: paymentRating,
+          website_usability_rating: websiteRating,
+          feedback_text: reviewText.trim(),
         }),
       });
       const data = await res.json();
@@ -83,7 +71,7 @@ const ReviewSystem = ({ bookingData }) => {
           navigate("/");
         }, 2500);
       } else {
-        setError(data.message || "Failed to submit review");
+        setError(data.message || "Failed to submit feedback.");
       }
     } catch {
       setError("Server error. Is the backend running?");
@@ -104,23 +92,19 @@ const ReviewSystem = ({ bookingData }) => {
               <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
 
-            {/* Primary heading — Rule 1 */}
             <h2 className="mb-1">
               <span className="font-sans font-black uppercase text-3xl tracking-tight text-stone-900">Thank </span>
               <span className="font-serif italic text-2xl text-[#C5A059] normal-case">You!</span>
             </h2>
 
-            {/* Kicker — Rule 2 */}
             <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-4">
-              Review Submitted
+              Feedback Submitted
             </p>
 
-            {/* Body — Rule 3 */}
             <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 mb-6">
-              Your feedback helps us improve. Redirecting you home...
+              Your booking experience feedback helps us refine our online booking system. Redirecting you home...
             </p>
 
-            {/* Button — Rule 4 */}
             <button onClick={() => navigate("/")}
               className="bg-[#3C3530] text-white px-8 py-3 rounded-2xl font-sans font-extrabold text-xs tracking-wider uppercase transition hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer">
               Go Home Now
@@ -132,12 +116,9 @@ const ReviewSystem = ({ bookingData }) => {
     );
   }
 
-  /* ── FORM ── */
   return (
     <div className="min-h-screen w-full bg-[#FAF7F2] font-sans text-stone-800 antialiased flex flex-col justify-between relative overflow-x-hidden">
-
       <div>
-        {/* ── GLOBAL NAVBAR HEADER ── */}
         <Navbar />
 
         {/* ── EXIT BACK BUTTON ── */}
@@ -147,82 +128,107 @@ const ReviewSystem = ({ bookingData }) => {
             className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white transition-all duration-300 group cursor-pointer select-none"
           >
             <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1 text-[#C5A059]" />
-            {/* Button label — Rule 4 */}
-            <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-[#3E362E]">Cancel Review</span>
+            <span className="font-sans font-extrabold text-xs tracking-wider uppercase text-[#3E362E]">Cancel Feedback</span>
           </button>
         </div>
 
-        {/* Review Modal Card Container */}
-        <div className="w-full max-w-lg bg-[#FDFBF0] rounded-[2rem] shadow-xl border border-stone-200/40 relative z-10 mx-auto my-12 animate-fade-in text-left">
+        {/* Feedback Card Container */}
+        <div className="w-full max-w-xl bg-[#FDFBF0] rounded-[2rem] shadow-xl border border-stone-200/40 relative z-10 mx-auto my-12 animate-fade-in text-left">
           <div className="p-8 md:p-12">
 
-            {/* Scissor Badge */}
-            <div className="flex justify-center mb-6">
-              <div className="bg-[#FAF6E9] p-4 rounded-2xl border border-[#F2EDE0] shadow-sm">
-                <ScissorIcon className="w-8 h-8 text-[#A68942] stroke-[1.2px]" />
+            {/* Icon Row */}
+            <div className="flex justify-center gap-3 mb-6">
+              <div className="bg-[#FAF6E9] p-3.5 rounded-2xl border border-[#F2EDE0] shadow-sm">
+                <Calendar className="w-6 h-6 text-[#A68942] stroke-[1.2px]" />
+              </div>
+              <div className="bg-[#FAF6E9] p-3.5 rounded-2xl border border-[#F2EDE0] shadow-sm">
+                <CreditCard className="w-6 h-6 text-[#A68942] stroke-[1.2px]" />
+              </div>
+              <div className="bg-[#FAF6E9] p-3.5 rounded-2xl border border-[#F2EDE0] shadow-sm">
+                <Monitor className="w-6 h-6 text-[#A68942] stroke-[1.2px]" />
               </div>
             </div>
 
-            {/* Primary Heading — Rule 1 */}
+            {/* Primary Heading */}
             <h2 className="text-center mb-2 leading-none">
-              <span className="font-sans font-black uppercase text-3xl md:text-4xl tracking-tight text-stone-900">Review </span>
-              <span className="font-serif italic text-2xl md:text-3xl text-[#C5A059] normal-case">Session</span>
+              <span className="font-sans font-black uppercase text-3xl md:text-4xl tracking-tight text-stone-900">Rate </span>
+              <span className="font-serif italic text-2xl md:text-3xl text-[#C5A059] normal-case">Booking Experience</span>
             </h2>
 
-            {/* Kicker — Rule 2 */}
+            {/* Kicker */}
             <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center mb-10 opacity-80">
-              Share your elite experience
+              Help us perfect our reservation & payment process
             </p>
 
             <div className="space-y-8">
-              {/* Salon Rating */}
-              <div className="space-y-3">
-                {/* Label — Rule 2 */}
+              {/* Booking Process Rating */}
+              <div className="bg-white/60 p-5 rounded-2xl border border-stone-200/20 shadow-sm space-y-3">
                 <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block text-center">
-                  Salon Ambience
+                  1. Ease of Booking
                 </label>
                 <div className="flex justify-center gap-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button key={star}
                       type="button"
-                      onMouseEnter={() => setSalonHover(star)}
-                      onMouseLeave={() => setSalonHover(0)}
-                      onClick={() => { setSalonRating(star); setError(""); }}
+                      onMouseEnter={() => setBookingHover(star)}
+                      onMouseLeave={() => setBookingHover(0)}
+                      onClick={() => { setBookingRating(star); setError(""); }}
                       className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
-                      <span className={`text-4xl ${star <= (salonHover || salonRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
+                      <span className={`text-4xl ${star <= (bookingHover || bookingRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
                     </button>
                   ))}
                 </div>
-                {/* Rating count — Rule 2 */}
-                {salonRating > 0 && (
-                  <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">
-                    {salonRating} / 5
+                {bookingRating > 0 && (
+                  <p className="font-sans text-[10px] font-bold text-[#A68942] text-center uppercase tracking-wider">
+                    {bookingRating} / 5
                   </p>
                 )}
               </div>
 
-              {/* Barber Rating */}
-              <div className="space-y-3">
-                {/* Label — Rule 2 */}
+              {/* Payment Flow Rating */}
+              <div className="bg-white/60 p-5 rounded-2xl border border-stone-200/20 shadow-sm space-y-3">
                 <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block text-center">
-                  Stylist: {barberName}
+                  2. Payment Flow & Transaction Convenience
                 </label>
                 <div className="flex justify-center gap-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button key={star}
                       type="button"
-                      onMouseEnter={() => setBarberHover(star)}
-                      onMouseLeave={() => setBarberHover(0)}
-                      onClick={() => { setBarberRating(star); setError(""); }}
+                      onMouseEnter={() => setPaymentHover(star)}
+                      onMouseLeave={() => setPaymentHover(0)}
+                      onClick={() => { setPaymentRating(star); setError(""); }}
                       className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
-                      <span className={`text-4xl ${star <= (barberHover || barberRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
+                      <span className={`text-4xl ${star <= (paymentHover || paymentRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
                     </button>
                   ))}
                 </div>
-                {/* Rating count — Rule 2 */}
-                {barberRating > 0 && (
-                  <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] text-center">
-                    {barberRating} / 5
+                {paymentRating > 0 && (
+                  <p className="font-sans text-[10px] font-bold text-[#A68942] text-center uppercase tracking-wider">
+                    {paymentRating} / 5
+                  </p>
+                )}
+              </div>
+
+              {/* Website Usability Rating */}
+              <div className="bg-white/60 p-5 rounded-2xl border border-stone-200/20 shadow-sm space-y-3">
+                <label className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block text-center">
+                  3. Website Usability & Interface
+                </label>
+                <div className="flex justify-center gap-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button key={star}
+                      type="button"
+                      onMouseEnter={() => setWebsiteHover(star)}
+                      onMouseLeave={() => setWebsiteHover(0)}
+                      onClick={() => { setWebsiteRating(star); setError(""); }}
+                      className="transition-transform duration-200 hover:scale-125 focus:outline-none cursor-pointer">
+                      <span className={`text-4xl ${star <= (websiteHover || websiteRating) ? "text-[#A68942]" : "text-[#E5E0D0]"}`}>★</span>
+                    </button>
+                  ))}
+                </div>
+                {websiteRating > 0 && (
+                  <p className="font-sans text-[10px] font-bold text-[#A68942] text-center uppercase tracking-wider">
+                    {websiteRating} / 5
                   </p>
                 )}
               </div>
@@ -233,11 +239,10 @@ const ReviewSystem = ({ bookingData }) => {
               <textarea
                 value={reviewText}
                 onChange={(e) => { setReviewText(e.target.value); setError(""); }}
-                placeholder="Your feedback matters..."
+                placeholder="Any suggestions or thoughts about the online reservation process?"
                 maxLength={500}
                 className="w-full bg-[#FAF6E9] border border-[#E5E0D0] rounded-2xl p-5 font-sans text-sm font-normal leading-relaxed text-stone-600 focus:border-[#A68942] focus:ring-0 outline-none transition-all h-28 resize-none placeholder:text-stone-400 shadow-inner"
               />
-              {/* Character count — Rule 2 */}
               <p className="text-right font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 mt-1">
                 {reviewText.length}/500
               </p>
@@ -247,32 +252,28 @@ const ReviewSystem = ({ bookingData }) => {
             {error && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                {/* Error text — Rule 3 */}
                 <p className="font-sans text-sm font-normal leading-relaxed text-red-600">{error}</p>
               </div>
             )}
 
-            {/* Submit Button — Rule 4 */}
+            {/* Submit Button */}
             <button
               type="button"
               onClick={handleSubmit}
               disabled={loading || !token}
               className="w-full bg-[#3C3530] hover:bg-[#C5A059] hover:text-[#2A241F] text-white font-sans font-extrabold text-xs tracking-wider uppercase py-5 rounded-2xl transition-all shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-              {loading ? "Submitting..." : "Submit Review"}
+              {loading ? "Submitting..." : "Submit Booking Feedback"}
             </button>
 
-            {/* Footer note — Rule 2 */}
             <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-stone-400 text-center mt-8 opacity-60">
-              Professional Grooming Standards
+              Online Reservation Quality Standards
             </p>
           </div>
         </div>
       </div>
 
-      {/* ── BRAND FOOTER MODULE ── */}
       <Footer />
 
-      {/* Embedded Fade-In Keyframe Logic */}
       <style dangerouslySetInnerHTML={{
         __html: `
         @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -282,4 +283,4 @@ const ReviewSystem = ({ bookingData }) => {
   );
 };
 
-export default ReviewSystem;
+export default BookingReviewSystem;

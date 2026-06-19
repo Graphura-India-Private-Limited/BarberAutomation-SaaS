@@ -275,7 +275,7 @@ export default function Wrapper() {
 
   // ── ✅ Navigate to review page with booking data
   const handleWriteReview = () => {
-    navigate("/write-review", {
+    navigate("/write-booking-review", {
       state: {
         status: "completed",
         barberName: bookingData.barber,

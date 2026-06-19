@@ -63,7 +63,7 @@ export default function ConfirmationPage({ bookingData = {}, onReset, onWriteRev
           className="w-full flex items-center justify-center gap-2 bg-[#C5A059] hover:opacity-90 text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 cursor-pointer"
         >
           <Star size={18} fill="white" />
-          Write a Review
+          Rate Booking Experience
         </button>
         <button
           type="button"

@@ -79,6 +79,7 @@ import RefundPage from "./pages/customer/RefundPage";
 
 /* ── Components ── */
 import ReviewSystem from "./components/reviews/ReviewSystem";
+import BookingReviewSystem from "./components/reviews/BookingReviewSystem";
 import SalonDetailPage from "./components/salon/SalonDetailPage";
 import NearbyBarbers from "./components/queue/NearbyBarbers";
 import LiveQueue from "./pages/owner/LiveQueue";
@@ -87,6 +88,11 @@ import LiveQueue from "./pages/owner/LiveQueue";
 function WriteReviewRoute() {
   const { state } = useLocation();
   return <ReviewSystem bookingData={state || {}} />;
+}
+
+function WriteBookingReviewRoute() {
+  const { state } = useLocation();
+  return <BookingReviewSystem bookingData={state || {}} />;
 }
 
 function App() {
@@ -162,6 +168,7 @@ function App() {
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
        <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteReviewRoute /></ProtectedRoute>} />
+       <Route path="/write-booking-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteBookingReviewRoute /></ProtectedRoute>} />
 
         {/* --- BARBER PROFILE & ACTIONS (RESTRICTED BY RBAC) --- */}
         <Route path="/barber/login" element={<BarberLogin />} />
