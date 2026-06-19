@@ -232,7 +232,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
       <div className="flex items-start gap-2 text-stone-500 text-[10px] leading-relaxed mb-6">
         <ShieldCheck size={16} className="text-emerald-500 shrink-0 mt-0.5" />
         <p>
-          Payments are secure and processed via <strong>Razorpay Payment Gateway</strong>. Refunds are eligible according to our Cancellation Policy (Token fee non-refundable; full payments refundable minus ₹50 fee).
+          Payments are secure and processed via <strong>Razorpay Payment Gateway</strong>. Once booked, bookings are non-refundable as per our Cancellation and Refund Policy.
         </p>
       </div>
 

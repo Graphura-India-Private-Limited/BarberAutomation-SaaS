@@ -198,7 +198,7 @@ exports.getRefundEstimation = async (req, res) => {
 
     if (paymentType === "FULL") {
       bookingCharges = 50;
-      refundAmount = Math.max(0, amountPaid - bookingCharges);
+      refundAmount = 0; // Disable refund
     } else {
       // For token payment, the charge is the entire paid token amount, so refund is 0
       bookingCharges = amountPaid;
@@ -216,11 +216,9 @@ exports.getRefundEstimation = async (req, res) => {
       },
       refundRules: {
         bookingCharges,
-        refundAmount,
-        refundable: paymentType === "FULL" && amountPaid > bookingCharges,
-        policyNote: paymentType === "TOKEN" 
-          ? "Token payments are non-refundable as per salon cancellation policy." 
-          : `Full payments are refundable after deducting a cancellation booking charge of ₹${bookingCharges}.`
+        refundAmount: 0,
+        refundable: false,
+        policyNote: "Once booked, bookings are non-refundable as per salon cancellation policy."
       }
     });
   } catch (err) {
@@ -248,23 +246,15 @@ exports.cancelWithRefund = async (req, res) => {
     let payment = await Payment.findOne({ booking_id: booking._id, status: "SUCCESS" });
 
     let refundAmount = 0;
-    let bookingCharges = 50;
     let paymentType = "NONE";
 
     if (payment) {
       paymentType = payment.payment_type;
-      if (paymentType === "FULL") {
-        refundAmount = Math.max(0, payment.amount - bookingCharges);
-        payment.status = "REFUNDED"; // Mark payment as refunded in db
-        await payment.save();
-      }
+      // Payments are non-refundable now. We do not set payment.status to 'REFUNDED' nor call Razorpay refund.
     } else {
       // Fallback
       const amountPaid = booking.total_amount || 0;
       paymentType = amountPaid <= 100 ? "TOKEN" : "FULL";
-      if (paymentType === "FULL") {
-        refundAmount = Math.max(0, amountPaid - bookingCharges);
-      }
     }
 
     // Cancel booking status
@@ -276,8 +266,8 @@ exports.cancelWithRefund = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Booking successfully cancelled and refund initiated",
-      refundAmount,
+      message: "Booking successfully cancelled. No refund is applicable as per salon cancellation policy.",
+      refundAmount: 0,
       bookingStatus: booking.status,
       paymentStatus: payment ? payment.status : "NONE"
     });
