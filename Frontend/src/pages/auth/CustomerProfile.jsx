@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import NearbyBarbers from "../../components/queue/NearbyBarbers";
-import barberBookingVideo from "../../assets/Barber Booking - Brave 2026-06-22 15-54-25.mp4";
+const barberBookingVideo = "/barber_booking.mp4";
 
 const GOLD = "#B58B67";
 const GOLD_LIGHT = "#FEF9EE";
