@@ -38,7 +38,7 @@ export default function CustomerManagement() {
       visits: 12,
       amount: 45000,
       rating: 4.8,
-      status: "VIP",
+      status: "Active",
     },
     {
       id: 2,
@@ -58,7 +58,7 @@ export default function CustomerManagement() {
       visits: 15,
       amount: 62000,
       rating: 5.0,
-      status: "VIP",
+      status: "Active",
     },
     {
       id: 4,
@@ -127,9 +127,9 @@ export default function CustomerManagement() {
         </div>
 
         <div className={cardStyle}>
-          <div className="text-[#C5A059] bg-[#C5A059]/10 p-2.5 rounded-xl w-fit border border-[#C5A059]/20"><Crown size={18} /></div>
-          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">18</h3>
-          <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">VIP Accounts</p>
+          <div className="text-[#C5A059] bg-[#C5A059]/10 p-2.5 rounded-xl w-fit border border-[#C5A059]/20"><Zap size={18} /></div>
+          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">78</h3>
+          <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Active Accounts</p>
         </div>
 
         <div className={cardStyle}>
@@ -151,7 +151,7 @@ export default function CustomerManagement() {
             <span>Visits Logged</span>
             <span>Rating Given</span>
             <span>Gross Revenue Spent</span>
-            <span className="text-right">Status Tier</span>
+            <span className="text-right">Status</span>
           </div>
 
           {/* Table Body */}
@@ -217,7 +217,7 @@ export default function CustomerManagement() {
                 <div className="md:block flex justify-between items-center md:text-right">
                   <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Status Tier</span>
                   <span className={`inline-flex items-center justify-center text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${
-                    customer.status === "VIP"
+                    customer.status === "Active"
                       ? "bg-amber-50 text-amber-800 border-amber-200"
                       : "bg-blue-50 text-blue-800 border-blue-200"
                   }`}>
@@ -259,19 +259,19 @@ export default function CustomerManagement() {
           </div>
         </div>
 
-        {/* Panel 2: High Value VIP Accounts */}
+        {/* Panel 2: High Value Spenders */}
         <div className={cardStyle}>
           <div className="flex items-center justify-between mb-5 border-b border-[#FAF6F0] pb-4">
             <div className="flex items-center gap-2.5">
-              <div className="text-[#C5A059] bg-[#C5A059]/10 p-2 rounded-lg"><Crown size={16} /></div>
-              <h4 className="font-serif font-bold text-[#3E362E] text-md tracking-wide">High Value Client Revenue</h4>
+              <div className="text-[#C5A059] bg-[#C5A059]/10 p-2 rounded-lg"><TrendingUp size={16} /></div>
+              <h4 className="font-serif font-bold text-[#3E362E] text-md tracking-wide">High Value Client Spends</h4>
             </div>
             <ArrowUpRight className="w-4 h-4 text-stone-400" />
           </div>
 
           <div className="divide-y divide-[#FAF6F0]">
             {customers
-              .filter((x) => x.status === "VIP")
+              .filter((x) => x.amount > 30000)
               .map((x) => (
                 <div key={x.id} className="flex justify-between items-center py-3.5 text-sm font-medium">
                   <p className="text-[#3E362E] font-semibold">{x.name}</p>

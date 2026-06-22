@@ -30,6 +30,7 @@ app.use("/api/noshow",   require("./routes/noshowRoutes"));
 app.use("/api/breaks", breakRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/review",   require("./routes/reviewRoutes"));
+app.use("/api/booking-feedback", require("./routes/bookingFeedbackRoutes"));
 app.use("/api/newsletter", require("./routes/newsletterRoutes"));
 
 

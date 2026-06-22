@@ -160,7 +160,7 @@ export default function Booking() {
                   </p>
                   {[
                     "Confirmed time slot with your selected barber",
-                    "Priority queue entry on arrival",
+                    "Instant slot reservation confirmation",
                     "Full amount adjustable at salon",
                   ].map((point, i) => (
                     <div key={i} className="flex items-start gap-3">

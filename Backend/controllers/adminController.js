@@ -469,7 +469,7 @@ exports.getAllPayments = async (req, res) => {
 
 /* ══ REVIEWS ══ */
 
-// @desc    Get all reviews
+// @desc    Get all reviews (including booking feedback)
 // @route   GET /api/admin/reviews
 // @access  Private (Admin)
 exports.getAllReviews = async (req, res) => {
@@ -479,7 +479,14 @@ exports.getAllReviews = async (req, res) => {
       .populate("salon_id", "salon_name")
       .populate("barber_id", "name")
       .sort({ created_at: -1 });
-    res.json({ success: true, reviews });
+
+    const BookingFeedback = require("../models/BookingFeedback");
+    const bookingFeedbacks = await BookingFeedback.find()
+      .populate("customer_id", "name mobile")
+      .populate("booking_id")
+      .sort({ created_at: -1 });
+
+    res.json({ success: true, reviews, bookingFeedbacks });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -492,6 +499,19 @@ exports.deleteReview = async (req, res) => {
   try {
     await Review.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Delete booking feedback directly
+// @route   DELETE /api/admin/booking-feedback/:id
+// @access  Private (Admin)
+exports.deleteBookingFeedback = async (req, res) => {
+  try {
+    const BookingFeedback = require("../models/BookingFeedback");
+    await BookingFeedback.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Booking feedback removed" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

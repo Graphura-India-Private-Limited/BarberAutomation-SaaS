@@ -21,13 +21,39 @@ exports.getBarbersBySalon = async (req, res) => {
 // @access  Private (Owner/Admin)
 exports.createBarber = async (req, res) => {
   try {
-    const { salon_id, name, mobile, password, specialization, experience } = req.body;
+    const { 
+      salon_id, 
+      name, 
+      mobile, 
+      password, 
+      specialization, 
+      experience,
+      email,
+      aadhaar,
+      pan,
+      photo,
+      document,
+      documentName
+    } = req.body;
     const exists = await Barber.findOne({ mobile });
     if (exists) {
       return res.status(400).json({ success: false, message: "Mobile exists" });
     }
     const password_hash = await bcrypt.hash(password, 10);
-    const barber = await Barber.create({ salon_id, name, mobile, password_hash, specialization, experience });
+    const barber = await Barber.create({ 
+      salon_id, 
+      name, 
+      mobile, 
+      password_hash, 
+      specialization, 
+      experience,
+      email,
+      aadhaar,
+      pan,
+      photo,
+      document,
+      documentName
+    });
     res.status(201).json({ success: true, barber });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -188,12 +214,14 @@ exports.endBreak = async (req, res) => {
   }
 };
 
-// @desc    Update barber profile info
-// @route   PUT /api/barber/:id
-// @access  Private (Barber/Owner/Admin)
 exports.updateBarberProfile = async (req, res) => {
   try {
-    const barber = await Barber.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = { ...req.body };
+    if (updateData.password) {
+      updateData.password_hash = await bcrypt.hash(updateData.password, 10);
+      delete updateData.password;
+    }
+    const barber = await Barber.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json({ success: true, barber });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -207,6 +235,20 @@ exports.deactivateBarber = async (req, res) => {
   try {
     await Barber.findByIdAndUpdate(req.params.id, { is_active: false });
     res.json({ success: true, message: "Deactivated" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Get break requests for a specific barber
+// @route   GET /api/barber/:id/breaks
+// @access  Private (Barber/Owner/Admin)
+exports.getBarberBreaks = async (req, res) => {
+  try {
+    const requests = await BreakRequest.find({ barber_id: req.params.id })
+      .populate("barber_id", "name mobile")
+      .sort({ created_at: -1 });
+    res.json({ success: true, requests });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

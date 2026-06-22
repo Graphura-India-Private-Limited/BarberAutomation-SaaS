@@ -23,8 +23,6 @@ import BarberDashboard from "./pages/barber/BarberDashboard";
 import ServiceConsole from "./pages/barber/ServiceConsole";
 import ServiceHandler from "./pages/barber/ServiceHandler";
 import BreakManagement from "./pages/barber/BreakManagement";
-import NoShowHandle from "./pages/barber/NoShowHandle";
-import QueuePage from "./pages/barber/QueuePage";
 import BarberSettings from "./pages/barber/BarberSettings";
 import BarberBookings from "./pages/barber/BarberBookings";
 import BarberEarnings from "./pages/barber/BarberEarnings";
@@ -38,12 +36,10 @@ import SalonRegistration from "./pages/owner/SalonRegistration";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import ManageServices from "./pages/owner/ManageServices";
 import HomeOverview from "./pages/barber/HomeOverview";
-import FinancePage from "./pages/owner/FinancePage";
 import PaymentDashboard from "./pages/owner/PaymentDashboard";
-import RevenueDashboard from "./pages/owner/RevenueDashboard";
 import SettingsPage from "./pages/owner/SettingsPage";
 import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
-import AnalyticsDashboard from "./pages/owner/AnalyticsDashboard";
+import FinancialAnalytics from "./pages/owner/FinancialAnalytics";
 import OwnerLayout from "./components/layout/OwnerLayout";
 import BarberTeam from "./pages/owner/BarberTeam";
 import OwnerLiveMonitoring from "./pages/owner/OwnerLiveMonitoring";
@@ -75,6 +71,8 @@ import SalonManagement from "./pages/admin/SalonManagement";
 import CustomerManagement from "./pages/customer/CustomerManagement";
 import AllReviews from "./pages/customer/AllReviews";
 import FaqPage from "./pages/public/FaqPage";
+import AboutPage from "./pages/public/AboutPage";
+import VisitRelaxPage from "./pages/public/VisitRelaxPage";
 import TermsPage from "./pages/public/TermsPage";
 import PrivacyPolicy from "./pages/public/PrivacyPolicy";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -83,16 +81,21 @@ import RefundPage from "./pages/customer/RefundPage";
 
 /* ── Components ── */
 import ReviewSystem from "./components/reviews/ReviewSystem";
+import BookingReviewSystem from "./components/reviews/BookingReviewSystem";
 import SalonDetailPage from "./components/salon/SalonDetailPage";
+import AllSalonsPage from "./components/salon/AllSalonsPage";
 import NearbyBarbers from "./components/queue/NearbyBarbers";
-import NoShowDelayPage from "./components/queue/NoShowDelayPage";
-import MembershipSection from "./components/membership/MembershipSection";
 import LiveQueue from "./pages/owner/LiveQueue";
 
 
 function WriteReviewRoute() {
   const { state } = useLocation();
   return <ReviewSystem bookingData={state || {}} />;
+}
+
+function WriteBookingReviewRoute() {
+  const { state } = useLocation();
+  return <BookingReviewSystem bookingData={state || {}} />;
 }
 
 function App() {
@@ -167,8 +170,11 @@ function App() {
         <Route path="/barbers" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
+        <Route path="/salons" element={<AllSalonsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/visit-relax" element={<VisitRelaxPage />} />
        <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteReviewRoute /></ProtectedRoute>} />
-        <Route path="/membership" element={<MembershipSection />} />
+       <Route path="/write-booking-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteBookingReviewRoute /></ProtectedRoute>} />
 
         {/* --- BARBER PROFILE & ACTIONS (RESTRICTED BY RBAC) --- */}
         <Route path="/barber/login" element={<BarberLogin />} />
@@ -178,11 +184,12 @@ function App() {
           <Route path="overview" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><HomeOverview /></BarberLayout>} />
           <Route path="profile" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberProfile /></BarberLayout>} />
           <Route path="breaks" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout>} />
+          <Route path="break" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout>} />
           <Route path="live-session" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
-          <Route path="service-handler" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceHandler /></BarberLayout>} />
+          <Route path="service-handler" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
           <Route path="service-console" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
-          <Route path="noshow-delay" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><NoShowDelayPage /> </BarberLayout>} />
-          <Route path="noshow-handle" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <NoShowHandle /> </BarberLayout>} />
+          <Route path="noshow-delay" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><ServiceConsole /> </BarberLayout>} />
+          <Route path="noshow-handle" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <ServiceConsole /> </BarberLayout>} />
           <Route path="settings" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberSettings /> </BarberLayout>} />
           <Route path="queue" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <SmartQueue /> </BarberLayout>} />
           <Route path="bookings" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BarberBookings /></BarberLayout>} />
@@ -197,13 +204,14 @@ function App() {
         <Route path="/register-salon" element={<SalonRegistration />} />
         <Route path="/owner" element={<ProtectedRoute allowedRoles={["owner"]}><OwnerLayout /></ProtectedRoute>}>
           <Route path="dashboard" element={<OwnerDashboard />} />
-          <Route path="dashboard/analytics" element={<AnalyticsDashboard />} />
+          <Route path="dashboard/analytics" element={<FinancialAnalytics />} />
+          <Route path="financial-analytics" element={<FinancialAnalytics />} />
           <Route path="payments" element={<PaymentDashboard />} />
-          <Route path="revenue" element={<RevenueDashboard />} />
+          <Route path="revenue" element={<FinancialAnalytics />} />
           <Route path="manage-services" element={<ManageServices />} />
           <Route path="approvals" element={<BreakApprovalDashboard />} />
           <Route path="bookings" element={<BookingManagement />} />
-          <Route path="finance" element={<FinancePage />} />
+          <Route path="finance" element={<FinancialAnalytics />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="queue" element={<LiveQueue />} />
           <Route path="live" element={<OwnerLiveMonitoring />} />

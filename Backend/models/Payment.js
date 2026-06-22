@@ -86,7 +86,7 @@ const paymentSchema = new mongoose.Schema(
     },
     booking_type: {
       type: String,
-      enum: ["QUEUE", "SLOT", "PRIORITY"],
+      enum: ["QUEUE", "SLOT"],
       default: "QUEUE",
       set: value => String(value || "QUEUE").toUpperCase(),
       alias: "bookingType",

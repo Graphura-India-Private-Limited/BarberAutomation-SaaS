@@ -88,10 +88,12 @@ export default function OwnerLiveMonitoring() {
   };
 
   const barberImg = (i) => [
-    "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&q=80",
-    "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400&q=80",
-    "https://images.unsplash.com/photo-1621605815841-aa33c5447a33?w=400&q=80"
-  ][i % 3];
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80"
+  ][i % 5];
 
   return (
     <div className="min-h-screen p-6 md:p-10 font-sans text-stone-800 text-left animate-fade-in" style={{ background: "#FAF6F0" }}>
@@ -130,14 +132,14 @@ export default function OwnerLiveMonitoring() {
           </button>
         </div>
       </header>
-
+ 
       {/* Live Badge indicator bar */}
       <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl border border-[#EADBCE] shadow-3xs w-fit mb-6">
         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
         <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Live tracking active</span>
         <span className="text-xs text-stone-500 font-sans font-medium">· {barbers.length} staff registered</span>
       </div>
-
+ 
       {loading && barbers.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center animate-pulse">
@@ -162,7 +164,14 @@ export default function OwnerLiveMonitoring() {
               {barbers.map((b, i) => (
                 <div key={b._id} className="card p-0 overflow-hidden bg-white">
                   <div className="h-44 overflow-hidden relative">
-                    <img src={barberImg(i)} alt={b.name} className="w-full h-full object-cover" />
+                    <img 
+                      src={barberImg(i)} 
+                      alt={b.name} 
+                      className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        e.target.src = "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=400&q=80";
+                      }}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                     
                     <div className="absolute bottom-4 left-4 text-left">

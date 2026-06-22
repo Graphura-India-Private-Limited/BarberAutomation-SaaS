@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { CreditCard, CheckCircle2, AlertCircle, Scissors } from 'lucide-react';
 
 const PLAN_ROWS = [
-  ['Membership plan',  'Silver Tier'],
+  ['Subscription tier',  'Silver Tier'],
   ['Billing cycle',    'Monthly'],
   ['Points per visit', '20 pts'],
   ['Discount Rate',    '10% Off'],
-  ['Priority access',  'Enabled'],
 ];
 
 const GOLD = "#C5A059";
@@ -103,7 +102,7 @@ export default function Payment() {
               Payment <span style={{ color: GOLD }}>Verification</span>
             </h1>
             <p className="text-xs font-medium text-stone-400 mt-1">
-              Confirm your premium account tier membership subscription parameters purchase.
+              Confirm your premium account tier subscription parameters purchase.
             </p>
           </div>
 

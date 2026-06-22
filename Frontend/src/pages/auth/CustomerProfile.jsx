@@ -4,10 +4,12 @@ import {
   Calendar, Clock, Award, Image, ChevronRight, ArrowLeft, Save,
   Bell, CheckCircle, ShieldAlert, Sparkles, LogOut, CheckSquare, 
   Square, Edit3, Settings, Gift, List, Heart, CalendarPlus, Star,
-  RefreshCw, Play, Search, ShoppingBag, Compass, HelpCircle, LifeBuoy
+  RefreshCw, Play, Search, ShoppingBag, Compass, HelpCircle, LifeBuoy,
+  Upload
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import NearbyBarbers from "../../components/queue/NearbyBarbers";
+import barberBookingVideo from "../../assets/barber_booking.mp4";
 
 const GOLD = "#B58B67";
 const GOLD_LIGHT = "#FEF9EE";
@@ -191,14 +193,14 @@ export default function CustomerProfile() {
   }, [activeTab]);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedApptDetails, setSelectedApptDetails] = useState(null);
+  const [stamps, setStamps] = useState(0);
+  const [unusedRewards, setUnusedRewards] = useState(0);
 
   const [profile, setProfile] = useState({
     name: "Rahul Jagtap",
     mobile: "9876543210",
     email: "rahul@example.com",
     profile_picture: "",
-    membership_tier: "Standard",
-    membership_renewal_date: null,
     total_visits: 0,
     marketing_emails: true,
     monthly_reminders: true,
@@ -278,7 +280,7 @@ export default function CustomerProfile() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const compileNotifications = (uProfile, uAppts, dbNotifs = []) => {
+  const compileNotifications = (uProfile, uAppts, dbNotifs = [], stampsCount = 0) => {
     const list = [...dbNotifs];
     let idCounter = list.length > 0 ? Math.max(...list.map(l => typeof l.id === 'number' ? l.id : 0)) + 1 : 1;
     if (isNaN(idCounter) || idCounter === -Infinity || idCounter === Infinity) idCounter = 1;
@@ -287,16 +289,10 @@ export default function CustomerProfile() {
     if (upcoming.length > 0) {
       list.push({ id: idCounter++, type: "status", title: "Booking Active", message: `Your appointment for ${upcoming[0].service} with ${upcoming[0].barberName} is scheduled for ${upcoming[0].date} at ${upcoming[0].time}.`, date: "Active", read: false });
     } else {
-      list.push({ id: idCounter++, type: "announcement", title: "Ready to Refresh?", message: "No active appointment scheduled. Browse our Premium Grooming Catalog and secure a priority slot today!", date: "Now", read: false });
+      list.push({ id: idCounter++, type: "announcement", title: "Ready to Refresh?", message: "No active appointment scheduled. Browse our Premium Grooming Catalog and secure a booking slot today!", date: "Now", read: false });
     }
-    if (uProfile.membership_tier === "Standard") {
-      list.push({ id: idCounter++, type: "announcement", title: "Upgrade to VIP Bronze/Gold", message: "Unlock free monthly haircuts, styling product discounts, and premium queue slots today!", date: "Today", read: false });
-    } else {
-      list.push({ id: idCounter++, type: "status", title: `${uProfile.membership_tier} Perks Active`, message: `Your premium membership tier is active. Enjoy exclusive styling benefits!${uProfile.membership_renewal_date ? ` Next renewal scheduled on ${uProfile.membership_renewal_date}.` : ""}`, date: "Active", read: false });
-    }
-    const stampsCount = uProfile.total_visits % 10;
     if (stampsCount > 0) {
-      list.push({ id: idCounter++, type: "status", title: "Fidelity Stamps Verified", message: `You have successfully gathered ${stampsCount} fidelity stamp${stampsCount > 1 ? 's' : ''}! Only ${10 - stampsCount} more sessions until your free grooming reward.`, date: "Updated", read: false });
+      list.push({ id: idCounter++, type: "status", title: "Fidelity Stamps Verified", message: `You have successfully gathered ${stampsCount} fidelity stamp${stampsCount > 1 ? 's' : ''}! Only ${10 - stampsCount} more sessions until your 10% discount reward.`, date: "Updated", read: false });
     }
     list.push({ id: idCounter++, type: "announcement", title: "Festive Discount Active", message: "Special styling discount: 15% off all premium haircut packages and styling treatments this weekend!", date: "1 day ago", read: false });
     setNotifications(prev => {
@@ -312,8 +308,18 @@ export default function CustomerProfile() {
     let currentProfile = { ...profile };
     let currentAppts = [...appointments];
     let dbNotifs = [];
+    let calculatedStamps = 0;
     if (!token) {
-      compileNotifications(currentProfile, currentAppts, dbNotifs);
+      const activeBookings = currentAppts.filter(a => 
+        a.status === "Completed" || a.status === "Confirmed" || a.status === "Pending" || a.status === "In-progress"
+      );
+      const usedRewardsCount = activeBookings.filter(a => a.promoCode === "LOYAL10").length;
+      const paidVisitsCount = activeBookings.filter(a => a.promoCode !== "LOYAL10").length;
+      calculatedStamps = paidVisitsCount % 10;
+      setStamps(calculatedStamps);
+      setUnusedRewards(Math.max(0, Math.floor(paidVisitsCount / 10) - usedRewardsCount));
+
+      compileNotifications(currentProfile, currentAppts, dbNotifs, calculatedStamps);
       setLoading(false);
       return;
     }
@@ -325,8 +331,6 @@ export default function CustomerProfile() {
         currentProfile = {
           name: u.name || "", mobile: u.mobile || "", email: u.email || "",
           profile_picture: u.profile_picture || "",
-          membership_tier: u.membership_tier || "Standard",
-          membership_renewal_date: u.membership_renewal_date ? new Date(u.membership_renewal_date).toLocaleDateString("en-IN") : null,
           total_visits: u.total_visits ?? 0,
           marketing_emails: u.marketing_emails ?? true, monthly_reminders: u.monthly_reminders ?? true,
           new_services_alerts: u.new_services_alerts ?? true, newsletter_opt_in: u.newsletter_opt_in ?? true,
@@ -348,10 +352,25 @@ export default function CustomerProfile() {
           status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
           servicesList: b.services?.map(s => ({ name: s.service_name, price: s.price, member_name: s.member_name })) || [{ name: "Custom Haircut", price: 400, member_name: "Self" }],
           total: b.total_amount || 400, paymentMethod: "Razorpay Secure",
-          styleNotes: b.notes || "Standard clean fade cut."
+          styleNotes: b.notes || "Standard clean fade cut.",
+          promoCode: b.promo_code || ""
         }));
         setAppointments(currentAppts);
-        const completedVisits = currentAppts.filter(a => a.status === "Completed").length;
+
+        const activeBookings = currentAppts.filter(a => 
+          a.status === "Completed" || a.status === "Confirmed" || a.status === "Pending" || a.status === "In-progress"
+        );
+        const usedRewardsCount = activeBookings.filter(a => a.promoCode === "LOYAL10").length;
+        const paidVisitsCount = activeBookings.filter(a => a.promoCode !== "LOYAL10").length;
+
+        calculatedStamps = paidVisitsCount % 10;
+        const calculatedEarned = Math.floor(paidVisitsCount / 10);
+        const calculatedUnused = Math.max(0, calculatedEarned - usedRewardsCount);
+
+        setStamps(calculatedStamps);
+        setUnusedRewards(calculatedUnused);
+
+        const completedVisits = activeBookings.length;
         if (completedVisits !== (profileData.user.total_visits || 0)) {
           currentProfile.total_visits = completedVisits;
           setProfile({ ...currentProfile });
@@ -373,7 +392,7 @@ export default function CustomerProfile() {
     } catch (err) {
       console.log("Offline local data fallback active.", err.message);
     } finally {
-      compileNotifications(currentProfile, currentAppts, dbNotifs);
+      compileNotifications(currentProfile, currentAppts, dbNotifs, calculatedStamps);
       setLoading(false);
     }
   };
@@ -424,6 +443,27 @@ export default function CustomerProfile() {
     } catch { triggerToast("Network error. Could not connect to pipeline.", "error"); }
   };
 
+  const handleAvatarUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      triggerToast("Please upload an image file only.", "error");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (uploadEvent) => {
+      const base64 = uploadEvent.target.result;
+      setProfile(p => ({ ...p, profile_picture: base64 }));
+      triggerToast("Image loaded successfully from computer!");
+    };
+    reader.onerror = () => {
+      triggerToast("Failed to read image file.", "error");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleAddFamilyMember = async (e) => {
     e.preventDefault();
     if (!newMember.name.trim() || !newMember.age) { triggerToast("Please fill in all member fields.", "error"); return; }
@@ -467,20 +507,7 @@ export default function CustomerProfile() {
     window.location.href = `/customer/refund/${id}`;
   };
 
-  const handleUpgradeMembership = async (tier) => {
-    const token = getToken();
-    const renewalDate = new Date(); renewalDate.setMonth(renewalDate.getMonth() + 1);
-    const updateData = { membership_tier: tier, membership_renewal_date: renewalDate };
-    if (token) {
-      try {
-        const res = await fetch(`${API}/auth/profile`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(updateData) });
-        const data = await res.json();
-        if (data.success) { triggerToast(`Plan successfully upgraded to ${tier}!`); syncData(); return; }
-      } catch (err) {}
-    }
-    setProfile(prev => ({ ...prev, membership_tier: tier, membership_renewal_date: renewalDate.toLocaleDateString("en-IN") }));
-    triggerToast(`Plan upgraded to ${tier} (Offline Mode)`);
-  };
+
 
   const handleLogout = () => {
     localStorage.clear(); triggerToast("Signing out of system console...");
@@ -535,7 +562,6 @@ export default function CustomerProfile() {
                   { id: "studios", label: "Our Studios", icon: Compass },
                   { id: "history", label: "Appointments Registry", icon: Calendar },
                   { id: "dummy_services", label: "Grooming Menu", icon: ShoppingBag },
-                  { id: "membership", label: "Membership Perks", icon: Award },
                   { id: "preferences", label: "Profile Settings", icon: User },
                   { id: "alerts", label: "Live System Alerts", icon: Bell, count: notifications.filter(n => !n.read).length }
                 ].map(item => {
@@ -584,7 +610,7 @@ export default function CustomerProfile() {
           <main className="flex-1 flex flex-col bg-[#FAF6F0] overflow-auto">
 
             {/* ── HEADER ── */}
-            <header className="bg-[#FFFDF9] border-b border-[#EADBCE] px-6 py-5 flex items-center justify-between sticky top-0 z-10 text-left shrink-0 shadow-2xs">
+            <header className="bg-[#FFFDF9] border-b border-[#EADBCE] px-6 py-5 flex items-center justify-between sticky top-0 z-30 text-left shrink-0 shadow-2xs">
               <div className="flex flex-col justify-center">
                 {/* ✅ FIX: NearbyBarbers removed from h1 — only text titles here */}
                 <h1 className="text-2xl font-black font-serif text-[#3D3126] leading-tight">
@@ -646,14 +672,10 @@ export default function CustomerProfile() {
                           <div className="border-b border-[#EADBCE] pb-3 mb-2.5">
                             <p className="text-xs font-black text-[#3D3126]">{profile.name}</p>
                             <p className="text-[10px] text-[#8A7A6A] font-semibold mt-0.5 truncate">{profile.email || profile.mobile}</p>
-                            <p className="text-[9px] text-[#B58B67] font-black uppercase tracking-wider mt-1">{profile.membership_tier} Tier</p>
                           </div>
                           <div className="space-y-1">
                             <button onClick={() => { setActiveTab("preferences"); setShowUserDropdown(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-black uppercase text-[#8A7A6A] hover:bg-[#FAF6F0] hover:text-[#3D3126] transition-colors cursor-pointer text-left">
                               <Settings size={13} className="text-[#B58B67]" /><span>Profile Settings</span>
-                            </button>
-                            <button onClick={() => { setActiveTab("membership"); setShowUserDropdown(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-black uppercase text-[#8A7A6A] hover:bg-[#FAF6F0] hover:text-[#3D3126] transition-colors cursor-pointer text-left">
-                              <Award size={13} className="text-[#B58B67]" /><span>Membership Perks</span>
                             </button>
                             <button onClick={() => { setActiveTab("alerts"); setShowUserDropdown(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[11px] font-black uppercase text-[#8A7A6A] hover:bg-[#FAF6F0] hover:text-[#3D3126] transition-colors cursor-pointer text-left">
                               <Bell size={13} className="text-[#B58B67]" /><span>System Alerts</span>
@@ -873,54 +895,77 @@ export default function CustomerProfile() {
               {/* TAB: OVERVIEW HUB */}
               {activeTab === "overview" && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  {profile.total_visits === 0 ? (
-                    <div className="bg-[#FEF9EE] border border-[#EADBCE] rounded-3xl p-6 text-left shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 hover:shadow-md transition-shadow relative overflow-hidden">
-                      <div className="absolute right-0 top-0 opacity-10 text-[#B58B67] -mr-8 -mt-8 pointer-events-none">
-                        <Scissors size={200} />
+                  {/* Loyalty Reward Voucher Card if >= 10 bookings */}
+                  {unusedRewards > 0 && (
+                    <div className="bg-gradient-to-r from-[#3D3126] via-[#4E4032] to-[#3D3126] border border-[#B58B67]/50 rounded-3xl p-6 text-left shadow-lg flex flex-col md:flex-row justify-between items-center gap-6 hover:shadow-xl transition-all relative overflow-hidden text-white">
+                      <div className="absolute right-0 top-0 opacity-15 text-[#B58B67] -mr-12 -mt-12 pointer-events-none">
+                        <Gift size={260} />
                       </div>
-                      <div className="space-y-4 max-w-xl">
-                        <span className="bg-[#B58B67] text-white text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-3xs">Onboarding Gift Active</span>
-                        <h2 className="text-2xl font-black font-serif text-[#3D3126] tracking-tight">Welcome to BarberPro, {profile.name}!</h2>
-                        <p className="text-xs text-[#8A7A6A] leading-relaxed">
-                          Experience the pinnacle of premium men's grooming. Book your first haircut today and unlock your customized styling record. Use coupon code <strong className="text-[#9E7452] font-mono text-sm bg-white border border-[#EADBCE] px-2 py-0.5 rounded-md font-black">FIRSTCUT20</strong> for a flat <strong className="text-[#9E7452]">20% off</strong> on your checkout!
+                      <div className="space-y-3 max-w-xl relative z-10">
+                        <span className="bg-[#B58B67] text-white text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-3xs animate-pulse">Loyalty Reward Unlocked</span>
+                        <h2 className="text-2xl font-black font-serif text-white tracking-tight">Congratulations! You've Earned a 10% Discount!</h2>
+                        <p className="text-xs text-stone-300 leading-relaxed font-sans">
+                          As a thank you for completing <strong className="text-[#B58B67] font-black">{profile.total_visits}</strong> premium appointments, your next haircut is 10% off. Use the exclusive coupon code below at checkout to redeem your reward:
                         </p>
-                        <div className="flex flex-wrap gap-3 pt-2">
-                          <button onClick={() => window.location.href = "/customer/booking"} className="bg-[#B58B67] hover:bg-[#9E7452] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-xs hover:scale-102 flex items-center gap-1.5">
-                            <Scissors size={12} /> Book Your First Cut
-                          </button>
-                          <button onClick={() => setShowVideoModal(true)} className="bg-white hover:bg-[#FAF6F0] text-[#3D3126] border border-[#EADBCE] px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-3xs hover:scale-102 flex items-center gap-1.5">
-                            <Play size={12} className="fill-[#3D3126] text-[#3D3126]" /> Play Grooming Tutorial
+                        <div className="flex items-center gap-2 pt-1.5">
+                          <span className="font-mono text-sm bg-white/10 border border-[#B58B67]/40 px-3 py-1.5 rounded-lg font-black text-[#B58B67] tracking-wider select-all cursor-pointer">
+                            LOYAL10
+                          </span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText("LOYAL10");
+                              triggerToast("Promo code copied to clipboard!");
+                            }}
+                            className="bg-[#B58B67] hover:bg-[#a67d58] text-white text-[9px] font-black uppercase px-3 py-2.5 rounded-lg border-none cursor-pointer transition-all"
+                          >
+                            Copy Code
                           </button>
                         </div>
                       </div>
-                      <div onClick={() => setShowVideoModal(true)} className="relative group w-full md:w-64 aspect-video md:aspect-auto md:h-36 rounded-2xl overflow-hidden border border-[#EADBCE] shadow-xs cursor-pointer shrink-0">
-                        <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80" alt="Grooming Tutorial Video" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                          <div className="w-12 h-12 rounded-full bg-white/90 group-hover:bg-white text-[#B58B67] flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
-                            <Play size={18} className="fill-[#B58B67] translate-x-0.5" />
-                          </div>
-                        </div>
-                        <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[9px] text-white font-black uppercase tracking-wider truncate">BarberPro Styling Guide</div>
-                      </div>
+                      <button
+                        onClick={() => window.location.href = "/customer/booking"}
+                        className="relative z-10 shrink-0 px-6 py-3.5 bg-white hover:bg-stone-50 text-[#3D3126] text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer border-none shadow-md hover:scale-102 flex items-center gap-1.5"
+                      >
+                        <Scissors size={12} /> Book Discounted Cut
+                      </button>
                     </div>
-                  ) : (
-                    <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 text-left shadow-xs flex flex-col sm:flex-row justify-between items-center gap-4 hover:shadow-sm transition-shadow">
-                      <div>
-                        <h2 className="text-2xl font-black font-serif text-[#3D3126]">Hello, {profile.name}!</h2>
-                        <p className="text-xs text-[#8A7A6A] mt-1">Ready to refresh your style at BarberPro?</p>
-                      </div>
-                      <div className="flex gap-3">
-                        <button onClick={() => setShowVideoModal(true)} className="px-5 py-2.5 bg-white border border-[#EADBCE] hover:bg-[#FEF9EE] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer text-[#3D3126] flex items-center gap-1.5">
-                          <Play size={12} className="fill-[#3D3126]" /> Styling Video
+                  )}
+
+                  {/* Onboarding Tutorial & Discount Card */}
+                  <div className="bg-[#FEF9EE] border border-[#EADBCE] rounded-3xl p-6 text-left shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div className="absolute right-0 top-0 opacity-10 text-[#B58B67] -mr-8 -mt-8 pointer-events-none">
+                      <Scissors size={200} />
+                    </div>
+                    <div className="space-y-4 max-w-xl">
+                      <span className="bg-[#B58B67] text-white text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-3xs">Onboarding Gift Active</span>
+                      <h2 className="text-2xl font-black font-serif text-[#3D3126] tracking-tight">Welcome to BarberPro, {profile.name}!</h2>
+                      <p className="text-xs text-[#8A7A6A] leading-relaxed font-sans">
+                        Experience the pinnacle of premium men's grooming. Book your first haircut today and unlock your customized styling record. Use coupon code <strong className="text-[#9E7452] font-mono text-sm bg-white border border-[#EADBCE] px-2 py-0.5 rounded-md font-black">FIRSTCUT20</strong> for a flat <strong className="text-[#9E7452]">20% off</strong> on your checkout!
+                      </p>
+                      <div className="flex flex-wrap gap-3 pt-2">
+                        <button onClick={() => window.location.href = "/customer/booking"} className="bg-[#B58B67] hover:bg-[#9E7452] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-xs hover:scale-102 flex items-center gap-1.5 font-sans">
+                          <Scissors size={12} /> Book Your First Cut
                         </button>
-                        <button onClick={() => setActiveTab("preferences")} className="px-5 py-2.5 border border-[#EADBCE] hover:bg-[#FEF9EE] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer text-[#3D3126]">
+                        <button onClick={() => setShowVideoModal(true)} className="bg-white hover:bg-[#FAF6F0] text-[#3D3126] border border-[#EADBCE] px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-3xs hover:scale-102 flex items-center gap-1.5 font-sans">
+                          <Play size={12} className="fill-[#3D3126] text-[#3D3126]" /> Play Grooming Tutorial
+                        </button>
+                        <button onClick={() => setActiveTab("preferences")} className="bg-white hover:bg-[#FAF6F0] text-[#3D3126] border border-[#EADBCE] px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-3xs hover:scale-102 flex items-center gap-1.5 font-sans">
                           Modify Profile Details
                         </button>
                       </div>
                     </div>
-                  )}
+                    <div onClick={() => setShowVideoModal(true)} className="relative group w-full md:w-64 aspect-video md:aspect-auto md:h-36 rounded-2xl overflow-hidden border border-[#EADBCE] shadow-xs cursor-pointer shrink-0">
+                      <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80" alt="Grooming Tutorial Video" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-white/90 group-hover:bg-white text-[#B58B67] flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
+                          <Play size={18} className="fill-[#B58B67] translate-x-0.5" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md text-[9px] text-white font-black uppercase tracking-wider truncate font-sans">BarberPro Styling Guide</div>
+                    </div>
+                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div onClick={() => { setActiveTab("history"); setApptSubTab("past"); }} className="bg-white rounded-2xl border border-[#EADBCE] hover:border-[#B58B67] p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all text-left cursor-pointer hover:scale-102">
                       <div className="w-12 h-12 rounded-xl bg-[#FEF9EE] border border-[#F5E6D3] flex items-center justify-center shrink-0 text-[#9E7452]"><Scissors size={20} /></div>
                       <div className="flex-1 min-w-0">
@@ -940,23 +985,15 @@ export default function CustomerProfile() {
                         )}
                       </div>
                     </div>
-                    <div onClick={() => setActiveTab("membership")} className="bg-white rounded-2xl border border-[#EADBCE] hover:border-emerald-300 p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all text-left cursor-pointer hover:scale-102">
-                      <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100/60 flex items-center justify-center shrink-0 text-[#137333]"><Award size={20} /></div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-[#8A7A6A] font-medium">Membership Tier</p>
-                        <p className="text-2xl font-black text-[#3D3126] mt-0.5">{profile.membership_tier}</p>
-                        <p className="text-[9px] text-[#8A7A6A] font-black uppercase tracking-wider mt-1.5">{profile.membership_tier === "Standard" ? "Upgrade to save more" : "Premium Tier unlocked"}</p>
-                      </div>
-                    </div>
-                    <div onClick={() => { setActiveTab("overview"); triggerToast(`You are ${(10 - (profile.total_visits % 10))} visits away from a free haircut reward!`); }} className="bg-white rounded-2xl border border-[#EADBCE] hover:border-amber-300 p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all text-left cursor-pointer hover:scale-102">
+                    <div onClick={() => { setActiveTab("overview"); triggerToast(`You are ${(10 - stamps)} visits away from a 10% discount reward!`); }} className="bg-white rounded-2xl border border-[#EADBCE] hover:border-amber-300 p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all text-left cursor-pointer hover:scale-102">
                       <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100/60 flex items-center justify-center shrink-0 text-[#B06000]"><Gift size={20} /></div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-[#8A7A6A] font-medium">Reward Progress</p>
-                        <p className="text-2xl font-black text-[#3D3126] mt-0.5">{profile.total_visits % 10} / 10</p>
+                        <p className="text-2xl font-black text-[#3D3126] mt-0.5">{stamps} / 10</p>
                         <div className="w-full h-1.5 bg-stone-100 rounded-full mt-2 overflow-hidden border border-stone-200/40">
-                          <div className="bg-[#B58B67] h-full rounded-full transition-all duration-500" style={{ width: `${(profile.total_visits % 10) * 10}%` }} />
+                          <div className="bg-[#B58B67] h-full rounded-full transition-all duration-500" style={{ width: `${stamps * 10}%` }} />
                         </div>
-                        <p className="text-[9px] text-[#8A7A6A] font-black uppercase tracking-wider mt-1.5">{10 - (profile.total_visits % 10)} cuts left to reward</p>
+                        <p className="text-[9px] text-[#8A7A6A] font-black uppercase tracking-wider mt-1.5">{10 - stamps} cuts left to reward</p>
                       </div>
                     </div>
                   </div>
@@ -992,11 +1029,11 @@ export default function CustomerProfile() {
                     <div className="card p-6 bg-white shadow-xs border border-[#EADBCE] rounded-2xl flex flex-col justify-between">
                       <div>
                         <h3 className="text-md font-black font-serif text-[#3D3126] tracking-tight">Fidelity Stamps</h3>
-                        <p className="text-[11px] text-[#8A7A6A] font-medium mt-1">Earn a complimentary cut after 10 stamps</p>
+                        <p className="text-[11px] text-[#8A7A6A] font-medium mt-1">Earn a 10% discount after 10 stamps</p>
                       </div>
                       <div className="grid grid-cols-5 gap-2 my-auto py-4">
                         {Array.from({ length: 10 }).map((_, i) => {
-                          const isStamped = i < (profile.total_visits % 10);
+                          const isStamped = i < stamps;
                           return (
                             <div key={i} className={`aspect-square rounded-xl border flex items-center justify-center transition-all duration-300 ${isStamped ? "bg-[#FEF9EE] border-[#B58B67] text-[#9E7452] scale-105 shadow-3xs" : "bg-stone-50 border-[#EADBCE] text-stone-300"}`}>
                               {isStamped ? <CheckCircle size={14} className="text-[#9E7452]" /> : <span className="text-[10px] font-mono font-bold">{i + 1}</span>}
@@ -1006,7 +1043,7 @@ export default function CustomerProfile() {
                       </div>
                       <div className="pt-2.5 border-t border-[#EADBCE] flex justify-between items-center text-xs">
                         <span className="text-[#8A7A6A] font-medium">Stamps Verified</span>
-                        <span className="font-black text-[#9E7452]">{profile.total_visits % 10} / 10 stamps</span>
+                        <span className="font-black text-[#9E7452]">{stamps} / 10 stamps</span>
                       </div>
                     </div>
                   </div>
@@ -1051,7 +1088,7 @@ export default function CustomerProfile() {
                             <div className="border border-dashed border-[#EADBCE] rounded-2xl p-6 text-center">
                               <HelpCircle size={24} className="mx-auto text-stone-300 mb-2" />
                               <p className="text-xs font-black uppercase tracking-wider text-stone-400">No active support inquiries</p>
-                              <p className="text-[10px] text-stone-400 mt-1 max-w-md mx-auto">If you faced any issues regarding your bookings, stylists, payments, or membership tiers, file a support ticket to get help.</p>
+                              <p className="text-[10px] text-stone-400 mt-1 max-w-md mx-auto">If you faced any issues regarding your bookings, stylists, or payments, file a support ticket to get help.</p>
                             </div>
                           ) : (
                             supportTickets.slice(0, 3).map(ticket => (
@@ -1214,58 +1251,7 @@ export default function CustomerProfile() {
                 </div>
               )}
 
-              {/* TAB: MEMBERSHIP PERKS */}
-              {activeTab === "membership" && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300 text-left">
-                  <div>
-                    <h2 className="text-lg font-black uppercase tracking-wider text-[#3D3126]">Fidelity Membership Systems</h2>
-                    <p className="text-xs text-[#8A7A6A]">Verify active perks, renewal schedules, or upgrade tier benefits.</p>
-                  </div>
-                  <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
-                    <div className="space-y-2">
-                      <span className="bg-[#B58B67]/10 text-[#9E7452] text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider border border-[#EADBCE]">ACTIVE PERK SCHEDULE</span>
-                      <h3 className="text-2xl font-black font-serif text-[#3D3126] mt-2">{profile.membership_tier} Membership Tier</h3>
-                      <div className="text-xs text-[#8A7A6A] space-y-1 mt-3 font-medium">
-                        {profile.membership_tier === "Standard" && <p>• Standard access to scheduling, basic stamps collection perks.</p>}
-                        {profile.membership_tier === "VIP Bronze" && <p>• VIP Bronze: 1 Free Fade/month, 5% off styling products.</p>}
-                        {profile.membership_tier === "VIP Gold" && <p>• VIP Gold: 2 Free Fades/month, 10% off products, custom priority slots.</p>}
-                        {profile.membership_renewal_date && <p className="font-bold text-[#3D3126] mt-2 font-mono text-[11px]">Renewal Date: {profile.membership_renewal_date}</p>}
-                      </div>
-                    </div>
-                    <div className="bg-[#FEF9EE] border border-[#EADBCE] rounded-2xl p-5 shrink-0 text-center shadow-3xs w-full md:w-auto">
-                      <Award size={32} className="text-[#9E7452] mx-auto mb-2" />
-                      <p className="text-[10px] font-black uppercase tracking-wider text-[#8A7A6A]">Current Status</p>
-                      <span className="inline-block mt-1 font-mono text-xs font-black text-[#9E7452] bg-[#FFFDF9] border border-[#EADBCE] px-3 py-1 rounded-full uppercase tracking-wider">{profile.membership_tier} Tier</span>
-                    </div>
-                  </div>
-                  {profile.membership_tier !== "VIP Gold" && (
-                    <div className="bg-white border border-[#EADBCE] p-6 rounded-2xl shadow-xs">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-[#B58B67] border-b pb-1.5 mb-4 font-serif">Upgrade Memberships</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {profile.membership_tier === "Standard" && (
-                          <div className="p-5 border border-[#EADBCE] rounded-xl flex flex-col justify-between bg-[#FAF6F0]/20">
-                            <div>
-                              <h4 className="text-sm font-black text-[#3D3126]">VIP Bronze Plan</h4>
-                              <p className="text-xs text-[#8A7A6A] mt-1">Unlock standard saves and free fades.</p>
-                              <ul className="text-[10px] text-[#8A7A6A] space-y-1 mt-3"><li>• 1 Free Fade monthly</li><li>• 5% off styling waxes</li></ul>
-                            </div>
-                            <button onClick={() => handleUpgradeMembership("VIP Bronze")} className="mt-4 w-full py-2 bg-[#B58B67] hover:bg-[#9E7452] text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors cursor-pointer">Upgrade to Bronze</button>
-                          </div>
-                        )}
-                        <div className="p-5 border border-[#B58B67] rounded-xl flex flex-col justify-between bg-[#FEF9EE]/30">
-                          <div>
-                            <span className="bg-[#B58B67] text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">RECOMMENDED</span>
-                            <h4 className="text-sm font-black text-[#3D3126] mt-1">VIP Gold Plan</h4>
-                            <p className="text-xs text-[#8A7A6A] mt-1">Unmatched priority scheduling and premium savings.</p>
-                            <ul className="text-[10px] text-[#8A7A6A] space-y-1 mt-3"><li>• 2 Free Fades monthly</li><li>• 10% off styling waxes</li><li>• Priority booking menu</li></ul>
-                          </div>
-                          <button onClick={() => handleUpgradeMembership("VIP Gold")} className="mt-4 w-full py-2 bg-[#3D3126] hover:bg-[#4E443A] text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-colors cursor-pointer">Upgrade to Gold</button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+
 
               {/* TAB: PROFILE SETTINGS */}
               {activeTab === "preferences" && (
@@ -1295,7 +1281,33 @@ export default function CustomerProfile() {
                         </div>
                         <div className="sm:col-span-2">
                           <label className="text-[9px] font-black uppercase tracking-widest text-[#8A7A6A] block mb-1">Profile Picture URL</label>
-                          <input disabled={!isEditingProfile} value={profile.profile_picture} onChange={(e) => setProfile({...profile, profile_picture: e.target.value})} placeholder="https://images.unsplash.com/... or paste image link" className={`w-full bg-[#FAF6F0]/60 border rounded-xl px-4 py-2.5 text-xs font-bold outline-none text-[#3D3126] focus:border-[#B58B67] transition-all ${!isEditingProfile ? "border-transparent opacity-80 cursor-not-allowed" : "border-[#EADBCE]"}`} />
+                          <div className="flex gap-2 items-center">
+                            <input 
+                              disabled={!isEditingProfile} 
+                              value={profile.profile_picture} 
+                              onChange={(e) => setProfile({...profile, profile_picture: e.target.value})} 
+                              placeholder="https://images.unsplash.com/... or paste image link" 
+                              className={`flex-grow bg-[#FAF6F0]/60 border rounded-xl px-4 py-2.5 text-xs font-bold outline-none text-[#3D3126] focus:border-[#B58B67] transition-all ${!isEditingProfile ? "border-transparent opacity-80 cursor-not-allowed" : "border-[#EADBCE]"}`} 
+                            />
+                            {isEditingProfile && (
+                              <>
+                                <input
+                                  type="file"
+                                  id="avatar-upload"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={handleAvatarUpload}
+                                />
+                                <label
+                                  htmlFor="avatar-upload"
+                                  className="p-2.5 rounded-xl border border-[#EADBCE] bg-[#FAF6F0]/60 hover:bg-[#FEF9EE] text-[#B58B67] hover:border-[#B58B67] cursor-pointer transition-all flex items-center justify-center shrink-0"
+                                  title="Upload Image"
+                                >
+                                  <Upload size={16} />
+                                </label>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                       {isEditingProfile && (
@@ -1400,12 +1412,12 @@ export default function CustomerProfile() {
               <div className="absolute top-4 right-4 z-20">
                 <button type="button" onClick={() => setShowVideoModal(false)} className="p-2 rounded-full bg-black/60 hover:bg-black text-white hover:text-[#B58B67] cursor-pointer transition-colors border border-white/10"><X size={20} /></button>
               </div>
-              <div className="aspect-video w-full">
-                <iframe src="https://www.youtube.com/embed/5a2d3dD3cSc?autoplay=1&rel=0&modestbranding=1" title="BarberPro Styling & Grooming Guide" className="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+              <div className="aspect-video w-full bg-black flex items-center justify-center">
+                <video src={barberBookingVideo} controls autoPlay className="w-full h-full object-contain" />
               </div>
               <div className="bg-[#FFFDF9] p-5 border-t border-[#EADBCE]">
                 <h3 className="text-md font-black font-serif text-[#3D3126]">BarberPro Premium Styling & Grooming Guide</h3>
-                <p className="text-[11px] text-[#8A7A6A] font-medium mt-1 leading-relaxed">Discover professional advice on maintaining your taper fades, beard styling with essential nourishing oils, and selecting your signature cut structure.</p>
+                <p className="text-[11px] text-[#8A7A6A] font-medium mt-1 leading-relaxed">Watch our step-by-step guide to selecting slots, booking your stylist, using promotional coupons, and navigating the smart queue radar.</p>
               </div>
             </motion.div>
           </div>

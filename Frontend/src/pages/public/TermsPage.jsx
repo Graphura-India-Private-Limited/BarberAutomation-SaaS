@@ -49,14 +49,14 @@ function TermsPage() {
       icon: RefreshCcw,
       tag: "booking",
       content:
-        "Appointments can be cancelled or rescheduled before the scheduled slot. Frequent cancellations or no-shows may result in temporary booking restrictions.",
+        "Appointments can be cancelled or rescheduled before the scheduled slot. Please note that once booked, payments are non-refundable and no money will be returned.",
     },
     {
       title: "Refund Policy",
       icon: ShieldCheck,
       tag: "finance",
       content:
-        "Payments made for completed services are generally non-refundable. Refund eligibility depends on service conditions and management approval.",
+        "Once a booking is made, no refunds will be given under any circumstances. Please ensure your availability before completing your booking.",
     },
     {
       title: "Service Disclaimer",

@@ -34,6 +34,10 @@ const emptyForm = {
   support_number: "",
   images: [],
   about: "",
+  shop_establishment_certificate: "",
+  trade_license: "",
+  gst_certificate: "",
+  aadhaar_card: "",
 };
 
 export default function SalonRegistration() {
@@ -44,6 +48,21 @@ export default function SalonRegistration() {
   const [error, setError] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [timeError, setTimeError] = useState("");
+  const [customServiceInput, setCustomServiceInput] = useState("");
+  const [availableServices, setAvailableServices] = useState(AVAILABLE_SERVICES);
+
+  const handleAddCustomService = () => {
+    const trimmed = customServiceInput.trim();
+    if (!trimmed) return;
+    const formatted = trimmed.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    if (!availableServices.includes(formatted)) {
+      setAvailableServices(prev => [...prev, formatted]);
+    }
+    if (!form.services_offered.includes(formatted)) {
+      toggleService(formatted);
+    }
+    setCustomServiceInput("");
+  };
 
   const setField = (name, value) => {
     setForm(prev => ({ ...prev, [name]: value }));
@@ -187,6 +206,16 @@ export default function SalonRegistration() {
     setForm(prev => ({ ...prev, images: [...prev.images, ...encoded].slice(0, 5) }));
   };
 
+  const handleDocumentUpload = async (event, fieldName) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setForm(prev => ({ ...prev, [fieldName]: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!form.latitude || !form.longitude) {
@@ -204,9 +233,20 @@ export default function SalonRegistration() {
       return;
     }
 
-    const emptyPrices = form.services_offered.filter(s => !form.service_prices[s] || Number(form.service_prices[s]) <= 0);
-    if (emptyPrices.length > 0) {
-      setError(`Please specify a valid price for: ${emptyPrices.join(", ")}`);
+    if (!form.shop_establishment_certificate) {
+      setError("Please upload your Shop and Establishment Certificate.");
+      return;
+    }
+    if (!form.trade_license) {
+      setError("Please upload your Trade License.");
+      return;
+    }
+    if (!form.gst_certificate) {
+      setError("Please upload your GST Certificate.");
+      return;
+    }
+    if (!form.aadhaar_card) {
+      setError("Please upload your Aadhaar Card.");
       return;
     }
     
@@ -214,13 +254,16 @@ export default function SalonRegistration() {
     setError("");
     setMessage("");
     try {
-      const haircutPrice = form.service_prices["Haircut"] || form.service_prices["Haircut + Shave"] || Object.values(form.service_prices)[0] || 0;
+      const servicePrices = {};
+      form.services_offered.forEach(s => {
+        servicePrices[s] = 150;
+      });
 
       const payload = {
         ...form,
         services_offered: form.services_offered,
-        service_prices: form.service_prices,
-        basic_pricing: Number(haircutPrice),
+        service_prices: servicePrices,
+        basic_pricing: 150,
         number_of_barbers: Number(form.number_of_barbers),
       };
       
@@ -393,7 +436,7 @@ export default function SalonRegistration() {
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setDropdownOpen(false)} />
                   <div className="absolute left-0 right-0 top-[85px] mt-1 bg-white border border-[#EADBCE] rounded-2xl shadow-xl z-30 p-2 space-y-1 max-h-60 overflow-y-auto">
-                    {AVAILABLE_SERVICES.map(service => {
+                    {availableServices.map(service => {
                       const isSelected = form.services_offered.includes(service);
                       return (
                         <div 
@@ -438,56 +481,120 @@ export default function SalonRegistration() {
                   ))}
                 </div>
               )}
+
+              {/* Custom Service Insertion Block */}
+              <div className="flex gap-3 mt-4 items-center max-w-lg">
+                <input 
+                  type="text" 
+                  placeholder="Can't find your service? Add a custom one..." 
+                  value={customServiceInput}
+                  onChange={e => setCustomServiceInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCustomService();
+                    }
+                  }}
+                  className="flex-grow bg-white border border-[#EADBCE] rounded-2xl p-3.5 outline-none text-[#3E362E] placeholder-stone-400 focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all text-xs font-medium font-sans shadow-3xs"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomService}
+                  className="h-11 px-5 rounded-2xl text-xs font-extrabold uppercase tracking-wider text-white transition-all bg-[#C5A059] hover:bg-[#3E362E] cursor-pointer"
+                >
+                  Add Service
+                </button>
+              </div>
             </div>
 
-            {/* Dynamic Service Pricing Inputs */}
-            <div className="md:col-span-2">
-              {form.services_offered.length > 0 ? (
-                <div className="bg-[#FAF6F0]/50 border border-[#EADBCE] rounded-3xl p-5 md:p-6 space-y-4">
-                  <div>
-                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
-                      Service Price Configuration *
-                    </span>
-                    <p className="text-stone-500 text-xs mt-1 font-sans">
-                      Please specify the price (in ₹) for each service you offer.
-                    </p>
+            {/* Business & Legal Verification Documents */}
+            <div className="md:col-span-2 space-y-4">
+              <div className="border-b border-[#EADBCE] pb-2">
+                <span className="text-[12px] font-extrabold uppercase tracking-wider text-[#C5A059] font-sans">
+                  Business & Legal Verification Documents *
+                </span>
+                <p className="text-stone-500 text-xs mt-1 font-sans">
+                  Please upload valid copies of the requested documents (PDF or Image formats supported).
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {/* Shop and Establishment Certificate */}
+                <Field label="Shop & Establishment Certificate *">
+                  <div className="relative w-full h-[50px]">
+                    <input 
+                      type="file" 
+                      id="shop-establishment-upload" 
+                      accept="image/*,application/pdf" 
+                      onChange={e => handleDocumentUpload(e, "shop_establishment_certificate")} 
+                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                    />
+                    <label htmlFor="shop-establishment-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                      <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
+                        {form.shop_establishment_certificate ? "Document uploaded ✓" : "Upload Certificate..."}
+                      </span>
+                      <Upload size={14} color={GOLD} />
+                    </label>
                   </div>
-                  
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {form.services_offered.map(serviceName => (
-                      <Field key={serviceName} label={`Price for ${serviceName} *`}>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 text-sm font-semibold">₹</span>
-                          <input 
-                            required 
-                            type="number" 
-                            min="1" 
-                            placeholder="e.g. 150" 
-                            value={form.service_prices[serviceName] || ""} 
-                            onChange={e => {
-                              const val = e.target.value;
-                              setForm(prev => ({
-                                ...prev,
-                                service_prices: {
-                                  ...prev.service_prices,
-                                  [serviceName]: val
-                                }
-                              }));
-                            }} 
-                            className={`${inputClass} pl-8`} 
-                          />
-                        </div>
-                      </Field>
-                    ))}
+                </Field>
+
+                {/* Trade License */}
+                <Field label="Trade License *">
+                  <div className="relative w-full h-[50px]">
+                    <input 
+                      type="file" 
+                      id="trade-license-upload" 
+                      accept="image/*,application/pdf" 
+                      onChange={e => handleDocumentUpload(e, "trade_license")} 
+                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                    />
+                    <label htmlFor="trade-license-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                      <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
+                        {form.trade_license ? "Document uploaded ✓" : "Upload License..."}
+                      </span>
+                      <Upload size={14} color={GOLD} />
+                    </label>
                   </div>
-                </div>
-              ) : (
-                <div className="bg-white border border-dashed border-[#EADBCE] rounded-3xl p-8 text-center">
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-stone-400 font-sans">
-                    Please select services above to configure pricing.
-                  </span>
-                </div>
-              )}
+                </Field>
+
+                {/* GST Certificate */}
+                <Field label="GST Certificate *">
+                  <div className="relative w-full h-[50px]">
+                    <input 
+                      type="file" 
+                      id="gst-certificate-upload" 
+                      accept="image/*,application/pdf" 
+                      onChange={e => handleDocumentUpload(e, "gst_certificate")} 
+                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                    />
+                    <label htmlFor="gst-certificate-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                      <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
+                        {form.gst_certificate ? "Document uploaded ✓" : "Upload GST Certificate..."}
+                      </span>
+                      <Upload size={14} color={GOLD} />
+                    </label>
+                  </div>
+                </Field>
+
+                {/* Aadhaar Card */}
+                <Field label="Owner's Aadhaar Card *">
+                  <div className="relative w-full h-[50px]">
+                    <input 
+                      type="file" 
+                      id="aadhaar-card-upload" 
+                      accept="image/*,application/pdf" 
+                      onChange={e => handleDocumentUpload(e, "aadhaar_card")} 
+                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                    />
+                    <label htmlFor="aadhaar-card-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                      <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
+                        {form.aadhaar_card ? "Document uploaded ✓" : "Upload Aadhaar Card..."}
+                      </span>
+                      <Upload size={14} color={GOLD} />
+                    </label>
+                  </div>
+                </Field>
+              </div>
             </div>
 
             <Field label="Total Active Chairs / Barbers *">

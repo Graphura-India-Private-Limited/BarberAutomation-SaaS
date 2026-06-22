@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import MembershipSection from "../../components/membership/MembershipSection";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import {
@@ -69,7 +68,7 @@ const HOW_IT_WORKS = [
     bg: "#ECFDF5", color: "#065F46",
   },
   {
-    step: "04", title: "Visit & Relax", path: "/salon-detail",
+    step: "04", title: "Visit & Relax", path: "/visit-relax",
     desc: "Walk in at your slot and enjoy a premium grooming experience.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
@@ -133,6 +132,32 @@ export default function HomePage() {
   const [visibleCount, setVisibleCount] = useState(1);
   const dropRef = useRef(null);
 
+  const [userCoords, setUserCoords] = useState(null);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationError, setLocationError] = useState(null);
+
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by this browser.");
+      return;
+    }
+    setIsDetectingLocation(true);
+    setLocationError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserCoords({ latitude, longitude });
+        setIsDetectingLocation(false);
+      },
+      (error) => {
+        console.error(error);
+        setLocationError("Location permission denied. Please allow location access to see salons.");
+        setIsDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   // Compute visible cards based on window width
   const getVisibleCount = () => {
     if (typeof window === "undefined") return 1;
@@ -153,6 +178,8 @@ export default function HomePage() {
     localStorage.removeItem("selectedSalonId");
     localStorage.removeItem("selectedSalonName");
     localStorage.removeItem("pendingBooking");
+
+    detectLocation();
 
     if (!API) {
       console.error("API base URL configuration is missing.");
@@ -195,7 +222,6 @@ export default function HomePage() {
     const paths = {
       men: "/customer/services/men",
       women: "/customer/services/women",
-      premium: "/membership",
     };
     navigate(paths[category] || "/customer/services");
   };
@@ -298,16 +324,7 @@ useEffect(() => {
                 </div>
               </button>
 
-              <button
-                onClick={() => handleCategoryClick("premium")}
-                className="flex items-center gap-3 bg-white/70 hover:bg-white transition-colors duration-200 backdrop-blur-sm border border-stone-200/60 hover:border-[#C5A059]/50 p-2.5 px-4 rounded-xl shadow-sm cursor-pointer"
-              >
-                <div className="p-1.5 bg-[#C5A059]/10 rounded-lg text-[#C5A059]"><Award size={14} /></div>
-                <div>
-                  <h4 className="text-[11px] font-black uppercase tracking-wider text-stone-800 leading-tight">Premium Experience</h4>
-                  <p className="text-[9px] text-stone-500 leading-none mt-0.5">Personalized. Luxury.</p>
-                </div>
-              </button>
+
             </div>
 
             <div className="flex items-center gap-4 bg-white/40 backdrop-blur-sm border border-stone-200/50 p-3 px-5 rounded-2xl w-fit shadow-xs my-2">
@@ -470,7 +487,7 @@ useEffect(() => {
                 ))}
               </div>
               <div className="flex flex-wrap gap-4">
-                <button onClick={() => navigate("/salon-detail")} className="flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] hover:scale-105 transition-all duration-300 cursor-pointer">
+                <button onClick={() => navigate("/about")} className="flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] hover:scale-105 transition-all duration-300 cursor-pointer">
                   Read More <ArrowRight className="w-4 h-4" />
                 </button>
                 <button onClick={() => navigate("/customer/services")} className="flex items-center gap-2 px-7 py-3.5 rounded-2xl border border-[#C5A059]/40 bg-white/5 backdrop-blur-xl text-[#FFE6A7] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[#C5A059]/10 hover:border-[#FFE6A7] transition-all duration-300 cursor-pointer">
@@ -594,54 +611,118 @@ useEffect(() => {
       </section>
 
       {/* ── NEARBY SALONS ── */}
-      {salons.length > 0 && (
-        <section className="bg-[#F9F5EF] py-20">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-14">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Find Us</span>
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">Nearby Salons</h2>
-              <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
-            </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              {salons.map((s) => (
-                <div key={s._id} onClick={() => navigate(`/salon/${s._id}`)}
-                  className="bg-white rounded-2xl p-6 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="font-black text-[#3E362E] text-lg">{s.salon_name}</h3>
-                      <p className="text-[11px] text-[#8D7B68] flex items-center gap-1 mt-1"><MapPin className="w-3 h-3" />{s.address}</p>
-                    </div>
-                    <span className="bg-[#ECFDF5] text-[#065F46] text-[10px] font-black px-2 py-1 rounded-full uppercase">Open</span>
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-[#8D7B68] mb-4">
-                    <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-[#C5A059] text-[#C5A059]" />{s.rating || "4.9"}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.opening_time} - {s.closing_time}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/salon/${s._id}`); }}
-                      className="flex-1 border border-[#EADDCA] text-[#3E362E] py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:border-[#C5A059] transition cursor-pointer bg-transparent">
-                      View Details
-                    </button>
-                    <button type="button" onClick={(e) => { e.stopPropagation(); navigate("/customer/services"); }}
-                      className="flex-1 bg-[#3E362E] text-white py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#C5A059] transition cursor-pointer">
-                      Book Now
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="text-center mt-8">
-              <button type="button" onClick={() => navigate("/nearby")}
-                className="inline-flex items-center gap-2 text-[#C5A059] font-black uppercase text-[11px] tracking-widest hover:gap-4 transition-all cursor-pointer bg-transparent border-none">
-                View All Salons <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+      <section className="bg-[#F9F5EF] py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#C5A059]">Find Us</span>
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-[#3E362E] mt-3">Nearby Salons</h2>
+            <div className="w-16 h-1 bg-[#C5A059] mx-auto mt-4 rounded-full" />
           </div>
-        </section>
-      )}
 
-      {/* ── MEMBERSHIP ── */}
-      <MembershipSection />
+          {userCoords ? (
+            salons.length === 0 ? (
+              <div className="py-12 text-center bg-white border border-[#EADDCA] rounded-[32px]">
+                <MapPin className="w-12 h-12 mx-auto text-[#C5A059]/40 mb-3" />
+                <p className="text-base font-extrabold text-[#3E362E]">No Salons Available</p>
+                <p className="text-stone-400 text-xs mt-1">There are no approved salons in our system at the moment.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {salons.map((s) => (
+                    <div key={s._id} onClick={() => navigate(`/salon/${s._id}`)}
+                      className="bg-white rounded-2xl p-6 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="font-black text-[#3E362E] text-lg">{s.salon_name}</h3>
+                          <p className="text-[11px] text-[#8D7B68] flex items-center gap-1 mt-1"><MapPin className="w-3 h-3" />{s.address}</p>
+                        </div>
+                        <span className="bg-[#ECFDF5] text-[#065F46] text-[10px] font-black px-2 py-1 rounded-full uppercase">Open</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-[#8D7B68] mb-4">
+                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-[#C5A059] text-[#C5A059]" />{s.rating || "4.9"}</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.opening_time} - {s.closing_time}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/salon/${s._id}`); }}
+                          className="flex-1 border border-[#EADDCA] text-[#3E362E] py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:border-[#C5A059] transition cursor-pointer bg-transparent">
+                          View Details
+                        </button>
+                        <button type="button" onClick={(e) => { e.stopPropagation(); navigate("/customer/services"); }}
+                          className="flex-1 bg-[#3E362E] text-white py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-[#C5A059] transition cursor-pointer">
+                          Book Now
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-center mt-8">
+                  <button type="button" onClick={() => navigate("/nearby")}
+                    className="inline-flex items-center gap-2 text-[#C5A059] font-black uppercase text-[11px] tracking-widest hover:gap-4 transition-all cursor-pointer bg-transparent border-none">
+                    View All Salons <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </>
+            )
+          ) : (
+            <div className="max-w-2xl mx-auto text-center py-12 px-6 bg-white border border-[#EADDCA] rounded-[32px] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-[#C5A059]/5 to-transparent rotate-12 pointer-events-none" />
+              
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="w-16 h-16 rounded-full bg-[#FAF6F0] border border-[#EADDCA] flex items-center justify-center mb-6 shadow-xs relative">
+                  <MapPin className="w-8 h-8 text-[#C5A059] animate-bounce" />
+                  <div className="absolute inset-0 rounded-full border-2 border-[#C5A059]/30 animate-ping opacity-75" />
+                </div>
+
+                <h3 className="text-xl font-black uppercase tracking-wider text-[#3E362E] mb-3">
+                  Enable Location Services
+                </h3>
+                
+                <p className="text-stone-600 text-sm leading-relaxed max-w-md mb-8">
+                  To view our premium grooming studios and nearby salons, please allow location access. Antigravity requires location to discover the nearest artists and estimate queue wait times.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={detectLocation}
+                  disabled={isDetectingLocation}
+                  className="px-8 py-4 bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black uppercase text-xs tracking-widest rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none flex items-center gap-2"
+                >
+                  {isDetectingLocation ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Requesting...
+                    </>
+                  ) : (
+                    <>
+                      <MapPin className="w-4 h-4" />
+                      Allow Location Access
+                    </>
+                  )}
+                </button>
+
+                {locationError && (
+                  <div className="mt-6 p-4 bg-amber-50/60 border border-amber-200/50 rounded-2xl max-w-md text-left flex items-start gap-3">
+                    <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                      <p className="text-xs font-extrabold text-amber-800 uppercase tracking-wider mb-1">
+                        Permission Blocked
+                      </p>
+                      <p className="text-stone-600 text-xs leading-normal">
+                        It looks like location permission is disabled or blocked. Please click the settings/lock icon next to the URL in your browser address bar and enable Location for this site.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+
 
  {/* ── 5. CUSTOMER TESTIMONIALS SECTION ── */}
       <section className="relative w-full overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] py-20 sm:py-24 px-4 flex flex-col items-center justify-center">

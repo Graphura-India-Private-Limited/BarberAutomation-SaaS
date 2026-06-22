@@ -14,6 +14,7 @@ router.put("/:barber_id/queue/:queue_id/complete", protect, requireRoles("barber
 router.put("/:barber_id/queue/:queue_id/noshow", protect, requireRoles("barber", "owner", "admin"), barberController.markNoShow);
 
 router.post("/:id/break-request", protect, requireRoles("barber"), barberController.submitBreakRequest);
+router.get("/:id/breaks", protect, requireRoles("barber", "owner", "admin"), barberController.getBarberBreaks);
 router.put("/:id/break-end", protect, requireRoles("barber"), barberController.endBreak);
 
 router.put("/:id", protect, requireRoles("barber", "owner", "admin"), barberController.updateBarberProfile);

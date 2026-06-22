@@ -15,8 +15,6 @@ const customerSchema = new mongoose.Schema({
   
   // Upgraded Fields
   profile_picture: { type: String, default: "" },
-  membership_tier: { type: String, default: "Standard" }, // Standard, VIP Bronze, VIP Gold
-  membership_renewal_date: { type: Date, default: null },
   total_visits: { type: Number, default: 0 },
   
   // Granular Notification Toggles

@@ -77,7 +77,11 @@ const ReviewSystem = ({ bookingData }) => {
       const data = await res.json();
       if (data.success) {
         setSubmitted(true);
-        setTimeout(() => navigate("/"), 2500);
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          navigate("/");
+        }, 2500);
       } else {
         setError(data.message || "Failed to submit review");
       }

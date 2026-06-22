@@ -27,7 +27,7 @@ const CATEGORIES = [
     desc: "Bespoke styling, rich couture colouring, and rejuvenating rituals that illuminate your natural radiance from root to tip.",
     img: "https://images.unsplash.com/photo-1560869713-7d0a29430803?w=900&q=80",
     path: "/customer/services/women",
-    tag: "18 Services",
+    tag: "12 Services",
     accent: "#D4A0B0",
     stats: [
       { label: "Cuts & Blowouts", val: "6+" },

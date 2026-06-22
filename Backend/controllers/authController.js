@@ -61,6 +61,10 @@ const pickSalonProfile = (body) => ({
   about: body.about || "",
   salary_model: body.salary_model || body.salaryModel || "commission",
   commission_percent: Number(body.commission_percent ?? body.commissionPercent ?? 10) || 10,
+  shop_establishment_certificate: body.shop_establishment_certificate || "",
+  trade_license: body.trade_license || "",
+  gst_certificate: body.gst_certificate || "",
+  aadhaar_card: body.aadhaar_card || "",
 });
 
 /* ══════════════════════════════════════
@@ -178,7 +182,7 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { 
-      name, email, profile_picture, membership_tier, membership_renewal_date,
+      name, email, profile_picture,
       total_visits, marketing_emails, monthly_reminders, new_services_alerts, newsletter_opt_in
     } = req.body;
     
@@ -186,8 +190,6 @@ exports.updateProfile = async (req, res) => {
     if (name !== undefined) updates.name = name;
     if (email !== undefined) updates.email = email;
     if (profile_picture !== undefined) updates.profile_picture = profile_picture;
-    if (membership_tier !== undefined) updates.membership_tier = membership_tier;
-    if (membership_renewal_date !== undefined) updates.membership_renewal_date = membership_renewal_date;
     if (total_visits !== undefined) updates.total_visits = Number(total_visits);
     if (marketing_emails !== undefined) updates.marketing_emails = marketing_emails;
     if (monthly_reminders !== undefined) updates.monthly_reminders = monthly_reminders;
