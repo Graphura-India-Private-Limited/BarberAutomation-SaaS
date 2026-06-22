@@ -9,5 +9,4 @@ Frontend/dist/
 .DS_Store
 Thumbs.db
 Backend/createTestData.js
-*.mp4
-
+Frontend/public/barber_booking.mp4

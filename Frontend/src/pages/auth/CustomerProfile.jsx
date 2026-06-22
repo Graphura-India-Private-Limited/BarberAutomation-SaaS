@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import NearbyBarbers from "../../components/queue/NearbyBarbers";
-const barberBookingVideo = "/barber_booking.mp4";
+import barberBookingVideo from "../../assets/barber_booking.mp4";
 
 const GOLD = "#B58B67";
 const GOLD_LIGHT = "#FEF9EE";
