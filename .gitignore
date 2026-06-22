@@ -9,3 +9,5 @@ Frontend/dist/
 .DS_Store
 Thumbs.db
 Backend/createTestData.js
+*.mp4
+

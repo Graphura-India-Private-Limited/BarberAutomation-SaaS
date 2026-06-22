@@ -11,13 +11,50 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
   const [upiId, setUpiId] = useState("");
   const [cardDetails, setCardDetails] = useState({ number: "", expiry: "", cvc: "", name: "" });
 
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState(null); // { code: '...', type: '...', value: 100 }
+  const [promoError, setPromoError] = useState("");
+
+  const handleApplyPromo = () => {
+    setPromoError("");
+    const code = promoCode.trim().toUpperCase();
+    if (!code) return;
+
+    if (code === "FIRSTCUT20") {
+      setAppliedPromo({ code, type: "PERCENT", value: 20 });
+    } else if (code === "LOYAL10") {
+      setAppliedPromo({ code, type: "PERCENT", value: 10 });
+    } else {
+      setPromoError("Invalid promo code.");
+      setAppliedPromo(null);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoCode("");
+    setPromoError("");
+  };
+
   const attendeesCount = bookingData.attendees ? bookingData.attendees.length : 1;
-  const tokenAmount = attendeesCount * 50;
   const servicePrice = bookingData.price || 500;
-  const fullAmount = servicePrice * attendeesCount;
+  const baseFullAmount = servicePrice * attendeesCount;
+
+  // Apply discount
+  let discountAmount = 0;
+  if (appliedPromo) {
+    if (appliedPromo.type === "PERCENT") {
+      discountAmount = Math.round(baseFullAmount * (appliedPromo.value / 100));
+    } else if (appliedPromo.type === "FREE") {
+      discountAmount = baseFullAmount;
+    }
+  }
+
+  const fullAmount = Math.max(0, baseFullAmount - discountAmount);
+  const tokenAmount = appliedPromo?.type === "FREE" ? 0 : (attendeesCount * 50);
 
   const amountToPayNow = paymentType === "FULL" ? fullAmount : tokenAmount;
-  const remainingAtSalon = paymentType === "FULL" ? 0 : (fullAmount - tokenAmount);
+  const remainingAtSalon = paymentType === "FULL" ? 0 : Math.max(0, fullAmount - tokenAmount);
 
   // Billing calculation details
   const platformFee = 15;
@@ -29,7 +66,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
     // Simulate Razorpay handshake / payment gateway loader
     setTimeout(async () => {
       try {
-        await onComplete(paymentType, amountToPayNow);
+        await onComplete(paymentType, amountToPayNow, appliedPromo?.code || "");
       } catch (err) {
         console.error(err);
       } finally {
@@ -120,8 +157,51 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
         <div className="space-y-2.5 text-xs text-stone-600 font-semibold">
           <div className="flex justify-between">
             <span>Service Total ({attendeesCount} person)</span>
-            <span className="font-mono text-stone-800">₹{fullAmount}</span>
+            <span className="font-mono text-stone-800">₹{baseFullAmount}</span>
           </div>
+          {discountAmount > 0 && (
+            <div className="flex justify-between text-emerald-700">
+              <span>Promo Discount ({appliedPromo?.code})</span>
+              <span className="font-mono font-bold">-₹{discountAmount}</span>
+            </div>
+          )}
+          <div className="flex justify-between items-center gap-4 py-1.5 border-t border-b border-dashed border-[#EADBCE]/60 my-1">
+            <span className="text-stone-500 font-bold">Coupon Code</span>
+            {appliedPromo ? (
+              <div className="flex items-center gap-2">
+                <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[9px] font-black uppercase">
+                  {appliedPromo.code} Applied
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRemovePromo}
+                  className="text-stone-400 hover:text-red-500 text-[10px] font-black cursor-pointer border-none bg-transparent"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2 shrink-0">
+                <input
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  placeholder="Enter Code"
+                  className="bg-white border border-[#EADBCE] rounded-lg px-2 py-1 text-[10px] font-mono font-bold outline-none text-[#3E362E] focus:border-[#C5A059] w-28 uppercase"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyPromo}
+                  className="bg-[#3E362E] hover:bg-[#2A241F] text-white text-[9px] font-black uppercase px-2.5 py-1.5 rounded-lg border-none cursor-pointer transition-all"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
+          </div>
+          {promoError && (
+            <p className="text-[10px] text-red-500 font-semibold text-right mt-0.5">{promoError}</p>
+          )}
           <div className="flex justify-between">
             <span>Platform Service Fee</span>
             <span className="flex items-center gap-1.5">
@@ -240,7 +320,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
         onClick={handlePay}
         className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 cursor-pointer text-center block border-none outline-none"
       >
-        Proceed to Pay ₹{amountToPayNow}
+        {amountToPayNow === 0 ? "Confirm Booking (Free Reward)" : `Proceed to Pay ₹${amountToPayNow}`}
       </button>
     </div>
   );

@@ -7,7 +7,7 @@ const Service = require("../models/Service");
 // @access  Private (Customer)
 exports.createBooking = async (req, res) => {
   try {
-    const { salon_id, barber_id, booking_type, services, slot_time, payment_type, attendees } = req.body;
+    const { salon_id, barber_id, booking_type, services, slot_time, payment_type, attendees, promo_code } = req.body;
 
     const serviceDetails = await Promise.all(
       (services || []).map(async (s) => {
@@ -62,7 +62,8 @@ exports.createBooking = async (req, res) => {
       services: serviceDetails,
       total_amount: total,
       slot_time: slot_time || null,
-      status: "confirmed"
+      status: "confirmed",
+      promo_code: promo_code || ""
     });
 
     const position = await Queue.countDocuments({
@@ -83,7 +84,13 @@ exports.createBooking = async (req, res) => {
     // Create corresponding successful Payment record in DB
     const attendeesCount = attendees && Array.isArray(attendees) ? attendees.length : 1;
     const payType = payment_type === "FULL" ? "FULL" : "TOKEN";
-    const payAmount = payType === "FULL" ? total : (attendeesCount * 50);
+    let payAmount = payType === "FULL" ? total : (attendeesCount * 50);
+
+    if (promo_code === "LOYAL10") {
+      payAmount = Math.max(0, Math.round(payAmount * 0.9));
+    } else if (promo_code === "FIRSTCUT20") {
+      payAmount = Math.max(0, Math.round(payAmount * 0.8));
+    }
 
     const Payment = require("../models/Payment");
     const payment = await Payment.create({

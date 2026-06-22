@@ -85,8 +85,8 @@ export default function Wrapper() {
     setCurrentStep(5);
   };
 
-  const handleCheckoutComplete = async (paymentType, amountPaid) => {
-    const finalBookingData = { ...bookingData, paymentType, amountPaid };
+  const handleCheckoutComplete = async (paymentType, amountPaid, promoCode = "") => {
+    const finalBookingData = { ...bookingData, paymentType, amountPaid, promoCode };
     setBookingData(finalBookingData);
 
     const token = localStorage.getItem("token");
@@ -237,7 +237,8 @@ export default function Wrapper() {
         })),
         slot_time: formattedSlot,
         payment_type: paymentType,
-        attendees: finalBookingData.attendees || [{ name: "Self", type: "Primary" }]
+        attendees: finalBookingData.attendees || [{ name: "Self", type: "Primary" }],
+        promo_code: finalBookingData.promoCode || ""
       };
 
       const bookingRes = await fetch(`${API}/booking`, {

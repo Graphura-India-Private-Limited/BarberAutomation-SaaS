@@ -11,6 +11,8 @@ const bookingSchema = new mongoose.Schema({
   status:{type:String,default:"pending",enum:["pending","confirmed","in-progress","completed","cancelled","noshow"]},
   total_amount:{type:Number,default:0}, services:[bsSchema],
   slot_time:{type:String,default:null}, rating:{type:Number,default:null},
-  notes:{type:String,default:""}, created_at:{type:Date,default:Date.now}
+  notes:{type:String,default:""},
+  promo_code:{type:String,default:""},
+  created_at:{type:Date,default:Date.now}
 });
 module.exports = mongoose.model("Booking", bookingSchema);

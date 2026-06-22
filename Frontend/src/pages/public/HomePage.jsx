@@ -68,7 +68,7 @@ const HOW_IT_WORKS = [
     bg: "#ECFDF5", color: "#065F46",
   },
   {
-    step: "04", title: "Visit & Relax", path: "/salons",
+    step: "04", title: "Visit & Relax", path: "/visit-relax",
     desc: "Walk in at your slot and enjoy a premium grooming experience.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
@@ -487,7 +487,7 @@ useEffect(() => {
                 ))}
               </div>
               <div className="flex flex-wrap gap-4">
-                <button onClick={() => navigate("/salons")} className="flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] hover:scale-105 transition-all duration-300 cursor-pointer">
+                <button onClick={() => navigate("/about")} className="flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] text-[#2A241F] font-black uppercase tracking-[0.2em] text-[10px] hover:scale-105 transition-all duration-300 cursor-pointer">
                   Read More <ArrowRight className="w-4 h-4" />
                 </button>
                 <button onClick={() => navigate("/customer/services")} className="flex items-center gap-2 px-7 py-3.5 rounded-2xl border border-[#C5A059]/40 bg-white/5 backdrop-blur-xl text-[#FFE6A7] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[#C5A059]/10 hover:border-[#FFE6A7] transition-all duration-300 cursor-pointer">

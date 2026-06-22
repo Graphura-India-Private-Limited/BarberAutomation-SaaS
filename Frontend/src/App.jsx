@@ -71,6 +71,8 @@ import SalonManagement from "./pages/admin/SalonManagement";
 import CustomerManagement from "./pages/customer/CustomerManagement";
 import AllReviews from "./pages/customer/AllReviews";
 import FaqPage from "./pages/public/FaqPage";
+import AboutPage from "./pages/public/AboutPage";
+import VisitRelaxPage from "./pages/public/VisitRelaxPage";
 import TermsPage from "./pages/public/TermsPage";
 import PrivacyPolicy from "./pages/public/PrivacyPolicy";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -169,6 +171,8 @@ function App() {
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
         <Route path="/salons" element={<AllSalonsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/visit-relax" element={<VisitRelaxPage />} />
        <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteReviewRoute /></ProtectedRoute>} />
        <Route path="/write-booking-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteBookingReviewRoute /></ProtectedRoute>} />
 
