@@ -81,6 +81,7 @@ import RefundPage from "./pages/customer/RefundPage";
 import ReviewSystem from "./components/reviews/ReviewSystem";
 import BookingReviewSystem from "./components/reviews/BookingReviewSystem";
 import SalonDetailPage from "./components/salon/SalonDetailPage";
+import AllSalonsPage from "./components/salon/AllSalonsPage";
 import NearbyBarbers from "./components/queue/NearbyBarbers";
 import LiveQueue from "./pages/owner/LiveQueue";
 
@@ -167,6 +168,7 @@ function App() {
         <Route path="/barbers" element={<NearbyBarbers />} />
         <Route path="/salon-detail" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
+        <Route path="/salons" element={<AllSalonsPage />} />
        <Route path="/write-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteReviewRoute /></ProtectedRoute>} />
        <Route path="/write-booking-review" element={<ProtectedRoute allowedRoles={["customer"]}><WriteBookingReviewRoute /></ProtectedRoute>} />
 
