@@ -9,16 +9,33 @@ const Service = require("../models/Service");
 const Admin = require("../models/Admin");
 const Queue = require("../models/Queue");
 const BreakRequest = require("../models/BreakRequest");
+const ApprovalRequest = require("../models/ApprovalRequest");
 
 // @desc    Get global platform metrics
 // @route   GET /api/admin/global-metrics
 // @access  Private (Admin)
 exports.getGlobalMetrics = async (req, res) => {
   try {
-    const totalSalons = await Salon.countDocuments();
-    const totalUsers = await Customer.countDocuments();
+    const { state } = req.query;
+    let matchQuery = {};
+    let salonQuery = {};
+    if (state && state !== "All" && state !== "All India") {
+      salonQuery.state = state;
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      matchQuery.salon_id = { $in: salonIds };
+    }
+
+    const totalSalons = await Salon.countDocuments(salonQuery);
+    let totalUsers;
+    if (state && state !== "All" && state !== "All India") {
+      const activeUserIds = await Booking.find(matchQuery).distinct("customer_id");
+      totalUsers = await Customer.countDocuments({ _id: { $in: activeUserIds } });
+    } else {
+      totalUsers = await Customer.countDocuments();
+    }
 
     const peakHoursData = await Booking.aggregate([
+      { $match: matchQuery },
       {
         $project: {
           hour: { $hour: "$created_at" }
@@ -45,6 +62,7 @@ exports.getGlobalMetrics = async (req, res) => {
     });
 
     const topSalonsData = await Booking.aggregate([
+      { $match: matchQuery },
       {
         $group: {
           _id: "$salon_id",
@@ -90,9 +108,23 @@ exports.getGlobalMetrics = async (req, res) => {
 // @access  Private (Admin)
 exports.getUsersOverview = async (req, res) => {
   try {
-    const salons = await Salon.find({}, "salon_name owner_name email max_barbers_limit status");
-    const barbers = await Barber.find({}, "name email phone salon_id status");
-    const customers = await Customer.find({}, "name phone email created_at");
+    const { state } = req.query;
+    let salonQuery = {};
+    let barberQuery = {};
+    let customerQuery = {};
+
+    if (state && state !== "All" && state !== "All India") {
+      salonQuery.state = state;
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      barberQuery.salon_id = { $in: salonIds };
+      
+      const activeUserIds = await Booking.find({ salon_id: { $in: salonIds } }).distinct("customer_id");
+      customerQuery._id = { $in: activeUserIds };
+    }
+
+    const salons = await Salon.find(salonQuery, "salon_name owner_name email max_barbers_limit status state");
+    const barbers = await Barber.find(barberQuery, "name email phone salon_id status");
+    const customers = await Customer.find(customerQuery, "name phone email created_at");
 
     res.json({
       success: true,
@@ -129,11 +161,27 @@ exports.updateSalonLimit = async (req, res) => {
 // @access  Private (Admin)
 exports.getAdminStats = async (req, res) => {
   try {
+    const { state } = req.query;
+    let customerQuery = {};
+    let salonQuery = { status: "approved" };
+    let bookingQuery = {};
+    let paymentMatch = { status: "SUCCESS" };
+
+    if (state && state !== "All" && state !== "All India") {
+      salonQuery.state = state;
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      bookingQuery.salon_id = { $in: salonIds };
+      paymentMatch.salon_id = { $in: salonIds };
+      
+      const customerIds = await Booking.find({ salon_id: { $in: salonIds } }).distinct("customer_id");
+      customerQuery._id = { $in: customerIds };
+    }
+
     const [customers, salons, bookings, payments] = await Promise.all([
-      Customer.countDocuments(),
-      Salon.countDocuments({ status: "approved" }),
-      Booking.countDocuments(),
-      Payment.aggregate([{ $match: { status: "SUCCESS" } }, { $group: { _id: null, total: { $sum: "$amount" } } }]),
+      Customer.countDocuments(customerQuery),
+      Salon.countDocuments(salonQuery),
+      Booking.countDocuments(bookingQuery),
+      Payment.aggregate([{ $match: paymentMatch }, { $group: { _id: null, total: { $sum: "$amount" } } }]),
     ]);
     res.json({ success: true, stats: { customers, salons, bookings, revenue: payments[0]?.total || 0 } });
   } catch (err) {
@@ -148,7 +196,12 @@ exports.getAdminStats = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllSalons = async (req, res) => {
   try {
-    const salons = await Salon.find().sort({ created_at: -1 });
+    const { state } = req.query;
+    let query = {};
+    if (state && state !== "All" && state !== "All India") {
+      query.state = state;
+    }
+    const salons = await Salon.find(query).sort({ created_at: -1 });
     res.json({ success: true, salons });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -278,7 +331,14 @@ exports.deleteSalon = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllCustomers = async (req, res) => {
   try {
-    const customers = await Customer.find().sort({ created_at: -1 });
+    const { state } = req.query;
+    let query = {};
+    if (state && state !== "All" && state !== "All India") {
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      const customerIds = await Booking.find({ salon_id: { $in: salonIds } }).distinct("customer_id");
+      query._id = { $in: customerIds };
+    }
+    const customers = await Customer.find(query).sort({ created_at: -1 });
     res.json({ success: true, customers });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -316,7 +376,13 @@ exports.deleteCustomer = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllBarbers = async (req, res) => {
   try {
-    const barbers = await Barber.find({ is_active: true }).populate("salon_id", "salon_name address").sort({ created_at: -1 });
+    const { state } = req.query;
+    let query = { is_active: true };
+    if (state && state !== "All" && state !== "All India") {
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      query.salon_id = { $in: salonIds };
+    }
+    const barbers = await Barber.find(query).populate("salon_id", "salon_name address").sort({ created_at: -1 });
     res.json({ success: true, barbers });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -377,7 +443,13 @@ exports.deleteBarber = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find()
+    const { state } = req.query;
+    let query = {};
+    if (state && state !== "All" && state !== "All India") {
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      query.salon_id = { $in: salonIds };
+    }
+    const bookings = await Booking.find(query)
       .populate("customer_id", "name mobile")
       .populate("salon_id", "salon_name")
       .populate("barber_id", "name")
@@ -407,7 +479,13 @@ exports.updateBookingStatus = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllServices = async (req, res) => {
   try {
-    const services = await Service.find().populate("salon_id", "salon_name").sort({ created_at: -1 });
+    const { state } = req.query;
+    let query = {};
+    if (state && state !== "All" && state !== "All India") {
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      query.salon_id = { $in: salonIds };
+    }
+    const services = await Service.find(query).populate("salon_id", "salon_name").sort({ created_at: -1 });
     res.json({ success: true, services });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -457,7 +535,13 @@ exports.deleteService = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllPayments = async (req, res) => {
   try {
-    const payments = await Payment.find()
+    const { state } = req.query;
+    let query = {};
+    if (state && state !== "All" && state !== "All India") {
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      query.salon_id = { $in: salonIds };
+    }
+    const payments = await Payment.find(query)
       .populate("customer_id", "name mobile")
       .populate("salon_id", "salon_name")
       .sort({ created_at: -1 });
@@ -474,14 +558,21 @@ exports.getAllPayments = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllReviews = async (req, res) => {
   try {
-    const reviews = await Review.find()
+    const { state } = req.query;
+    let query = {};
+    if (state && state !== "All" && state !== "All India") {
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      query.salon_id = { $in: salonIds };
+    }
+
+    const reviews = await Review.find(query)
       .populate("customer_id", "name mobile")
       .populate("salon_id", "salon_name")
       .populate("barber_id", "name")
       .sort({ created_at: -1 });
 
     const BookingFeedback = require("../models/BookingFeedback");
-    const bookingFeedbacks = await BookingFeedback.find()
+    const bookingFeedbacks = await BookingFeedback.find(query)
       .populate("customer_id", "name mobile")
       .populate("booking_id")
       .sort({ created_at: -1 });
@@ -531,6 +622,65 @@ exports.createAdmin = async (req, res) => {
     const mpin_hash = await bcrypt.hash(mpin, 10);
     await Admin.create({ email, mobile: mobile || "", password_hash, mpin_hash });
     res.json({ success: true, message: "Admin created!" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/* ══ APPROVAL REQUESTS ══ */
+
+// @desc    Get all change approval requests
+// @route   GET /api/admin/approval-requests
+// @access  Private (Admin)
+exports.getApprovalRequests = async (req, res) => {
+  try {
+    const { state } = req.query;
+    let query = {};
+    if (state && state !== "All" && state !== "All India") {
+      const salonIds = await Salon.find({ state }).distinct("_id");
+      query.salon_id = { $in: salonIds };
+    }
+    const requests = await ApprovalRequest.find(query).sort({ created_at: -1 });
+    res.json({ success: true, requests });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Approve or Reject a change request
+// @route   PUT /api/admin/approval-request/:id/action
+// @access  Private (Admin)
+exports.handleApprovalRequestAction = async (req, res) => {
+  const { action, admin_note } = req.body; // action: "approved" or "rejected"
+  try {
+    if (!["approved", "rejected"].includes(action)) {
+      return res.status(400).json({ success: false, message: "Invalid action. Must be approved or rejected." });
+    }
+
+    const request = await ApprovalRequest.findById(req.params.id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: "Request not found" });
+    }
+
+    if (request.status !== "pending") {
+      return res.status(400).json({ success: false, message: "Request is already resolved" });
+    }
+
+    request.status = action;
+    request.admin_note = admin_note || "";
+    request.resolved_at = new Date();
+    await request.save();
+
+    if (action === "approved") {
+      // Apply proposed changes to the live Salon document
+      const proposedChanges = {};
+      request.proposed_changes.forEach((value, key) => {
+        proposedChanges[key] = value;
+      });
+      await Salon.findByIdAndUpdate(request.salon_id, proposedChanges);
+    }
+
+    res.json({ success: true, message: `Request successfully ${action}`, data: request });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

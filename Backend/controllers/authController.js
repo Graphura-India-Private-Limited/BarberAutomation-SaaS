@@ -5,6 +5,7 @@ const Barber = require("../models/Barber");
 const Admin = require("../models/Admin");
 const Salon = require("../models/Salon");
 const OtpStore = require("../models/OtpStore");
+const ApprovalRequest = require("../models/ApprovalRequest");
 
 // Helper: Generate JWT Token
 const genToken = (id, role = "customer") =>
@@ -43,6 +44,7 @@ const pickSalonProfile = (body) => ({
   mobile: body.mobile || body.mobileNumber || "",
   email: body.email || "",
   address: body.address || "",
+  state: body.state || "Maharashtra",
   latitude: Number(body.latitude ?? body.location?.lat ?? 0) || 0,
   longitude: Number(body.longitude ?? body.location?.lng ?? 0) || 0,
   opening_time: body.opening_time || body.openingTime || "09:00",
@@ -387,23 +389,57 @@ exports.updateOwnerProfile = async (req, res) => {
       }
     });
 
-    // Check if address or coordinates changed
+    // Check if address, state, or coordinates changed
     const addressChanged = (updates.address && updates.address !== currentSalon.address) ||
+                           (updates.state && updates.state !== currentSalon.state) ||
                            (updates.latitude !== undefined && Number(updates.latitude) !== currentSalon.latitude) ||
                            (updates.longitude !== undefined && Number(updates.longitude) !== currentSalon.longitude);
 
+    let approvalSubmitted = false;
     if (addressChanged) {
-      updates.status = "pending";
-      updates.approved_at = null;
-      updates.rejection_reason = "";
+      const proposed = {};
+      const current = {};
+      if (updates.address && updates.address !== currentSalon.address) {
+        proposed.address = updates.address;
+        current.address = currentSalon.address || "";
+      }
+      if (updates.state && updates.state !== currentSalon.state) {
+        proposed.state = updates.state;
+        current.state = currentSalon.state || "Maharashtra";
+      }
+      if (updates.latitude !== undefined && Number(updates.latitude) !== currentSalon.latitude) {
+        proposed.latitude = Number(updates.latitude);
+        current.latitude = currentSalon.latitude || 0;
+      }
+      if (updates.longitude !== undefined && Number(updates.longitude) !== currentSalon.longitude) {
+        proposed.longitude = Number(updates.longitude);
+        current.longitude = currentSalon.longitude || 0;
+      }
+
+      // Remove from updates so they are NOT directly modified in the live Salon doc
+      delete updates.address;
+      delete updates.state;
+      delete updates.latitude;
+      delete updates.longitude;
+
+      await ApprovalRequest.create({
+        salon_id: currentSalon._id,
+        salon_name: currentSalon.salon_name,
+        owner_name: currentSalon.owner_name,
+        request_type: "address_change",
+        proposed_changes: proposed,
+        current_values: current,
+        status: "pending"
+      });
+      approvalSubmitted = true;
     }
 
     const salon = await Salon.findByIdAndUpdate(req.user.id, updates, { new: true });
     res.json({ 
       success: true, 
       salon, 
-      message: addressChanged 
-        ? "Address updated. Reset to pending approval by admin." 
+      message: approvalSubmitted 
+        ? "Address / State update request submitted to admin for approval. Your active listing remains unchanged until approved." 
         : "Salon profile updated" 
     });
   } catch (err) {

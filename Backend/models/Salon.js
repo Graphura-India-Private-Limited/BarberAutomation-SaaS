@@ -7,6 +7,7 @@ const salonSchema = new mongoose.Schema({
   email:              { type:String, default:"" },
   password_hash:      { type:String, default:"" },
   address:            { type:String, default:"" },
+  state:              { type:String, default:"Maharashtra" },
   latitude:           { type:Number, default:0 },
   longitude:          { type:Number, default:0 },
   opening_time:       { type:String, default:"09:00" },

@@ -44,6 +44,10 @@ router.get("/reviews", protect, requireRoles("admin"), adminController.getAllRev
 router.delete("/review/:id", protect, requireRoles("admin"), adminController.deleteReview);
 router.delete("/booking-feedback/:id", protect, requireRoles("admin"), adminController.deleteBookingFeedback);
 
+/* ── APPROVAL REQUESTS ── */
+router.get("/approval-requests", protect, requireRoles("admin"), adminController.getApprovalRequests);
+router.put("/approval-request/:id/action", protect, requireRoles("admin"), adminController.handleApprovalRequestAction);
+
 /* ── CREATE ADMIN ── */
 router.post("/create", adminController.createAdmin);
 

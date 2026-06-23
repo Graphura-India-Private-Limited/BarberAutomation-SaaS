@@ -154,7 +154,7 @@ const Navbar = () => {
     if (cleanRole.includes("admin")) {
       return [
         { label: "Admin Dashboard", icon: Home, path: "/admin" },
-        { label: "Requests & Salons", icon: Users, path: "/admin/requests" },
+        { label: "Salon Management", icon: Users, path: "/admin/salon-management" },
         { label: "Reports & Tickets", icon: Star, path: "/admin/tickets" },
         { label: "Platform Settings", icon: Settings, path: "/admin/settings" },
       ];

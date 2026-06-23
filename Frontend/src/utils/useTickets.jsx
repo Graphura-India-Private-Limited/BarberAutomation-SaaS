@@ -1,8 +1,15 @@
-import { useState, useMemo } from 'react'
-import { mockTickets, TICKET_STATUS, TICKET_TYPE } from './tickets.jsx'
+import { useState, useMemo, useEffect } from 'react'
+import { mockTickets, TICKET_STATUS, TICKET_TYPE, TICKET_PRIORITY } from './tickets.jsx'
 
 export function useTickets() {
-  const [tickets, setTickets] = useState(mockTickets)
+  const [tickets, setTickets] = useState(() => {
+    const saved = localStorage.getItem('app_tickets');
+    return saved ? JSON.parse(saved) : mockTickets;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('app_tickets', JSON.stringify(tickets));
+  }, [tickets]);
   const [filterStatus, setFilterStatus] = useState('All')
   const [filterType, setFilterType] = useState('All')
   const [filterPriority, setFilterPriority] = useState('All')
@@ -64,6 +71,44 @@ export function useTickets() {
     }
   }
 
+  const addTicket = (ticketData) => {
+    const role = localStorage.getItem("role") || "customer";
+    const loggedInName = localStorage.getItem("name") || localStorage.getItem("userName") || localStorage.getItem("barberName") || localStorage.getItem("salonName") || "";
+    
+    const determinedType = (role === "owner" || role === "barber") 
+      ? TICKET_TYPE.SALON 
+      : TICKET_TYPE.CUSTOMER;
+      
+    let determinedPriority = TICKET_PRIORITY.MEDIUM;
+    if (ticketData.category === "payment") {
+      determinedPriority = TICKET_PRIORITY.HIGH;
+    } else if (ticketData.category === "other") {
+      determinedPriority = TICKET_PRIORITY.LOW;
+    }
+    
+    const tags = [ticketData.category || "general"];
+
+    const newTicket = {
+      id: `TKT-${1000 + tickets.length + 1}`,
+      title: ticketData.title || "Inquiry Ticket",
+      description: ticketData.description || "",
+      type: determinedType,
+      status: TICKET_STATUS.OPEN,
+      priority: determinedPriority,
+      customer: loggedInName || (ticketData.email ? ticketData.email.split("@")[0] : "Guest User"),
+      email: ticketData.email || "",
+      phone: "-",
+      assignee: "Unassigned",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      tags: tags,
+      notes: [],
+    };
+    
+    setTickets(prev => [newTicket, ...prev]);
+    return newTicket;
+  };
+
   return {
     tickets,
     filteredTickets,
@@ -79,5 +124,6 @@ export function useTickets() {
     assignTicket,
     addNote,
     updateTicketStatus,
+    addTicket,
   }
 }

@@ -4,8 +4,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Store, Users, UserSquare2, UserPlus2, 
   CalendarCheck, Scissors, CreditCard, Star, Activity, Settings, LogOut,
-  Bell, RefreshCw, ChevronDown, X, Eye
+  Bell, RefreshCw, ChevronDown, X, Eye, Minimize2, Maximize2, Award, Phone, ShieldCheck, FileText, Inbox
 } from "lucide-react";  
+import { useTickets } from "../../utils/useTickets";
+import { TicketsPage } from "./TicketsPage";
+import { 
+  ResponsiveContainer, AreaChart, Area, BarChart, Bar, XAxis, YAxis, 
+  CartesianGrid, Tooltip, Legend 
+} from "recharts";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
@@ -57,12 +63,13 @@ const Avatar = ({ name, size = 32, color = C.gold, bg = C.goldLight }) => (
   </div>
 );
 
-const StatCard = ({ label, value, color, sub, icon: Icon, iconBg, iconColor }) => (
+const StatCard = ({ label, value, color, sub, icon: Icon, iconBg, iconColor, onClick }) => (
   <div style={{
     background: C.card, borderRadius: 12, padding: "18px 20px",
     border: `1px solid ${C.border}`, boxShadow: "0 1px 4px rgba(0,0,0,.04)",
-    transition: "transform 0.2s, box-shadow 0.2s", cursor: "default",
+    transition: "transform 0.2s, box-shadow 0.2s", cursor: onClick ? "pointer" : "default",
   }}
+    onClick={onClick}
     onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"; }}
     onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)"; }}
   >
@@ -92,6 +99,12 @@ const TD = ({ children, style = {} }) => (
   <td style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, ...style }}>{children}</td>
 );
 
+const formatDate = (value) => {
+  if (!value) return "—";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+};
+
 const SectionCard = ({ title, actionLabel, onAction, children, minHeight }) => (
   <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
     <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -111,7 +124,9 @@ const NAV = [
   { k: "appointments", label: "Appointments" },
   { k: "services", label: "Services" },
   { k: "payments", label: "Payments" },
-  { k: "reviews", label: "Reviews" },
+  { k: "reviews", label: "Salon Performance" },
+  { k: "tickets", label: "Support Tickets" },
+  { k: "ownerRequests", label: "Owner Requests" },
   { k: "settings", label: "Settings" },
 ];
 
@@ -128,11 +143,44 @@ const bStatus  = s => s === "available" ? C.green : s === "busy" ? C.amber : s =
 const bkStatus = s => s === "completed" ? C.green : s === "pending" ? C.purple : s === "cancelled" ? C.red : C.blue;
 const pyStatus = s => s === "captured" ? C.green : s === "refunded" ? C.blue : s === "pending" ? C.amber : C.red;
 
+const getStatusBadge = (status) => {
+  switch (status) {
+    case "available":
+      return {
+        label: "Present & Available",
+        bg: C.greenLight,
+        color: C.green,
+        border: `${C.green}30`
+      };
+    case "busy":
+      return {
+        label: "Busy",
+        bg: C.redLight,
+        color: C.red,
+        border: `${C.red}30`
+      };
+    case "break":
+      return {
+        label: "On Break",
+        bg: C.orangeLight,
+        color: C.orange,
+        border: `${C.orange}30`
+      };
+    default:
+      return {
+        label: "Offline",
+        bg: "#FAFAF8",
+        color: C.muted,
+        border: C.border
+      };
+  }
+};
+
 const NAV_ICONS = {
   dashboard: LayoutDashboard, salons: Store, customers: Users,
   barbers: UserSquare2, addbarber: UserPlus2, appointments: CalendarCheck,
   services: Scissors, payments: CreditCard, reviews: Star,
-  live: Activity, settings: Settings
+  tickets: Inbox, live: Activity, settings: Settings, ownerRequests: ShieldCheck
 };
 
 const DocumentPreview = ({ label, data }) => {
@@ -187,7 +235,6 @@ export default function AdminOnboarding() {
   const ROUTE_TAB_MAP = {
     "/admin": "dashboard",
     "/admin/": "dashboard",
-    "/admin/requests": "dashboard",
     "/admin/salons": "salons",
     "/admin/salon-management": "salons",
     "/admin/customers": "customers",
@@ -195,6 +242,12 @@ export default function AdminOnboarding() {
     "/admin/services": "services",
     "/admin/payments": "payments",
     "/admin/reviews": "reviews",
+    "/admin/tickets": "tickets",
+    "/admin/customer-issues": "tickets",
+    "/admin/salon-issues": "tickets",
+    "/admin/owner-requests": "ownerRequests",
+    "/admin/requests": "ownerRequests",
+    "/admin/ownerRequests": "ownerRequests",
     "/admin/live": "live",
     "/admin/live-monitoring": "live",
     "/admin/settings": "settings",
@@ -213,14 +266,17 @@ export default function AdminOnboarding() {
     }
   }, [location.pathname]);
 
-  const handleTabChange = (tabKey) => {
+  const handleTabChange = (tabKey, salonId = "") => {
     setTab(tabKey);
+    setSelectedSalonId(salonId);
     if (tabKey === "dashboard") {
       navigate("/admin");
     } else if (tabKey === "salons") {
       navigate("/admin/salon-management");
     } else if (tabKey === "settings") {
       navigate("/admin/platform-settings");
+    } else if (tabKey === "ownerRequests") {
+      navigate("/admin/owner-requests");
     } else {
       navigate(`/admin/${tabKey}`);
     }
@@ -246,6 +302,26 @@ export default function AdminOnboarding() {
   const [addedBarbers, setAddedBarbers] = useState([]);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [viewingSalon, setViewingSalon] = useState(null);
+  const [selectedSalonId, setSelectedSalonId] = useState("");
+  const [selectedState, setSelectedState] = useState("All India");
+  const [expandedSalons, setExpandedSalons] = useState({});
+  const [apptPage, setApptPage] = useState(1);
+  const [apptPerPage, setApptPerPage] = useState(10);
+  const [servPage, setServPage] = useState(1);
+  const [servPerPage, setServPerPage] = useState(10);
+  const [payPage, setPayPage] = useState(1);
+  const [payPerPage, setPayPerPage] = useState(10);
+  const [payPeriod, setPayPeriod] = useState("all");
+  const [selectedBarber, setSelectedBarber] = useState(null);
+  const [viewingDocument, setViewingDocument] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [selectedPerformanceSalon, setSelectedPerformanceSalon] = useState(null);
+  const ticketState = useTickets();
+  const [approvalRequests, setApprovalRequests] = useState([]);
+  const [ownerRequestSearch, setOwnerRequestSearch] = useState("");
+  const [ownerRequestFilter, setOwnerRequestFilter] = useState("All");
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [adminNote, setAdminNote] = useState("");
 
   const [newBarber, setNewBarber] = useState({
     name:"", mobile:"", password:"", specialization:"", experience:"", salon_id:"",
@@ -253,7 +329,7 @@ export default function AdminOnboarding() {
   });
   const [newService, setNewService] = useState({ name:"", category:"men", price:"", duration:"30", salon_id:"" });
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(selectedState); }, [selectedState]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -268,20 +344,22 @@ export default function AdminOnboarding() {
 
   const h = () => ({ Authorization:`Bearer ${getToken()}`, "Content-Type":"application/json" });
 
-  const fetchAll = async () => {
+  const fetchAll = async (stateFilter = selectedState) => {
     setLoading(true);
     try {
+      const q = stateFilter && stateFilter !== "All India" ? `?state=${encodeURIComponent(stateFilter)}` : "";
       const results = await Promise.allSettled([
-        fetch(`${API}/admin/salons`,    { headers:h() }).then(r=>r.json()),
-        fetch(`${API}/admin/stats`,     { headers:h() }).then(r=>r.json()),
-        fetch(`${API}/admin/customers`, { headers:h() }).then(r=>r.json()),
-        fetch(`${API}/admin/barbers`,   { headers:h() }).then(r=>r.json()),
-        fetch(`${API}/admin/bookings`,  { headers:h() }).then(r=>r.json()),
-        fetch(`${API}/admin/services`,  { headers:h() }).then(r=>r.json()),
-        fetch(`${API}/admin/payments`,  { headers:h() }).then(r=>r.json()),
-        fetch(`${API}/admin/reviews`,   { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/salons${q}`,    { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/stats${q}`,     { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/customers${q}`, { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/barbers${q}`,   { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/bookings${q}`,  { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/services${q}`,  { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/payments${q}`,  { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/reviews${q}`,   { headers:h() }).then(r=>r.json()),
+        fetch(`${API}/admin/approval-requests${q}`, { headers:h() }).then(r=>r.json()),
       ]);
-      const [salonsR, statsR, custR, barbersR, bookR, servR, payR, revR] = results.map(r => r.status==="fulfilled" ? r.value : null);
+      const [salonsR, statsR, custR, barbersR, bookR, servR, payR, revR, appReqR] = results.map(r => r.status==="fulfilled" ? r.value : null);
       if (salonsR?.success)   setSalons(salonsR.salons||[]);
       if (statsR?.success)    setStats(statsR.stats);
       if (custR?.success)     setCustomers(custR.customers||[]);
@@ -293,6 +371,7 @@ export default function AdminOnboarding() {
         setReviews(revR.reviews||[]);
         setBookingFeedbacks(revR.bookingFeedbacks||[]);
       }
+      if (appReqR?.success)   setApprovalRequests(appReqR.requests||[]);
     } catch(e) { pop("Failed to load data","error"); }
     finally { setLoading(false); }
   };
@@ -330,6 +409,29 @@ export default function AdminOnboarding() {
     } catch (err) {
       console.error(err);
       pop("Server error updating capacity limit", "error");
+    }
+  };
+
+  const handleApprovalRequest = async (id, action, admin_note = "") => {
+    setBusy(true);
+    try {
+      const r = await fetch(`${API}/admin/approval-request/${id}/action`, {
+        method: "PUT",
+        headers: h(),
+        body: JSON.stringify({ action, admin_note }),
+      });
+      const d = await r.json();
+      if (d.success) {
+        pop(`Request successfully ${action}!`, "success");
+        fetchAll(selectedState);
+      } else {
+        pop(d.message || "Failed to update request status", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      pop("Server error updating request", "error");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -479,13 +581,136 @@ export default function AdminOnboarding() {
     setNewBarber(p=>({...p, document:file, documentName:file.name}));
   };
 
-  const SALONS_FILTERED = salons.filter(s =>
-    salonTab==="requests" ? s.status==="pending" :
-    salonTab==="approved" ? s.status==="approved" : s.status==="rejected"
-  );
+  // --- Filtered lists for Studio-wise data ---
+  const filteredBookings = selectedSalonId
+    ? bookings.filter(b => (b.salon_id?._id || b.salon_id) === selectedSalonId)
+    : bookings;
 
-  const pendingBookings = bookings.filter(b=>b.status==="pending").length;
-  const totalRevenue = payments.filter(p=>p.status==="captured").reduce((a,b)=>a+(b.amount||0),0);
+  const filteredBarbers = selectedSalonId
+    ? barbers.filter(b => (b.salon_id?._id || b.salon_id) === selectedSalonId)
+    : barbers;
+
+  const filteredServices = selectedSalonId
+    ? services.filter(s => (s.salon_id?._id || s.salon_id) === selectedSalonId)
+    : services;
+
+  const filteredPayments = selectedSalonId
+    ? payments.filter(p => (p.salon_id?._id || p.salon_id) === selectedSalonId)
+    : payments;
+
+  const filteredReviews = selectedSalonId
+    ? reviews.filter(r => (r.salon_id?._id || r.salon_id) === selectedSalonId)
+    : reviews;
+
+  const filteredBookingFeedbacks = selectedSalonId
+    ? bookingFeedbacks.filter(fb => (fb.booking_id?.salon_id?._id || fb.booking_id?.salon_id) === selectedSalonId)
+    : bookingFeedbacks;
+
+  const getSalonPerformanceData = (salon) => {
+    const salonId = salon._id;
+
+    // Bookings for this salon
+    const salonBookings = bookings.filter(b => (b.salon_id?._id || b.salon_id) === salonId);
+    const completedBookings = salonBookings.filter(b => b.status === "completed");
+    const cancelledBookings = salonBookings.filter(b => b.status === "cancelled");
+    const pendingBookings = salonBookings.filter(b => b.status === "pending");
+
+    // Payments for this salon
+    const salonPayments = payments.filter(p => (p.salon_id?._id || p.salon_id) === salonId);
+    
+    // Income: captured payments for bookings that are NOT cancelled
+    const income = salonPayments
+      .filter(p => p.status === "captured")
+      .reduce((a, b) => a + (b.amount || 0), 0) / 100;
+
+    // Loss: failed/refunded payments + captured payments for CANCELLED bookings
+    const loss = salonPayments
+      .filter(p => p.status === "refunded" || p.status === "failed" || (p.status === "captured" && salonBookings.find(b => b._id === p.booking_id && b.status === "cancelled")))
+      .reduce((a, b) => a + (b.amount || 0), 0) / 100;
+
+    const netProfit = income - loss;
+
+    // Reviews for this salon
+    const salonReviews = reviews.filter(r => (r.salon_id?._id || r.salon_id) === salonId);
+    const avgRating = salonReviews.length > 0
+      ? salonReviews.reduce((sum, r) => sum + (r.rating || r.salon_rating || 5), 0) / salonReviews.length
+      : 5.0;
+
+    // Booking Feedback for this salon
+    const salonFeedbacks = bookingFeedbacks.filter(fb => (fb.booking_id?.salon_id?._id || fb.booking_id?.salon_id) === salonId);
+    const avgBookingProcess = salonFeedbacks.length > 0 ? salonFeedbacks.reduce((sum, fb) => sum + (fb.booking_process_rating || 5), 0) / salonFeedbacks.length : 5.0;
+    const avgPaymentProcess = salonFeedbacks.length > 0 ? salonFeedbacks.reduce((sum, fb) => sum + (fb.payment_process_rating || 5), 0) / salonFeedbacks.length : 5.0;
+    const avgWebsiteUsability = salonFeedbacks.length > 0 ? salonFeedbacks.reduce((sum, fb) => sum + (fb.website_usability_rating || 5), 0) / salonFeedbacks.length : 5.0;
+
+    return {
+      salon,
+      bookingsCount: salonBookings.length,
+      completedCount: completedBookings.length,
+      cancelledCount: cancelledBookings.length,
+      pendingCount: pendingBookings.length,
+      income,
+      loss,
+      netProfit,
+      avgRating,
+      avgBookingProcess,
+      avgPaymentProcess,
+      avgWebsiteUsability,
+      reviews: salonReviews,
+      feedbacks: salonFeedbacks
+    };
+  };
+
+  // Filter customers to only those who booked with this salon
+  const filteredCustomers = selectedSalonId
+    ? (() => {
+        const salonCustomerIds = new Set(
+          bookings
+            .filter(b => (b.salon_id?._id || b.salon_id) === selectedSalonId)
+            .map(b => b.customer_id?._id || b.customer_id)
+            .filter(Boolean)
+        );
+        return customers.filter(c => salonCustomerIds.has(c._id));
+      })()
+    : customers;
+
+  // Helper to get customers for a specific salon
+  const getSalonCustomers = (salonId) => {
+    const customerIds = new Set(
+      bookings
+        .filter(b => (b.salon_id?._id || b.salon_id) === salonId)
+        .map(b => b.customer_id?._id || b.customer_id)
+        .filter(Boolean)
+    );
+    return customers.filter(c => customerIds.has(c._id));
+  };
+
+  const toggleSalonExpand = (salonId) => {
+    setExpandedSalons(prev => ({
+      ...prev,
+      [salonId]: prev[salonId] === false ? true : false
+    }));
+  };
+
+  // --- Calculations for Stat Cards ---
+  const displayCustomersCount = loading ? "—" : filteredCustomers.length;
+  const displaySalonsCount = loading
+    ? "—"
+    : selectedSalonId
+    ? (salons.find(s => s._id === selectedSalonId && s.status === "approved") ? 1 : 0)
+    : salons.filter(s => s.status === "approved").length;
+  const displayBookingsCount = loading ? "—" : filteredBookings.length;
+  const displayPendingBookingsCount = filteredBookings.filter(b => b.status === "pending").length;
+  const displayRevenue = loading
+    ? "—"
+    : `₹${(filteredPayments.filter(p => p.status === "captured").reduce((a, b) => a + (b.amount || 0), 0) / 100).toLocaleString("en-IN")}`;
+
+  const globalPendingBookings = bookings.filter(b => b.status === "pending").length;
+
+  const SALONS_FILTERED = salons.filter(s =>
+    (salonTab === "requests" ? s.status === "pending" :
+     salonTab === "approved" ? s.status === "approved" : s.status === "rejected") &&
+    (!selectedSalonId || s._id === selectedSalonId)
+  );
 
   const inputStyle = {
     background: "#FAFAF8", border: `1.5px solid ${C.border}`, borderRadius: 9,
@@ -557,7 +782,7 @@ export default function AdminOnboarding() {
             const Icon = NAV_ICONS[n.k] || LayoutDashboard;
             return (
               <React.Fragment key={n.k}>
-                {(i === 3 || i === 6 || i === 7) && (
+                {(i === 2 || i === 5 || i === 6) && (
                   <div style={{ height: 1, background: C.border, margin: "10px 0" }} />
                 )}
                 <button
@@ -577,12 +802,12 @@ export default function AdminOnboarding() {
                 >
                   <Icon size={16} strokeWidth={isActive ? 2.5 : 2} style={{ color: isActive ? C.gold : C.muted, flexShrink: 0 }} />
                   <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.label}</span>
-                  {n.k === "appointments" && pendingBookings > 0 && (
+                  {n.k === "appointments" && globalPendingBookings > 0 && (
                     <span style={{
                       background: C.purpleLight, color: C.purple,
                       borderRadius: 8, padding: "2px 7px", fontSize: 10, fontWeight: 700, lineHeight: 1,
                     }}>
-                      {pendingBookings}
+                      {globalPendingBookings}
                     </span>
                   )}
                 </button>
@@ -634,8 +859,35 @@ export default function AdminOnboarding() {
               <span style={{ fontSize: 13, fontWeight: 500, color: C.muted }}>
                 {new Date().toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}
               </span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: `1px solid ${C.border}`, borderRadius: 99, padding: "2px 8px 2px 14px", marginRight: 4 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, color: C.muted }}>Branch:</span>
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: C.gold,
+                    outline: "none",
+                    cursor: "pointer",
+                    padding: "6px 8px 6px 0px"
+                  }}
+                >
+                  <option value="All India">All India</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                </select>
+              </div>
               <button type="button"
-                onClick={fetchAll}
+                onClick={() => fetchAll(selectedState)}
                 style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", borderRadius:99, fontSize:13, fontWeight:500, background: C.bg2, border:`1px solid ${C.border}`, color: C.ink, cursor:"pointer", fontFamily:"inherit" }}
               >
                 <RefreshCw size={13} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} />
@@ -647,9 +899,9 @@ export default function AdminOnboarding() {
                 style={{ position:"relative", cursor:"pointer", width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", border:`1px solid ${C.border}` }}
               >
                 <Bell size={17} color={C.muted} />
-                {pendingBookings > 0 && (
+                {globalPendingBookings > 0 && (
                   <span style={{ position:"absolute", top:-1, right:-1, minWidth:17, height:17, padding:"0 3px", borderRadius:99, background: C.gold, color:"#fff", fontSize:10, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 0 2px #fff" }}>
-                    {pendingBookings}
+                    {globalPendingBookings}
                   </span>
                 )}
               </button>
@@ -709,17 +961,74 @@ export default function AdminOnboarding() {
           </header>
 
           {/* Gold divider line */}
-          <div style={{ width:"100%", height:2, background:"#A1804E", opacity:0.9, marginBottom:32 }} />
+          <div style={{ width:"100%", height:2, background:"#A1804E", opacity:0.9, marginBottom:24 }} />
+
+          {/* Studio Selector Bar */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "#FFFFFF",
+            border: `1px solid ${C.gold}30`,
+            borderRadius: 16,
+            padding: "12px 24px",
+            marginBottom: 24,
+            boxShadow: "0 4px 15px rgba(197, 160, 89, 0.04)",
+            flexWrap: "wrap",
+            gap: 12
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: selectedSalonId ? C.green : C.gold }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                Active View:
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 650, color: selectedSalonId ? C.goldD : C.muted }}>
+                {selectedSalonId ? salons.find(s => s._id === selectedSalonId)?.salon_name : "All Salons & Studios"}
+              </span>
+            </div>
+            
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: C.muted }}>Filter Studio:</span>
+              <select
+                value={selectedSalonId}
+                onChange={(e) => {
+                  setSelectedSalonId(e.target.value);
+                  setCustPage(1);
+                  setApptPage(1);
+                  setServPage(1);
+                }}
+                className="inp"
+                style={{
+                  padding: "6px 14px",
+                  borderRadius: 10,
+                  border: `1px solid ${C.gold}50`,
+                  background: "#FAF9F6",
+                  fontSize: 12,
+                  color: C.ink,
+                  fontWeight: 705,
+                  outline: "none",
+                  cursor: "pointer",
+                  minWidth: 200,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
+                }}
+              >
+                <option value="">✨ All Studios / Salons</option>
+                {salons.filter(s => s.status === "approved").map(s => (
+                  <option key={s._id} value={s._id}>💈 {s.salon_name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           {/* ════ MAIN CONTENT ════ */}
           <main style={{ paddingBottom: 60 }}>
 
             {/* STAT CARDS — shown on all tabs */}
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
-              <StatCard label="Total Customers" value={loading?"—":stats?.customers??customers.length} sub="Registered users" color={C.blue} icon={Users} iconBg={C.blueLight} iconColor={C.blue}/>
-              <StatCard label="Active Salons"   value={loading?"—":stats?.salons??salons.filter(s=>s.status==="approved").length} sub="Approved & live" color={C.green} icon={Store} iconBg={C.greenLight} iconColor={C.green}/>
-              <StatCard label="Total Bookings"  value={loading?"—":stats?.bookings??bookings.length} sub={`${pendingBookings} pending`} color={C.purple} icon={CalendarCheck} iconBg={C.purpleLight} iconColor={C.purple}/>
-              <StatCard label="Revenue"         value={loading?"—":`₹${((stats?.revenue||totalRevenue)/100||0).toLocaleString("en-IN")}`} sub="Total collected" color={C.orange} icon={CreditCard} iconBg={C.orangeLight} iconColor={C.orange}/>
+              <StatCard label="Total Customers" value={displayCustomersCount} sub={selectedSalonId ? "Booked in Studio" : "Registered users"} color={C.blue} icon={Users} iconBg={C.blueLight} iconColor={C.blue} onClick={() => { handleTabChange("customers", "all"); setCustPage(1); }}/>
+              <StatCard label="Active Salons"   value={displaySalonsCount} sub={selectedSalonId ? "Selected Studio" : "Approved & live"} color={C.green} icon={Store} iconBg={C.greenLight} iconColor={C.green} onClick={() => handleTabChange("salons")}/>
+              <StatCard label="Total Bookings"  value={displayBookingsCount} sub={`${displayPendingBookingsCount} pending`} color={C.purple} icon={CalendarCheck} iconBg={C.purpleLight} iconColor={C.purple} onClick={() => handleTabChange("appointments")}/>
+              <StatCard label="Revenue"         value={displayRevenue} sub="Total collected" color={C.orange} icon={CreditCard} iconBg={C.orangeLight} iconColor={C.orange} onClick={() => handleTabChange("payments")}/>
             </div>
 
              {/* ══ DASHBOARD ══ */}
@@ -730,9 +1039,9 @@ export default function AdminOnboarding() {
                    {/* Recent Bookings */}
                    <SectionCard title="Recent Bookings" actionLabel="View All →" onAction={()=>handleTabChange("appointments")}>
                      {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
-                     : bookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No bookings yet</div>
-                     : bookings.slice(0,4).map((b,i) => (
-                       <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(bookings.length, 4)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                     : filteredBookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No bookings yet</div>
+                     : filteredBookings.slice(0,4).map((b,i) => (
+                       <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(filteredBookings.length, 4)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                            <Avatar name={b.customer_id?.name||"C"} size={32} color={C.blue} bg={C.blueLight}/>
                            <div>
@@ -751,9 +1060,9 @@ export default function AdminOnboarding() {
                    {/* Barber Status */}
                    <SectionCard title="Barber Status" actionLabel="Live View →" onAction={()=>handleTabChange("live")}>
                      {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
-                     : barbers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers added yet</div>
-                     : barbers.slice(0,4).map((b,i) => (
-                       <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(barbers.length, 4)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                     : filteredBarbers.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers added yet</div>
+                     : filteredBarbers.slice(0,4).map((b,i) => (
+                       <div key={b._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(filteredBarbers.length, 4)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                            <img src={barberImg(i)} alt={b.name} style={{ width:34, height:34, borderRadius:8, objectFit:"cover", border:`1px solid ${C.border}` }}/>
                            <div>
@@ -789,45 +1098,27 @@ export default function AdminOnboarding() {
  
                    {/* Registered Salons (Live) */}
                    <SectionCard title="Registered Salons (Live)" actionLabel="View All →" onAction={()=>handleTabChange("salons")}>
-                     {salons.filter(s=>s.status==="approved").length===0
-                       ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No approved salons yet</div>
-                       : salons.filter(s=>s.status==="approved").slice(0,3).map((s,i) => (
-                       <div key={s._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(salons.filter(s=>s.status==="approved").length, 3)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                           <img src={s.images?.[0]||salonImg(i)} alt={s.salon_name} style={{ width:36, height:36, borderRadius:8, objectFit:"cover", border:`1px solid ${C.border}` }}/>
-                           <div>
-                             <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.salon_name}</div>
-                             <div style={{ fontSize:11, color:C.muted }}>{s.owner_name} · {s.mobile} · {s.address||"No address"}</div>
+                     {(() => {
+                       const activeSalons = selectedSalonId
+                         ? salons.filter(s => s._id === selectedSalonId && s.status === "approved")
+                         : salons.filter(s => s.status === "approved");
+                       
+                       return activeSalons.length===0
+                         ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No approved salons yet</div>
+                         : activeSalons.slice(0,3).map((s,i) => (
+                         <div key={s._id} style={{ padding:"12px 20px", borderBottom:i<Math.min(activeSalons.length, 3)-1?`1px solid ${C.border}`:"none", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                             <img src={s.images?.[0]||salonImg(i)} alt={s.salon_name} style={{ width:36, height:36, borderRadius:8, objectFit:"cover", border:`1px solid ${C.border}` }}/>
+                             <div>
+                               <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.salon_name}</div>
+                               <div style={{ fontSize:11, color:C.muted }}>{s.owner_name} · {s.mobile} · {s.address||"No address"}</div>
+                             </div>
                            </div>
+                           <Badge label="Active" color={C.green}/>
                          </div>
-                         <Badge label="Active" color={C.green}/>
-                       </div>
-                     ))}
+                       ));
+                     })()}
                    </SectionCard>
- 
-                   {/* Barber Credentials */}
-                   <div style={{ gridColumn: "span 2" }}>
-                     <SectionCard title="Barber Credentials">
-                       {loading ? <div style={{ padding:20, textAlign:"center", color:C.muted, fontSize:13 }}>Loading...</div>
-                       : barbers.length===0
-                         ? <div style={{ padding:40, textAlign:"center", color:C.muted, fontSize:13 }}>No barbers in system</div>
-                         : (
-                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, padding: "10px 20px" }}>
-                             {barbers.slice(0, 4).map((b,i) => (
-                               <div key={b._id} style={{ padding: 12, border: `1px solid ${C.border}`, borderRadius: 12, background: C.goldLight }}>
-                                 <div style={{ fontSize:13, fontWeight:700, color:C.ink, marginBottom:6 }}>{b.name}</div>
-                                 <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
-                                   <span style={{ fontSize:11, color:C.muted }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></span>
-                                   <span style={{ fontSize:11, color:C.muted }}>Password: <strong style={{ color:C.red }}>••••••••</strong></span>
-                                   <span style={{ fontSize:11, color:C.muted }}>Salon: <strong style={{ color:C.gold }}>{b.salon_id?.salon_name || "—"}</strong></span>
-                                 </div>
-                                 <div style={{ fontSize:10, color:C.muted, marginTop:8, borderTop: `1px solid ${C.border}`, paddingTop: 6 }}>Registered: {b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—"}</div>
-                               </div>
-                             ))}
-                           </div>
-                         )}
-                     </SectionCard>
-                   </div>
                  </div>
                </div>
              )}
@@ -960,71 +1251,1439 @@ export default function AdminOnboarding() {
                 )}
               </div>
             )}
-
             {/* ══ CUSTOMERS ══ */}
             {tab==="customers" && (() => {
-              const filtered = customers.filter(c=>!search||c.name?.toLowerCase().includes(search.toLowerCase())||c.mobile?.includes(search));
-              const totalPages = Math.ceil(filtered.length / custPerPage) || 1;
-              const startIndex = (custPage - 1) * custPerPage;
-              const paginated = filtered.slice(startIndex, startIndex + custPerPage);
+              const filterList = (list) => list.filter(c => !search || c.name?.toLowerCase().includes(search.toLowerCase()) || c.mobile?.includes(search));
+              
+              const allBookedCustomerIds = new Set(
+                bookings.map(b => b.customer_id?._id || b.customer_id).filter(Boolean)
+              );
+              const unassignedCustomers = filterList(customers.filter(c => !allBookedCustomerIds.has(c._id)));
+
+              if (selectedSalonId) {
+                const isGeneral = selectedSalonId === "general";
+                const isAll = selectedSalonId === "all";
+                
+                const filtered = isAll
+                  ? filterList(customers)
+                  : isGeneral 
+                  ? unassignedCustomers 
+                  : filterList(getSalonCustomers(selectedSalonId));
+                
+                const totalPages = Math.ceil(filtered.length / custPerPage) || 1;
+                const startIndex = (custPage - 1) * custPerPage;
+                const paginated = filtered.slice(startIndex, startIndex + custPerPage);
+
+                const currentSalonName = isAll
+                  ? "All Registered Users"
+                  : isGeneral 
+                  ? "General / Unassigned Customers" 
+                  : salons.find(s => s._id === selectedSalonId)?.salon_name || "Selected Studio";
+
+                return (
+                  <div className="fade-in">
+                    <div style={{ marginBottom: 16 }}>
+                      <button 
+                        onClick={() => setSelectedSalonId("")}
+                        style={btnStyle(C.goldLight, C.gold, `1px solid ${C.gold}30`)}
+                      >
+                        ← Back to All Studios
+                      </button>
+                    </div>
+
+                    <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                      <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                        <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>
+                          {filtered.length} Customers for {currentSalonName}
+                        </span>
+                        <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setCustPage(1); }} placeholder="Search by name or mobile..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                      </div>
+                      {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
+                      : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No customers found</div>
+                      : (
+                        <>
+                          <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                            <thead><tr>{["Customer","Mobile","Email","Loyalty Points","Joined","Status","Studio / Saloon"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
+                            <tbody>
+                              {paginated.map(c=>(
+                                <tr key={c._id} className="tr">
+                                  <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={c.name||"C"} size={30} color={C.blue} bg={C.blueLight}/><span style={{ fontSize:13, fontWeight:600, color:C.ink }}>{c.name||"—"}</span></div></TD>
+                                  <TD style={{ fontSize:12, color:C.muted, fontFamily:"monospace" }}>{c.mobile}</TD>
+                                  <TD style={{ fontSize:12, color:C.muted }}>{c.email||"—"}</TD>
+                                  <TD style={{ fontSize:13, fontWeight:700, color:C.gold }}>{c.loyalty_points||0}</TD>
+                                  <TD style={{ fontSize:12, color:C.muted }}>{c.created_at?new Date(c.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}):"—"}</TD>
+                                  <TD><Badge label={c.blocked?"Blocked":"Active"} color={c.blocked?C.red:C.green}/></TD>
+                                  <TD style={{ fontSize:12, fontWeight:600, color:C.gold }}>
+                                    {(() => {
+                                      const getSalonId = (salon) => {
+                                        if (!salon) return "";
+                                        return typeof salon === "object" ? salon._id : salon;
+                                      };
+                                      const getCustomerId = (cust) => {
+                                        if (!cust) return "";
+                                        return typeof cust === "object" ? cust._id : cust;
+                                      };
+                                      
+                                      const customerBookings = bookings.filter(b => 
+                                        getCustomerId(b.customer_id) === c._id
+                                      );
+                                      if (customerBookings.length === 0) return "—";
+                                      
+                                      const uniqueSalons = new Set(
+                                        customerBookings.map(b => {
+                                          if (b.salon_id?.salon_name) return b.salon_id.salon_name;
+                                          const sId = getSalonId(b.salon_id);
+                                          return salons.find(s => s._id === sId)?.salon_name;
+                                        }).filter(Boolean)
+                                      );
+                                      return uniqueSalons.size > 0 ? Array.from(uniqueSalons).join(", ") : "—";
+                                    })()}
+                                  </TD>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          
+                          {/* Premium Pagination Control Footer */}
+                          <div style={{
+                            padding: "12px 20px",
+                            borderTop: `1px solid ${C.border}`,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: 12,
+                            background: "#FAFAF8"
+                          }}>
+                            <div style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>
+                              Showing {filtered.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + custPerPage, filtered.length)} of {filtered.length} customers
+                            </div>
+                            
+                            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                              {/* Page size dropdown */}
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
+                                <select 
+                                  value={custPerPage} 
+                                  onChange={(e) => {
+                                    setCustPerPage(Number(e.target.value));
+                                    setCustPage(1);
+                                  }}
+                                  style={{
+                                    padding: "4px 8px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: "#fff",
+                                    fontSize: 12,
+                                    color: C.ink,
+                                    cursor: "pointer",
+                                    outline: "none",
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  <option value={5}>5</option>
+                                  <option value={10}>10</option>
+                                  <option value={20}>20</option>
+                                  <option value={50}>50</option>
+                                </select>
+                              </div>
+
+                              {/* Page selection dropdown */}
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
+                                <select
+                                  value={custPage}
+                                  onChange={(e) => setCustPage(Number(e.target.value))}
+                                  style={{
+                                    padding: "4px 8px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: "#fff",
+                                    fontSize: 12,
+                                    color: C.ink,
+                                    cursor: "pointer",
+                                    outline: "none",
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  {Array.from({ length: totalPages }, (_, idx) => (
+                                    <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                                  ))}
+                                </select>
+                                <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
+                              </div>
+
+                              {/* Prev / Next buttons */}
+                              <div style={{ display: "flex", gap: 6 }}>
+                                <button
+                                  disabled={custPage === 1}
+                                  onClick={() => setCustPage(p => Math.max(p - 1, 1))}
+                                  style={{
+                                    padding: "5px 12px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: custPage === 1 ? "#F5F5F4" : "#fff",
+                                    color: custPage === 1 ? "#A8A29E" : C.ink,
+                                    fontSize: 12,
+                                    fontWeight: 650,
+                                    cursor: custPage === 1 ? "not-allowed" : "pointer",
+                                    transition: "all 0.2s",
+                                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                  }}
+                                >
+                                  Prev
+                                </button>
+                                <button
+                                  disabled={custPage >= totalPages}
+                                  onClick={() => setCustPage(p => Math.min(p + 1, totalPages))}
+                                  style={{
+                                    padding: "5px 12px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: custPage >= totalPages ? "#F5F5F4" : "#fff",
+                                    color: custPage >= totalPages ? "#A8A29E" : C.ink,
+                                    fontSize: 12,
+                                    fontWeight: 650,
+                                    cursor: custPage >= totalPages ? "not-allowed" : "pointer",
+                                    transition: "all 0.2s",
+                                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                  }}
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+
+              // Grid of Salon Containers
+              const approvedSalons = salons.filter(s => s.status === "approved");
 
               return (
-                <div className="fade-in">
+                <div className="fade-in" style={{ display:"flex", flexDirection:"column", gap:20 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)" }}>
+                    <span style={{ fontSize:15, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>Select a Studio to View Customers</span>
+                    <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                    {approvedSalons
+                      .filter(s => !search || s.salon_name?.toLowerCase().includes(search.toLowerCase()) || s.address?.toLowerCase().includes(search.toLowerCase()))
+                      .map((salon, idx) => {
+                        const count = getSalonCustomers(salon._id).length;
+                        return (
+                          <div 
+                            key={salon._id}
+                            onClick={() => {
+                              setSelectedSalonId(salon._id);
+                              setCustPage(1);
+                              setApptPage(1);
+                              setServPage(1);
+                            }}
+                            style={{
+                              background: C.card,
+                              border: `1.5px solid ${C.border}`,
+                              borderRadius: 16,
+                              padding: 20,
+                              cursor: "pointer",
+                              transition: "all 0.22s ease",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                              position: "relative",
+                              overflow: "hidden"
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.transform = "translateY(-4px)";
+                              e.currentTarget.style.borderColor = C.gold;
+                              e.currentTarget.style.boxShadow = "0 8px 24px rgba(197, 160, 89, 0.08)";
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.borderColor = C.border;
+                              e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.02)";
+                            }}
+                          >
+                            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${C.gold}, ${C.goldD})` }} />
+                            
+                            <div style={{ fontSize: 16, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", marginBottom: 8 }}>
+                              💈 {salon.salon_name}
+                            </div>
+                            
+                            <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.4, height: 34, overflow: "hidden", textOverflow: "ellipsis" }}>
+                              📍 {salon.address || salon.state || "No Address"}
+                            </div>
+                            
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${C.border}80`, paddingTop: 12 }}>
+                              <span style={{ fontSize: 11, color: C.muted }}>Owner: <strong style={{ color: C.ink }}>{salon.owner_name}</strong></span>
+                              <span style={{
+                                background: C.blueLight,
+                                color: C.blue,
+                                padding: "3px 9px",
+                                borderRadius: 20,
+                                fontSize: 10,
+                                fontWeight: 700
+                              }}>
+                                {count} Customers
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                    {/* General / Unassigned Customers Card */}
+                    <div 
+                      onClick={() => {
+                        setSelectedSalonId("general");
+                        setCustPage(1);
+                        setApptPage(1);
+                        setServPage(1);
+                      }}
+                      style={{
+                        background: C.card,
+                        border: `1.5px solid ${C.border}`,
+                        borderRadius: 16,
+                        padding: 20,
+                        cursor: "pointer",
+                        transition: "all 0.22s ease",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                        position: "relative",
+                        overflow: "hidden"
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.borderColor = C.purple;
+                        e.currentTarget.style.boxShadow = "0 8px 24px rgba(124, 58, 237, 0.08)";
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.borderColor = C.border;
+                        e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.02)";
+                      }}
+                    >
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${C.purple}, ${C.purpleLight})` }} />
+                      
+                      <div style={{ fontSize: 16, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", marginBottom: 8 }}>
+                        🌐 General Customers
+                      </div>
+                      
+                      <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.4, height: 34 }}>
+                        Registered users with no salon bookings yet.
+                      </div>
+                      
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${C.border}80`, paddingTop: 12 }}>
+                        <span style={{ fontSize: 11, color: C.muted }}>System-wide</span>
+                        <span style={{
+                          background: C.purpleLight,
+                          color: C.purple,
+                          padding: "3px 9px",
+                          borderRadius: 20,
+                          fontSize: 10,
+                          fontWeight: 700
+                        }}>
+                          {customers.filter(c => !allBookedCustomerIds.has(c._id)).length} Customers
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* All Registered Customers Card */}
+                    <div 
+                      onClick={() => {
+                        setSelectedSalonId("all");
+                        setCustPage(1);
+                        setApptPage(1);
+                        setServPage(1);
+                      }}
+                      style={{
+                        background: C.card,
+                        border: `1.5px solid ${C.border}`,
+                        borderRadius: 16,
+                        padding: 20,
+                        cursor: "pointer",
+                        transition: "all 0.22s ease",
+                        boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                        position: "relative",
+                        overflow: "hidden"
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.transform = "translateY(-4px)";
+                        e.currentTarget.style.borderColor = C.blue;
+                        e.currentTarget.style.boxShadow = "0 8px 24px rgba(37, 99, 235, 0.08)";
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.borderColor = C.border;
+                        e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.02)";
+                      }}
+                    >
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${C.blue}, ${C.blueLight})` }} />
+                      
+                      <div style={{ fontSize: 16, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", marginBottom: 8 }}>
+                        👥 All Registered Users
+                      </div>
+                      
+                      <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.4, height: 34 }}>
+                        View all customers registered across the entire system.
+                      </div>
+                      
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${C.border}80`, paddingTop: 12 }}>
+                        <span style={{ fontSize: 11, color: C.muted }}>System-wide</span>
+                        <span style={{
+                          background: C.blueLight,
+                          color: C.blue,
+                          padding: "3px 9px",
+                          borderRadius: 20,
+                          fontSize: 10,
+                          fontWeight: 700
+                        }}>
+                          {customers.length} Customers
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+
+
+            {/* ══ APPOINTMENTS ══ */}
+            {tab==="appointments" && (() => {
+              const filterAppointments = (list) => list.filter(b => 
+                !search || 
+                b.customer_id?.name?.toLowerCase().includes(search.toLowerCase()) || 
+                b.barber_id?.name?.toLowerCase().includes(search.toLowerCase()) ||
+                b.services?.[0]?.service_name?.toLowerCase().includes(search.toLowerCase())
+              );
+
+              if (selectedSalonId) {
+                const salonBookings = bookings.filter(b => (b.salon_id?._id || b.salon_id) === selectedSalonId);
+                const filtered = filterAppointments(salonBookings);
+                const totalPages = Math.ceil(filtered.length / apptPerPage) || 1;
+                const startIndex = (apptPage - 1) * apptPerPage;
+                const paginated = filtered.slice(startIndex, startIndex + apptPerPage);
+                const currentSalonName = salons.find(s => s._id === selectedSalonId)?.salon_name || "Selected Studio";
+
+                return (
+                  <div className="fade-in">
+                    <div style={{ marginBottom: 16 }}>
+                      <button 
+                        onClick={() => setSelectedSalonId("")}
+                        style={btnStyle(C.goldLight, C.gold, `1px solid ${C.gold}30`)}
+                      >
+                        ← Back to All Studios
+                      </button>
+                    </div>
+
+                    <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                      <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                        <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>
+                          {filtered.length} Appointments for {currentSalonName}
+                        </span>
+                        <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setApptPage(1); }} placeholder="Search by customer, service or stylist..." style={{ ...inputStyle, width:280, padding:"7px 12px", fontSize:12 }}/>
+                      </div>
+                      {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
+                      : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No appointments found</div>
+                      : (
+                        <>
+                          <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                            <thead><tr>{["Customer","Service","Barber","Date","Amount","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
+                            <tbody>
+                              {paginated.map(b=>(
+                                <tr key={b._id} className="tr">
+                                  <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={b.customer_id?.name||"C"} size={28} color={C.blue} bg={C.blueLight}/><span style={{ fontSize:13, fontWeight:600, color:C.ink }}>{b.customer_id?.name||"—"}</span></div></TD>
+                                  <TD style={{ fontSize:12, color:C.muted }}>{b.services?.[0]?.service_name||"—"}</TD>
+                                  <TD style={{ fontSize:12, color:C.gold }}>{b.barber_id?.name||"—"}</TD>
+                                  <TD style={{ fontSize:12, color:C.muted }}>{b.created_at?new Date(b.created_at).toLocaleDateString("en-IN"):"—"}</TD>
+                                  <TD style={{ fontSize:13, fontWeight:700, color:C.ink }}>₹{b.total_amount||0}</TD>
+                                  <TD><Badge label={b.status} color={bkStatus(b.status)}/></TD>
+                                  <TD>
+                                    {b.status==="pending" && (
+                                      <div style={{ display:"flex", gap:6 }}>
+                                        <button className="action-btn" onClick={()=>changeBookingStatus(b._id,"confirmed")} style={btnStyle(`${C.green}15`, C.green, `1px solid ${C.green}30`)}>Confirm</button>
+                                        <button className="action-btn" onClick={()=>changeBookingStatus(b._id,"cancelled")} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Cancel</button>
+                                      </div>
+                                    )}
+                                  </TD>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+
+                          {/* Premium Pagination Control Footer */}
+                          <div style={{
+                            padding: "12px 20px",
+                            borderTop: `1px solid ${C.border}`,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: 12,
+                            background: "#FAFAF8"
+                          }}>
+                            <div style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>
+                              Showing {filtered.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + apptPerPage, filtered.length)} of {filtered.length} appointments
+                            </div>
+                            
+                            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                              {/* Page size dropdown */}
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
+                                <select 
+                                  value={apptPerPage} 
+                                  onChange={(e) => {
+                                    setApptPerPage(Number(e.target.value));
+                                    setApptPage(1);
+                                  }}
+                                  style={{
+                                    padding: "4px 8px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: "#fff",
+                                    fontSize: 12,
+                                    color: C.ink,
+                                    cursor: "pointer",
+                                    outline: "none",
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  <option value={5}>5</option>
+                                  <option value={10}>10</option>
+                                  <option value={20}>20</option>
+                                  <option value={50}>50</option>
+                                </select>
+                              </div>
+
+                              {/* Page selection dropdown */}
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
+                                <select
+                                  value={apptPage}
+                                  onChange={(e) => setApptPage(Number(e.target.value))}
+                                  style={{
+                                    padding: "4px 8px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: "#fff",
+                                    fontSize: 12,
+                                    color: C.ink,
+                                    cursor: "pointer",
+                                    outline: "none",
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  {Array.from({ length: totalPages }, (_, idx) => (
+                                    <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                                  ))}
+                                </select>
+                                <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
+                              </div>
+
+                              {/* Prev / Next buttons */}
+                              <div style={{ display: "flex", gap: 6 }}>
+                                <button
+                                  disabled={apptPage === 1}
+                                  onClick={() => setApptPage(p => Math.max(p - 1, 1))}
+                                  style={{
+                                    padding: "5px 12px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: apptPage === 1 ? "#F5F5F4" : "#fff",
+                                    color: apptPage === 1 ? "#A8A29E" : C.ink,
+                                    fontSize: 12,
+                                    fontWeight: 650,
+                                    cursor: apptPage === 1 ? "not-allowed" : "pointer",
+                                    transition: "all 0.2s",
+                                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                  }}
+                                >
+                                  Prev
+                                </button>
+                                <button
+                                  disabled={apptPage >= totalPages}
+                                  onClick={() => setApptPage(p => Math.min(p + 1, totalPages))}
+                                  style={{
+                                    padding: "5px 12px",
+                                    borderRadius: 8,
+                                    border: `1px solid ${C.border}`,
+                                    background: apptPage >= totalPages ? "#F5F5F4" : "#fff",
+                                    color: apptPage >= totalPages ? "#A8A29E" : C.ink,
+                                    fontSize: 12,
+                                    fontWeight: 650,
+                                    cursor: apptPage >= totalPages ? "not-allowed" : "pointer",
+                                    transition: "all 0.2s",
+                                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                  }}
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+
+              // Grid of Salon Containers for Appointments
+              const approvedSalons = salons.filter(s => s.status === "approved");
+
+              return (
+                <div className="fade-in" style={{ display:"flex", flexDirection:"column", gap:20 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)" }}>
+                    <span style={{ fontSize:15, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>Select a Studio to View Appointments</span>
+                    <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                    {approvedSalons
+                      .filter(s => !search || s.salon_name?.toLowerCase().includes(search.toLowerCase()) || s.address?.toLowerCase().includes(search.toLowerCase()))
+                      .map((salon, idx) => {
+                        const salonBookings = bookings.filter(b => (b.salon_id?._id || b.salon_id) === salon._id);
+                        const pendingCount = salonBookings.filter(b => b.status === "pending").length;
+                        return (
+                          <div 
+                            key={salon._id}
+                            onClick={() => {
+                              setSelectedSalonId(salon._id);
+                              setCustPage(1);
+                              setApptPage(1);
+                              setServPage(1);
+                            }}
+                            style={{
+                              background: C.card,
+                              border: `1.5px solid ${C.border}`,
+                              borderRadius: 16,
+                              padding: 20,
+                              cursor: "pointer",
+                              transition: "all 0.22s ease",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                              position: "relative",
+                              overflow: "hidden"
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.transform = "translateY(-4px)";
+                              e.currentTarget.style.borderColor = C.gold;
+                              e.currentTarget.style.boxShadow = "0 8px 24px rgba(197, 160, 89, 0.08)";
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.borderColor = C.border;
+                              e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.02)";
+                            }}
+                          >
+                            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${C.gold}, ${C.goldD})` }} />
+                            
+                            <div style={{ fontSize: 16, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", marginBottom: 8 }}>
+                              💈 {salon.salon_name}
+                            </div>
+                            
+                            <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.4, height: 34, overflow: "hidden", textOverflow: "ellipsis" }}>
+                              📍 {salon.address || salon.state || "No Address"}
+                            </div>
+                            
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${C.border}80`, paddingTop: 12 }}>
+                              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                <span style={{ fontSize: 11, color: C.muted }}>Owner: <strong style={{ color: C.ink }}>{salon.owner_name}</strong></span>
+                                {pendingCount > 0 && (
+                                  <span style={{ fontSize: 10, color: C.purple, fontWeight: 600 }}>{pendingCount} pending request{pendingCount > 1 ? "s" : ""}</span>
+                                )}
+                              </div>
+                              <span style={{
+                                background: C.purpleLight,
+                                color: C.purple,
+                                padding: "3px 9px",
+                                borderRadius: 20,
+                                fontSize: 10,
+                                fontWeight: 700
+                              }}>
+                                {salonBookings.length} Bookings
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* ══ SERVICES ══ */}
+            {tab==="services" && (
+              <div className="fade-in">
+                {selectedSalonId && selectedSalonId !== "general" ? (
+                  // Single salon view
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <button 
+                        onClick={() => setSelectedSalonId("")}
+                        style={btnStyle(C.goldLight, C.gold, `1px solid ${C.gold}30`)}
+                      >
+                        ← Back to All Studios
+                      </button>
+                    </div>
+
+                    <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                      <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                        <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>
+                          Services for {salons.find(s => s._id === selectedSalonId)?.salon_name || "Selected Studio"}
+                        </span>
+                      </div>
+                      {filteredServices.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No services yet</div>
+                      : (() => {
+                        const totalPages = Math.ceil(filteredServices.length / servPerPage) || 1;
+                        const startIndex = (servPage - 1) * servPerPage;
+                        const paginated = filteredServices.slice(startIndex, startIndex + servPerPage);
+                        return (
+                          <>
+                            <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                              <thead><tr>{["Service","Category","Price","Duration","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
+                              <tbody>
+                                {paginated.map(s=>(
+                                  <tr key={s._id} className="tr">
+                                    <TD style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.name}</TD>
+                                    <TD><Badge label={s.category} color={s.category==="men"?C.blue:s.category==="women"?C.purple:C.amber}/></TD>
+                                    <TD style={{ fontSize:13, fontWeight:700, color:C.gold }}>₹{s.price}</TD>
+                                    <TD style={{ fontSize:12, color:C.muted }}>{s.duration} min</TD>
+                                    <TD><Badge label={s.is_active?"Active":"Inactive"} color={s.is_active?C.green:C.red}/></TD>
+                                    <TD>
+                                      <div style={{ display:"flex", gap:6 }}>
+                                        <button className="action-btn" onClick={()=>toggleService(s._id,!s.is_active)} style={btnStyle(`${C.gold}15`, C.gold, `1px solid ${C.gold}30`)}>{s.is_active?"Disable":"Enable"}</button>
+                                        <button className="action-btn" onClick={()=>deleteService(s._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
+                                      </div>
+                                    </TD>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+
+                            {/* Premium Pagination Control Footer */}
+                            <div style={{
+                              padding: "12px 20px",
+                              borderTop: `1px solid ${C.border}`,
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              flexWrap: "wrap",
+                              gap: 12,
+                              background: "#FAFAF8"
+                            }}>
+                              <div style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>
+                                Showing {filteredServices.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + servPerPage, filteredServices.length)} of {filteredServices.length} services
+                              </div>
+                              
+                              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                                {/* Page size dropdown */}
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
+                                  <select 
+                                    value={servPerPage} 
+                                    onChange={(e) => {
+                                      setServPerPage(Number(e.target.value));
+                                      setServPage(1);
+                                    }}
+                                    style={{
+                                      padding: "4px 8px",
+                                      borderRadius: 8,
+                                      border: `1px solid ${C.border}`,
+                                      background: "#fff",
+                                      fontSize: 12,
+                                      color: C.ink,
+                                      cursor: "pointer",
+                                      outline: "none",
+                                      fontWeight: 600
+                                    }}
+                                  >
+                                    <option value={5}>5</option>
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                  </select>
+                                </div>
+
+                                {/* Page selection dropdown */}
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
+                                  <select
+                                    value={servPage}
+                                    onChange={(e) => setServPage(Number(e.target.value))}
+                                    style={{
+                                      padding: "4px 8px",
+                                      borderRadius: 8,
+                                      border: `1px solid ${C.border}`,
+                                      background: "#fff",
+                                      fontSize: 12,
+                                      color: C.ink,
+                                      cursor: "pointer",
+                                      outline: "none",
+                                      fontWeight: 600
+                                    }}
+                                  >
+                                    {Array.from({ length: totalPages }, (_, idx) => (
+                                      <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
+                                    ))}
+                                  </select>
+                                  <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
+                                </div>
+
+                                {/* Prev / Next buttons */}
+                                <div style={{ display: "flex", gap: 6 }}>
+                                  <button
+                                    disabled={servPage === 1}
+                                    onClick={() => setServPage(p => Math.max(p - 1, 1))}
+                                    style={{
+                                      padding: "5px 12px",
+                                      borderRadius: 8,
+                                      border: `1px solid ${C.border}`,
+                                      background: servPage === 1 ? "#F5F5F4" : "#fff",
+                                      color: servPage === 1 ? "#A8A29E" : C.ink,
+                                      fontSize: 12,
+                                      fontWeight: 650,
+                                      cursor: servPage === 1 ? "not-allowed" : "pointer",
+                                      transition: "all 0.2s",
+                                      boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                    }}
+                                  >
+                                    Prev
+                                  </button>
+                                  <button
+                                    disabled={servPage >= totalPages}
+                                    onClick={() => setServPage(p => Math.min(p + 1, totalPages))}
+                                    style={{
+                                      padding: "5px 12px",
+                                      borderRadius: 8,
+                                      border: `1px solid ${C.border}`,
+                                      background: servPage >= totalPages ? "#F5F5F4" : "#fff",
+                                      color: servPage >= totalPages ? "#A8A29E" : C.ink,
+                                      fontSize: 12,
+                                      fontWeight: 650,
+                                      cursor: servPage >= totalPages ? "not-allowed" : "pointer",
+                                      transition: "all 0.2s",
+                                      boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                                    }}
+                                  >
+                                    Next
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                ) : (
+                  // Grid of Salon Containers
+                  <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <span style={{ fontSize:15, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>Select a Studio to View Services</span>
+                      <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                      {salons.filter(s => s.status === "approved" && (!search || s.salon_name?.toLowerCase().includes(search.toLowerCase()) || s.address?.toLowerCase().includes(search.toLowerCase()))).map((salon) => {
+                        const salonServices = services.filter(s => (s.salon_id?._id || s.salon_id) === salon._id);
+                        return (
+                          <div 
+                            key={salon._id}
+                            onClick={() => {
+                              setSelectedSalonId(salon._id);
+                              setCustPage(1);
+                              setApptPage(1);
+                              setServPage(1);
+                            }}
+                            style={{
+                              background: C.card,
+                              border: `1.5px solid ${C.border}`,
+                              borderRadius: 16,
+                              padding: 20,
+                              cursor: "pointer",
+                              transition: "all 0.22s ease",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                              position: "relative",
+                              overflow: "hidden"
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.transform = "translateY(-4px)";
+                              e.currentTarget.style.borderColor = C.gold;
+                              e.currentTarget.style.boxShadow = "0 8px 24px rgba(197, 160, 89, 0.08)";
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.borderColor = C.border;
+                              e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.02)";
+                            }}
+                          >
+                            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${C.gold}, ${C.goldD})` }} />
+                            
+                            <div style={{ fontSize: 16, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", marginBottom: 8 }}>
+                              💈 {salon.salon_name}
+                            </div>
+                            
+                            <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.4, height: 34, overflow: "hidden", textOverflow: "ellipsis" }}>
+                              📍 {salon.address || salon.state || "No Address"}
+                            </div>
+                            
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${C.border}80`, paddingTop: 12 }}>
+                              <span style={{ fontSize: 11, color: C.muted }}>Owner: <strong style={{ color: C.ink }}>{salon.owner_name}</strong></span>
+                              <span style={{
+                                background: C.goldLight,
+                                color: C.gold,
+                                padding: "3px 9px",
+                                borderRadius: 20,
+                                fontSize: 10,
+                                fontWeight: 700
+                              }}>
+                                {salonServices.length} Services
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ══ PAYMENTS ══ */}
+            {tab==="payments" && (() => {
+              const approvedSalons = salons.filter(s => s.status === "approved");
+              
+              if (!selectedSalonId) {
+                const searchedSalons = approvedSalons.filter(s => 
+                  !search || 
+                  s.salon_name?.toLowerCase().includes(search.toLowerCase()) || 
+                  s.address?.toLowerCase().includes(search.toLowerCase())
+                );
+                
+                return (
+                  <div className="fade-in" style={{ display:"flex", flexDirection:"column", gap:20 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <span style={{ fontSize:15, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>Select a Studio to View Payments</span>
+                      <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                      {searchedSalons.map((salon, idx) => {
+                        const salonPayments = payments.filter(p => (p.salon_id?._id || p.salon_id) === salon._id);
+                        const capturedPayments = salonPayments.filter(p => {
+                          const isSuccess = p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success";
+                          if (!isSuccess) return false;
+                          const bId = p.booking_id?._id || p.booking_id;
+                          const booking = bookings.find(b => b._id === bId);
+                          return booking?.status?.toLowerCase() !== "cancelled";
+                        });
+                        const totalIncome = capturedPayments.reduce((sum, p) => sum + (p.amount || 0), 0) / 100;
+                        return (
+                          <div 
+                            key={salon._id}
+                            onClick={() => {
+                              setSelectedSalonId(salon._id);
+                              setPayPage(1);
+                              setPayPeriod("all");
+                            }}
+                            style={{
+                              background: C.card,
+                              border: `1.5px solid ${C.border}`,
+                              borderRadius: 16,
+                              padding: 20,
+                              cursor: "pointer",
+                              transition: "all 0.22s ease",
+                              boxShadow: "0 2px 6px rgba(0,0,0,0.02)",
+                              position: "relative",
+                              overflow: "hidden"
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.transform = "translateY(-4px)";
+                              e.currentTarget.style.borderColor = C.gold;
+                              e.currentTarget.style.boxShadow = "0 8px 24px rgba(197, 160, 89, 0.08)";
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.transform = "translateY(0)";
+                              e.currentTarget.style.borderColor = C.border;
+                              e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.02)";
+                            }}
+                          >
+                            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${C.gold}, ${C.goldD})` }} />
+                            
+                            <div style={{ fontSize: 16, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", marginBottom: 8 }}>
+                              💈 {salon.salon_name}
+                            </div>
+                            
+                            <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.4, height: 34, overflow: "hidden", textOverflow: "ellipsis" }}>
+                              📍 {salon.address || salon.state || "No Address"}
+                            </div>
+                            
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${C.border}80`, paddingTop: 12 }}>
+                              <span style={{ fontSize: 11, color: C.muted }}>Owner: <strong style={{ color: C.ink }}>{salon.owner_name}</strong></span>
+                              <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:2 }}>
+                                <span style={{ background: C.greenLight, color: C.green, padding: "2px 8px", borderRadius: 12, fontSize: 10, fontWeight: 700 }}>
+                                  ₹{totalIncome.toLocaleString("en-IN")}
+                                </span>
+                                <span style={{ fontSize: 9, color: C.muted }}>
+                                  {capturedPayments.length} txns
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              }
+
+              // Detailed studio payments view
+              const currentSalon = salons.find(s => s._id === selectedSalonId);
+              const currentSalonName = currentSalon?.salon_name || "Selected Studio";
+              const salonPayments = payments.filter(p => (p.salon_id?._id || p.salon_id) === selectedSalonId);
+
+              // Date period filtering helper
+              const getPeriodFilteredPayments = (list, period) => {
+                if (period === "all") return list;
+                const now = new Date();
+                
+                // Today start: 00:00:00.000 local
+                const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                
+                // Week start (Sunday)
+                const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+                
+                // Month start
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                
+                // Year start
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                
+                return list.filter(p => {
+                  if (!p.created_at) return false;
+                  const pDate = new Date(p.created_at);
+                  if (period === "day") return pDate >= startOfToday;
+                  if (period === "week") return pDate >= startOfWeek;
+                  if (period === "month") return pDate >= startOfMonth;
+                  if (period === "year") return pDate >= startOfYear;
+                  return true;
+                });
+              };
+
+              const periodPayments = getPeriodFilteredPayments(salonPayments, payPeriod);
+
+              // Calculations for StatCards
+              const capturedList = periodPayments.filter(p => {
+                const isSuccess = p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success";
+                if (!isSuccess) return false;
+                const bId = p.booking_id?._id || p.booking_id;
+                const booking = bookings.find(b => b._id === bId);
+                return booking?.status?.toLowerCase() !== "cancelled";
+              });
+              const totalIncome = capturedList.reduce((sum, p) => sum + (p.amount || 0), 0) / 100;
+
+              const lossList = periodPayments.filter(p => {
+                const isFailed = p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded";
+                const bId = p.booking_id?._id || p.booking_id;
+                const booking = bookings.find(b => b._id === bId);
+                const isCancelled = booking?.status?.toLowerCase() === "cancelled";
+                return isFailed || isCancelled;
+              });
+              const totalLoss = lossList.reduce((sum, p) => sum + (p.amount || 0), 0) / 100;
+
+              const netProfit = totalIncome - totalLoss;
+
+              // Search filtering
+              const searchFilteredPayments = periodPayments.filter(p => {
+                if (!search) return true;
+                const term = search.toLowerCase();
+                const custName = p.customer_id?.name?.toLowerCase() || "";
+                const custMobile = p.customer_id?.mobile || "";
+                const payId = p.razorpay_payment_id?.toLowerCase() || "";
+                const payType = p.payment_type?.toLowerCase() || "";
+                const payStatus = p.status?.toLowerCase() || "";
+                return custName.includes(term) || custMobile.includes(term) || payId.includes(term) || payType.includes(term) || payStatus.includes(term);
+              });
+
+              // Pagination
+              const totalPages = Math.ceil(searchFilteredPayments.length / payPerPage) || 1;
+              const startIndex = (payPage - 1) * payPerPage;
+              const paginatedPayments = searchFilteredPayments.slice(startIndex, startIndex + payPerPage);
+
+              const getChartData = () => {
+                const now = new Date();
+                
+                if (payPeriod === "day") {
+                  const hours = Array.from({ length: 24 }, (_, i) => ({
+                    name: `${String(i).padStart(2, '0')}:00`,
+                    Income: 0,
+                    Loss: 0
+                  }));
+                  
+                  periodPayments.forEach(p => {
+                    if (!p.created_at) return;
+                    const hour = new Date(p.created_at).getHours();
+                    const isSuccess = p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success";
+                    const bId = p.booking_id?._id || p.booking_id;
+                    const booking = bookings.find(b => b._id === bId);
+                    const isCancelled = booking?.status?.toLowerCase() === "cancelled";
+                    
+                    const amt = (p.amount || 0) / 100;
+                    if (isSuccess && !isCancelled) {
+                      hours[hour].Income += amt;
+                    } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
+                      hours[hour].Loss += amt;
+                    }
+                  });
+                  return hours.filter(h => h.Income > 0 || h.Loss > 0);
+                }
+
+                if (payPeriod === "week") {
+                  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                  const weekData = days.map(d => ({ name: d.slice(0, 3), Income: 0, Loss: 0 }));
+                  
+                  periodPayments.forEach(p => {
+                    if (!p.created_at) return;
+                    const dayIdx = new Date(p.created_at).getDay();
+                    const isSuccess = p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success";
+                    const bId = p.booking_id?._id || p.booking_id;
+                    const booking = bookings.find(b => b._id === bId);
+                    const isCancelled = booking?.status?.toLowerCase() === "cancelled";
+                    
+                    const amt = (p.amount || 0) / 100;
+                    if (isSuccess && !isCancelled) {
+                      weekData[dayIdx].Income += amt;
+                    } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
+                      weekData[dayIdx].Loss += amt;
+                    }
+                  });
+                  
+                  const todayIdx = now.getDay();
+                  const orderedWeekData = [];
+                  for (let i = 6; i >= 0; i--) {
+                    const idx = (todayIdx - i + 7) % 7;
+                    orderedWeekData.push(weekData[idx]);
+                  }
+                  return orderedWeekData;
+                }
+
+                if (payPeriod === "month") {
+                  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                  const monthData = Array.from({ length: daysInMonth }, (_, i) => ({
+                    name: String(i + 1),
+                    Income: 0,
+                    Loss: 0
+                  }));
+                  
+                  periodPayments.forEach(p => {
+                    if (!p.created_at) return;
+                    const date = new Date(p.created_at);
+                    if (date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+                      const dateNum = date.getDate();
+                      const isSuccess = p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success";
+                      const bId = p.booking_id?._id || p.booking_id;
+                      const booking = bookings.find(b => b._id === bId);
+                      const isCancelled = booking?.status?.toLowerCase() === "cancelled";
+                      
+                      const amt = (p.amount || 0) / 100;
+                      if (isSuccess && !isCancelled) {
+                        monthData[dateNum - 1].Income += amt;
+                      } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
+                        monthData[dateNum - 1].Loss += amt;
+                      }
+                    }
+                  });
+                  return monthData.filter((d, i) => d.Income > 0 || d.Loss > 0 || (i + 1) % 5 === 0);
+                }
+
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const yearData = months.map(m => ({ name: m, Income: 0, Loss: 0 }));
+                
+                periodPayments.forEach(p => {
+                  if (!p.created_at) return;
+                  const date = new Date(p.created_at);
+                  if (payPeriod === "all" || date.getFullYear() === now.getFullYear()) {
+                    const monthIdx = date.getMonth();
+                    const isSuccess = p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success";
+                    const bId = p.booking_id?._id || p.booking_id;
+                    const booking = bookings.find(b => b._id === bId);
+                    const isCancelled = booking?.status?.toLowerCase() === "cancelled";
+                    
+                    const amt = (p.amount || 0) / 100;
+                    if (isSuccess && !isCancelled) {
+                      yearData[monthIdx].Income += amt;
+                    } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
+                      yearData[monthIdx].Loss += amt;
+                    }
+                  }
+                });
+                
+                return yearData;
+              };
+
+              const chartData = getChartData();
+
+              const getBreakdownData = () => {
+                let tokenCount = 0;
+                let fullCount = 0;
+                let tokenAmount = 0;
+                let fullAmount = 0;
+
+                periodPayments.forEach(p => {
+                  const isSuccess = p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success";
+                  if (!isSuccess) return;
+                  const bId = p.booking_id?._id || p.booking_id;
+                  const booking = bookings.find(b => b._id === bId);
+                  if (booking?.status?.toLowerCase() === "cancelled") return;
+
+                  const amt = (p.amount || 0) / 100;
+                  if (p.payment_type?.toUpperCase() === "FULL") {
+                    fullCount++;
+                    fullAmount += amt;
+                  } else {
+                    tokenCount++;
+                    tokenAmount += amt;
+                  }
+                });
+
+                return [
+                  { name: "Token Payments", Count: tokenCount, Revenue: tokenAmount },
+                  { name: "Full Payments", Count: fullCount, Revenue: fullAmount }
+                ];
+              };
+
+              const breakdownData = getBreakdownData();
+
+              return (
+                <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <button 
+                      onClick={() => setSelectedSalonId("")}
+                      style={btnStyle(C.goldLight, C.gold, `1px solid ${C.gold}30`)}
+                    >
+                      ← Back to All Studios
+                    </button>
+                  </div>
+
+                  <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
+                      <div>
+                        <h2 style={{ fontSize: 18, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", margin: 0 }}>
+                          💈 {currentSalonName} Payments
+                        </h2>
+                        <p style={{ fontSize: 12, color: C.muted, margin: "4px 0 0 0" }}>
+                          Viewing payment history and time-period analysis
+                        </p>
+                      </div>
+                      
+                      {/* Time Period Selector Tabs */}
+                      <div style={{ display: "flex", gap: 6, background: "#F5F5F4", padding: 4, borderRadius: 10 }}>
+                        {[
+                          { k: "all", label: "All Time" },
+                          { k: "day", label: "Today" },
+                          { k: "week", label: "This Week" },
+                          { k: "month", label: "This Month" },
+                          { k: "year", label: "This Year" }
+                        ].map(p => (
+                          <button
+                            key={p.k}
+                            onClick={() => {
+                              setPayPeriod(p.k);
+                              setPayPage(1);
+                            }}
+                            style={{
+                              padding: "6px 12px",
+                              borderRadius: 8,
+                              fontSize: 11,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              border: "none",
+                              background: payPeriod === p.k ? C.card : "transparent",
+                              color: payPeriod === p.k ? C.goldD : C.muted,
+                              boxShadow: payPeriod === p.k ? "0 1px 3px rgba(0,0,0,0.06)" : "none",
+                              transition: "all 0.15s ease"
+                            }}
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Analytics Stats Cards */}
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
+                    <StatCard 
+                      label="Total Income" 
+                      value={`₹${totalIncome.toLocaleString("en-IN")}`} 
+                      sub="Successful/Captured bookings" 
+                      color={C.green} 
+                      icon={CreditCard} 
+                      iconBg={C.greenLight} 
+                      iconColor={C.green}
+                    />
+                    <StatCard 
+                      label="Total Loss" 
+                      value={`₹${totalLoss.toLocaleString("en-IN")}`} 
+                      sub="Refunded to customers" 
+                      color={C.red} 
+                      icon={CreditCard} 
+                      iconBg={C.redLight} 
+                      iconColor={C.red}
+                    />
+                    <StatCard 
+                      label="Net Profit" 
+                      value={`₹${netProfit.toLocaleString("en-IN")}`} 
+                      sub="Income minus refunds" 
+                      color={netProfit >= 0 ? C.green : C.red} 
+                      icon={CreditCard} 
+                      iconBg={netProfit >= 0 ? C.greenLight : C.redLight} 
+                      iconColor={netProfit >= 0 ? C.green : C.red}
+                    />
+                  </div>
+
+                  {/* Graph Analytics Section */}
+                  <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
+                    {/* Left: AreaChart showing Income vs Loss Trend */}
+                    <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block", marginBottom: 16 }}>
+                        Income vs Loss Trend (₹)
+                      </span>
+                      <div style={{ width: "100%", height: 260 }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={C.green} stopOpacity={0.25}/>
+                                <stop offset="95%" stopColor={C.green} stopOpacity={0.01}/>
+                              </linearGradient>
+                              <linearGradient id="colorLoss" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={C.red} stopOpacity={0.25}/>
+                                <stop offset="95%" stopColor={C.red} stopOpacity={0.01}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
+                            <XAxis dataKey="name" stroke={C.muted} fontSize={11} tickLine={false} />
+                            <YAxis stroke={C.muted} fontSize={11} tickLine={false} axisLine={false} />
+                            <Tooltip 
+                              contentStyle={{ background: "#FFF", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 12 }} 
+                              formatter={(value) => [`₹${value}`, ""]}
+                            />
+                            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
+                            <Area type="monotone" dataKey="Income" stroke={C.green} strokeWidth={2.5} fillOpacity={1} fill="url(#colorIncome)" name="Income" />
+                            <Area type="monotone" dataKey="Loss" stroke={C.red} strokeWidth={2.5} fillOpacity={1} fill="url(#colorLoss)" name="Loss / Cancelled" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    {/* Right: BarChart showing Revenue breakdown by Payment Type */}
+                    <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block", marginBottom: 16 }}>
+                        Payment Type Revenue (₹)
+                      </span>
+                      <div style={{ width: "100%", height: 260 }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={breakdownData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
+                            <XAxis dataKey="name" stroke={C.muted} fontSize={11} tickLine={false} />
+                            <YAxis stroke={C.muted} fontSize={11} tickLine={false} axisLine={false} />
+                            <Tooltip 
+                              contentStyle={{ background: "#FFF", borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 12 }}
+                              formatter={(value) => [`₹${value}`, "Revenue"]}
+                            />
+                            <Bar dataKey="Revenue" fill={C.gold} radius={[6, 6, 0, 0]} maxBarSize={45} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Transactions Table & Search */}
                   <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
                     <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                      <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>{filtered.length} Customers</span>
-                      <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setCustPage(1); }} placeholder="Search by name or mobile..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                      <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>
+                        {searchFilteredPayments.length} Transactions Found
+                      </span>
+                      <input 
+                        className="inp" 
+                        value={search} 
+                        onChange={e=>{ setSearch(e.target.value); setPayPage(1); }} 
+                        placeholder="Search by customer, payment ID, type..." 
+                        style={{ ...inputStyle, width:260, padding:"7px 12px", fontSize:12 }}
+                      />
                     </div>
-                    {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
-                    : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No customers yet</div>
-                    : (
+
+                    {searchFilteredPayments.length === 0 ? (
+                      <div style={{ padding:40, textAlign:"center", color:C.muted }}>No payments found for the selected criteria</div>
+                    ) : (
                       <>
                         <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                          <thead><tr>{["Customer","Mobile","Email","Loyalty Points","Joined","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
+                          <thead>
+                            <tr>
+                              {["Customer", "Payment ID", "Amount", "Type", "Status", "Date"].map(h=><TH key={h}>{h}</TH>)}
+                            </tr>
+                          </thead>
                           <tbody>
-                            {paginated.map(c=>(
-                              <tr key={c._id} className="tr">
-                                <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={c.name||"C"} size={30} color={C.blue} bg={C.blueLight}/><span style={{ fontSize:13, fontWeight:600, color:C.ink }}>{c.name||"—"}</span></div></TD>
-                                <TD style={{ fontSize:12, color:C.muted, fontFamily:"monospace" }}>{c.mobile}</TD>
-                                <TD style={{ fontSize:12, color:C.muted }}>{c.email||"—"}</TD>
-                                <TD style={{ fontSize:13, fontWeight:700, color:C.gold }}>{c.loyalty_points||0}</TD>
-                                <TD style={{ fontSize:12, color:C.muted }}>{c.created_at?new Date(c.created_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"}):"—"}</TD>
-                                <TD><Badge label={c.blocked?"Blocked":"Active"} color={c.blocked?C.red:C.green}/></TD>
+                            {paginatedPayments.map(p=>(
+                              <tr key={p._id} className="tr">
                                 <TD>
-                                  <button className="action-btn" onClick={()=>blockCustomer(c._id,!c.blocked)}
-                                    style={btnStyle(c.blocked?`${C.green}15`:`${C.red}10`, c.blocked?C.green:C.red, `1px solid ${c.blocked?C.green:C.red}30`)}>
-                                    {c.blocked?"Unblock":"Block"}
-                                  </button>
+                                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                                    <Avatar name={p.customer_id?.name||"C"} size={28} color={C.purple} bg={C.purpleLight}/>
+                                    <div>
+                                      <div style={{ fontSize:13, fontWeight:600, color:C.ink }}>{p.customer_id?.name||"—"}</div>
+                                      <div style={{ fontSize:10, color:C.muted }}>{p.customer_id?.mobile||""}</div>
+                                    </div>
+                                  </div>
+                                </TD>
+                                <TD style={{ fontSize:12, color:C.muted, fontFamily:"monospace" }}>
+                                  {p.razorpay_payment_id || p.razorpay_order_id || "Manual/Offline"}
+                                </TD>
+                                <TD style={{ fontSize:13, fontWeight:700, color:C.ink }}>
+                                  ₹{(p.amount||0)/100}
+                                </TD>
+                                <TD>
+                                  <Badge label={p.payment_type||"TOKEN"} color={p.payment_type?.toUpperCase()==="FULL"?C.green:C.blue}/>
+                                </TD>
+                                <TD>
+                                  <Badge 
+                                    label={p.status} 
+                                    color={
+                                      p.status?.toLowerCase()==="success" || p.status?.toLowerCase()==="captured"
+                                        ? C.green
+                                        : p.status?.toLowerCase()==="refunded"
+                                        ? C.blue
+                                        : p.status?.toLowerCase()==="pending"
+                                        ? C.amber
+                                        : C.red
+                                    }
+                                  />
+                                </TD>
+                                <TD style={{ fontSize:12, color:C.muted }}>
+                                  {p.created_at ? new Date(p.created_at).toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" }) : "—"}
                                 </TD>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                         
-                        {/* Premium Pagination Control Footer */}
-                        <div style={{
-                          padding: "12px 20px",
-                          borderTop: `1px solid ${C.border}`,
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          flexWrap: "wrap",
-                          gap: 12,
-                          background: "#FAFAF8"
-                        }}>
+                        {/* Pagination Footer */}
+                        <div style={{ padding: "12px 20px", background: "#FAFAF8", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
                           <div style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>
-                            Showing {filtered.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + custPerPage, filtered.length)} of {filtered.length} customers
+                            Showing {searchFilteredPayments.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + payPerPage, searchFilteredPayments.length)} of {searchFilteredPayments.length} items
                           </div>
                           
                           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                            {/* Page size dropdown */}
+                            {/* Show per page dropdown */}
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
-                              <select 
-                                value={custPerPage} 
+                              <select
+                                value={payPerPage}
                                 onChange={(e) => {
-                                  setCustPerPage(Number(e.target.value));
-                                  setCustPage(1);
+                                  setPayPerPage(Number(e.target.value));
+                                  setPayPage(1);
                                 }}
                                 style={{
                                   padding: "4px 8px",
@@ -1049,8 +2708,8 @@ export default function AdminOnboarding() {
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
                               <select
-                                value={custPage}
-                                onChange={(e) => setCustPage(Number(e.target.value))}
+                                value={payPage}
+                                onChange={(e) => setPayPage(Number(e.target.value))}
                                 style={{
                                   padding: "4px 8px",
                                   borderRadius: 8,
@@ -1073,17 +2732,17 @@ export default function AdminOnboarding() {
                             {/* Prev / Next buttons */}
                             <div style={{ display: "flex", gap: 6 }}>
                               <button
-                                disabled={custPage === 1}
-                                onClick={() => setCustPage(p => Math.max(p - 1, 1))}
+                                disabled={payPage === 1}
+                                onClick={() => setPayPage(p => Math.max(p - 1, 1))}
                                 style={{
                                   padding: "5px 12px",
                                   borderRadius: 8,
                                   border: `1px solid ${C.border}`,
-                                  background: custPage === 1 ? "#F5F5F4" : "#fff",
-                                  color: custPage === 1 ? "#A8A29E" : C.ink,
+                                  background: payPage === 1 ? "#F5F5F4" : "#fff",
+                                  color: payPage === 1 ? "#A8A29E" : C.ink,
                                   fontSize: 12,
                                   fontWeight: 650,
-                                  cursor: custPage === 1 ? "not-allowed" : "pointer",
+                                  cursor: payPage === 1 ? "not-allowed" : "pointer",
                                   transition: "all 0.2s",
                                   boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
                                 }}
@@ -1091,17 +2750,17 @@ export default function AdminOnboarding() {
                                 Prev
                               </button>
                               <button
-                                disabled={custPage >= totalPages}
-                                onClick={() => setCustPage(p => Math.min(p + 1, totalPages))}
+                                disabled={payPage >= totalPages}
+                                onClick={() => setPayPage(p => Math.min(p + 1, totalPages))}
                                 style={{
                                   padding: "5px 12px",
                                   borderRadius: 8,
                                   border: `1px solid ${C.border}`,
-                                  background: custPage >= totalPages ? "#F5F5F4" : "#fff",
-                                  color: custPage >= totalPages ? "#A8A29E" : C.ink,
+                                  background: payPage >= totalPages ? "#F5F5F4" : "#fff",
+                                  color: payPage >= totalPages ? "#A8A29E" : C.ink,
                                   fontSize: 12,
                                   fontWeight: 650,
-                                  cursor: custPage >= totalPages ? "not-allowed" : "pointer",
+                                  cursor: payPage >= totalPages ? "not-allowed" : "pointer",
                                   transition: "all 0.2s",
                                   boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
                                 }}
@@ -1119,212 +2778,162 @@ export default function AdminOnboarding() {
             })()}
 
 
+            {/* ══ SALON PERFORMANCE ══ */}
+            {tab==="reviews" && (() => {
+              const approvedSalons = salons.filter(s => s.status === "approved");
+              const salonPerformances = approvedSalons.map(s => getSalonPerformanceData(s));
 
-            {/* ══ APPOINTMENTS ══ */}
-            {tab==="appointments" && (
-              <div className="fade-in">
-                <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                  <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}` }}>
-                    <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>{bookings.length} Appointments</span>
+              // Top revenue salon
+              const topRevenueSalon = salonPerformances.length > 0 
+                ? [...salonPerformances].sort((a, b) => b.netProfit - a.netProfit)[0]
+                : null;
+
+              // Highest rated salon
+              const topRatedSalon = salonPerformances.length > 0
+                ? [...salonPerformances].sort((a, b) => b.avgRating - a.avgRating)[0]
+                : null;
+
+              // Salons with negative net profit or high loss
+              const lossSalonsCount = salonPerformances.filter(p => p.netProfit < 0 || p.loss > p.income * 0.4).length;
+
+              return (
+                <div className="fade-in">
+                  {/* Performance Summary Cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 24 }}>
+                    <StatCard 
+                      label="Tracked Studios" 
+                      value={approvedSalons.length} 
+                      sub="Active & Approved" 
+                      color={C.gold} 
+                      icon={Store} 
+                      iconBg={C.goldLight} 
+                      iconColor={C.gold} 
+                    />
+                    <StatCard 
+                      label="Most Profitable" 
+                      value={topRevenueSalon ? `₹${topRevenueSalon.netProfit.toLocaleString("en-IN", { maximumFractionDigits: 0 })}` : "₹0"} 
+                      sub={topRevenueSalon ? topRevenueSalon.salon.salon_name : "No data"} 
+                      color={C.green} 
+                      icon={CreditCard} 
+                      iconBg={C.greenLight} 
+                      iconColor={C.green} 
+                    />
+                    <StatCard 
+                      label="Highest Rated" 
+                      value={topRatedSalon ? `${topRatedSalon.avgRating.toFixed(1)} ★` : "5.0 ★"} 
+                      sub={topRatedSalon ? topRatedSalon.salon.salon_name : "No data"} 
+                      color={C.purple} 
+                      icon={Star} 
+                      iconBg={C.purpleLight} 
+                      iconColor={C.purple} 
+                    />
+                    <StatCard 
+                      label="Financial Warning" 
+                      value={`${lossSalonsCount} Studios`} 
+                      sub="Negative net profit or high losses" 
+                      color={C.red} 
+                      icon={Activity} 
+                      iconBg={C.redLight} 
+                      iconColor={C.red} 
+                    />
                   </div>
-                  {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
-                  : bookings.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No bookings yet</div>
-                  : (
-                    <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                      <thead><tr>{["Customer","Service","Barber","Salon","Date","Amount","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                      <tbody>
-                        {bookings.map(b=>(
-                          <tr key={b._id} className="tr">
-                            <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={b.customer_id?.name||"C"} size={28} color={C.blue} bg={C.blueLight}/><span style={{ fontSize:13, fontWeight:600, color:C.ink }}>{b.customer_id?.name||"—"}</span></div></TD>
-                            <TD style={{ fontSize:12, color:C.muted }}>{b.services?.[0]?.service_name||"—"}</TD>
-                            <TD style={{ fontSize:12, color:C.gold }}>{b.barber_id?.name||"—"}</TD>
-                            <TD style={{ fontSize:12, color:C.muted }}>{b.salon_id?.salon_name||"—"}</TD>
-                            <TD style={{ fontSize:12, color:C.muted }}>{b.created_at?new Date(b.created_at).toLocaleDateString("en-IN"):"—"}</TD>
-                            <TD style={{ fontSize:13, fontWeight:700, color:C.ink }}>₹{b.total_amount||0}</TD>
-                            <TD><Badge label={b.status} color={bkStatus(b.status)}/></TD>
-                            <TD>
-                              {b.status==="pending" && (
-                                <div style={{ display:"flex", gap:6 }}>
-                                  <button className="action-btn" onClick={()=>changeBookingStatus(b._id,"confirmed")} style={btnStyle(`${C.green}15`, C.green, `1px solid ${C.green}30`)}>Confirm</button>
-                                  <button className="action-btn" onClick={()=>changeBookingStatus(b._id,"cancelled")} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Cancel</button>
-                                </div>
-                              )}
-                            </TD>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              </div>
-            )}
 
-            {/* ══ SERVICES ══ */}
-            {tab==="services" && (
-              <div className="fade-in">
-                <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                  {services.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No services yet</div>
-                  : (
-                    <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                      <thead><tr>{["Service","Salon","Category","Price","Duration","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                      <tbody>
-                        {services.map(s=>(
-                          <tr key={s._id} className="tr">
-                            <TD style={{ fontSize:13, fontWeight:600, color:C.ink }}>{s.name}</TD>
-                            <TD style={{ fontSize:12, color:C.gold }}>{s.salon_id?.salon_name||"—"}</TD>
-                            <TD><Badge label={s.category} color={s.category==="men"?C.blue:s.category==="women"?C.purple:C.amber}/></TD>
-                            <TD style={{ fontSize:13, fontWeight:700, color:C.gold }}>₹{s.price}</TD>
-                            <TD style={{ fontSize:12, color:C.muted }}>{s.duration} min</TD>
-                            <TD><Badge label={s.is_active?"Active":"Inactive"} color={s.is_active?C.green:C.red}/></TD>
-                            <TD>
-                              <div style={{ display:"flex", gap:6 }}>
-                                <button className="action-btn" onClick={()=>toggleService(s._id,!s.is_active)} style={btnStyle(`${C.gold}15`, C.gold, `1px solid ${C.gold}30`)}>{s.is_active?"Disable":"Enable"}</button>
-                                <button className="action-btn" onClick={()=>deleteService(s._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
-                              </div>
-                            </TD>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* ══ PAYMENTS ══ */}
-            {tab==="payments" && (
-              <div className="fade-in">
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14, marginBottom:16 }}>
-                  <StatCard label="Total Collected" value={`₹${(payments.filter(p=>p.status==="captured").reduce((a,b)=>a+(b.amount||0),0)/100).toLocaleString("en-IN")}`} sub="Captured payments" color={C.green} icon={CreditCard} iconBg={C.greenLight} iconColor={C.green}/>
-                  <StatCard label="Pending" value={payments.filter(p=>p.status==="pending").length} sub="Awaiting capture" color={C.amber} icon={CreditCard} iconBg={C.orangeLight} iconColor={C.orange}/>
-                  <StatCard label="Refunded" value={payments.filter(p=>p.status==="refunded").length} sub="Returned to customer" color={C.red} icon={CreditCard} iconBg={C.redLight} iconColor={C.red}/>
-                </div>
-                <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                  {payments.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No payments yet</div>
-                  : (
-                    <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                      <thead><tr>{["Customer","Salon","Amount","Type","Status","Date"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                      <tbody>
-                        {payments.map(p=>(
-                          <tr key={p._id} className="tr">
-                            <TD><div style={{ display:"flex", alignItems:"center", gap:8 }}><Avatar name={p.customer_id?.name||"C"} size={28} color={C.purple} bg={C.purpleLight}/><span style={{ fontSize:13, fontWeight:600, color:C.ink }}>{p.customer_id?.name||"—"}</span></div></TD>
-                            <TD style={{ fontSize:12, color:C.gold }}>{p.salon_id?.salon_name||"—"}</TD>
-                            <TD style={{ fontSize:13, fontWeight:700, color:C.ink }}>₹{(p.amount||0)/100}</TD>
-                            <TD><Badge label={p.payment_type||"token"} color={p.payment_type==="full"?C.green:C.blue}/></TD>
-                            <TD><Badge label={p.status} color={pyStatus(p.status)}/></TD>
-                            <TD style={{ fontSize:12, color:C.muted }}>{p.created_at?new Date(p.created_at).toLocaleDateString("en-IN"):"—"}</TD>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* ══ REVIEWS ══ */}
-            {tab==="reviews" && (
-              <div className="fade-in">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-                  {/* Left Column: Booking Feedback */}
-                  <div>
-                    <div style={{ borderBottom: `2px solid ${C.gold}`, paddingBottom: 10, marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, fontFamily: "Georgia, serif", color: C.ink }}>Booking Feedback</h3>
-                      <Badge label={`${bookingFeedbacks.length} Feedback`} color={C.gold} />
-                    </div>
-                    {bookingFeedbacks.length === 0 ? (
-                      <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 40, textAlign: "center", color: C.muted, fontSize: 13 }}>No booking feedback yet</div>
-                    ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                        {bookingFeedbacks.map((fb) => (
-                          <div key={fb._id} style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 18, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <Avatar name={fb.customer_id?.name || "C"} size={32} color={C.blue} bg={C.blueLight} />
-                                <div>
-                                  <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{fb.customer_id?.name || "Customer"}</div>
-                                  <div style={{ fontSize: 11, color: C.muted }}>{fb.customer_id?.mobile || "No Mobile"}</div>
-                                </div>
-                              </div>
-                              <button className="action-btn" onClick={() => deleteBookingFeedback(fb._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
-                            </div>
-                            
-                            {/* Ratings metrics */}
-                            <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: 11, color: C.muted, margin: "8px 0" }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `1px dashed ${C.border}`, paddingBottom: 4 }}>
-                                <span>Booking Process:</span>
-                                <span style={{ color: C.gold, fontWeight: 700 }}>
-                                  {"★".repeat(fb.booking_process_rating || 5)}{"☆".repeat(5 - (fb.booking_process_rating || 5))}
-                                </span>
-                              </div>
-                              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `1px dashed ${C.border}`, padding: "4px 0" }}>
-                                <span>Payment Flow:</span>
-                                <span style={{ color: C.gold, fontWeight: 700 }}>
-                                  {"★".repeat(fb.payment_process_rating || 5)}{"☆".repeat(5 - (fb.payment_process_rating || 5))}
-                                </span>
-                              </div>
-                              <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 4 }}>
-                                <span>Web Usability:</span>
-                                <span style={{ color: C.gold, fontWeight: 700 }}>
-                                  {"★".repeat(fb.website_usability_rating || 5)}{"☆".repeat(5 - (fb.website_usability_rating || 5))}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div style={{ fontSize: 13, color: C.ink, lineHeight: 1.6, marginTop: 8, fontStyle: fb.feedback_text ? "normal" : "italic" }}>
-                              {fb.feedback_text || "No text feedback provided"}
-                            </div>
-                            <div style={{ fontSize: 10, color: C.muted, marginTop: 10, textAlign: "right" }}>
-                              {fb.created_at ? new Date(fb.created_at).toLocaleDateString("en-IN") : "—"}
-                            </div>
-                          </div>
-                        ))}
+                  {/* Main comparison list */}
+                  <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                    <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block" }}>Studios Performance Comparison</span>
+                        <span style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>Compare financial status, booking completion rates, and average customer ratings.</span>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Right Column: Personal Reviews */}
-                  <div>
-                    <div style={{ borderBottom: `2px solid ${C.gold}`, paddingBottom: 10, marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, fontFamily: "Georgia, serif", color: C.ink }}>Personal Reviews</h3>
-                      <Badge label={`${reviews.length} Reviews`} color={C.purple} />
                     </div>
-                    {reviews.length === 0 ? (
-                      <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 40, textAlign: "center", color: C.muted, fontSize: 13 }}>No personal reviews yet</div>
-                    ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                        {reviews.map((r) => {
-                          const displayStars = r.rating || r.salon_rating || r.barber_rating || 5;
-                          return (
-                            <div key={r._id} style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 18, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
-                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <Avatar name={r.customer_id?.name || "C"} size={32} color={C.purple} bg={C.purpleLight} />
-                                  <div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{r.customer_id?.name || "Customer"}</div>
-                                    <div style={{ fontSize: 11, color: C.muted }}>
-                                      {r.salon_id?.salon_name || "—"} {r.barber_id?.name ? `(Stylist: ${r.barber_id.name})` : ""}
+
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <thead>
+                          <tr>
+                            <TH>Salon / Studio</TH>
+                            <TH>Financial Status</TH>
+                            <TH>Income / Loss</TH>
+                            <TH>Booking Success</TH>
+                            <TH>Avg Rating</TH>
+                            <TH>Action</TH>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {salonPerformances.length === 0 ? (
+                            <tr>
+                              <td colSpan={6} style={{ padding: 40, textAlign: "center", color: C.muted, fontSize: 13 }}>No active salons available for analysis.</td>
+                            </tr>
+                          ) : (
+                            salonPerformances.map((p, i) => {
+                              const completionRate = p.bookingsCount > 0 
+                                ? Math.round((p.completedCount / p.bookingsCount) * 100)
+                                : 0;
+                              const profitLabel = p.netProfit >= 0 ? "Profit" : "Loss";
+                              const profitColor = p.netProfit >= 0 ? C.green : C.red;
+                              const profitBg = p.netProfit >= 0 ? C.greenLight : C.redLight;
+
+                              return (
+                                <tr key={p.salon._id} className="tr" style={{ transition: "background 0.2s" }}>
+                                  <TD>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                      <img src={p.salon.images?.[0] || salonImg(i)} alt={p.salon.salon_name} style={{ width: 40, height: 40, borderRadius: 8, objectFit: "cover", border: `1px solid ${C.border}` }} />
+                                      <div>
+                                        <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{p.salon.salon_name}</div>
+                                        <div style={{ fontSize: 11, color: C.muted }}>Owner: {p.salon.owner_name}</div>
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                                <button className="action-btn" onClick={() => deleteReview(r._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
-                              </div>
-                              <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
-                                {[1, 2, 3, 4, 5].map((s) => (
-                                  <span key={s} style={{ fontSize: 14, color: s <= displayStars ? C.gold : "#D1C5BA" }}>★</span>
-                                ))}
-                              </div>
-                              <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>{r.review_text || "No comment"}</div>
-                              <div style={{ fontSize: 10, color: C.border, marginTop: 8 }}>{r.created_at ? new Date(r.created_at).toLocaleDateString("en-IN") : "—"}</div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                                  </TD>
+                                  <TD>
+                                    <span style={{
+                                      padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700,
+                                      background: profitBg, color: profitColor, border: `1px solid ${profitColor}30`
+                                    }}>
+                                      {profitLabel}: ₹{p.netProfit.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                                    </span>
+                                  </TD>
+                                  <TD style={{ fontSize: 12 }}>
+                                    <div style={{ color: C.green, fontWeight: 600 }}>Inc: ₹{p.income.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
+                                    <div style={{ color: C.red, fontWeight: 600, marginTop: 2 }}>Loss: ₹{p.loss.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
+                                  </TD>
+                                  <TD>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 4, width: 120 }}>
+                                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontWeight: 650 }}>
+                                        <span style={{ color: C.muted }}>{completionRate}% Successful</span>
+                                        <span style={{ color: C.ink }}>{p.bookingsCount} total</span>
+                                      </div>
+                                      <div style={{ width: "100%", height: 6, borderRadius: 3, backgroundColor: "#E7E5E4", overflow: "hidden" }}>
+                                        <div style={{ width: `${completionRate}%`, height: "100%", backgroundColor: completionRate > 75 ? C.green : completionRate > 50 ? C.orange : C.red, borderRadius: 3 }} />
+                                      </div>
+                                    </div>
+                                  </TD>
+                                  <TD>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 4, fontWeight: 700, fontSize: 13, color: C.ink }}>
+                                      <Star size={14} fill="#F59E0B" color="#F59E0B" />
+                                      {p.avgRating.toFixed(1)}
+                                      <span style={{ fontSize: 11, color: C.muted, fontWeight: 500 }}>({p.reviews.length})</span>
+                                    </div>
+                                  </TD>
+                                  <TD>
+                                    <button 
+                                      className="action-btn" 
+                                      onClick={() => setSelectedPerformanceSalon(p)} 
+                                      style={btnStyle(C.goldLight, C.gold, `1px solid ${C.gold}30`)}
+                                    >
+                                      Analyze Why
+                                    </button>
+                                  </TD>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* ══ LIVE MONITORING ══ */}
             {tab==="live" && (
@@ -1332,13 +2941,19 @@ export default function AdminOnboarding() {
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16, background:C.card, padding:"10px 16px", borderRadius:10, border:`1px solid ${C.border}`, width:"fit-content", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
                   <div style={{ width:8, height:8, borderRadius:"50%", background:C.green }}/>
                   <span style={{ fontSize:12, color:C.green, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em" }}>Live Monitoring Active</span>
-                  <span style={{ fontSize:12, color:C.muted }}>· {barbers.length} barbers tracked</span>
+                  <span style={{ fontSize:12, color:C.muted }}>· {filteredBarbers.length} barbers tracked</span>
                 </div>
-                {barbers.length===0 ? <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No barbers to monitor</div>
+                {filteredBarbers.length===0 ? <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No barbers to monitor</div>
                 : (
                   <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
-                    {barbers.map((b,i)=>(
-                      <div key={b._id} style={{ background:C.card, borderRadius:16, border:`2px solid ${b.status==="available"?C.green+"40":C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                    {filteredBarbers.map((b,i)=>(
+                      <div 
+                        key={b._id} 
+                        onClick={() => setSelectedBarber(b)}
+                        onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)"; }}
+                        style={{ background:C.card, borderRadius:16, border:`2px solid ${b.status==="available"?C.green+"40":C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)", cursor:"pointer", transition:"transform 0.2s, box-shadow 0.2s" }}
+                      >
                         <div style={{ height:160, overflow:"hidden", position:"relative" }}>
                           <img src={barberImg(i)} alt={b.name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                           <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(0,0,0,.6),transparent)" }}/>
@@ -1351,11 +2966,14 @@ export default function AdminOnboarding() {
                           </div>
                         </div>
                         <div style={{ padding:"14px 16px" }}>
-                          <div style={{ fontSize:12, color:C.muted, marginBottom:12 }}>Salon: <span style={{ color:C.gold, fontWeight:700 }}>{b.salon_id?.salon_name||"—"}</span></div>
+                          <div style={{ fontSize:12, color:C.muted, marginBottom:4 }}>Salon: <span style={{ color:C.gold, fontWeight:700 }}>{b.salon_id?.salon_name||"—"}</span></div>
+                          <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></div>
+                          <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>Password: <strong style={{ color:C.red }}>••••••••</strong></div>
+                          <div style={{ fontSize:11, color:C.muted, marginBottom:12 }}>Registered: <strong style={{ color:C.ink }}>{b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—"}</strong></div>
                           <div style={{ display:"flex", gap:6 }}>
                             {["available","break","offline"].map(s=>(
                               <button key={s} className="action-btn" disabled={b.status===s}
-                                onClick={()=>changeBarberStatus(b._id,s)}
+                                onClick={(e)=>{ e.stopPropagation(); changeBarberStatus(b._id,s); }}
                                 style={{ flex:1, padding:"6px 4px", fontSize:10, fontWeight:700, borderRadius:6, cursor:"pointer", border:`1px solid ${b.status===s?bStatus(s)+"50":C.border}`, background:b.status===s?`${bStatus(s)}20`:"#F7F5F2", color:b.status===s?bStatus(s):C.muted, fontFamily:"inherit", textAlign:"center", textTransform:"capitalize" }}>
                                 {s}
                               </button>
@@ -1368,6 +2986,346 @@ export default function AdminOnboarding() {
                 )}
               </div>
             )}
+
+            {/* ══ SUPPORT TICKETS ══ */}
+            {tab==="tickets" && (() => {
+              const typeFilter = window.location.pathname.includes("customer-issues") 
+                ? "Customer" 
+                : window.location.pathname.includes("salon-issues") 
+                ? "Salon" 
+                : undefined;
+              return (
+                <div className="fade-in">
+                  <TicketsPage {...ticketState} typeFilter={typeFilter} />
+                </div>
+              );
+            })()}
+
+            {/* ══ OWNER REQUESTS ══ */}
+            {tab==="ownerRequests" && (() => {
+               const filteredRequests = approvalRequests.filter(req => {
+                 const matchesFilter = ownerRequestFilter === "All" || req.status === ownerRequestFilter.toLowerCase();
+                 const query = ownerRequestSearch.toLowerCase();
+                 const matchesSearch = !query || 
+                   req.salon_name.toLowerCase().includes(query) ||
+                   req.owner_name.toLowerCase().includes(query) ||
+                   (req.request_type && req.request_type.toLowerCase().includes(query));
+                 return matchesFilter && matchesSearch;
+               });
+
+               return (
+                 <div className="fade-in" style={{ padding: "0 0 60px", display: "flex", flexDirection: "column", gap: 20 }}>
+                   {/* Top Header Card */}
+                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:`1px solid ${C.border}`, paddingBottom:16 }}>
+                     <div>
+                       <span style={{ fontSize:10, fontWeight:700, color:C.gold, textTransform:"uppercase", letterSpacing:"0.18em" }}>Salon Operations Console</span>
+                       <h2 style={{ fontSize:22, fontWeight:700, color:C.ink, margin:"4px 0 0 0", fontFamily:"Georgia, serif" }}>Owner Update Requests</h2>
+                     </div>
+                     
+                     <div style={{ display:"flex", alignItems:"center", gap:8, background:C.card, border:`1px solid ${C.border}`, padding:"8px 16px", borderRadius:10, boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
+                       <ShieldCheck size={16} color={C.gold} />
+                       <span style={{ fontSize:12, fontWeight:700, color:C.ink }}>{approvalRequests.filter(r => r.status === "pending").length} Pending Requests</span>
+                     </div>
+                   </div>
+
+                   {/* Filters and Search Row */}
+                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                     <div style={{ display:"flex", gap:8 }}>
+                       {["All", "Pending", "Approved", "Rejected"].map(filterVal => {
+                         const count = filterVal === "All" 
+                           ? approvalRequests.length 
+                           : approvalRequests.filter(r => r.status === filterVal.toLowerCase()).length;
+                         const isActive = ownerRequestFilter === filterVal;
+                         return (
+                           <button
+                             key={filterVal}
+                             onClick={() => setOwnerRequestFilter(filterVal)}
+                             style={{
+                               padding: "8px 16px",
+                               borderRadius: 20,
+                               fontSize: 12,
+                               fontWeight: 700,
+                               cursor: "pointer",
+                               border: `1px solid ${isActive ? C.gold : C.border}`,
+                               background: isActive ? C.gold : "#fff",
+                               color: isActive ? "#fff" : C.muted,
+                               transition: "all 0.2s"
+                             }}
+                           >
+                             {filterVal} ({count})
+                           </button>
+                         );
+                       })}
+                     </div>
+
+                     <div style={{ position:"relative", width:300 }}>
+                       <input
+                         type="text"
+                         placeholder="Search by salon, owner, type..."
+                         value={ownerRequestSearch}
+                         onChange={(e) => setOwnerRequestSearch(e.target.value)}
+                         style={{
+                           width: "100%",
+                           padding: "10px 16px",
+                           borderRadius: 12,
+                           border: `1px solid ${C.border}`,
+                           fontSize: 12,
+                           outline: "none",
+                           background: "#fff",
+                           color: C.ink
+                         }}
+                       />
+                     </div>
+                   </div>
+
+                   {/* Main requests stream list */}
+                   {filteredRequests.length === 0 ? (
+                     <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>
+                       No requests matching the selected filter query criteria.
+                     </div>
+                   ) : (
+                     <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                       <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                         <thead>
+                           <tr style={{ background: "#FAFAF8", borderBottom: `1px solid ${C.border}` }}>
+                             <th style={{ padding: "14px 20px", fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Salon & Owner</th>
+                             <th style={{ padding: "14px 20px", fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Request Type</th>
+                             <th style={{ padding: "14px 20px", fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Submitted Date</th>
+                             <th style={{ padding: "14px 20px", fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Status</th>
+                             <th style={{ padding: "14px 20px", fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "right" }}>Action</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           {filteredRequests.map(req => {
+                             let typeLabel = req.request_type ? req.request_type.replace("_", " ") : "address change";
+                             let statusColor = req.status === "approved" ? C.green : req.status === "rejected" ? C.red : C.orange;
+                             return (
+                               <tr key={req._id} style={{ borderBottom: `1px solid ${C.border}`, transition: "background 0.2s" }} className="table-row-hover">
+                                 <td style={{ padding: "16px 20px" }}>
+                                   <div style={{ fontWeight: 700, color: C.ink }}>{req.salon_name}</div>
+                                   <div style={{ fontSize: 11, color: C.muted }}>Owner: {req.owner_name}</div>
+                                 </td>
+                                 <td style={{ padding: "16px 20px", textTransform: "capitalize" }}>
+                                   <span style={{ fontSize: 11, fontWeight: 600, color: C.ink }}>{typeLabel}</span>
+                                 </td>
+                                 <td style={{ padding: "16px 20px", fontSize: 12, color: C.muted }}>
+                                   {formatDate(req.created_at)}
+                                 </td>
+                                 <td style={{ padding: "16px 20px" }}>
+                                   <Badge label={req.status} color={statusColor} />
+                                 </td>
+                                 <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                                   <button
+                                     onClick={() => {
+                                       setSelectedRequest(req);
+                                       setAdminNote(req.admin_note || "");
+                                     }}
+                                     style={{
+                                       padding: "6px 12px",
+                                       fontSize: 11,
+                                       fontWeight: 700,
+                                       borderRadius: 8,
+                                       cursor: "pointer",
+                                       border: `1px solid ${C.gold}`,
+                                       background: "transparent",
+                                       color: C.gold,
+                                       transition: "all 0.2s"
+                                     }}
+                                   >
+                                     Review Changes
+                                   </button>
+                                 </td>
+                               </tr>
+                             );
+                           })}
+                         </tbody>
+                       </table>
+                     </div>
+                   )}
+
+                   {/* Detail Review Modal popup */}
+                   {selectedRequest && (
+                     <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.4)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1000, backdropFilter:"blur(4px)" }}>
+                       <div className="scale-up" style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 640, overflow: "hidden", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)" }}>
+                         
+                         {/* Modal Header */}
+                         <div style={{ background: "linear-gradient(to right, #8B5A2B, #4A3E3D)", padding: "20px 24px", color: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                           <div>
+                             <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: 1.2, color: "rgba(255,255,255,0.7)", fontWeight: 700 }}>Review Update Request</span>
+                             <h3 style={{ fontSize: 18, fontWeight: 700, margin: "2px 0 0 0", fontFamily: "Georgia, serif" }}>{selectedRequest.salon_name}</h3>
+                           </div>
+                           <button onClick={() => setSelectedRequest(null)} style={{ border: "none", background: "none", color: "#fff", cursor: "pointer" }}>
+                             <X size={20} />
+                           </button>
+                         </div>
+
+                         {/* Modal Content */}
+                         <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 18, maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}>
+                           {/* Info grid */}
+                           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, background: C.bg, padding: 12, borderRadius: 10 }}>
+                             <div>
+                               <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, textTransform: "uppercase" }}>Salon Owner</div>
+                               <div style={{ fontSize: 12, color: C.ink, fontWeight: 600 }}>{selectedRequest.owner_name}</div>
+                             </div>
+                             <div>
+                               <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, textTransform: "uppercase" }}>Request Type</div>
+                               <div style={{ fontSize: 12, color: C.ink, fontWeight: 600, textTransform: "capitalize" }}>{selectedRequest.request_type ? selectedRequest.request_type.replace("_", " ") : "address change"}</div>
+                             </div>
+                           </div>
+
+                           {/* Proposed Changes Matrix */}
+                           <div>
+                             <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>Proposed Values & Comparison</div>
+                             
+                             {/* If general query request type */}
+                             {selectedRequest.request_type === "general_query" ? (
+                               <div style={{ background: "#FAFAF8", padding: 14, borderRadius: 8, border: `1px solid ${C.border}` }}>
+                                 <div style={{ fontSize: 10, color: C.muted, fontWeight: 700, marginBottom: 4, textTransform: "uppercase" }}>Query Message / Request Description</div>
+                                 <p style={{ fontSize: 12, color: C.ink, margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
+                                   {selectedRequest.proposed_changes?.query_text || (selectedRequest.proposed_changes instanceof Map ? selectedRequest.proposed_changes.get("query_text") : selectedRequest.proposed_changes?.query_text) || "No details provided"}
+                                 </p>
+                               </div>
+                             ) : (
+                               <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden" }}>
+                                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
+                                   <thead>
+                                     <tr style={{ background: "#FAFAF8", borderBottom: `1px solid ${C.border}` }}>
+                                       <th style={{ padding: "8px 12px", fontWeight: 700, color: C.muted }}>Field</th>
+                                       <th style={{ padding: "8px 12px", fontWeight: 700, color: C.muted }}>Current Value</th>
+                                       <th style={{ padding: "8px 12px", fontWeight: 700, color: C.muted }}>Proposed Value</th>
+                                     </tr>
+                                   </thead>
+                                   <tbody>
+                                     {Object.keys(selectedRequest.proposed_changes || {}).map(field => {
+                                       const currentVal = selectedRequest.current_values?.[field];
+                                       const proposedVal = selectedRequest.proposed_changes?.[field];
+                                       
+                                       const renderVal = (v) => {
+                                         if (typeof v === "object" && v !== null) return JSON.stringify(v);
+                                         return String(v ?? "—");
+                                       };
+
+                                       return (
+                                         <tr key={field} style={{ borderBottom: `1px solid ${C.border}` }}>
+                                           <td style={{ padding: "10px 12px", fontWeight: 700, textTransform: "capitalize" }}>{field.replace("_", " ")}</td>
+                                           <td style={{ padding: "10px 12px", color: C.muted }}>{renderVal(currentVal)}</td>
+                                           <td style={{ padding: "10px 12px", color: C.green, fontWeight: 700 }}>{renderVal(proposedVal)}</td>
+                                         </tr>
+                                       );
+                                     })}
+                                   </tbody>
+                                 </table>
+                               </div>
+                             )}
+                           </div>
+
+                           {/* Resolution Note Section */}
+                           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                             <label style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase" }}>Admin Action Feedback / Resolution Note</label>
+                             <textarea
+                               value={adminNote}
+                               onChange={(e) => setAdminNote(e.target.value)}
+                               placeholder="Add verification findings, approval note, or reason for rejection here..."
+                               disabled={selectedRequest.status !== "pending"}
+                               style={{
+                                 width: "100%",
+                                 height: 80,
+                                 borderRadius: 8,
+                                 border: `1px solid ${C.border}`,
+                                 padding: 10,
+                                 fontSize: 12,
+                                 outline: "none",
+                                 resize: "none",
+                                 background: selectedRequest.status !== "pending" ? "#FAF8F6" : "#fff",
+                                 color: C.ink
+                               }}
+                             />
+                           </div>
+
+                           {/* Resolution details if already resolved */}
+                           {selectedRequest.status !== "pending" && (
+                             <div style={{ background: selectedRequest.status === "approved" ? C.greenLight : C.redLight, border: `1px solid ${selectedRequest.status === "approved" ? C.green : C.red}30`, padding: 12, borderRadius: 10 }}>
+                               <div style={{ fontSize: 11, fontWeight: 700, color: selectedRequest.status === "approved" ? C.green : C.red, textTransform: "uppercase" }}>
+                                 Resolution details
+                               </div>
+                               <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
+                                 Decision: <strong style={{ textTransform: "capitalize", color: selectedRequest.status === "approved" ? C.green : C.red }}>{selectedRequest.status}</strong>
+                               </div>
+                               {selectedRequest.resolved_at && (
+                                 <div style={{ fontSize: 11, color: C.muted }}>
+                                   Resolved On: {new Date(selectedRequest.resolved_at).toLocaleString("en-IN")}
+                                 </div>
+                               )}
+                             </div>
+                           )}
+                         </div>
+
+                         {/* Modal Footer */}
+                         <div style={{ padding: "16px 24px", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "flex-end", gap: 10, background: "#FAFAF8" }}>
+                           <button
+                             onClick={() => setSelectedRequest(null)}
+                             style={{
+                               padding: "8px 16px",
+                               fontSize: 12,
+                               fontWeight: 700,
+                               borderRadius: 8,
+                               border: `1px solid ${C.border}`,
+                               background: "#fff",
+                               color: C.muted,
+                               cursor: "pointer"
+                             }}
+                           >
+                             Cancel
+                           </button>
+                           
+                           {selectedRequest.status === "pending" && (
+                             <>
+                               <button
+                                 onClick={() => {
+                                   handleApprovalRequest(selectedRequest._id, "rejected", adminNote);
+                                   setSelectedRequest(null);
+                                 }}
+                                 style={{
+                                   padding: "8px 16px",
+                                   fontSize: 12,
+                                   fontWeight: 700,
+                                   borderRadius: 8,
+                                   border: "none",
+                                   background: C.red,
+                                   color: "#fff",
+                                   cursor: "pointer"
+                                 }}
+                               >
+                                 Reject Request
+                               </button>
+                               <button
+                                 onClick={() => {
+                                   handleApprovalRequest(selectedRequest._id, "approved", adminNote);
+                                   setSelectedRequest(null);
+                                 }}
+                                 style={{
+                                   padding: "8px 16px",
+                                   fontSize: 12,
+                                   fontWeight: 700,
+                                   borderRadius: 8,
+                                   border: "none",
+                                   background: C.green,
+                                   color: "#fff",
+                                   cursor: "pointer"
+                                 }}
+                               >
+                                 Approve & Apply
+                               </button>
+                             </>
+                           )}
+                         </div>
+
+                       </div>
+                     </div>
+                   )}
+                 </div>
+               );
+            })()}
 
             {/* ══ SETTINGS ══ */}
             {tab==="settings" && (
@@ -1425,6 +3383,7 @@ export default function AdminOnboarding() {
           </div>
         </div>
       )}
+
 
       {/* ══ VIEW DETAILS MODAL ══ */}
       {viewingSalon && (
@@ -1509,6 +3468,756 @@ export default function AdminOnboarding() {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ BARBER DETAILS MODAL ══ */}
+      {selectedBarber && (
+        <div 
+          style={{ 
+            position: "fixed", inset: 0, zIndex: 1000, 
+            display: "flex", alignItems: "center", justifyContext: "center", 
+            justifyContent: "center",
+            padding: 16, background: "rgba(28, 25, 23, 0.6)", backdropFilter: "blur(4px)" 
+          }}
+          onClick={() => { setSelectedBarber(null); setViewingDocument(false); }}
+        >
+          <div 
+            style={{ 
+              background: C.card, 
+              border: `1px solid ${C.border}`, 
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", 
+              position: "relative", 
+              display: "flex", 
+              flexDirection: "column", 
+              overflow: "hidden", 
+              transition: "all 0.3s ease",
+              width: "100%",
+              maxWidth: isMaximized ? 1024 : 512,
+              height: isMaximized ? "90vh" : "auto",
+              maxHeight: isMaximized ? "90vh" : "85vh",
+              borderRadius: 24,
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header / Banner */}
+            <div 
+              style={{ 
+                height: 96, 
+                background: "linear-gradient(to right, #8B5A2B, #4A3E3D)", 
+                position: "relative", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "flex-end", 
+                padding: "0 24px", 
+                flexShrink: 0 
+              }}
+            >
+              {/* Window Controls (Maximize, Close) */}
+              <div 
+                style={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: 10, 
+                  position: "absolute", 
+                  top: 16, 
+                  right: 16, 
+                  background: "rgba(0, 0, 0, 0.25)", 
+                  backdropFilter: "blur(4px)", 
+                  padding: "6px 12px", 
+                  borderRadius: 99, 
+                  zIndex: 10, 
+                  userSelect: "none" 
+                }}
+              >
+                {/* Maximize/Restore Toggle Button */}
+                <button 
+                  onClick={() => setIsMaximized(!isMaximized)}
+                  style={{ 
+                    background: "none", border: "none", color: "rgba(255, 255, 255, 0.8)", 
+                    cursor: "pointer", padding: 4, display: "flex", alignItems: "center" 
+                  }}
+                  title={isMaximized ? "Restore Size" : "Maximize Details"}
+                >
+                  {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                </button>
+                <span style={{ width: 1, height: 12, background: "rgba(255, 255, 255, 0.2)" }}></span>
+                {/* Close Button */}
+                <button 
+                  onClick={() => { setSelectedBarber(null); setViewingDocument(false); }}
+                  style={{ 
+                    background: "none", border: "none", color: "rgba(255, 255, 255, 0.8)", 
+                    cursor: "pointer", padding: 4, display: "flex", alignItems: "center" 
+                  }}
+                  title="Close Details"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body (Scrollable) */}
+            <div 
+              style={{ 
+                padding: "16px 24px 32px", 
+                overflowY: "auto", 
+                flex: 1, 
+                scrollbarWidth: "thin" 
+              }}
+            >
+              {/* Profile Header Row */}
+              <div 
+                style={{ 
+                  display: "flex", 
+                  flexDirection: isMaximized ? "row" : "column", 
+                  alignItems: isMaximized ? "flex-start" : "center", 
+                  gap: 24, 
+                  marginTop: 16, 
+                  marginBottom: 32 
+                }}
+              >
+                {/* Passport size photo */}
+                <div style={{ flexShrink: 0, zIndex: 10 }}>
+                  <div 
+                    style={{ 
+                      width: 128, 
+                      height: 176, 
+                      borderRadius: 16, 
+                      border: "4px solid #fff", 
+                      background: "linear-gradient(to bottom right, #8B5A2B, #4A3E3D)", 
+                      color: "#fff", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "center", 
+                      fontFamily: "Georgia, serif", 
+                      fontSize: 32, 
+                      fontWeight: "bold", 
+                      overflow: "hidden", 
+                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" 
+                    }}
+                  >
+                    {selectedBarber.photo ? (
+                      <img src={selectedBarber.photo} alt={selectedBarber.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      selectedBarber.name?.[0]?.toUpperCase() || "?"
+                    )}
+                  </div>
+                </div>
+
+                {/* Header Information */}
+                <div 
+                  style={{ 
+                    flex: 1, 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    justifyContent: "space-between", 
+                    alignSelf: "stretch", 
+                    padding: "4px 0", 
+                    width: "100%",
+                    textAlign: isMaximized ? "left" : "center"
+                  }}
+                >
+                  <div>
+                    <div 
+                      style={{ 
+                        display: "flex", 
+                        flexDirection: isMaximized ? "row" : "column", 
+                        alignItems: isMaximized ? "center" : "center", 
+                        justifyContent: "space-between", 
+                        gap: 12 
+                      }}
+                    >
+                      <div>
+                        <h3 style={{ fontSize: 28, fontWeight: 900, fontFamily: "Georgia, serif", color: C.ink, margin: 0 }}>
+                          {selectedBarber.name}
+                        </h3>
+                        <p style={{ fontSize: 12, color: C.gold, fontWeight: 900, margin: "6px 0 0", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                          {selectedBarber.specialization || "General Stylist"}
+                        </p>
+                      </div>
+                      <div 
+                        style={{ 
+                          display: "flex", 
+                          flexDirection: "column", 
+                          alignItems: isMaximized ? "flex-end" : "center", 
+                          gap: 6, 
+                          flexShrink: 0 
+                        }}
+                      >
+                        {(() => {
+                          const statusMeta = getStatusBadge(selectedBarber.status);
+                          return (
+                            <span 
+                              style={{ 
+                                padding: "4px 12px", 
+                                borderRadius: 8, 
+                                border: `1px solid ${statusMeta.border}`, 
+                                background: statusMeta.bg, 
+                                color: statusMeta.color, 
+                                fontSize: 10, 
+                                fontWeight: 900, 
+                                textTransform: "uppercase", 
+                                letterSpacing: "0.05em" 
+                              }}
+                            >
+                              {statusMeta.label}
+                            </span>
+                          );
+                        })()}
+                        <span style={{ fontSize: 10, color: C.muted, fontWeight: 600 }}>
+                          Joined: {new Date(selectedBarber.created_at || selectedBarber.createdAt || Date.now()).toLocaleDateString("en-IN")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Highlights Bar */}
+                  <div 
+                    style={{ 
+                      display: "grid", 
+                      gridTemplateColumns: "repeat(3, 1fr)", 
+                      gap: 12, 
+                      marginTop: 24, 
+                      borderTop: `1px solid ${C.border}`, 
+                      borderBottom: `1px solid ${C.border}`, 
+                      padding: "14px 0", 
+                      color: C.muted, 
+                      fontSize: 12, 
+                      fontWeight: "bold", 
+                      backgroundColor: "#FAFAF8", 
+                      borderRadius: 12, 
+                      border: `1px solid ${C.border}` 
+                    }}
+                  >
+                    <div style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: 9, color: C.muted, display: "block", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Rating</span>
+                      <span style={{ color: C.ink, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                        <Star size={12} fill="#F59E0B" color="#F59E0B" />
+                        {(selectedBarber.rating || 0).toFixed(1)}
+                      </span>
+                    </div>
+                    <div style={{ textAlign: "center", borderLeft: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}` }}>
+                      <span style={{ fontSize: 9, color: C.muted, display: "block", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Experience</span>
+                      <span style={{ color: C.ink, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                        <Award size={12} color={C.gold} />
+                        {selectedBarber.experience || 0} Years
+                      </span>
+                    </div>
+                    <div style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: 9, color: C.muted, display: "block", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>Phone</span>
+                      <span style={{ color: C.ink, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                        <Phone size={12} color={C.gold} />
+                        +91 {selectedBarber.mobile}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Three Column Layout when Maximized */}
+              <div 
+                style={{ 
+                  display: "grid", 
+                  gridTemplateColumns: isMaximized ? "1fr 1fr 1fr" : "1fr", 
+                  gap: 24 
+                }}
+              >
+                {/* Column 1: Personal Details */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div style={{ padding: 16, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}` }}>
+                    <h4 style={{ fontSize: 12, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                      Personal Profile
+                    </h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, fontSize: 12, fontWeight: 600, color: C.muted }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Mobile Number</span>
+                        <span style={{ color: C.ink, display: "flex", alignItems: "center", gap: 6 }}>
+                          <Phone size={12} color={C.gold} />
+                          +91 {selectedBarber.mobile}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Email Address</span>
+                        <span style={{ color: C.ink, textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap", maxWidth: 180 }} title={selectedBarber.email}>
+                          {selectedBarber.email || "Not Provided"}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Experience</span>
+                        <span style={{ color: C.ink, display: "flex", alignItems: "center", gap: 6 }}>
+                          <Award size={12} color={C.gold} />
+                          {selectedBarber.experience || 0} Years
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Rating</span>
+                        <span style={{ color: C.ink, display: "flex", alignItems: "center", gap: 6 }}>
+                          <Star size={12} fill="#F59E0B" color="#F59E0B" />
+                          {(selectedBarber.rating || 0).toFixed(1)} / 5.0 Rating
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2: Verification Details */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div style={{ padding: 16, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}` }}>
+                    <h4 style={{ fontSize: 12, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                      Verification & ID
+                    </h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, fontSize: 12, fontWeight: 600, color: C.muted }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Aadhaar Number</span>
+                        <span style={{ color: C.ink, display: "flex", alignItems: "center", gap: 6 }}>
+                          <ShieldCheck size={12} color={C.gold} />
+                          {selectedBarber.aadhaar || "Not Provided"}
+                        </span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>PAN Card Number</span>
+                        <span style={{ color: C.ink, textTransform: "uppercase" }}>
+                          {selectedBarber.pan || "Not Provided"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 3: Login Credentials */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div style={{ padding: 16, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}` }}>
+                    <h4 style={{ fontSize: 12, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                      Login Credentials
+                    </h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12, fontSize: 12, fontWeight: 600, color: C.muted }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Mobile (Login ID)</span>
+                        <strong style={{ color: C.ink }}>{selectedBarber.mobile}</strong>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Password</span>
+                        <strong style={{ color: C.red }}>••••••••</strong>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Assigned Salon</span>
+                        <strong style={{ color: C.gold }}>{selectedBarber.salon_id?.salon_name || "—"}</strong>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span>Registration Date</span>
+                        <strong style={{ color: C.ink }}>
+                          {selectedBarber.created_at ? new Date(selectedBarber.created_at).toLocaleDateString("en-IN") : "—"}
+                        </strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Uploaded Documents ID Section */}
+              {selectedBarber.document ? (
+                <div style={{ marginTop: 24, padding: 16, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}` }}>
+                  <h4 style={{ fontSize: 12, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                    Attached Document ID
+                  </h4>
+                  <div style={{ display: "flex", flexDirection: isMaximized ? "row" : "column", alignItems: isMaximized ? "center" : "stretch", justifyContent: "space-between", gap: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: "#ECFDF5", border: "1px solid #D1FAE5", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                        📄
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontSize: 12, fontWeight: "bold", color: C.ink, margin: 0, textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                          {selectedBarber.documentName || "Identity Document"}
+                        </p>
+                        <p style={{ fontSize: 10, color: C.muted, margin: "2px 0 0" }}>Identity verification file</p>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                      <button 
+                        onClick={() => setViewingDocument(true)}
+                        style={{ 
+                          display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 12, 
+                          backgroundColor: "#fff", border: `1px solid ${C.border}`, fontSize: 10, fontWeight: 900, 
+                          textTransform: "uppercase", color: C.ink, cursor: "pointer", transition: "all 0.2s" 
+                        }}
+                      >
+                        <Eye size={12} color={C.gold} />
+                        View
+                      </button>
+                      <a 
+                        href={selectedBarber.document} 
+                        download={selectedBarber.documentName || "document"} 
+                        style={{ 
+                          display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: 12, 
+                          backgroundColor: C.gold, fontSize: 10, fontWeight: 900, textTransform: "uppercase", 
+                          color: "#fff", textDecoration: "none", cursor: "pointer", transition: "all 0.2s" 
+                        }}
+                      >
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                  {/* Document preview if it's an image */}
+                  {(selectedBarber.document.startsWith("data:image/") || selectedBarber.documentName?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
+                    <div 
+                      onClick={() => setViewingDocument(true)}
+                      style={{ 
+                        marginTop: 16, borderRadius: 12, overflow: "hidden", border: `1px solid ${C.border}`, 
+                        maxHeight: 224, display: "flex", alignItems: "center", justifyContent: "center", 
+                        backgroundColor: "#fff", cursor: "pointer", transition: "opacity 0.2s" 
+                      }}
+                    >
+                      <img src={selectedBarber.document} alt="Document Preview" style={{ maxHeight: 224, width: "100%", objectFit: "contain" }} />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ marginTop: 24, padding: 24, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px dashed ${C.border}`, textAlign: "center", fontSize: 12, color: C.muted, fontWeight: 600 }}>
+                  No identity documents uploaded.
+                </div>
+              )}
+
+              {/* Footer actions */}
+              <div style={{ marginTop: 32, paddingTop: 16, borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "flex-end" }}>
+                <button 
+                  onClick={() => { setSelectedBarber(null); setViewingDocument(false); }}
+                  style={{ 
+                    padding: "10px 20px", borderRadius: 12, backgroundColor: "#F3F4F6", border: `1px solid ${C.border}`, 
+                    color: C.muted, fontWeight: "bold", fontSize: 12, textTransform: "uppercase", cursor: "pointer", 
+                    transition: "all 0.2s" 
+                  }}
+                >
+                  Close Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Document Viewer Modal */}
+      {selectedBarber && viewingDocument && selectedBarber.document && (
+        <div 
+          style={{ 
+            zIndex: 2000, position: "fixed", inset: 0, 
+            background: "rgba(0, 0, 0, 0.85)", backdropFilter: "blur(8px)", 
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 16 
+          }}
+          onClick={() => setViewingDocument(false)}
+        >
+          <div 
+            style={{ 
+              position: "absolute", top: 16, right: 16, display: "flex", alignItems: "center", gap: 12 
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <a 
+              href={selectedBarber.document} 
+              download={selectedBarber.documentName || "document"} 
+              style={{ 
+                backgroundColor: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "#fff", padding: "8px 16px", borderRadius: 12, fontSize: 12, fontWeight: "bold", 
+                textTransform: "uppercase", textDecoration: "none", cursor: "pointer", transition: "background 0.2s" 
+              }}
+            >
+              Download Original
+            </a>
+            <button 
+              onClick={() => setViewingDocument(false)}
+              style={{ 
+                backgroundColor: "rgba(255, 255, 255, 0.1)", border: "none", color: "#fff", 
+                borderRadius: "50%", width: 40, height: 40, display: "flex", alignItems: "center", 
+                justifyContent: "center", fontSize: 18, fontWeight: "bold", cursor: "pointer", transition: "background 0.2s" 
+              }}
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div 
+            style={{ 
+              maxWidth: 1024, width: "100%", maxHeight: "80vh", display: "flex", alignItems: "center", 
+              justifyContent: "center", padding: 8, borderRadius: 16, backgroundColor: "rgba(255, 255, 255, 0.05)", 
+              border: "1px solid rgba(255, 255, 255, 0.1)", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" 
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {selectedBarber.document.startsWith("data:image/") || selectedBarber.documentName?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+              <img 
+                src={selectedBarber.document} 
+                alt={selectedBarber.documentName || "Document Proof"} 
+                style={{ maxWidth: "100%", maxHeight: "75vh", objectFit: "contain", borderRadius: 8 }}
+              />
+            ) : selectedBarber.document.startsWith("data:application/pdf") || selectedBarber.documentName?.match(/\.pdf$/i) ? (
+              <object 
+                data={selectedBarber.document} 
+                type="application/pdf" 
+                style={{ width: "100%", height: "75vh", borderRadius: 8 }}
+              >
+                <div style={{ padding: 32, textAlign: "center", color: "#fff", fontSize: 14 }}>
+                  <p style={{ marginBottom: 16 }}>PDF Preview is not supported by your browser directly from Base64 Data URL.</p>
+                  <a 
+                    href={selectedBarber.document} 
+                    download={selectedBarber.documentName || "document.pdf"}
+                    style={{ 
+                      display: "inline-block", padding: "12px 20px", borderRadius: 12, fontSize: 12, 
+                      fontWeight: "bold", textTransform: "uppercase", color: "#000", backgroundColor: "#fff", 
+                      textDecoration: "none" 
+                    }}
+                  >
+                    Download and View PDF
+                  </a>
+                </div>
+              </object>
+            ) : (
+              <div style={{ padding: 48, textAlign: "center", color: "#fff" }}>
+                <FileText size={48} style={{ margin: "0 auto 16px", color: "rgba(255, 255, 255, 0.5)" }} />
+                <h4 style={{ fontSize: 16, fontWeight: "bold", margin: "0 0 4px" }}>{selectedBarber.documentName || "Identity Document"}</h4>
+                <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.4)", marginBottom: 24 }}>Preview unavailable for this file format.</p>
+                <a 
+                  href={selectedBarber.document} 
+                  download={selectedBarber.documentName || "document"}
+                  style={{ 
+                    display: "inline-block", padding: "12px 20px", borderRadius: 12, fontSize: 12, 
+                    fontWeight: "bold", textTransform: "uppercase", color: "#000", backgroundColor: "#fff", 
+                    textDecoration: "none" 
+                  }}
+                >
+                  Download Document
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ══ SALON PERFORMANCE ANALYTICS MODAL ══ */}
+      {selectedPerformanceSalon && (
+        <div 
+          style={{ 
+            position: "fixed", inset: 0, zIndex: 1000, 
+            display: "flex", alignItems: "center", justifyContent: "center", 
+            padding: 16, background: "rgba(28, 25, 23, 0.6)", backdropFilter: "blur(4px)" 
+          }}
+          onClick={() => setSelectedPerformanceSalon(null)}
+        >
+          <div 
+            style={{ 
+              background: C.card, 
+              border: `1px solid ${C.border}`, 
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", 
+              position: "relative", 
+              display: "flex", 
+              flexDirection: "column", 
+              overflow: "hidden", 
+              width: "100%",
+              maxWidth: 768,
+              height: "85vh",
+              borderRadius: 24,
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div 
+              style={{ 
+                padding: "20px 24px", 
+                borderBottom: `1px solid ${C.border}`, 
+                display: "flex", 
+                justifyContent: "space-between", 
+                alignItems: "center",
+                flexShrink: 0
+              }}
+            >
+              <div>
+                <h3 style={{ fontSize: 20, fontWeight: 700, fontFamily: "Georgia, serif", color: C.ink, margin: 0 }}>
+                  Performance Analysis: {selectedPerformanceSalon.salon.salon_name}
+                </h3>
+                <p style={{ fontSize: 12, color: C.muted, margin: "4px 0 0" }}>
+                  Detailed analysis of why this studio is in {selectedPerformanceSalon.netProfit >= 0 ? "Profit" : "Loss"}
+                </p>
+              </div>
+              <button 
+                onClick={() => setSelectedPerformanceSalon(null)} 
+                style={{ background: "none", border: "none", cursor: "pointer", color: C.muted }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body (Scrollable) */}
+            <div style={{ padding: 24, overflowY: "auto", flex: 1, scrollbarWidth: "thin" }}>
+              
+              {/* Row 1: Financial & Booking Status Overview */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+                {/* Financial Summary */}
+                <div style={{ padding: 16, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}` }}>
+                  <h4 style={{ fontSize: 12, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                    Financial Summary
+                  </h4>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 12, fontWeight: 650 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: C.muted }}>Total Income:</span>
+                      <span style={{ color: C.green }}>₹{selectedPerformanceSalon.income.toLocaleString("en-IN")}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: C.muted }}>Total Loss/Refunds:</span>
+                      <span style={{ color: C.red }}>₹{selectedPerformanceSalon.loss.toLocaleString("en-IN")}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px dashed ${C.border}`, paddingTop: 8, fontSize: 13, fontWeight: 700 }}>
+                      <span style={{ color: C.ink }}>Net Financial Status:</span>
+                      <span style={{ color: selectedPerformanceSalon.netProfit >= 0 ? C.green : C.red }}>
+                        ₹{selectedPerformanceSalon.netProfit.toLocaleString("en-IN")} ({selectedPerformanceSalon.netProfit >= 0 ? "Profit" : "Loss"})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Booking Efficiency */}
+                <div style={{ padding: 16, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}` }}>
+                  <h4 style={{ fontSize: 12, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                    Booking Efficiency
+                  </h4>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 12, fontWeight: 650 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: C.muted }}>Total Appointments:</span>
+                      <span style={{ color: C.ink }}>{selectedPerformanceSalon.bookingsCount} bookings</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: C.muted }}>Completed:</span>
+                      <span style={{ color: C.green }}>{selectedPerformanceSalon.completedCount} ({selectedPerformanceSalon.bookingsCount > 0 ? Math.round((selectedPerformanceSalon.completedCount/selectedPerformanceSalon.bookingsCount)*100) : 0}%)</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: C.muted }}>Cancelled / Loss Rate:</span>
+                      <span style={{ color: C.red }}>{selectedPerformanceSalon.cancelledCount} ({selectedPerformanceSalon.bookingsCount > 0 ? Math.round((selectedPerformanceSalon.cancelledCount/selectedPerformanceSalon.bookingsCount)*100) : 0}%)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Customer Quality Metrics */}
+              <div style={{ padding: 16, borderRadius: 16, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}`, marginBottom: 24 }}>
+                <h4 style={{ fontSize: 12, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 16px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                  Customer Quality Metrics (Platform Feedback)
+                </h4>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+                  <div style={{ textAlign: "center", borderRight: `1px solid ${C.border}` }}>
+                    <span style={{ fontSize: 10, color: C.muted, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Booking Process</span>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>
+                      {selectedPerformanceSalon.avgBookingProcess.toFixed(1)} / 5.0
+                    </div>
+                    <div style={{ fontSize: 12, color: C.gold, marginTop: 4 }}>
+                      {"★".repeat(Math.round(selectedPerformanceSalon.avgBookingProcess)) + "☆".repeat(5 - Math.round(selectedPerformanceSalon.avgBookingProcess))}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "center", borderRight: `1px solid ${C.border}` }}>
+                    <span style={{ fontSize: 10, color: C.muted, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Payment Flow</span>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>
+                      {selectedPerformanceSalon.avgPaymentProcess.toFixed(1)} / 5.0
+                    </div>
+                    <div style={{ fontSize: 12, color: C.gold, marginTop: 4 }}>
+                      {"★".repeat(Math.round(selectedPerformanceSalon.avgPaymentProcess)) + "☆".repeat(5 - Math.round(selectedPerformanceSalon.avgPaymentProcess))}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <span style={{ fontSize: 10, color: C.muted, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Website Usability</span>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>
+                      {selectedPerformanceSalon.avgWebsiteUsability.toFixed(1)} / 5.0
+                    </div>
+                    <div style={{ fontSize: 12, color: C.gold, marginTop: 4 }}>
+                      {"★".repeat(Math.round(selectedPerformanceSalon.avgWebsiteUsability)) + "☆".repeat(5 - Math.round(selectedPerformanceSalon.avgWebsiteUsability))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Reviews & Comments */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20 }}>
+                {/* Customer Reviews & Feedback comments */}
+                <div>
+                  <h4 style={{ fontSize: 13, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                    Written Customer Reviews & Complaints
+                  </h4>
+                  {selectedPerformanceSalon.reviews.length === 0 ? (
+                    <div style={{ padding: 24, textAlign: "center", color: C.muted, fontSize: 12, border: `1px dashed ${C.border}`, borderRadius: 12 }}>
+                      No written reviews left for this studio yet.
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {selectedPerformanceSalon.reviews.map((r) => (
+                        <div key={r._id} style={{ padding: 12, borderRadius: 12, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}`, fontSize: 12 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                            <strong style={{ color: C.ink }}>{r.customer_id?.name || "Customer"}</strong>
+                            <div style={{ color: C.gold }}>
+                              {"★".repeat(r.rating || r.salon_rating || 5)}{"☆".repeat(5 - (r.rating || r.salon_rating || 5))}
+                            </div>
+                          </div>
+                          <p style={{ margin: 0, color: C.muted, lineHeight: 1.5 }}>
+                            {r.review_text || "No written review comments provided"}
+                          </p>
+                          <div style={{ fontSize: 9, color: C.muted, marginTop: 6, textAlign: "right" }}>
+                            {r.created_at ? new Date(r.created_at).toLocaleDateString("en-IN") : "—"}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Booking App Feedback comments */}
+                <div>
+                  <h4 style={{ fontSize: 13, fontWeight: "bold", color: "#8B5A2B", textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 12px", paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+                    System Feedback & Suggestions
+                  </h4>
+                  {selectedPerformanceSalon.feedbacks.length === 0 ? (
+                    <div style={{ padding: 24, textAlign: "center", color: C.muted, fontSize: 12, border: `1px dashed ${C.border}`, borderRadius: 12 }}>
+                      No platform suggestions or website comments left for this studio yet.
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {selectedPerformanceSalon.feedbacks.map((fb) => (
+                        <div key={fb._id} style={{ padding: 12, borderRadius: 12, backgroundColor: "#FAFAF8", border: `1px solid ${C.border}`, fontSize: 12 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                            <strong style={{ color: C.ink }}>{fb.customer_id?.name || "Customer"}</strong>
+                            <span style={{ fontSize: 10, color: C.muted }}>{fb.customer_id?.mobile}</span>
+                          </div>
+                          <p style={{ margin: 0, color: C.muted, lineHeight: 1.5 }}>
+                            {fb.feedback_text || "No text suggestion comments provided"}
+                          </p>
+                          <div style={{ fontSize: 9, color: C.muted, marginTop: 6, textAlign: "right" }}>
+                            {fb.created_at ? new Date(fb.created_at).toLocaleDateString("en-IN") : "—"}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Footer */}
+            <div 
+              style={{ 
+                padding: 16, 
+                borderTop: `1px solid ${C.border}`, 
+                display: "flex", 
+                justifyContent: "flex-end",
+                flexShrink: 0
+              }}
+            >
+              <button 
+                onClick={() => setSelectedPerformanceSalon(null)}
+                style={{ 
+                  padding: "10px 20px", borderRadius: 12, backgroundColor: "#F3F4F6", border: `1px solid ${C.border}`, 
+                  color: C.muted, fontWeight: "bold", fontSize: 12, textTransform: "uppercase", cursor: "pointer", 
+                  transition: "all 0.2s" 
+                }}
+              >
+                Close Analysis
+              </button>
+            </div>
+
           </div>
         </div>
       )}

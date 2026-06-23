@@ -16,7 +16,7 @@ const MOCK_FAQS = [
   { q: "How does the Smart Queue timeline estimation work?", a: "Our system calculates live check-in volumes dynamically by multiplying your queue position index with the baseline haircut service runtime averages (~20-30 minutes per appointment)." },
 ];
 
-export default function ContactSupport() {
+export default function ContactSupport({ onCreateTicket }) {
   const navigate = useNavigate();
   
   /* ── State Management ── */
@@ -43,6 +43,14 @@ export default function ContactSupport() {
     // Simulate backend payload synchronization stream
     try {
       await new Promise((resolve) => setTimeout(resolve, 1400));
+      if (onCreateTicket) {
+        onCreateTicket({
+          title: subject,
+          description: message,
+          email: email,
+          category: category,
+        });
+      }
       setSubmitted(true);
     } catch {
       setError("Failed to sync message ticket to the support matrix.");

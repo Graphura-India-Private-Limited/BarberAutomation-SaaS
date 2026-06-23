@@ -15,6 +15,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [approvalRequests, setApprovalRequests] = useState([]);
 
   // Salon Profile Editing States
   const [editing, setEditing] = useState(false);
@@ -25,6 +26,7 @@ export default function SettingsPage() {
     owner_name: "",
     email: "",
     address: "",
+    state: "Maharashtra",
     latitude: 0,
     longitude: 0,
     opening_time: "09:00",
@@ -53,6 +55,7 @@ export default function SettingsPage() {
       owner_name: nextSalon?.owner_name || "",
       email: nextSalon?.email || "",
       address: nextSalon?.address || "",
+      state: nextSalon?.state || "Maharashtra",
       latitude: nextSalon?.latitude || 0,
       longitude: nextSalon?.longitude || 0,
       opening_time: nextSalon?.opening_time || "09:00",
@@ -85,12 +88,12 @@ export default function SettingsPage() {
       }
       
       if (salonId) {
-        const bs = await fetch(`${API}/barber/salon/${salonId}`, {
-          headers: headers()
-        }).then(r => r.json());
-        if (bs.success) {
-          setBarbers(bs.barbers || []);
-        }
+        const [bs, reqs] = await Promise.all([
+          fetch(`${API}/barber/salon/${salonId}`, { headers: headers() }).then(r => r.json()),
+          fetch(`${API}/owner/salon/${salonId}/approval-requests`, { headers: headers() }).then(r => r.json())
+        ]);
+        if (bs.success) setBarbers(bs.barbers || []);
+        if (reqs.success) setApprovalRequests(reqs.requests || []);
       }
     } catch (err) {
       setError("Failed to load settings data");
@@ -223,15 +226,24 @@ export default function SettingsPage() {
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Update failed");
-      const statusChangedToPending = data.salon?.status === "pending" && salon?.status === "approved";
       syncSalon(data.salon);
       setEditing(false);
-      if (statusChangedToPending) {
-        setMessage("Address changed! Reset to pending verification for admin approval.");
+      
+      if (salonId) {
+        const reqs = await fetch(`${API}/owner/salon/${salonId}/approval-requests`, {
+          headers: headers()
+        }).then(r => r.json());
+        if (reqs.success) {
+          setApprovalRequests(reqs.requests || []);
+        }
+      }
+
+      if (data.message && data.message.includes("admin")) {
+        setMessage(data.message);
       } else {
         setMessage(resubmit ? "Profile resubmitted for approval." : "Profile details saved successfully.");
       }
-      setTimeout(() => setMessage(""), 5000);
+      setTimeout(() => setMessage(""), 6000);
     } catch (err) {
       setError(err.message || "Update failed");
     } finally {
@@ -417,6 +429,69 @@ export default function SettingsPage() {
           )}
         </div>
 
+        {/* Change Approval Requests History */}
+        {role === "owner" && approvalRequests.length > 0 && (
+          <div className="card p-6 mb-6 bg-white text-left">
+            <h3 className="text-lg font-bold font-serif text-zinc-900 flex items-center gap-2 border-b pb-4 border-stone-100 mb-4">
+              📝 Change Approval Requests History
+            </h3>
+            <p className="text-xs text-stone-500 font-sans mt-0.5 mb-4">
+              Track requests submitted to the admin for studio updates (e.g. address or state updates).
+            </p>
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+              {approvalRequests.map((req) => {
+                const changes = Object.entries(req.proposed_changes || {});
+                return (
+                  <div key={req._id} className="border border-stone-100 rounded-xl p-4 bg-stone-50/50 hover:bg-stone-50 transition-colors">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-zinc-100 text-zinc-600">
+                        {req.request_type ? req.request_type.replace("_", " ") : "address change"}
+                      </span>
+                      <span className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        req.status === "approved"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : req.status === "rejected"
+                          ? "bg-rose-100 text-rose-800"
+                          : "bg-amber-100 text-amber-800 animate-pulse"
+                      }`}>
+                        {req.status}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-xs font-sans">
+                      {changes.map(([key, val]) => (
+                        <div key={key} className="grid grid-cols-[100px_1fr] gap-2">
+                          <span className="text-stone-400 capitalize">{key}:</span>
+                          <span className="text-stone-700 font-medium break-all">
+                            {req.current_values?.[key] && (
+                              <span className="line-through text-stone-400 mr-2">{req.current_values[key]}</span>
+                            )}
+                            {val}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-3 flex justify-between items-center text-[10px] text-stone-400 font-sans border-t pt-2 border-stone-100/50">
+                      <span>Submitted: {new Date(req.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                      {req.resolved_at && (
+                        <span>Resolved: {new Date(req.resolved_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                      )}
+                    </div>
+
+                    {req.admin_note && (
+                      <div className="mt-2.5 bg-white border border-stone-200 rounded-lg p-2.5 text-xs text-stone-600">
+                        <strong className="text-stone-800 font-bold block mb-0.5">Admin Note:</strong>
+                        {req.admin_note}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Compensation & Commission Model Card */}
         <div className="card p-6 mb-6 bg-white">
           <h3 className="text-lg font-bold font-serif text-zinc-900 mb-1 flex items-center gap-2">
@@ -601,6 +676,22 @@ function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, bu
         </div>
       </div>
       
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div>
+          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Branch State</label>
+          <select className={inputClass} value={form.state} onChange={e => setField("state", e.target.value)}>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Madhya Pradesh">Madhya Pradesh</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+          </select>
+        </div>
+      </div>
+
       <div className="mt-4">
         <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Physical Address</label>
         <textarea className={`${inputClass} min-h-16 resize-none`} value={form.address} onChange={e => setField("address", e.target.value)} onBlur={handleAddressBlur} placeholder="Physical Destination Address" />

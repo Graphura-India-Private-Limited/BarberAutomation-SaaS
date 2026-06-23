@@ -52,7 +52,6 @@ import { ReportsPage } from "./pages/admin/ReportsPage";
 import { AdminSettings } from "./pages/admin/AdminSettings";
 import { useTickets } from "./utils/useTickets";
 import { TICKET_TYPE } from "./utils/tickets";
-import AdminRequests from "./pages/admin/AdminRequests";
 import ServiceCategories from "./pages/customer/ServiceCategories";
 import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
@@ -223,7 +222,6 @@ function App() {
         {/* --- SUPER ADMIN CENTRAL PANEL (RESTRICTED BY RBAC) --- */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><AdminActivityTracker /></ProtectedRoute>}>
-          <Route path="requests" element={<AdminOnboarding />} />
           <Route path="customers" element={<AdminOnboarding />} />
           <Route path="salon-management" element={<AdminOnboarding />} />
           <Route path="appointments" element={<AdminOnboarding />} />
@@ -237,11 +235,12 @@ function App() {
           <Route path="user-management" element={<AdminLayout page="users"><AdminUserManagement /></AdminLayout>} />
           <Route path="analytics" element={<AdminLayout page="analytics"><AdminAnalytics /></AdminLayout>} />
           <Route path="dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
-          <Route path="tickets" element={<AdminLayout page="tickets"><TicketsPage {...ticketState} /></AdminLayout>} />
+          <Route path="tickets" element={<AdminOnboarding />} />
           <Route path="reports" element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />
           <Route path="settings" element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
-          <Route path="customer-issues" element={<AdminLayout page="customer"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.CUSTOMER} /></AdminLayout>} />
-          <Route path="salon-issues" element={<AdminLayout page="salon"><TicketsPage {...ticketState} typeFilter={TICKET_TYPE.SALON} /></AdminLayout>} />
+          <Route path="customer-issues" element={<AdminOnboarding />} />
+          <Route path="salon-issues" element={<AdminOnboarding />} />
+          <Route path="owner-requests" element={<AdminOnboarding />} />
         </Route>
 
         {/* --- UTILITY & FALLBACK SECURITY CORE --- */}
@@ -251,7 +250,7 @@ function App() {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/support" element={<ContactSupport />} />
+        <Route path="/support" element={<ContactSupport onCreateTicket={ticketState.addTicket} />} />
       </Routes>
     </BrowserRouter>
   );

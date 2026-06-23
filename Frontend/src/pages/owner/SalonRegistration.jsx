@@ -23,6 +23,7 @@ const emptyForm = {
   email: "",
   password: "",
   address: "",
+  state: "Maharashtra",
   latitude: 0,
   longitude: 0,
   opening_time: "09:00",
@@ -609,6 +610,21 @@ export default function SalonRegistration() {
                   <Upload size={14} color={GOLD} />
                 </label>
               </div>
+            </Field>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-2 mb-4">
+            <Field label="Branch State *">
+              <select required value={form.state} onChange={e => setField("state", e.target.value)} className={inputClass}>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+              </select>
             </Field>
           </div>
 

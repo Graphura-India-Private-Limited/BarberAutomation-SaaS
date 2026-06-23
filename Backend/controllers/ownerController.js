@@ -3,6 +3,7 @@ const Barber = require("../models/Barber");
 const Booking = require("../models/Booking");
 const Queue = require("../models/Queue");
 const BreakRequest = require("../models/BreakRequest");
+const ApprovalRequest = require("../models/ApprovalRequest");
 
 // @desc    Get owner dashboard statistics for a specific salon
 // @route   GET /api/owner/salon/:salon_id/dashboard
@@ -250,6 +251,18 @@ exports.debugOwnerLoginBypass = async (req, res) => {
       message: "Debug payload interceptor successfully executed!",
       token: "mock-jwt-token-bypass"
     });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Get approval requests for a specific salon
+// @route   GET /api/owner/salon/:salon_id/approval-requests
+// @access  Private (Owner)
+exports.getSalonApprovalRequests = async (req, res) => {
+  try {
+    const requests = await ApprovalRequest.find({ salon_id: req.params.salon_id }).sort({ created_at: -1 });
+    res.json({ success: true, requests });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
