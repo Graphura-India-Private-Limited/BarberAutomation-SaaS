@@ -630,7 +630,11 @@ useEffect(() => {
               <>
                 <div className="grid gap-6 md:grid-cols-3">
                   {salons.map((s) => (
-                    <div key={s._id} onClick={() => navigate(`/salon/${s._id}`)}
+                    <div key={s._id} onClick={() => {
+                      localStorage.setItem("selectedSalonId", s._id);
+                      localStorage.setItem("selectedSalonName", s.salon_name);
+                      navigate("/salon");
+                    }}
                       className="bg-white rounded-2xl p-6 border border-[#EADDCA] hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
                       <div className="flex items-start justify-between mb-4">
                         <div>
@@ -644,7 +648,12 @@ useEffect(() => {
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.opening_time} - {s.closing_time}</span>
                       </div>
                       <div className="flex gap-2">
-                        <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/salon/${s._id}`); }}
+                        <button type="button" onClick={(e) => {
+                          e.stopPropagation();
+                          localStorage.setItem("selectedSalonId", s._id);
+                          localStorage.setItem("selectedSalonName", s.salon_name);
+                          navigate("/salon");
+                        }}
                           className="flex-1 border border-[#EADDCA] text-[#3E362E] py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:border-[#C5A059] transition cursor-pointer bg-transparent">
                           View Details
                         </button>

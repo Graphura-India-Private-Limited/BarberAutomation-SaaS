@@ -211,6 +211,7 @@ const Navbar = () => {
                   onMouseLeave={() => setDropOpen(false)}
                 >
                   <button
+                    onClick={() => setDropOpen((prev) => !prev)}
                     className={`flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest transition-colors cursor-pointer border-none bg-transparent outline-none ${dropOpen ? "text-[#C5A059]" : "text-stone-300 hover:text-[#C5A059]"
                       }`}
                   >
