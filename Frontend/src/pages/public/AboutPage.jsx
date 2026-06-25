@@ -87,7 +87,7 @@ export default function AboutPage() {
               Redefining the Luxury Grooming Standard
             </h2>
             <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
-              Founded in 2026, BarberPro has grown into a premier network connecting discerning customers with master barbers and luxury salon spaces across Pune and beyond. Our platform bridges the gap between premium heritage craftsmanship and advanced digital ease.
+              Founded in 2026, BarberPro has grown into a premier network connecting discerning customers with master barbers and luxury salon spaces across Globally . Our platform bridges the gap between premium heritage craftsmanship and advanced digital ease.
             </p>
             <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
               Whether you are looking for a razor-sharp mid fade, a global balayage highlight, or a relaxing scalp revitalization spa, our studios provide highly customized consultations tailored to your visual geometry.
