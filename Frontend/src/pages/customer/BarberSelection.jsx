@@ -266,6 +266,13 @@ export default function BarberSelection() {
   const [salonName,      setSalonName]       = useState(localStorage.getItem("selectedSalonName") || "");
   const [hasSalon,       setHasSalon]        = useState(!!localStorage.getItem("selectedSalonId"));
 
+  useEffect(() => {
+    const storedSalonId = localStorage.getItem("selectedSalonId");
+    if (!storedSalonId) {
+      navigate("/nearby");
+    }
+  }, [navigate]);
+
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {

@@ -135,6 +135,13 @@ export default function MenServices() {
   const cardRefs = useRef({});
 
   useEffect(() => {
+    const salonId = localStorage.getItem("selectedSalonId");
+    if (!salonId) {
+      navigate("/nearby");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     const iv = setInterval(() => setSlideIndex((p) => (p + 1) % heroImages.length), 5000);
     return () => clearInterval(iv);
   }, []);

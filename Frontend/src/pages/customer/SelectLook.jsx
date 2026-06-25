@@ -194,6 +194,13 @@ export default function SelectLook() {
     l.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => {
+    const salonId = localStorage.getItem("selectedSalonId");
+    if (!salonId) {
+      navigate("/nearby");
+    }
+  }, [navigate]);
+
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {

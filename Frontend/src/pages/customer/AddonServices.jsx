@@ -470,6 +470,13 @@ export default function AddonServices() {
   const cardRefs = useRef({});
 
   useEffect(() => {
+    const salonId = localStorage.getItem("selectedSalonId");
+    if (!salonId) {
+      navigate("/nearby");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
