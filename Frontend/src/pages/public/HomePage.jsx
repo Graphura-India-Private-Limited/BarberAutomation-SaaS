@@ -758,16 +758,36 @@ useEffect(() => {
               }}
             >
               {displayReviews.map((item, idx) => {
-      const isReal = !!item._id;
-      const name = isReal ? item.customer_id?.name || "Anonymous" : item.name;
-      const text = isReal ? item.review_text || "(No written feedback)" : item.review_text || item.text;
+                const isReal = !!item._id;
+                const name = isReal ? item.customer_id?.name || "Anonymous" : item.name;
+                const rawText = isReal ? item.review_text || "(No written feedback)" : item.review_text || item.text || "";
 
-      // ── ✅ FIXED: MAP LIVE BLANK AVATARS TO RANDOM LUXURY STYLIST PORTRAITS FOR TESTING ──
-      const avatar = item.avatar || (
-        isReal 
-          ? `https://i.pravatar.cc/150?img=${(idx % 10) + 11}` // Generates unique real faces for your MongoDB records automatically
-          : null
-      );
+                // Parse MCQ details
+                let cleanText = rawText;
+                let mcqDetails = null;
+                if (rawText.startsWith("[")) {
+                  const closeIndex = rawText.indexOf("]");
+                  if (closeIndex !== -1) {
+                    const bracketed = rawText.substring(1, closeIndex);
+                    cleanText = rawText.substring(closeIndex + 1).trim();
+                    if (!cleanText) {
+                      cleanText = "Bespoke styling and premium grooming experience.";
+                    }
+                    
+                    mcqDetails = {};
+                    const parts = bracketed.split("|");
+                    parts.forEach(p => {
+                      const colonIndex = p.indexOf(":");
+                      if (colonIndex !== -1) {
+                        const key = p.substring(0, colonIndex).trim();
+                        const val = p.substring(colonIndex + 1).trim();
+                        mcqDetails[key] = val;
+                      }
+                    });
+                  }
+                }
+
+                const rating = item.salon_rating || item.barber_rating || item.rating || 5;
 
                 return (
                   <div
@@ -784,17 +804,17 @@ useEffect(() => {
                       sm:w-[48%]
                       lg:w-[31%]
                       xl:w-[23%]
-                      min-h-[420px]
+                      min-h-[350px]
                       flex-shrink-0
-                      rounded-[30px]
+                      rounded-[24px]
                       border border-white/10
                       bg-white/[0.07]
                       backdrop-blur-2xl
                       overflow-hidden
                       p-6 sm:p-7
                       flex flex-col
-                      items-center
-                      text-center
+                      items-start
+                      text-left
                       transition-all
                       duration-500
                       hover:-translate-y-3
@@ -810,40 +830,51 @@ useEffect(() => {
                     {/* Shine Effect */}
                     <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-[120%] transition-all duration-1000 rotate-12 pointer-events-none" />
 
-                    {/* Avatar */}
-                    <div className="relative z-10 mt-1">
-                      <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#C5A059] p-1 bg-black/20 shadow-[0_0_30px_rgba(197,160,89,0.5)]">
-                        {avatar ? (
-                          <img
-                            src={avatar}
-                            alt={name}
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-gradient-to-br from-[#C5A059] via-[#E8C878] to-[#C5A059] flex items-center justify-center text-white text-2xl font-black">
-                            {(name[0] || "?").toUpperCase()}
-                          </div>
+                    {/* Author Header */}
+                    <div className="w-full flex justify-between items-start z-10 relative">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <h3 className="text-[#FFE6A7] text-[15px] font-black uppercase tracking-wide truncate">
+                          {name}
+                        </h3>
+                        {isReal && (
+                          <CheckCircle className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400/10 stroke-[2.5px] flex-shrink-0" />
                         )}
                       </div>
+                      {isReal && item.created_at && (
+                        <span className="text-[8px] font-mono text-stone-400 uppercase tracking-widest flex-shrink-0">
+                          {new Date(item.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                        </span>
+                      )}
                     </div>
 
-                    {/* Quote */}
-                    <div className="relative z-10 text-[55px] leading-none text-[#E8C878] mt-5 font-serif">
-                      “
+                    {/* Stars Rating */}
+                    <div className="flex gap-0.5 justify-start mt-2 mb-3.5 relative z-10">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`w-3.5 h-3.5 ${i < Math.round(rating) ? 'fill-[#E8C878] text-[#E8C878]' : 'text-white/20'}`} 
+                        />
+                      ))}
                     </div>
 
                     {/* Review Text */}
-                    <p className="relative z-10 mt-3 text-stone-200 italic font-serif text-[15px] leading-8 line-clamp-5 flex-grow flex items-center">
-                      {text}
+                    <p className="relative z-10 text-stone-200 italic font-serif text-[13.5px] leading-6 line-clamp-5 flex-grow text-left w-full">
+                      "{cleanText}"
                     </p>
 
-                    {/* Name */}
-                    <h3 className="relative z-10 mt-6 text-[#FFE6A7] text-[20px] font-bold">
-                      — {name}
-                    </h3>
+                    {/* MCQ Details Badges */}
+                    {mcqDetails && (
+                      <div className="relative z-10 flex flex-wrap gap-1.5 mt-4 mb-2 w-full justify-start">
+                        {Object.entries(mcqDetails).map(([key, val]) => (
+                          <span key={key} className="text-[7px] font-sans font-black uppercase tracking-widest bg-white/10 text-[#FFE6A7] px-2.5 py-1 rounded-md border border-white/5 whitespace-nowrap">
+                            {key}: {val}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Button */}
-                    <div className="relative z-10 w-full mt-7">
+                    <div className="relative z-10 w-full mt-5">
                       <button
                         type="button"
                         onClick={(e) => {
@@ -852,9 +883,9 @@ useEffect(() => {
                         }}
                         className="
                           w-full
-                          py-3.5
+                          py-3
                           border-none
-                          rounded-full
+                          rounded-xl
                           bg-gradient-to-r
                           from-[#C5A059]
                           via-[#E8C878]
@@ -862,10 +893,10 @@ useEffect(() => {
                           text-[#2A241F]
                           font-black
                           uppercase
-                          tracking-[0.25em]
-                          text-[10px]
-                          shadow-[0_0_30px_rgba(197,160,89,0.35)]
-                          hover:scale-[1.03]
+                          tracking-[0.2em]
+                          text-[9px]
+                          shadow-[0_0_20px_rgba(197,160,89,0.25)]
+                          hover:scale-[1.02]
                           transition-all
                           duration-300
                           cursor-pointer
@@ -1002,10 +1033,55 @@ useEffect(() => {
               </div>
             )}
 
-            <div className="text-[#C5A059] text-5xl font-serif italic leading-none mb-2">"</div>
-            <p className="font-serif italic text-base leading-[1.7] text-[#3E362E] mb-6">
-              {selectedReview.review_text || "No written feedback"}
-            </p>
+            {(() => {
+              const rawText = selectedReview.review_text || "";
+              let cleanText = rawText;
+              let mcqDetails = null;
+              if (rawText.startsWith("[")) {
+                const closeIndex = rawText.indexOf("]");
+                if (closeIndex !== -1) {
+                  const bracketed = rawText.substring(1, closeIndex);
+                  cleanText = rawText.substring(closeIndex + 1).trim();
+                  if (!cleanText) {
+                    cleanText = "Bespoke styling and premium grooming experience.";
+                  }
+                  
+                  mcqDetails = {};
+                  const parts = bracketed.split("|");
+                  parts.forEach(p => {
+                    const colonIndex = p.indexOf(":");
+                    if (colonIndex !== -1) {
+                      const key = p.substring(0, colonIndex).trim();
+                      const val = p.substring(colonIndex + 1).trim();
+                      mcqDetails[key] = val;
+                    }
+                  });
+                }
+              }
+              
+              return (
+                <>
+                  {mcqDetails && (
+                    <div className="bg-[#FAF6F0] rounded-xl p-4 border border-[#EADDCA]/60 mb-5 space-y-2.5 text-left shadow-inner">
+                      <p className="text-[9px] tracking-widest uppercase text-[#C5A059] font-black border-b border-[#EADDCA]/30 pb-1.5 mb-2">Category Metrics</p>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-[#3E362E]">
+                        {Object.entries(mcqDetails).map(([key, val]) => (
+                          <div key={key} className="flex justify-between font-sans">
+                            <span className="font-semibold text-stone-500 text-[10px]">{key}:</span>
+                            <span className="font-black uppercase text-[10px] text-stone-800">{val}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="text-[#C5A059] text-5xl font-serif italic leading-none mb-2">"</div>
+                  <p className="font-serif italic text-base leading-[1.7] text-[#3E362E] mb-6">
+                    {cleanText || "No written feedback"}
+                  </p>
+                </>
+              );
+            })()}
 
             {selectedReview.barber_id?.name && (
               <div className="bg-[#FDFBF7] rounded-xl p-3 mb-5 border border-[#EADDCA]/50">

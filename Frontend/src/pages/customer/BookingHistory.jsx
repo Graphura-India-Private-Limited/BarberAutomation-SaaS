@@ -52,6 +52,19 @@ export default function BookingHistory() {
     navigate('/customer/services');
   }
 
+  // ✅ Write Review
+  function handleWriteReview(booking) {
+    navigate('/write-review', {
+      state: {
+        bookingId: booking.id,
+        salonId: booking.salonId || '6a1557d0da95e9c4a81f4321', // Fallback Vansh Salon ID
+        salonName: booking.salon,
+        barberId: booking.barberId || '',
+        barberName: booking.barber || 'Assigned Stylist'
+      }
+    });
+  }
+
   const totalVisits = mockBookings.filter(b => b.status === 'completed').length;
   const totalSpent = mockBookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + b.amountPaid, 0);
 
@@ -227,14 +240,24 @@ active:scale-95
                         <span>Cancel Visit</span>
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={handleRebook}
-                        className="flex-shrink-0 flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#3E362E] hover:text-[#C5A059] transition-colors cursor-pointer group select-none"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5 group-hover:rotate-45 transition-transform duration-300" />
-                        <span>Rebook</span>
-                      </button>
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleWriteReview(booking)}
+                          className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#C5A059] hover:text-[#3E362E] transition-colors cursor-pointer group select-none"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 group-hover:scale-110 transition-transform duration-300" />
+                          <span>Write Review</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRebook}
+                          className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#3E362E] hover:text-[#C5A059] transition-colors cursor-pointer group select-none"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5 group-hover:rotate-45 transition-transform duration-300" />
+                          <span>Rebook</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
