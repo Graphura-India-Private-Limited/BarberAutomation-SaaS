@@ -167,7 +167,7 @@ function App() {
         {/* --- DISCOVERY & REVIEWS --- */}
         <Route path="/nearby" element={<NearbyBarbers />} />
         <Route path="/barbers" element={<NearbyBarbers />} />
-        <Route path="/salon-detail" element={<SalonDetailPage />} />
+        <Route path="/salon" element={<SalonDetailPage />} />
         <Route path="/salon/:id" element={<SalonDetailPage />} />
         <Route path="/salons" element={<AllSalonsPage />} />
         <Route path="/about" element={<AboutPage />} />

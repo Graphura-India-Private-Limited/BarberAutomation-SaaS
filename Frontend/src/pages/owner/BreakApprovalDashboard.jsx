@@ -6,6 +6,8 @@ import {
   Coffee, Sandwich, ArrowLeft 
 } from "lucide-react";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 // ── ✅ DIRECT STRATEGIC IMPORTS FOR USER FRONTEND COHERENCE ──
 import Navbar from "../../components/layout/Navbar"; // Adjust paths to match your folder hierarchy
 import Footer from "../../components/layout/Footer";
@@ -27,9 +29,15 @@ export default function BreakApprovalDashboard() {
     return () => clearInterval(timer);
   }, []);
 
+  const token = localStorage.getItem("token");
+  const headers = () => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  });
+
   const fetchRequests = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/breaks/pending");
+      const res = await fetch(`${API}/breaks/pending`, { headers: headers() });
       const data = await res.json();
       if (data.success) setRequests(data.data);
       setLoading(false);
@@ -41,9 +49,9 @@ export default function BreakApprovalDashboard() {
 
   const handleAction = async (id, status) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/breaks/action/${id}`, {
+      const res = await fetch(`${API}/breaks/action/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: headers(),
         body: JSON.stringify({ status })
       });
       if (res.ok) setRequests(prev => prev.filter(req => req._id !== id));
@@ -193,7 +201,10 @@ export default function BreakApprovalDashboard() {
                       </div>
                       <div>
                         {/* Operator Name text format details */}
-                        <h3 className="font-bold text-stone-900 text-sm tracking-tight font-sans">{req.barber_id?.name || "Personnel Barber"}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-stone-900 text-sm tracking-tight font-sans">{req.barber_id?.name || "Personnel Barber"}</h3>
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200 animate-pulse" title="Pending break request" />
+                        </div>
                         {/* Rule 2 metadata badge kicker tag config styles */}
                         <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-1 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-md inline-block font-sans">
                           {req.break_type} • {req.duration_mins} Mins Duration

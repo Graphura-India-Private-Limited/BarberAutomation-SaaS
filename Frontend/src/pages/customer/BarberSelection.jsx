@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 
 /* ─── DATA ─────────────────────────────────────────────────── */
 const BARBERS = [
@@ -261,18 +262,42 @@ export default function BarberSelection() {
 
   const [barbersList,    setBarbersList]     = useState([]);
   const [loading,        setLoading]         = useState(true);
+  const [salonId,        setSalonId]         = useState(localStorage.getItem("selectedSalonId") || "");
+  const [salonName,      setSalonName]       = useState(localStorage.getItem("selectedSalonName") || "");
+  const [hasSalon,       setHasSalon]        = useState(!!localStorage.getItem("selectedSalonId"));
+
+  useEffect(() => {
+    const storedSalonId = localStorage.getItem("selectedSalonId");
+    if (!storedSalonId) {
+      navigate("/nearby");
+    }
+  }, [navigate]);
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
   useEffect(() => {
+    const handleStorageChange = () => {
+      const currentSalonId = localStorage.getItem("selectedSalonId") || "";
+      const currentSalonName = localStorage.getItem("selectedSalonName") || "";
+      setSalonId(currentSalonId);
+      setSalonName(currentSalonName);
+      setHasSalon(!!currentSalonId);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  useEffect(() => {
     const fetchBarbers = async () => {
       setLoading(true);
-      const salonId = localStorage.getItem("selectedSalonId");
       if (!salonId) {
         console.warn("No selected salon ID found in localStorage.");
+        setHasSalon(false);
+        setBarbersList([]);
         setLoading(false);
         return;
       }
+      setHasSalon(true);
       try {
         const res = await fetch(`${API}/barber/salon/${salonId}`);
         const data = await res.json();
@@ -321,7 +346,7 @@ export default function BarberSelection() {
     };
 
     fetchBarbers();
-  }, []);
+  }, [salonId]);
 
   useEffect(() => {
     setVisibleCards(new Set());
@@ -359,6 +384,7 @@ export default function BarberSelection() {
   return (
     <>
     <Navbar />
+    <SalonSelectorBar />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -399,6 +425,11 @@ export default function BarberSelection() {
               Select Your{" "}
               <em style={{ fontStyle: "italic", color: "#C5A059", fontWeight: 400 }}>Stylist</em>
             </h1>
+            {salonName && (
+              <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 14, fontWeight: 600, color: "#C5A059", textTransform: "uppercase", letterSpacing: "0.15em", margin: "10px 0 0" }}>
+                At {salonName}
+              </p>
+            )}
             <div style={{ width: 56, height: 1, background: "linear-gradient(to right, transparent, #C5A059, transparent)", margin: "14px auto 18px" }} />
             <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,0.55)", maxWidth: 400, lineHeight: 1.8 }}>
               Our curated professionals are ready to craft your perfect experience.
@@ -522,6 +553,13 @@ export default function BarberSelection() {
                 <div style={{ textAlign: "center", padding: "80px 20px" }}>
                   <div style={{ width: 40, height: 40, border: "3px solid #EAE0D0", borderTopColor: "#C5A059", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
                   <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 14, color: "#888" }}>Finding active stylists...</p>
+                </div>
+              ) : !hasSalon ? (
+                <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
+                  <div style={{ fontSize: 32, marginBottom: 12 }}>📍</div>
+                  <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 20, color: "#8A7060", margin: "0 0 8px" }}>No Salon Selected</p>
+                  <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: "#AAA", margin: "0 0 24px", lineHeight: 1.6 }}>You have not selected a salon studio yet. Please choose a studio location using the selector bar at the top or click below.</p>
+                  <button onClick={() => navigate("/nearby")} style={{ padding: "10px 28px", background: "#2C241E", color: "#fff", border: "none", borderRadius: 8, fontSize: 11, fontFamily: "'Montserrat',sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Select Salon Studio</button>
                 </div>
               ) : barbersList.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>

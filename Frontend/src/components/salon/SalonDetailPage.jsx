@@ -19,7 +19,8 @@ import {
   Image as ImageIcon,
   ImageOff,
   Info,
-  Mail
+  Mail,
+  ChevronDown
 } from "lucide-react";
 
 const demoSalons = [
@@ -80,6 +81,14 @@ export default function SalonDetailPage() {
   
   const [activeImage, setActiveImage] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [servicesPage, setServicesPage] = useState(1);
+
+  useEffect(() => {
+    if (id) {
+      localStorage.setItem("selectedSalonId", id);
+      navigate("/salon", { replace: true });
+    }
+  }, [id, navigate]);
 
   useEffect(() => {
     const fetchSalonData = async () => {
@@ -161,6 +170,10 @@ export default function SalonDetailPage() {
     fetchSalonData();
   }, [id]);
 
+  useEffect(() => {
+    setServicesPage(1);
+  }, [selectedCategory]);
+
   const handleBookVisit = () => {
     if (!salon) return;
     localStorage.setItem("selectedSalonId", salon.id);
@@ -194,6 +207,33 @@ export default function SalonDetailPage() {
     if (selectedCategory === "all") return true;
     return (service.category || "").toLowerCase() === selectedCategory.toLowerCase();
   });
+
+  const SERVICES_PER_PAGE = 6;
+  const totalServicesPages = Math.ceil(filteredServices.length / SERVICES_PER_PAGE) || 1;
+  const servicesStartIndex = (servicesPage - 1) * SERVICES_PER_PAGE;
+  const paginatedServices = filteredServices.slice(servicesStartIndex, servicesStartIndex + SERVICES_PER_PAGE);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    if (totalServicesPages <= maxVisible) {
+      for (let i = 1; i <= totalServicesPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      let start = Math.max(2, servicesPage - 1);
+      let end = Math.min(totalServicesPages - 1, servicesPage + 1);
+      if (servicesPage <= 3) {
+        end = 4;
+      } else if (servicesPage >= totalServicesPages - 2) {
+        start = totalServicesPages - 3;
+      }
+      if (start > 2) pages.push("...");
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (end < totalServicesPages - 1) pages.push("...");
+      pages.push(totalServicesPages);
+    }
+    return pages;
+  };
 
   if (loading) {
     return (
@@ -383,55 +423,49 @@ export default function SalonDetailPage() {
             )}
           </div>
 
-          {/* 💈 Services Section with Sidebar and Images */}
+          {/* 💈 Services Section with Horizontal Tabs and Dropdown */}
           <div id="popular-services" className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left">
-            <div className="mb-6 flex items-center justify-between border-b border-stone-100 pb-4">
+            <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 pb-5">
               <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-[#3E362E] flex items-center justify-start gap-2 whitespace-nowrap">
                 <span className="font-bold uppercase text-[17px] sm:text-[19px]">Available</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Services Menu</span>
               </h2>
-              <Scissors className="text-[#C5A059] stroke-[2px]" size={18} />
-            </div>
 
-            <div className="grid gap-6 lg:grid-cols-[0.3fr_0.7fr]">
-              {/* Left Column: Category Filters Sidebar */}
-              <div className="space-y-2 lg:border-r lg:border-stone-150 lg:pr-4">
-                <p className="text-[10px] font-black uppercase tracking-wider text-[#B58B67] mb-3">Categories</p>
-                <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
-                  {[
-                    { id: "all", label: "All Services" },
-                    { id: "men", label: "Men Services" },
-                    { id: "women", label: "Women Services" },
-                    { id: "addon", label: "Addon Services" }
-                  ].map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl border text-left whitespace-nowrap transition-all duration-300 cursor-pointer ${
-                        selectedCategory === cat.id
-                          ? "bg-[#FEF3E2] text-[#9E7452] border-[#EEDBCA] font-extrabold shadow-3xs"
-                          : "text-[#8A7B6A] border-transparent hover:bg-stone-50"
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <p className="text-[10px] font-black uppercase tracking-wider text-[#B58B67] sm:mb-0">Filter By Category:</p>
+                
+                {/* Dropdown Selector for Category Filtering */}
+                <div className="relative w-full sm:w-auto min-w-[200px]">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full text-[10px] font-black uppercase tracking-widest bg-[#FAF6F0] text-[#3E362E] border border-[#E8DCCB] rounded-xl px-4 py-2.5 outline-none appearance-none cursor-pointer pr-10"
+                  >
+                    <option value="all">All Services</option>
+                    <option value="men">Men Services</option>
+                    <option value="women">Women Services</option>
+                    <option value="addon">Addon Services</option>
+                  </select>
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#9E7452]">
+                    <ChevronDown size={14} className="stroke-[2.5px]" />
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Right Column: Grid of Service Cards with Images */}
-              <div>
-                {filteredServices.length === 0 ? (
-                  <div className="py-12 text-center bg-[#FAF6F0]/50 rounded-2xl border border-dashed border-[#E8DCCB]">
-                    <Scissors className="text-stone-300 mx-auto mb-2 animate-pulse" size={32} />
-                    <p className="text-sm font-bold text-stone-505">No services listed for this category.</p>
-                  </div>
-                ) : (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {filteredServices.map((service) => (
+            <div className="w-full">
+              {filteredServices.length === 0 ? (
+                <div className="py-12 text-center bg-[#FAF6F0]/50 rounded-2xl border border-dashed border-[#E8DCCB]">
+                  <Scissors className="text-stone-300 mx-auto mb-2 animate-pulse" size={32} />
+                  <p className="text-sm font-bold text-stone-505">No services listed for this category.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {paginatedServices.map((service) => (
                       <div
                         key={service._id}
-                        className="group rounded-2xl border border-[#E8DCCB] bg-white overflow-hidden shadow-xs hover:shadow-md hover:border-[#C5A059]/50 transition-all duration-300 flex flex-col justify-between"
+                        className="group rounded-2xl border border-[#E8DCCB] bg-white overflow-hidden shadow-xs hover:shadow-md hover:border-[#C5A059]/55 transition-all duration-300 flex flex-col justify-between"
                       >
                         {/* Service Image Section */}
                         <div className="relative h-36 bg-stone-100 overflow-hidden">
@@ -489,8 +523,71 @@ export default function SalonDetailPage() {
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
+
+                  {/* Pagination Controls */}
+                  {filteredServices.length > SERVICES_PER_PAGE && (
+                    <div className="mt-8 pt-5 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                        Showing {servicesStartIndex + 1} - {Math.min(servicesStartIndex + SERVICES_PER_PAGE, filteredServices.length)} of {filteredServices.length} Services
+                      </span>
+                      
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          disabled={servicesPage === 1}
+                          onClick={() => {
+                            setServicesPage(p => Math.max(p - 1, 1));
+                            document.getElementById("popular-services")?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                          className="px-3 py-2 rounded-xl border border-[#E8DCCB] text-[#3E362E] text-[10px] font-black uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-50 cursor-pointer transition"
+                        >
+                          Prev
+                        </button>
+                        
+                        {getPageNumbers().map((page, idx) => {
+                          if (page === "...") {
+                            return (
+                              <span
+                                key={`ellipsis-${idx}`}
+                                className="w-8 h-8 flex items-center justify-center text-[#8A7B6A] text-[10px] font-black"
+                              >
+                                ...
+                              </span>
+                            );
+                          }
+                          const isActive = page === servicesPage;
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => {
+                                setServicesPage(page);
+                                document.getElementById("popular-services")?.scrollIntoView({ behavior: "smooth" });
+                              }}
+                              className={`w-8 h-8 rounded-xl text-[10px] font-black tracking-widest transition flex items-center justify-center cursor-pointer ${
+                                isActive
+                                  ? "bg-[#3E362E] text-white"
+                                  : "border border-[#E8DCCB] text-[#3E362E] hover:bg-stone-50"
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        })}
+                        
+                        <button
+                          disabled={servicesPage === totalServicesPages}
+                          onClick={() => {
+                            setServicesPage(p => Math.min(p + 1, totalServicesPages));
+                            document.getElementById("popular-services")?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                          className="px-3 py-2 rounded-xl border border-[#E8DCCB] text-[#3E362E] text-[10px] font-black uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-50 cursor-pointer transition"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
 

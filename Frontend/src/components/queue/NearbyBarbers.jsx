@@ -177,7 +177,9 @@ const SalonCard = ({ salon, onSelect }) => {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/salon/${salon.id}`);
+            localStorage.setItem("selectedSalonId", salon.id);
+            localStorage.setItem("selectedSalonName", salon.name || salon.salon_name);
+            navigate("/salon");
           }}
           className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] hover:text-[#a07f3f] transition-colors cursor-pointer flex items-center gap-1"
         >
@@ -309,6 +311,7 @@ const NearbyBarbers = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         setUserCoords({ latitude, longitude });
+        setSortBy("distance");
         try {
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
@@ -486,10 +489,16 @@ const handleBook = async () => {
       return matchesSearch && matchesCity && matchesRating;
     })
     .sort((a, b) => {
-      if (sortBy === "distance" && userCoords && a.latitude && a.longitude && b.latitude && b.longitude) {
-        const distA = getDistanceInKm(userCoords.latitude, userCoords.longitude, a.latitude, a.longitude);
-        const distB = getDistanceInKm(userCoords.latitude, userCoords.longitude, b.latitude, b.longitude);
-        return distA - distB;
+      if (sortBy === "distance" && userCoords) {
+        const hasCoordsA = a.latitude && a.longitude;
+        const hasCoordsB = b.latitude && b.longitude;
+        if (hasCoordsA && hasCoordsB) {
+          const distA = getDistanceInKm(userCoords.latitude, userCoords.longitude, a.latitude, a.longitude);
+          const distB = getDistanceInKm(userCoords.latitude, userCoords.longitude, b.latitude, b.longitude);
+          return distA - distB;
+        }
+        if (hasCoordsA) return -1;
+        if (hasCoordsB) return 1;
       }
       if (sortBy === "rating") {
         return b.rating - a.rating;
@@ -497,7 +506,7 @@ const handleBook = async () => {
       if (sortBy === "name") {
         return a.name.localeCompare(b.name);
       }
-      return 0;
+      return 0; // Default: no sorting
     });
 
   const content = (

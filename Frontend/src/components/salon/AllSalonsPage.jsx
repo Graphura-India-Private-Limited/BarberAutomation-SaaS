@@ -435,7 +435,11 @@ export default function AllSalonsPage() {
                   {/* Actions Bar */}
                   <div className="p-6 sm:p-8 pt-0 flex flex-col sm:flex-row gap-3">
                     <button
-                      onClick={() => navigate(`/salon/${salon.id}`)}
+                      onClick={() => {
+                        localStorage.setItem("selectedSalonId", salon.id);
+                        localStorage.setItem("selectedSalonName", salon.name);
+                        navigate("/salon");
+                      }}
                       className="flex-1 px-5 py-3.5 border border-[#E8DCCB] hover:border-[#C5A059] bg-white hover:bg-stone-50/50 text-[#3E362E] font-black text-[10px] uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
                     >
                       <Info size={13} className="stroke-[2.5px]" /> View Studio Details

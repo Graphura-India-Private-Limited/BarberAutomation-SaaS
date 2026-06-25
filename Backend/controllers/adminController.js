@@ -225,31 +225,167 @@ exports.updateSalonStatus = async (req, res) => {
       // Check if services are already created for this salon
       const existingServices = await Service.find({ salon_id: salon._id });
       if (existingServices.length === 0) {
-        const defaultMins = {
-          'haircut': 20,
-          'shave': 15,
-          'beard': 10,
-          'combo': 35,
-          'color': 60,
-          'kids': 15,
+        const serviceRegistry = {
+          // Men's Services (40)
+          "classic executive cut": { category: "men", duration: 35 },
+          "modern fade (skin/low/drop)": { category: "men", duration: 40 },
+          "premium keratin infusion": { category: "men", duration: 90 },
+          "indian wedding grooming": { category: "men", duration: 60 },
+          "kids' style cut": { category: "men", duration: 25 },
+          "slick back classic pompadour": { category: "men", duration: 45 },
+          "buzz cut & edge-up": { category: "men", duration: 20 },
+          "textured crop fade": { category: "men", duration: 40 },
+          "bollywood premium styling": { category: "men", duration: 45 },
+          "scalp detox & cut combo": { category: "men", duration: 50 },
+
+          "beard sculpting": { category: "men", duration: 30 },
+          "royal shave ritual": { category: "men", duration: 40 },
+          "beard hydration & wash": { category: "men", duration: 25 },
+          "mustache styling & trim": { category: "men", duration: 15 },
+          "charcoal beard softening": { category: "men", duration: 30 },
+          "signature hot towel shave": { category: "men", duration: 30 },
+          "beard color touch-up": { category: "men", duration: 35 },
+          "indian royal beard styling": { category: "men", duration: 45 },
+          "detox clay beard mask": { category: "men", duration: 30 },
+          "classic clean shave": { category: "men", duration: 20 },
+
+          "gentleman's facial": { category: "men", duration: 45 },
+          "scalp revitalize massage": { category: "men", duration: 30 },
+          "indian ayurvedic head massage": { category: "men", duration: 35 },
+          "detoxifying charcoal mask": { category: "men", duration: 30 },
+          "premium face & neck massage": { category: "men", duration: 30 },
+          "tan removal peel-off mask": { category: "men", duration: 25 },
+          "anti-stress neck & shoulder rub": { category: "men", duration: 20 },
+          "hydrating aloe vera facial": { category: "men", duration: 40 },
+          "ice cool mint scalp massage": { category: "men", duration: 25 },
+          "aromatherapy facial spa": { category: "men", duration: 50 },
+
+          "grey blending": { category: "men", duration: 60 },
+          "global hair highlight": { category: "men", duration: 75 },
+          "beard global coloring": { category: "men", duration: 40 },
+          "root touch-up (men)": { category: "men", duration: 45 },
+          "fashion streaks (per streak)": { category: "men", duration: 30 },
+          "ammonia-free organic color": { category: "men", duration: 60 },
+          "premium beard glossing": { category: "men", duration: 30 },
+          "platinum blonde highlights": { category: "men", duration: 90 },
+          "natural henna treatment": { category: "men", duration: 60 },
+          "mustache & beard color combo": { category: "men", duration: 50 },
+
+          // Women's Services (40)
+          "precision cut & blow dry": { category: "women", duration: 60 },
+          "bridal style & updo": { category: "women", duration: 90 },
+          "couture hair styling (curling/straightening)": { category: "women", duration: 45 },
+          "layered cut & blowout": { category: "women", duration: 60 },
+          "creative hair makeover": { category: "women", duration: 75 },
+          "express hair wash & blow dry": { category: "women", duration: 30 },
+          "kids girls styling & cut": { category: "women", duration: 35 },
+          "bollywood signature blowout": { category: "women", duration: 50 },
+          "anti-frizz hair styling": { category: "women", duration: 40 },
+          "premium hot iron styling": { category: "women", duration: 50 },
+
+          "global hair coloring": { category: "women", duration: 100 },
+          "signature balayage": { category: "women", duration: 150 },
+          "ammonia-free root touchup": { category: "women", duration: 45 },
+          "ombre hair transformation": { category: "women", duration: 160 },
+          "fashion color streaks (3 foils)": { category: "women", duration: 50 },
+          "blonde highlights accent": { category: "women", duration: 90 },
+          "indian henna pack application": { category: "women", duration: 70 },
+          "shine toner & color glaze": { category: "women", duration: 60 },
+          "full global highlights": { category: "women", duration: 180 },
+          "crown area highlights touch-up": { category: "women", duration: 90 },
+
+          "organic oil head massage": { category: "women", duration: 30 },
+          "hydrating hair spa": { category: "women", duration: 50 },
+          "therapeutic scalp cleansing": { category: "women", duration: 45 },
+          "relaxing neck & back therapy": { category: "women", duration: 35 },
+          "anti-dandruff scalp treatment": { category: "women", duration: 50 },
+          "intense nourishing cream spa": { category: "women", duration: 60 },
+          "ayurvedic hair vitality ritual": { category: "women", duration: 70 },
+          "detoxifying charcoal spa": { category: "women", duration: 50 },
+          "deep moisture oil therapy": { category: "women", duration: 40 },
+          "aromatic scalp soothing treatment": { category: "women", duration: 45 },
+
+          "cysteine smoothing treatment": { category: "women", duration: 180 },
+          "advanced keratin therapy": { category: "women", duration: 120 },
+          "olaplex damage repair": { category: "women", duration: 60 },
+          "pro-keratin shine therapy": { category: "women", duration: 110 },
+          "anti-hairfall laser therapy": { category: "women", duration: 90 },
+          "biotin nourishing infusion": { category: "women", duration: 80 },
+          "volume-boost root treatment": { category: "women", duration: 45 },
+          "organic frizz-free smoothing": { category: "women", duration: 150 },
+          "silk protein glazing": { category: "women", duration: 70 },
+          "scalp hydradermie treatment": { category: "women", duration: 60 },
+
+          // Addon Services (30)
+          "aromatherapy scalp massage": { category: "addon", duration: 20 },
+          "acupressure shoulder relief": { category: "addon", duration: 25 },
+          "charcoal beard detox": { category: "addon", duration: 20 },
+          "relaxing foot reflexology": { category: "addon", duration: 20 },
+          "warm herbal oil champo": { category: "addon", duration: 15 },
+          "quick eye stress relief": { category: "addon", duration: 10 },
+          "face roller massage": { category: "addon", duration: 10 },
+          "deep back relief": { category: "addon", duration: 25 },
+          "mint cooling champo": { category: "addon", duration: 20 },
+          "head & temples rub": { category: "addon", duration: 15 },
+
+          "deep conditioning mask": { category: "addon", duration: 30 },
+          "express keratin booster": { category: "addon", duration: 40 },
+          "instant bond-repair shield": { category: "addon", duration: 30 },
+          "anti-frizz serum infusion": { category: "addon", duration: 20 },
+          "citrus scalp scrub": { category: "addon", duration: 25 },
+          "protein nourishing spray": { category: "addon", duration: 15 },
+          "leave-in moroccan argan shot": { category: "addon", duration: 15 },
+          "volumizing root boost": { category: "addon", duration: 20 },
+          "scalp cooling serum ampoule": { category: "addon", duration: 15 },
+          "split-end prevention treatment": { category: "addon", duration: 20 },
+
+          "premium shine glaze / toner": { category: "addon", duration: 45 },
+          "silver / grey glossing": { category: "addon", duration: 30 },
+          "gold highlights accents (2 foils)": { category: "addon", duration: 30 },
+          "color protect lock sealant": { category: "addon", duration: 20 },
+          "hair gloss & lusterspa": { category: "addon", duration: 30 },
+          "hair gloss & luster spa": { category: "addon", duration: 30 },
+          "copper / caramel glaze refresher": { category: "addon", duration: 35 },
+          "fashion streaks booster": { category: "addon", duration: 20 },
+          "root shadow blending": { category: "addon", duration: 30 },
+          "ammonia-free color gloss": { category: "addon", duration: 25 },
+          "balayage glow booster": { category: "addon", duration: 30 }
         };
-        const categories = {
-          'haircut': 'men',
-          'shave': 'men',
-          'beard': 'men',
-          'combo': 'men',
-          'color': 'men',
-          'kids': 'men',
-        };
-        
+
         for (const serviceName of salon.services_offered) {
-          const lower = serviceName.toLowerCase();
-          let key = 'haircut';
-          if (lower.includes('shave') && lower.includes('haircut')) key = 'combo';
-          else if (lower.includes('shave')) key = 'shave';
-          else if (lower.includes('beard')) key = 'beard';
-          else if (lower.includes('color')) key = 'color';
-          else if (lower.includes('kids') || lower.includes('child')) key = 'kids';
+          const lower = serviceName.toLowerCase().trim();
+          let matched = serviceRegistry[lower];
+          let category = "men";
+          let duration = 30;
+
+          if (matched) {
+            category = matched.category;
+            duration = matched.duration;
+          } else {
+            // fallback heuristic logic
+            if (lower.includes('shave') && lower.includes('haircut')) {
+              category = 'men';
+              duration = 35;
+            } else if (lower.includes('shave')) {
+              category = 'men';
+              duration = 15;
+            } else if (lower.includes('beard')) {
+              category = 'men';
+              duration = 10;
+            } else if (lower.includes('color') || lower.includes('highlight') || lower.includes('glaze') || lower.includes('balayage')) {
+              category = 'men';
+              duration = 60;
+            } else if (lower.includes('kids') || lower.includes('child')) {
+              category = 'men';
+              duration = 15;
+            } else if (lower.includes('massage') || lower.includes('relief') || lower.includes('scrub')) {
+              category = 'addon';
+              duration = 20;
+            } else if (lower.includes('mask') || lower.includes('booster') || lower.includes('shield') || lower.includes('infusion')) {
+              category = 'addon';
+              duration = 25;
+            }
+          }
 
           let price = 0;
           if (salon.service_prices) {
@@ -266,9 +402,9 @@ exports.updateSalonStatus = async (req, res) => {
           await Service.create({
             salon_id: salon._id,
             name: serviceName,
-            category: categories[key] || 'men',
+            category: category,
             price: Number(price),
-            duration: defaultMins[key] || 30,
+            duration: duration,
             is_active: true
           });
         }

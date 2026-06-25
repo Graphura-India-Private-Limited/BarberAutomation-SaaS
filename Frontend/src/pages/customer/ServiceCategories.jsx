@@ -181,6 +181,13 @@ export default function ServiceCategories() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    const salonId = localStorage.getItem("selectedSalonId");
+    if (!salonId) {
+      navigate("/nearby");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);

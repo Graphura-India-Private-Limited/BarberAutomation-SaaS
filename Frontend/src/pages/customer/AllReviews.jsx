@@ -216,9 +216,50 @@ export default function AllReviews() {
                       <div className="text-[#C5A059] font-serif text-4xl leading-none -mb-1 opacity-60">"</div>
 
                       {/* Review text — serif italic luxury accent (Rule 1 Line 2 style) */}
-                      <p className="font-serif italic text-[#3E362E] text-base leading-relaxed line-clamp-4 mb-6">
-                        {r.review_text || "(No written feedback provided by customer)"}
-                      </p>
+                      {(() => {
+                        const rawText = r.review_text || "";
+                        let cleanText = rawText;
+                        let mcqDetails = null;
+                        if (rawText.startsWith("[")) {
+                          const closeIndex = rawText.indexOf("]");
+                          if (closeIndex !== -1) {
+                            const bracketed = rawText.substring(1, closeIndex);
+                            cleanText = rawText.substring(closeIndex + 1).trim();
+                            if (!cleanText) {
+                              cleanText = "Bespoke styling and premium grooming experience.";
+                            }
+                            
+                            mcqDetails = {};
+                            const parts = bracketed.split("|");
+                            parts.forEach(p => {
+                              const colonIndex = p.indexOf(":");
+                              if (colonIndex !== -1) {
+                                const key = p.substring(0, colonIndex).trim();
+                                const val = p.substring(colonIndex + 1).trim();
+                                mcqDetails[key] = val;
+                              }
+                            });
+                          }
+                        }
+                        
+                        return (
+                          <>
+                            <p className="font-serif italic text-[#3E362E] text-base leading-relaxed line-clamp-4 mb-4">
+                              {cleanText || "(No written feedback provided by customer)"}
+                            </p>
+                            
+                            {mcqDetails && (
+                              <div className="flex flex-wrap gap-1 mb-5">
+                                {Object.entries(mcqDetails).map(([key, val]) => (
+                                  <span key={key} className="text-[7.5px] font-sans font-black uppercase tracking-widest bg-[#C5A059]/10 text-[#C5A059] px-2 py-0.5 rounded-full border border-[#C5A059]/20 whitespace-nowrap">
+                                    {key}: {val}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
 
                     {/* Profile Wrapper */}
@@ -295,13 +336,58 @@ export default function AllReviews() {
               </div>
             )}
 
-            {/* Opening quote */}
-            <div className="text-[#C5A059] font-serif text-5xl leading-none opacity-60 mb-1">"</div>
-
-            {/* Review body — Rule 3 but serif italic for luxury feel */}
-            <p className="font-serif italic text-base leading-relaxed text-[#3E362E] mb-6 whitespace-pre-wrap">
-              {selectedReview.review_text || "No written feedback provided."}
-            </p>
+            {(() => {
+              const rawText = selectedReview.review_text || "";
+              let cleanText = rawText;
+              let mcqDetails = null;
+              if (rawText.startsWith("[")) {
+                const closeIndex = rawText.indexOf("]");
+                if (closeIndex !== -1) {
+                  const bracketed = rawText.substring(1, closeIndex);
+                  cleanText = rawText.substring(closeIndex + 1).trim();
+                  if (!cleanText) {
+                    cleanText = "Bespoke styling and premium grooming experience.";
+                  }
+                  
+                  mcqDetails = {};
+                  const parts = bracketed.split("|");
+                  parts.forEach(p => {
+                    const colonIndex = p.indexOf(":");
+                    if (colonIndex !== -1) {
+                      const key = p.substring(0, colonIndex).trim();
+                      const val = p.substring(colonIndex + 1).trim();
+                      mcqDetails[key] = val;
+                    }
+                  });
+                }
+              }
+              
+              return (
+                <>
+                  {mcqDetails && (
+                    <div className="bg-[#FAF6F0] rounded-xl p-4 border border-[#EADDCA]/60 mb-5 space-y-2 text-left shadow-inner">
+                      <p className="font-sans text-[10px] font-extrabold tracking-widest uppercase text-[#C5A059] border-b border-[#EADDCA]/30 pb-1.5 mb-2">Category Metrics</p>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-[#3E362E]">
+                        {Object.entries(mcqDetails).map(([key, val]) => (
+                          <div key={key} className="flex justify-between font-sans">
+                            <span className="font-semibold text-stone-500 text-[10px]">{key}:</span>
+                            <span className="font-black uppercase text-[10px] text-[#3E362E]">{val}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Opening quote */}
+                  <div className="text-[#C5A059] font-serif text-5xl leading-none opacity-60 mb-1">"</div>
+                  
+                  {/* Review body — Rule 3 but serif italic for luxury feel */}
+                  <p className="font-serif italic text-base leading-relaxed text-[#3E362E] mb-6 whitespace-pre-wrap">
+                    {cleanText || "No written feedback provided."}
+                  </p>
+                </>
+              );
+            })()}
 
             {selectedReview.barber_id?.name && (
               <div className="bg-[#FAF6F0] border-l-2 border-[#C5A059] px-4 py-2.5 rounded-r-xl mb-6">

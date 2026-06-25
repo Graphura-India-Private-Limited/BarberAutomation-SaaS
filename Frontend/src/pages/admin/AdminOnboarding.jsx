@@ -105,6 +105,40 @@ const formatDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 };
 
+const PaginationSelect = ({ value, onChange, options }) => (
+  <div style={{ position: "relative", display: "inline-block" }}>
+    <select
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      style={{
+        padding: "5px 28px 5px 12px",
+        borderRadius: 10,
+        border: `1px solid ${C.border}`,
+        background: "#FAF9F6",
+        fontSize: 11,
+        color: C.ink,
+        cursor: "pointer",
+        outline: "none",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: "0.05em",
+        appearance: "none",
+        WebkitAppearance: "none",
+        MozAppearance: "none"
+      }}
+    >
+      {options.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
+      ))}
+    </select>
+    <div style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", display: "flex", alignItems: "center", color: C.gold }}>
+      <ChevronDown size={12} style={{ strokeWidth: "2.5px" }} />
+    </div>
+  </div>
+);
+
 const SectionCard = ({ title, actionLabel, onAction, children, minHeight }) => (
   <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
     <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -1363,53 +1397,24 @@ export default function AdminOnboarding() {
                               {/* Page size dropdown */}
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
-                                <select 
+                                 <PaginationSelect 
                                   value={custPerPage} 
-                                  onChange={(e) => {
-                                    setCustPerPage(Number(e.target.value));
+                                  onChange={(val) => {
+                                    setCustPerPage(val);
                                     setCustPage(1);
                                   }}
-                                  style={{
-                                    padding: "4px 8px",
-                                    borderRadius: 8,
-                                    border: `1px solid ${C.border}`,
-                                    background: "#fff",
-                                    fontSize: 12,
-                                    color: C.ink,
-                                    cursor: "pointer",
-                                    outline: "none",
-                                    fontWeight: 600
-                                  }}
-                                >
-                                  <option value={5}>5</option>
-                                  <option value={10}>10</option>
-                                  <option value={20}>20</option>
-                                  <option value={50}>50</option>
-                                </select>
+                                  options={[5, 10, 20, 50]}
+                                />
                               </div>
 
                               {/* Page selection dropdown */}
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
-                                <select
-                                  value={custPage}
-                                  onChange={(e) => setCustPage(Number(e.target.value))}
-                                  style={{
-                                    padding: "4px 8px",
-                                    borderRadius: 8,
-                                    border: `1px solid ${C.border}`,
-                                    background: "#fff",
-                                    fontSize: 12,
-                                    color: C.ink,
-                                    cursor: "pointer",
-                                    outline: "none",
-                                    fontWeight: 600
-                                  }}
-                                >
-                                  {Array.from({ length: totalPages }, (_, idx) => (
-                                    <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
-                                  ))}
-                                </select>
+                                <PaginationSelect 
+                                  value={custPage} 
+                                  onChange={setCustPage}
+                                  options={Array.from({ length: totalPages }, (_, idx) => idx + 1)}
+                                />
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
                               </div>
 
@@ -1732,53 +1737,24 @@ export default function AdminOnboarding() {
                               {/* Page size dropdown */}
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
-                                <select 
+                                 <PaginationSelect 
                                   value={apptPerPage} 
-                                  onChange={(e) => {
-                                    setApptPerPage(Number(e.target.value));
+                                  onChange={(val) => {
+                                    setApptPerPage(val);
                                     setApptPage(1);
                                   }}
-                                  style={{
-                                    padding: "4px 8px",
-                                    borderRadius: 8,
-                                    border: `1px solid ${C.border}`,
-                                    background: "#fff",
-                                    fontSize: 12,
-                                    color: C.ink,
-                                    cursor: "pointer",
-                                    outline: "none",
-                                    fontWeight: 600
-                                  }}
-                                >
-                                  <option value={5}>5</option>
-                                  <option value={10}>10</option>
-                                  <option value={20}>20</option>
-                                  <option value={50}>50</option>
-                                </select>
+                                  options={[5, 10, 20, 50]}
+                                />
                               </div>
 
                               {/* Page selection dropdown */}
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
-                                <select
-                                  value={apptPage}
-                                  onChange={(e) => setApptPage(Number(e.target.value))}
-                                  style={{
-                                    padding: "4px 8px",
-                                    borderRadius: 8,
-                                    border: `1px solid ${C.border}`,
-                                    background: "#fff",
-                                    fontSize: 12,
-                                    color: C.ink,
-                                    cursor: "pointer",
-                                    outline: "none",
-                                    fontWeight: 600
-                                  }}
-                                >
-                                  {Array.from({ length: totalPages }, (_, idx) => (
-                                    <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
-                                  ))}
-                                </select>
+                                <PaginationSelect 
+                                  value={apptPage} 
+                                  onChange={setApptPage}
+                                  options={Array.from({ length: totalPages }, (_, idx) => idx + 1)}
+                                />
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
                               </div>
 
@@ -1981,53 +1957,24 @@ export default function AdminOnboarding() {
                                 {/* Page size dropdown */}
                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                   <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
-                                  <select 
+                                   <PaginationSelect 
                                     value={servPerPage} 
-                                    onChange={(e) => {
-                                      setServPerPage(Number(e.target.value));
+                                    onChange={(val) => {
+                                      setServPerPage(val);
                                       setServPage(1);
                                     }}
-                                    style={{
-                                      padding: "4px 8px",
-                                      borderRadius: 8,
-                                      border: `1px solid ${C.border}`,
-                                      background: "#fff",
-                                      fontSize: 12,
-                                      color: C.ink,
-                                      cursor: "pointer",
-                                      outline: "none",
-                                      fontWeight: 600
-                                    }}
-                                  >
-                                    <option value={5}>5</option>
-                                    <option value={10}>10</option>
-                                    <option value={20}>20</option>
-                                    <option value={50}>50</option>
-                                  </select>
+                                    options={[5, 10, 20, 50]}
+                                  />
                                 </div>
 
                                 {/* Page selection dropdown */}
                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                   <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
-                                  <select
-                                    value={servPage}
-                                    onChange={(e) => setServPage(Number(e.target.value))}
-                                    style={{
-                                      padding: "4px 8px",
-                                      borderRadius: 8,
-                                      border: `1px solid ${C.border}`,
-                                      background: "#fff",
-                                      fontSize: 12,
-                                      color: C.ink,
-                                      cursor: "pointer",
-                                      outline: "none",
-                                      fontWeight: 600
-                                    }}
-                                  >
-                                    {Array.from({ length: totalPages }, (_, idx) => (
-                                      <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
-                                    ))}
-                                  </select>
+                                  <PaginationSelect 
+                                    value={servPage} 
+                                    onChange={setServPage}
+                                    options={Array.from({ length: totalPages }, (_, idx) => idx + 1)}
+                                  />
                                   <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
                                 </div>
 
@@ -2679,53 +2626,24 @@ export default function AdminOnboarding() {
                             {/* Show per page dropdown */}
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
-                              <select
-                                value={payPerPage}
-                                onChange={(e) => {
-                                  setPayPerPage(Number(e.target.value));
+                               <PaginationSelect 
+                                value={payPerPage} 
+                                onChange={(val) => {
+                                  setPayPerPage(val);
                                   setPayPage(1);
                                 }}
-                                style={{
-                                  padding: "4px 8px",
-                                  borderRadius: 8,
-                                  border: `1px solid ${C.border}`,
-                                  background: "#fff",
-                                  fontSize: 12,
-                                  color: C.ink,
-                                  cursor: "pointer",
-                                  outline: "none",
-                                  fontWeight: 600
-                                }}
-                              >
-                                <option value={5}>5</option>
-                                <option value={10}>10</option>
-                                <option value={20}>20</option>
-                                <option value={50}>50</option>
-                              </select>
+                                options={[5, 10, 20, 50]}
+                              />
                             </div>
 
                             {/* Page selection dropdown */}
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Page:</span>
-                              <select
-                                value={payPage}
-                                onChange={(e) => setPayPage(Number(e.target.value))}
-                                style={{
-                                  padding: "4px 8px",
-                                  borderRadius: 8,
-                                  border: `1px solid ${C.border}`,
-                                  background: "#fff",
-                                  fontSize: 12,
-                                  color: C.ink,
-                                  cursor: "pointer",
-                                  outline: "none",
-                                  fontWeight: 600
-                                }}
-                              >
-                                {Array.from({ length: totalPages }, (_, idx) => (
-                                  <option key={idx + 1} value={idx + 1}>{idx + 1}</option>
-                                ))}
-                              </select>
+                              <PaginationSelect 
+                                value={payPage} 
+                                onChange={setPayPage}
+                                options={Array.from({ length: totalPages }, (_, idx) => idx + 1)}
+                              />
                               <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>of {totalPages}</span>
                             </div>
 

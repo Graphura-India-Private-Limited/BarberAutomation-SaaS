@@ -147,12 +147,12 @@ function PrivacyPolicy() {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight text-[#3E362E] leading-none">
-              Privacy{" "}
-              <span className="text-[#C5A059] italic font-serif normal-case drop-shadow-[0_4px_10px_rgba(197,160,89,0.15)]">
-                Policy
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-[#3E362E] mt-6 leading-none">
+                Privacy{" "}
+              <span className="text-[#C5A059] italic font-serif normal-case block sm:inline sm:ml-3">
+                Policy 
               </span>
-            </h1>
+            </h2>
 
             <div className="w-24 h-[2px] bg-gradient-to-r from-transparent via-[#C5A059] to-transparent mx-auto mt-6" />
 
