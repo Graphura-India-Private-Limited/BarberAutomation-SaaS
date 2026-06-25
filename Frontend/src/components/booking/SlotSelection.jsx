@@ -143,7 +143,7 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
   const displayedSlots = timeSlots.filter(time => !isSlotBooked(selectedDate, time));
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-xl mx-auto">
+    <div className="max-w-xl mx-auto">
       <div className="mb-8 border-b pb-4">
         <h2 className="text-2xl font-bold text-gray-900">Select your slot</h2>
         <p className="text-gray-500 mt-1">

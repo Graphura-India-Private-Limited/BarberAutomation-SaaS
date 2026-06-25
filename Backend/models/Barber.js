@@ -5,7 +5,7 @@ const barberSchema = new mongoose.Schema({
   name:{type:String,required:true}, mobile:{type:String,required:true,unique:true},
   password_hash:{type:String,required:true}, specialization:{type:String,default:""},
   experience:{type:Number,default:0},
-  status:{type:String,default:"available",enum:["available","busy","break","offline"]},
+  status:{type:String,default:"available",enum:["available","busy","break"]},
   rating:{type:Number,default:0}, is_active:{type:Boolean,default:true},
   email: { type: String, default: "" },
   aadhaar: { type: String, default: "" },

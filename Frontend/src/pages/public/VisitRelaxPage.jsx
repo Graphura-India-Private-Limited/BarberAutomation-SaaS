@@ -508,16 +508,31 @@ Always keep your neckline clean—trimming two fingers above your Adam's apple i
 
             {/* Content Body */}
             <div className="p-8 overflow-y-auto text-left space-y-4 text-[#3E362E] leading-relaxed text-sm">
-              {selectedArticle.content.split("\n\n").map((para, idx) => {
-                if (para.startsWith("1.") || para.startsWith("2.") || para.startsWith("3.") || para.startsWith("4.")) {
-                  return (
-                    <div key={idx} className="pl-4 border-l-2 border-[#C5A059] py-0.5 my-2">
-                      <p className="font-semibold text-[#3E362E]">{para}</p>
-                    </div>
-                  );
-                }
-                return <p key={idx}>{para}</p>;
-              })}
+              {(() => {
+                const lines = selectedArticle.content.split("\n")
+                  .map(line => line.trim())
+                  .filter(line => line.length > 0);
+                
+                return lines.map((line, idx) => {
+                  const isListItem = /^\d+\.\s/.test(line);
+                  const parts = line.split("**");
+                  const parsedText = parts.map((part, index) => {
+                    if (index % 2 === 1) {
+                      return <strong key={index} className="font-black text-[#2A241F]">{part}</strong>;
+                    }
+                    return part;
+                  });
+
+                  if (isListItem) {
+                    return (
+                      <div key={idx} className="pl-4 border-l-2 border-[#C5A059] py-0.5 my-2">
+                        <p className="font-semibold text-[#3E362E]">{parsedText}</p>
+                      </div>
+                    );
+                  }
+                  return <p key={idx}>{parsedText}</p>;
+                });
+              })()}
             </div>
 
             {/* Footer */}

@@ -189,8 +189,12 @@ exports.startService = async (req, res) => {
     if (!q.barber_id) return res.status(400).json({ success: false, message: "Assign a barber first" });
 
     await Queue.findByIdAndUpdate(req.params.queue_id, { status: "in-progress" });
-    await Booking.findByIdAndUpdate(q.booking_id, { status: "in-progress" });
-    await Barber.findByIdAndUpdate(q.barber_id, { status: "busy" });
+    if (q.booking_id) {
+      await Booking.findByIdAndUpdate(q.booking_id, { status: "in-progress" });
+    }
+    if (q.barber_id) {
+      await Barber.findByIdAndUpdate(q.barber_id, { status: "busy" });
+    }
 
     res.json({ success: true, message: "Service started" });
   } catch (err) {
@@ -210,7 +214,9 @@ exports.completeService = async (req, res) => {
       status: "completed",
       served_at: new Date(),
     });
-    await Booking.findByIdAndUpdate(q.booking_id, { status: "completed" });
+    if (q.booking_id) {
+      await Booking.findByIdAndUpdate(q.booking_id, { status: "completed" });
+    }
 
     if (q.barber_id) {
       await Barber.findByIdAndUpdate(q.barber_id, { status: "available" });

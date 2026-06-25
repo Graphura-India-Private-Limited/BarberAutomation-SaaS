@@ -285,7 +285,7 @@ export function DetailModal({ entry, isQueue, onClose, onServe, onRemove }) {
           <div className="flex flex-col sm:flex-row gap-3">
             <button 
               className="flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest border border-rose-200 bg-rose-50/40 text-rose-700 hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all cursor-pointer shadow-3xs flex items-center justify-center gap-1.5"
-              onClick={() => { onRemove(entry.id); onClose(); }}
+              onClick={() => { onRemove(entry); onClose(); }}
             >
               <Trash2 size={13} />
               {isQueue ? 'Remove from Queue' : 'Cancel Booking'}
@@ -295,10 +295,10 @@ export function DetailModal({ entry, isQueue, onClose, onServe, onRemove }) {
               <button 
                 className="flex-1 py-4 rounded-xl font-black text-xs uppercase tracking-widest text-white shadow-md active:scale-98 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 style={{ backgroundColor: CHARCOAL }}
-                onClick={() => { onServe(entry.id); onClose(); }}
+                onClick={() => { onServe(entry); onClose(); }}
               >
                 <CheckCircle2 size={13} color={GOLD} />
-                Mark as Served
+                {entry.status === 'in-progress' ? 'Complete Service' : 'Start Service'}
               </button>
             )}
           </div>

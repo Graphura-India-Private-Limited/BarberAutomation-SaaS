@@ -275,7 +275,8 @@ export default function SmartQueue() {
     }
   };
 
-  const handleServe = id => {
+  const handleServe = idOrEntry => {
+    const id = idOrEntry && typeof idOrEntry === 'object' ? idOrEntry.id : idOrEntry;
     setQueue(prev => {
       const done = prev.find(e => e.id === id);
       if (done) { toast(`${done.name} served! `, 'success'); setServedCount(n => n + 1); }
@@ -284,7 +285,8 @@ export default function SmartQueue() {
     setDetail(null);
   };
 
-  const handleRemoveQueue = id => {
+  const handleRemoveQueue = idOrEntry => {
+    const id = idOrEntry && typeof idOrEntry === 'object' ? idOrEntry.id : idOrEntry;
     setQueue(prev => {
       const gone = prev.find(e => e.id === id);
       if (gone) toast(`${gone.name} removed from queue`, 'warn');
@@ -292,7 +294,8 @@ export default function SmartQueue() {
     });
   };
 
-  const handleRemoveBooking = id => {
+  const handleRemoveBooking = idOrEntry => {
+    const id = idOrEntry && typeof idOrEntry === 'object' ? idOrEntry.id : idOrEntry;
     setBookings(prev => {
       const gone = prev.find(e => e.id === id);
       if (gone) toast(`${gone.name}'s booking cancelled`, 'warn');

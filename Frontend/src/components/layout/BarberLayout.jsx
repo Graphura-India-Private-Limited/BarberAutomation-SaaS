@@ -9,17 +9,44 @@ import {
 
 const STATUS_CFG = {
   available: { label: "Available", dot: "bg-emerald-500", text: "text-emerald-700" },
-  busy: { label: "Busy", dot: "bg-amber-500", text: "text-amber-700" },
-  break: { label: "On Break", dot: "bg-rose-500", text: "text-rose-700" }
+  busy:      { label: "Busy",      dot: "bg-amber-500",   text: "text-amber-700" },
+  break:     { label: "On Break",  dot: "bg-stone-500",   text: "text-stone-700" }
 };
 
 export default function BarberLayout({ children, profile, status, setStatus, toast }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sideOpen, setSideOpen] = useState(false);
-  const [statusOpen, setStatusOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
+  const [dbStatus, setDbStatus] = useState("available");
+
+  const barberId = localStorage.getItem("barberId");
+  const token = localStorage.getItem("token");
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+  React.useEffect(() => {
+    if (!barberId) return;
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch(`${API}/barber/${barberId}/dashboard`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (data.success && data.barber) {
+          setDbStatus(data.barber.status || "available");
+        }
+      } catch (err) {
+        console.error("Error fetching status:", err);
+      }
+    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 10000);
+    return () => clearInterval(interval);
+  }, [barberId, token, API]);
 
   const mockNotifications = [
     { id: 1, text: "New Booking: Mayur K. booked Classic Haircut at 10:30 AM", time: "5m ago" },
@@ -27,7 +54,7 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
     { id: 3, text: "System Alert: Salon hours extended by 30 mins today for festive demand", time: "2h ago" },
   ];
 
-  const sc = STATUS_CFG[status] || STATUS_CFG.available;
+  const sc = STATUS_CFG[dbStatus] || STATUS_CFG.available;
 
   // ═══ स्क्रीनशॉटनुसार सर्व पेजेसची अचूक लिस्ट ═══
   const NAV = [
@@ -119,33 +146,11 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
           </div>
 
           {/* Status selector */}
-          <div className="mt-3 relative">
-            <button 
-              onClick={() => setStatusOpen(!statusOpen)} 
-              className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#FFFBF4] hover:bg-[#FFF8EE] border border-[#C5A059]/40 hover:border-[#C5A059] text-[#3E362E] transition-all cursor-pointer h-10 shadow-3xs"
-            >
-              <span className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${sc.dot} ring-4 ${status === 'available' ? 'ring-emerald-500/20' : status === 'busy' ? 'ring-amber-500/20' : 'ring-rose-500/20'} animate-pulse`} />
-                <span>{sc.label}</span>
-              </span>
-              <ChevronDown className={`w-3.5 h-3.5 text-[#C5A059] transition-transform duration-300 ${statusOpen ? "rotate-180" : ""}`} />
-            </button>
-            
-            {statusOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl overflow-hidden z-50 bg-white border border-[#C5A059]/30 shadow-md animate-in fade-in slide-in-from-top-1 duration-150">
-                {Object.entries(STATUS_CFG).map(([key, cfg]) => (
-                  <button 
-                    key={key} 
-                    onClick={() => { setStatus(key); setStatusOpen(false); }} 
-                    className="w-full flex items-center gap-2.5 px-3.5 py-3 text-[10px] uppercase tracking-wider border-b border-stone-100 last:border-0 hover:bg-[#FAF6F0] transition-colors text-left cursor-pointer font-black text-[#3E362E]"
-                  >
-                    <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                    <span className="font-sans">{cfg.label}</span>
-                    {status === key && <Check className="w-3.5 h-3.5 ml-auto text-[#C5A059] stroke-[3px]" />}
-                  </button>
-                ))}
-              </div>
-            )}
+          <div className="mt-3">
+            <div className="w-full flex items-center gap-2 px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-[#FFFBF4] border border-[#C5A059]/40 text-[#3E362E] h-10 shadow-3xs">
+              <span className={`w-2 h-2 rounded-full ${sc.dot} ring-4 ${dbStatus === "available" ? "ring-emerald-500/20" : dbStatus === "busy" ? "ring-amber-500/20" : "ring-stone-500/20"} animate-pulse`} />
+              <span>{sc.label}</span>
+            </div>
           </div>
         </div>
 

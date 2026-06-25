@@ -234,10 +234,10 @@ export default function SelectLook() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E", paddingBottom: 120 }}>
 
         {/* ── BACK BUTTON ── */}
-        <div style={{ position: "fixed", top: 88, left: 20, zIndex: 9999 }}>
+        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
           <button
             onClick={() => navigate(-1)}
-            style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "center", color: "#2C241E" }}
+            style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
           >←</button>
@@ -266,7 +266,7 @@ export default function SelectLook() {
         </div>
 
         {/* ── MAIN CONTENT ── */}
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 32px 0" }}>
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10">
 
           {/* ── CONTEXT STRIP ── */}
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28, flexWrap: "wrap" }}>
@@ -349,17 +349,10 @@ export default function SelectLook() {
         </div>
 
         {/* ── STICKY BOTTOM BAR ── */}
-        <div style={{
-          position: "fixed", bottom: 0, left: 0, right: 0,
-          background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)",
-          borderTop: "1px solid #EAE0D0",
-          boxShadow: "0 -8px 32px rgba(44,36,30,0.07)",
-          zIndex: 50,
-          padding: "16px 32px",
-        }}>
-          <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
+        <div className="fixed bottom-0 left-0 right-0 bg-white/92 backdrop-blur-md border-t border-[#EAE0D0] shadow-[0_-8px_32px_rgba(44,36,30,0.07)] z-50 p-4 md:px-8">
+          <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
             {/* left: selected look preview */}
-            <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+            <div className="flex items-center gap-3.5 min-w-0 w-full sm:w-auto justify-start">
               {selectedLook ? (
                 <>
                   <div style={{ width: 48, height: 48, borderRadius: 10, overflow: "hidden", border: "2px solid #C5A059", flexShrink: 0 }}>
@@ -386,6 +379,7 @@ export default function SelectLook() {
             <button
               onClick={handleContinue}
               disabled={!selectedLook}
+              className="w-full sm:w-auto justify-center"
               style={{
                 flexShrink: 0,
                 padding: "14px 36px",

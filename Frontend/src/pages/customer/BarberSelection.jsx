@@ -375,10 +375,10 @@ export default function BarberSelection() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
 
         {/* ── BACK BUTTON ── */}
-        <div style={{ position: "fixed", top: 88, left: 20, zIndex: 9999 }}>
+        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
           <button
             onClick={() => navigate(-1)}
-            style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "center", color: "#2C241E" }}
+            style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
           >←</button>
@@ -409,7 +409,7 @@ export default function BarberSelection() {
         </div>
 
         {/* ── MAIN ── */}
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "32px 32px 100px" }}>
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10">
 
           {/* ── SERVICE CONTEXT STRIP ── */}
           {selectedService && (
@@ -431,10 +431,10 @@ export default function BarberSelection() {
           )}
 
           {/* ── LAYOUT ── */}
-          <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
 
             {/* ── SIDEBAR ── */}
-            <aside style={{ width: 240, flexShrink: 0, position: "sticky", top: 90 }}>
+            <aside className="w-full md:w-[240px] shrink-0 md:sticky md:top-[90px] mb-6 md:mb-0">
               <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0", overflow: "hidden" }}>
                 <div style={{ padding: "15px 20px 12px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2C241E" }}>⚙ Filters</span>
@@ -499,7 +499,7 @@ export default function BarberSelection() {
             </aside>
 
             {/* ── CARDS AREA ── */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex-1 w-full min-w-0">
               {/* top bar */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
                 <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: "#888", margin: 0 }}>
@@ -538,7 +538,7 @@ export default function BarberSelection() {
                   <button onClick={clearFilters} style={{ padding: "10px 28px", background: "#2C241E", color: "#fff", border: "none", borderRadius: 8, fontSize: 11, fontFamily: "'Montserrat',sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Clear Filters</button>
                 </div>
               ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 24 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
                   {filtered.map((b, i) => (
                     <div key={b.id} ref={(el) => (cardRefs.current[b.id] = el)}>
                       <BarberCard
@@ -555,8 +555,8 @@ export default function BarberSelection() {
 
               {/* CONTINUE CTA */}
               {selectedBarber && (
-                <div style={{ marginTop: 40, padding: "24px 28px", background: "#fff", border: "1px solid #EAE0D0", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-                  <div>
+                <div className="mt-10 p-5 md:p-7 bg-white border border-[#EAE0D0] rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="w-full sm:w-auto text-left">
                     <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#AAA", margin: "0 0 4px" }}>Selected Artist</p>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                       <img src={selectedBarber.img} alt={selectedBarber.name} style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A059" }} />
@@ -583,6 +583,7 @@ export default function BarberSelection() {
                         navigate("/customer/look", { state: { service: selectedService, barber: selectedBarber, gender } });
                       }
                     }}
+                    className="w-full sm:w-auto justify-center"
                     style={{ background: "#C5A059", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s", display: "flex", alignItems: "center", gap: 8 }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "#2C241E"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "#C5A059"; }}

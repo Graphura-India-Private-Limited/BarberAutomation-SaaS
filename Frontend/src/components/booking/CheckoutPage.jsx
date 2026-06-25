@@ -76,7 +76,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100 max-w-2xl mx-auto text-left font-sans">
+    <div className="max-w-2xl mx-auto text-left font-sans">
       <AnimatePresence>
         {processing && (
           <motion.div

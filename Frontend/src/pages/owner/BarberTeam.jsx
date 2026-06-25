@@ -405,7 +405,7 @@ export default function BarberTeam() {
                         {statusMeta.label}
                       </span>
 
-                      {barber.status !== "busy" && barber.status !== "offline" ? (
+                      {barber.status !== "busy" ? (
                         <button 
                           onClick={(e) => { e.stopPropagation(); toggleStatus(barber._id, barber.status); }}
                           disabled={busyId === barber._id}
@@ -429,7 +429,7 @@ export default function BarberTeam() {
                         </button>
                       ) : (
                         <div className="px-4 py-2 rounded-xl border border-dashed border-stone-200 text-stone-400 font-extrabold text-[10px] uppercase tracking-wider text-center select-none bg-stone-50/50">
-                          {barber.status === "busy" ? "Busy" : "Offline"}
+                          Busy
                         </div>
                       )}
                     </div>

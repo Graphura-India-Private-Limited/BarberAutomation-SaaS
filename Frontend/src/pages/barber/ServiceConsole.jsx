@@ -87,7 +87,14 @@ export default function ServiceConsole() {
   const [selectedId, setSelectedId] = useState(null);
   const [elapsedTimes, setElapsedTimes] = useState({});
 
-  const activeQueue = queue.filter(c => c.status !== "completed" && c.status !== "noshow");
+  const barberId = localStorage.getItem("barberId");
+  const activeQueue = queue.filter(c => {
+    if (c.status === "completed" || c.status === "noshow") return false;
+    if (barberId && !usingDemo) {
+      return c.barber_id === barberId;
+    }
+    return true;
+  });
   const cur = activeQueue.find(c => c.id === selectedId) || activeQueue[0];
 
   // Set/Sync selectedId
@@ -141,8 +148,8 @@ export default function ServiceConsole() {
         headers: { Authorization: `Bearer ${getToken()}` }
       });
       const data = await res.json();
-      if (data.success && data.queue?.length > 0) {
-        const mapped = data.queue.map(q => ({
+      if (data.success) {
+        const mapped = (data.queue || []).map(q => ({
           id: q._id,
           booking_id: q.booking_id?._id || q.booking_id,
           position: q.position,
@@ -150,7 +157,8 @@ export default function ServiceConsole() {
           customer_mobile: q.customer_id?.mobile || q.phone || "No Mobile",
           services: q.booking_id?.services || [{ service: q.service || "Grooming Session" }],
           status: q.status, // waiting, in-progress, paused, delayed, noshow, completed
-          joined_at: q.joined_at
+          joined_at: q.joined_at,
+          barber_id: q.barber_id?._id || q.barber_id || null
         }));
         setQueue(mapped);
         setUsingDemo(false);
@@ -446,7 +454,9 @@ export default function ServiceConsole() {
                       <StatusBadge status={c.status} small />
                     </div>
                   </div>
-                  <span className="text-xs font-black text-stone-300">#{c.position}</span>
+                  <span className="text-xs font-black text-stone-300">
+                    {c.status === "in-progress" ? "In Chair" : `#${c.position}`}
+                  </span>
                 </div>
               ))}
             </div>

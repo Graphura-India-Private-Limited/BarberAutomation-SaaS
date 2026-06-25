@@ -204,7 +204,7 @@ export default function ServiceCategories() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
 
         {/* ── BACK BUTTON ── */}
-        <div style={{ position: "fixed", top: 88, left: 20, zIndex: 9999 }}>
+        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
           <button
             onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
             style={{
@@ -215,7 +215,7 @@ export default function ServiceCategories() {
               cursor: "pointer", fontSize: 18,
               boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
               transition: "all 0.3s ease",
-              display: "flex", alignItems: "center", justifyContent: "center",
+              display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center",
               color: "#2C241E",
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
@@ -289,8 +289,8 @@ export default function ServiceCategories() {
         </div>
 
         {/* ── CARDS GRID ── */}
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 32px 100px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 28 }}>
+        <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-10 md:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
             {CATEGORIES.map((cat, i) => (
               <CategoryCard key={cat.id} cat={cat} index={i} navigate={navigate} />
             ))}

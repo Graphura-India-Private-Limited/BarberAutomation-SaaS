@@ -6,7 +6,7 @@ export default function ConfirmationPage({ bookingData = {}, onReset, onWriteRev
   const [bookingId] = useState(() => bookingData._id || bookingData.bookingId || "BKG-" + Math.floor(100000 + Math.random() * 900000));
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center max-w-xl mx-auto">
+    <div className="text-center max-w-xl mx-auto">
       <div className="flex justify-center mb-6">
         <div className="h-20 w-20 bg-green-50 rounded-full flex items-center justify-center border border-green-100">
           <svg className="h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">

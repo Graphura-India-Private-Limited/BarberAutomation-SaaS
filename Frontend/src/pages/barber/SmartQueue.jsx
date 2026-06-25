@@ -32,7 +32,6 @@ const ScissorIcon = ({ className }) => (
   </svg>
 );
 
-
 // ─── QUEUE ROW COMPONENT ──────────────────────────────────────────────────────
 function QueueRow({ entry, idx, onClick, onServe }) {
   const barber  = BARBERS.find(b => b.id === entry.barber);
@@ -64,7 +63,11 @@ function QueueRow({ entry, idx, onClick, onServe }) {
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
           <SourceTag src={entry.source} />
-          {isFirst && <Chip color="#A37B58">● NEXT UP</Chip>}
+          {isFirst && (
+            <Chip color={entry.status === 'in-progress' ? '#2E8B57' : '#A37B58'}>
+              {entry.status === 'in-progress' ? '● SERVING' : '● NEXT UP'}
+            </Chip>
+          )}
         </div>
         <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
           {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
@@ -82,10 +85,10 @@ function QueueRow({ entry, idx, onClick, onServe }) {
       {/* Action Trigger */}
       {isFirst && (
         <button
-          onClick={e => { e.stopPropagation(); onServe(entry.id); }}
+          onClick={e => { e.stopPropagation(); onServe(entry); }}
           className="bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-xl transition-colors shadow-xs cursor-pointer"
         >
-          SERVE
+          {entry.status === "in-progress" ? "COMPLETE" : "SERVE"}
         </button>
       )}
     </div>
@@ -218,6 +221,10 @@ function StatsPanel({ queue, bookings, servedCount, liveActive }) {
 }
 
 // ─── MAIN APP VIEW PANEL ──────────────────────────────────────────────────────
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const getToken = () => localStorage.getItem("token");
+
+// ─── MAIN APP VIEW PANEL ──────────────────────────────────────────────────────
 export default function SmartQueue() {
   const navigate = useNavigate();
   const {
@@ -235,28 +242,122 @@ export default function SmartQueue() {
   const [liveActive,  setLiveActive]  = useState(true);
   const notifRef = useRef();
 
+  const barberId = localStorage.getItem("barberId");
+  const salonId = localStorage.getItem("salonId");
+  const token = localStorage.getItem("token");
+  const useDbData = !!barberId && !!salonId;
+
+  const [dbQueue, setDbQueue] = useState([]);
+  const [dbBookings, setDbBookings] = useState([]);
+  const [dbServedCount, setDbServedCount] = useState(0);
+
   const loggedInBarberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "";
   const currentBarberId = loggedInBarberName ? loggedInBarberName.split(" ")[0].toLowerCase() : "";
 
-  const myQueue = queue.filter(e => {
-    if (!currentBarberId) return true;
-    return e.barber === currentBarberId;
-  });
+  // Dynamic helper to map DB service names to expected short service IDs
+  const mapDbServiceToId = (serviceName) => {
+    if (!serviceName) return "haircut";
+    const name = serviceName.toLowerCase();
+    if (name.includes("haircut") && name.includes("shave")) return "combo";
+    if (name.includes("haircut")) return "haircut";
+    if (name.includes("shave")) return "shave";
+    if (name.includes("beard")) return "beard";
+    if (name.includes("color")) return "color";
+    if (name.includes("kids")) return "kids";
+    return "haircut"; // default fallback
+  };
 
-  const myBookings = bookings.filter(e => {
-    if (!currentBarberId) return true;
-    return e.barber === currentBarberId;
-  });
+  const fetchDbData = async () => {
+    if (!useDbData) return;
+    try {
+      // 1. Fetch queue and stats
+      const queueRes = await fetch(`${API}/barber/${barberId}/dashboard`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const queueData = await queueRes.json();
+      if (queueData.success) {
+        setDbQueue(queueData.todayQueue || []);
+        if (queueData.stats) {
+          setDbServedCount(queueData.stats.completedToday || 0);
+        }
+      }
+
+      // 2. Fetch bookings for the salon and filter for this barber
+      const bookingsRes = await fetch(`${API}/booking/salon/${salonId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const bookingsData = await bookingsRes.json();
+      if (bookingsData.success) {
+        const activeBookings = (bookingsData.bookings || []).filter(b => {
+          const bBarberId = b.barber_id?._id || b.barber_id;
+          return bBarberId === barberId && (b.status === "confirmed" || b.status === "pending");
+        });
+        setDbBookings(activeBookings);
+      }
+    } catch (err) {
+      console.error("Error fetching db queue/bookings:", err);
+    }
+  };
+
+  // Polling useEffect
+  useEffect(() => {
+    if (useDbData) {
+      fetchDbData();
+      const interval = setInterval(fetchDbData, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [useDbData]);
+
+  const myQueue = useDbData
+    ? dbQueue.map((item, idx) => ({
+        id: item._id,
+        bookingId: item.booking_id?._id || item.booking_id,
+        name: item.customer_id?.name || "Customer",
+        phone: item.customer_id?.mobile || "—",
+        service: mapDbServiceToId(item.booking_id?.services?.[0]?.service_name || item.service),
+        barber: currentBarberId,
+        position: item.position || (idx + 1),
+        joinedAt: new Date(item.joined_at || item.created_at || Date.now()).getTime(),
+        source: item.booking_id?.booking_type === "slot" ? "booked" : "walk-in",
+        status: item.status
+      }))
+    : queue.filter(e => {
+        if (!currentBarberId) return true;
+        return e.barber === currentBarberId;
+      });
+
+  const myBookings = useDbData
+    ? dbBookings.map(item => ({
+        id: item._id,
+        name: item.customer_id?.name || "Customer",
+        phone: item.customer_id?.mobile || "—",
+        service: mapDbServiceToId(item.services?.[0]?.service_name || "Haircut"),
+        barber: currentBarberId,
+        slot: item.slot_time || "—",
+        date: new Date(item.created_at || Date.now()).toLocaleDateString(),
+        status: item.status
+      }))
+    : bookings.filter(e => {
+        if (!currentBarberId) return true;
+        return e.barber === currentBarberId;
+      });
+
+  const displayServedCount = useDbData ? dbServedCount : servedCount;
 
   const toast = useCallback((msg, type='info') => {
-
     setNotif({ msg, type });
     clearTimeout(notifRef.current);
     notifRef.current = setTimeout(() => setNotif(null), 3500);
   }, []);
 
   useEffect(() => {
-    if (!liveActive) return;
+    if (!liveActive || useDbData) return;
     const t = setInterval(() => {
       setQueue(prev => {
         if (!prev.length) return prev;
@@ -267,10 +368,10 @@ export default function SmartQueue() {
       });
     }, 18000);
     return () => clearInterval(t);
-  }, [liveActive, toast]);
+  }, [liveActive, toast, useDbData]);
 
   useEffect(() => {
-    if (!liveActive) return;
+    if (!liveActive || useDbData) return;
     const t = setInterval(() => {
       setBookings(prev => {
         const toMove = prev.find(b => b.status === 'confirmed');
@@ -286,9 +387,13 @@ export default function SmartQueue() {
       });
     }, 30000);
     return () => clearInterval(t);
-  }, [liveActive, toast]);
+  }, [liveActive, toast, useDbData]);
 
   const handleAdd = ({ type, entry }) => {
+    if (useDbData) {
+      toast("Direct customer injection is disabled in live database mode.", "warn");
+      return;
+    }
     if (type === 'queue') {
       setQueue(prev => [...prev, { ...entry, position: prev.length + 1 }]);
       toast(`${entry.name} added to queue `, 'success');
@@ -298,33 +403,119 @@ export default function SmartQueue() {
     }
   };
 
-  const handleServe = id => {
-    setQueue(prev => {
-      const done = prev.find(e => e.id === id);
-      if (done) { toast(`${done.name} served! `, 'success'); setServedCount(n => n + 1); }
-      return prev.filter(e => e.id !== id).map((e, i) => ({ ...e, position: i + 1 }));
-    });
+  const handleServe = async idOrEntry => {
+    const entry = idOrEntry && typeof idOrEntry === 'object' ? idOrEntry : null;
+    const id = entry ? entry.id : idOrEntry;
+
+    if (useDbData && entry) {
+      const endpoint = entry.status === "in-progress" ? "complete" : "start";
+      try {
+        const res = await fetch(`${API}/barber/${barberId}/queue/${entry.id}/${endpoint}`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast(`${entry.name} ${endpoint === "start" ? "started" : "completed"}!`, "success");
+          fetchDbData();
+        } else {
+          toast(data.message || "Failed to update service status", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        toast("Network error updating service status", "error");
+      }
+    } else {
+      setQueue(prev => {
+        const done = prev.find(e => e.id === id);
+        if (done) { toast(`${done.name} served! `, 'success'); setServedCount(n => n + 1); }
+        return prev.filter(e => e.id !== id).map((e, i) => ({ ...e, position: i + 1 }));
+      });
+    }
     setDetail(null);
   };
 
-  const handleRemoveQueue = id => {
-    setQueue(prev => {
-      const gone = prev.find(e => e.id === id);
-      if (gone) toast(`${gone.name} removed from queue`, 'warn');
-      return prev.filter(e => e.id !== id).map((e, i) => ({ ...e, position: i + 1 }));
-    });
+  const handleRemoveQueue = async idOrEntry => {
+    const entry = idOrEntry && typeof idOrEntry === 'object' ? idOrEntry : null;
+    const id = entry ? entry.id : idOrEntry;
+
+    if (useDbData && entry) {
+      const bId = entry.bookingId;
+      if (!bId) {
+        toast("Unable to find booking ID to cancel", "error");
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/booking/${bId}/cancel`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast(`${entry.name} cancelled / removed!`, "success");
+          fetchDbData();
+        } else {
+          toast(data.message || "Failed to cancel", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        toast("Network error cancelling booking", "error");
+      }
+    } else {
+      setQueue(prev => {
+        const gone = prev.find(e => e.id === id);
+        if (gone) toast(`${gone.name} removed from queue`, 'warn');
+        return prev.filter(e => e.id !== id).map((e, i) => ({ ...e, position: i + 1 }));
+      });
+    }
+    setDetail(null);
   };
 
-  const handleRemoveBooking = id => {
-    setBookings(prev => {
-      const gone = prev.find(e => e.id === id);
-      if (gone) toast(`${gone.name}'s booking cancelled`, 'warn');
-      return prev.filter(e => e.id !== id);
-    });
+  const handleRemoveBooking = async idOrEntry => {
+    const entry = idOrEntry && typeof idOrEntry === 'object' ? idOrEntry : null;
+    const id = entry ? entry.id : idOrEntry;
+
+    if (useDbData) {
+      try {
+        const res = await fetch(`${API}/booking/${id}/cancel`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast(`Booking cancelled`, "success");
+          fetchDbData();
+        } else {
+          toast(data.message || "Failed to cancel booking", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        toast("Network error cancelling booking", "error");
+      }
+    } else {
+      setBookings(prev => {
+        const gone = prev.find(e => e.id === id);
+        if (gone) toast(`${gone.name}'s booking cancelled`, 'warn');
+        return prev.filter(e => e.id !== id);
+      });
+    }
+    setDetail(null);
   };
-  
 
   const handleMoveToQueue = id => {
+    if (useDbData) {
+      toast("Walk-in / Booking assignments are managed via the customer checking-in or the owner panel.", "info");
+      return;
+    }
     setBookings(prev => {
       const b = prev.find(e => e.id === id);
       if (!b) return prev;
@@ -350,7 +541,7 @@ export default function SmartQueue() {
           {[
             { v: myQueue.length,                                           l: 'In Queue',   c: 'text-[#3E362E]' },
             { v: myBookings.filter(b => b.status === 'confirmed').length,  l: 'Bookings',   c: 'text-blue-600' },
-            { v: servedCount,                                              l: 'Served',     c: 'text-emerald-700' },
+            { v: displayServedCount,                                       l: 'Served',     c: 'text-emerald-700' },
             { v: `${totalWaitMins}m`,                                      l: 'Total Wait', c: 'text-[#A37B58]' },
           ].map(({ v, l, c }) => (
 
@@ -454,7 +645,7 @@ export default function SmartQueue() {
 
         {/* ANALYTICS WORKLOAD TAB */}
         {tab === 'stats' && (
-          <StatsPanel queue={myQueue} bookings={myBookings} servedCount={servedCount} liveActive={liveActive} />
+          <StatsPanel queue={myQueue} bookings={myBookings} servedCount={displayServedCount} liveActive={liveActive} />
         )}
       </div>
 

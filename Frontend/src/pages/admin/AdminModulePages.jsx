@@ -786,7 +786,7 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
         return false;
 
       if (
-        ["available", "busy", "offline"].includes(statusFilter) &&
+        ["available", "busy", "break"].includes(statusFilter) &&
         b.status !== statusFilter
       ) {
         return false;
@@ -821,14 +821,14 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
     { value: "inactive", label: "Inactive" },
     { value: "available", label: "Available" },
     { value: "busy", label: "Busy" },
-    { value: "offline", label: "Offline" }
+    { value: "break", label: "On Break" }
   ];
 
   const statCards = [
     { label: "Total Barbers", value: barbers.length, sub: "All barbers", subColor: C.gold, icon: UserSquare, iconBg: C.goldLight, iconColor: C.gold },
     { label: "Active This Month", value: newMonth || activeCount, sub: "Active barbers", subColor: C.green, icon: UserPlus, iconBg: C.greenLight, iconColor: C.green },
     { label: "On Duty Now", value: onDuty, sub: "Currently working", subColor: C.purple, icon: Radio, iconBg: C.purpleLight, iconColor: C.purple },
-    { label: "Inactive Barbers", value: inactiveCount, sub: "Offline barbers", subColor: C.orange, icon: UserX, iconBg: C.orangeLight, iconColor: C.orange },
+    { label: "Inactive Barbers", value: inactiveCount, sub: "Inactive platform status", subColor: C.orange, icon: UserX, iconBg: C.orangeLight, iconColor: C.orange },
   ];
 
   return (
@@ -898,7 +898,7 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
                     </button>
                     {menuId === b._id && (
                       <div className="absolute right-0 top-full mt-1 z-10 min-w-[160px] rounded-md border bg-white py-1 shadow-lg" style={{ borderColor: C.border }}>
-                        {["available", "break", "offline"].map((s) => (
+                        {["available", "break"].map((s) => (
                           <button key={s} type="button" onClick={() => { changeBarberStatus(b._id, s); setMenuId(null); }}
                             className="w-full px-4 py-2 text-left font-sans text-sm font-normal hover:bg-gray-50 capitalize" style={{ color: C.ink }}>
                             Set {s}
@@ -1489,7 +1489,7 @@ export function LiveMonitoringModule({ barbers, loading, changeBarberStatus }) {
     { label: "Barbers Tracked", value: barbers.length, sub: "On platform", subColor: C.gold, icon: UserSquare, iconBg: C.goldLight, iconColor: C.gold },
     { label: "On Duty", value: onDuty, sub: "Live now", subColor: C.green, icon: Radio, iconBg: C.greenLight, iconColor: C.green },
     { label: "On Break", value: barbers.filter((b) => b.status === "break").length, sub: "Paused", subColor: C.blue, icon: Clock, iconBg: C.blueLight, iconColor: C.blue },
-    { label: "Offline", value: barbers.filter((b) => b.status === "offline").length, sub: "Not available", subColor: C.muted, icon: UserX, iconBg: "#F5F5F4", iconColor: C.muted },
+    { label: "Busy Barbers", value: barbers.filter((b) => b.status === "busy").length, sub: "Serving customers", subColor: C.red, icon: Scissors, iconBg: C.redLight, iconColor: C.red },
   ];
 
   return (
@@ -1523,7 +1523,7 @@ export function LiveMonitoringModule({ barbers, loading, changeBarberStatus }) {
               <div className="p-4">
                 <p className="font-sans text-xs font-normal mb-3" style={{ color: C.muted }}>Salon: <span className="font-semibold" style={{ color: C.gold }}>{b.salon_id?.salon_name || "—"}</span></p>
                 <div className="flex gap-2">
-                  {["available", "break", "offline"].map((s) => (
+                  {["available", "break"].map((s) => (
                     <button key={s} type="button" disabled={b.status === s} onClick={() => changeBarberStatus(b._id, s)}
                       className="flex-1 py-1.5 rounded-md font-sans text-[10px] font-extrabold tracking-wider disabled:opacity-60 capitalize"
                       style={{ background: b.status === s ? C.greenLight : "#F5F5F4", color: b.status === s ? C.green : C.muted, border: `1px solid ${C.border}` }}>

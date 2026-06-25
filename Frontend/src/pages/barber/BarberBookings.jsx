@@ -4,16 +4,18 @@ import {
   Search, SlidersHorizontal, User, Sparkles, Scissors, Landmark
 } from "lucide-react";
 
-// Mock operational dataset
+// Reservation ledger — customer names synced with LiveQueue mock data
 const INITIAL_BOOKINGS = [
-  { id: "BK-2026-01", customer: "Mayur K.", service: "Classic Haircut", time: "10:30 AM", date: "Today", price: 299, status: "confirmed", notes: "Prefers low fade drop" },
-  { id: "BK-2026-02", customer: "Rahul Verma", service: "Beard Trim & Shape", time: "11:45 AM", date: "Today", price: 199, status: "in-service", notes: "Lineup with straight razor" },
+  { id: "BK-2026-01", customer: "Aarav Mehta", service: "Premium Haircut & Beard Grooming", time: "10:30 AM", date: "Today", price: 450, status: "confirmed", notes: "Prefers low fade drop" },
+  { id: "BK-2026-02", customer: "Kabir Dev", service: "Royal Oil Head Massage", time: "11:45 AM", date: "Today", price: 250, status: "confirmed", notes: "Relaxing session preferred" },
+  { id: "BK-2026-03", customer: "Rohan Das", service: "Charcoal Face Scrub & Cleanse", time: "1:00 PM", date: "Today", price: 350, status: "pending", notes: "First-time client" },
+  { id: "BK-2026-04", customer: "Vikram Sen", service: "Classic Hair Wash & Conditioning", time: "2:30 PM", date: "Today", price: 200, status: "pending", notes: "" },
 ];
 
 const STATUS_CONFIG = {
   "pending": { label: "Awaiting Check-in", css: "bg-amber-50 text-amber-700 border-amber-200/60" },
   "confirmed": { label: "Confirmed Slot", css: "bg-stone-100 text-stone-800 border-stone-300/50" },
-  "in-service": { label: "Live In Service", css: "bg-emerald-50 text-emerald-700 border-emerald-200/60 animate-pulse" },
+  "in-service": { label: "Live In Service", css: "bg-emerald-50 text-emerald-700 border-emerald-200/60" },
   "cancelled": { label: "Cancelled Log", css: "bg-rose-50 text-rose-700 border-rose-200/40" }
 };
 
@@ -150,7 +152,7 @@ export default function BarberBookings() {
                           {conf.label}
                         </span>
 
-                        {/* Inline transactional state modifier controller dropdown split toggle list */}
+                        {/* Action controls - barbers can confirm or start service only, no cancel */}
                         {item.status !== "cancelled" && (
                           <div className="flex gap-1.5">
                             {item.status === "pending" && (
@@ -176,15 +178,6 @@ export default function BarberBookings() {
                                 className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-[#C5A059] text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-xs"
                               >
                                 Complete 🏁
-                              </button>
-                            )}
-                            {item.status === "pending" && (
-                              <button 
-                                onClick={() => updateBookingStatus(item.id, "cancelled")}
-                                className="p-1.5 rounded-lg bg-rose-50/40 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200/60 transition-colors cursor-pointer"
-                                title="Strike cancel log ticket slot"
-                              >
-                                <XCircle size={14} />
                               </button>
                             )}
                           </div>

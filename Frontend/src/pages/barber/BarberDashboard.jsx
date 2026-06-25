@@ -17,13 +17,6 @@ import {
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
 
-const STATUS_CFG = {
-  available: { dot: "bg-emerald-400", text: "text-emerald-400", label: "Available",   ring: "ring-emerald-400/30" },
-  busy:      { dot: "bg-amber-400",   text: "text-amber-400",   label: "Busy",        ring: "ring-amber-400/30" },
-  break:     { dot: "bg-sky-400",     text: "text-sky-400",     label: "On Break",    ring: "ring-sky-400/30" },
-  offline:   { dot: "bg-zinc-500",    text: "text-zinc-400",    label: "Offline",     ring: "ring-zinc-500/30" },
-};
-
 /* Weekly bar data */
 const WEEK_DATA = [
   { day: "Mon", val: 3200 },
@@ -35,18 +28,36 @@ const WEEK_DATA = [
   { day: "Sun", val: 5600, current: true },
 ];
 
+/* Stable custom bar label — prevents re-render blinking */
+const CustomBarLabel = ({ x, y, width, value }) => {
+  const label = `₹${(value / 1000).toFixed(1)}k`;
+  return (
+    <text
+      x={x + width / 2}
+      y={y - 6}
+      textAnchor="middle"
+      fontSize={12}
+      fontWeight={700}
+      fill="#4A3E3D"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", userSelect: 'none' }}
+    >
+      {label}
+    </text>
+  );
+};
+
 export default function BarberDashboard() {
   const navigate = useNavigate();
   const [active,      setActive]      = useState("dashboard");
   const [sideOpen,    setSideOpen]    = useState(false);
-  const [status,      setStatus]      = useState("available");
-  const [statusOpen,  setStatusOpen]  = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [loading,     setLoading]     = useState(true);
   const [toast,       setToast]       = useState(null);
   const [currentSvc,  setCurrentSvc]  = useState(null);
   const [salonOpen,   setSalonOpen]   = useState(true);
   const [showNextClient, setShowNextClient] = useState(false);
+  const [dbQueue, setDbQueue] = useState([]);
+  const [dbStats, setDbStats] = useState(null);
 
   const getInitials = (name) => {
     if (!name) return "AM";
@@ -139,27 +150,50 @@ export default function BarberDashboard() {
   const loggedInBarberName = localStorage.getItem("barberName") || localStorage.getItem("name") || "";
   const currentBarberId = loggedInBarberName ? loggedInBarberName.split(" ")[0].toLowerCase() : "ali";
 
+  const barberId = localStorage.getItem("barberId");
+  const useDbData = !!barberId;
+
   const myQueue = globalQueue.filter(e => {
     if (e.status === "done" || e.status === "Completed") return false;
     return e.barber === currentBarberId;
   });
 
-  const queue = myQueue.map((item, index) => {
-    const svcObj = SERVICES_LIST.find(s => s.id === item.service);
-    const amount = item.amount || (svcObj ? svcObj.price * 80 : 499);
-    const serviceLabel = item.serviceLabel || (svcObj ? svcObj.label : item.service);
-    const waitTime = item.wait || fmtWaitLocal(index + 1, item.service);
-    
-    return {
-      ...item,
-      customer: item.customer || item.name,
-      mobile: item.mobile || item.phone,
-      service: serviceLabel,
-      amount,
-      time: item.time || (item.slot || new Date(item.joinedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
-      wait: waitTime,
-      position: index + 1
-    };
+  const rawQueue = useDbData ? dbQueue : myQueue;
+
+  // Filter out any active in-progress item from the waiting queue list
+  const waitingQueue = rawQueue.filter(item => item.status !== "in-progress");
+
+  const queue = waitingQueue.map((item, index) => {
+    const isDb = item._id && !item._id.toString().startsWith("mock-");
+    if (isDb) {
+      return {
+        ...item,
+        id: item._id,
+        customer: item.customer_id?.name || "Customer",
+        mobile: item.customer_id?.mobile || "—",
+        service: item.booking_id?.services?.[0]?.service_name || "Service",
+        amount: item.booking_id?.total_amount || 0,
+        time: item.booking_id?.slot_time ? new Date(item.booking_id.slot_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date(item.joined_at || item.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        wait: `${index * 20 + 20} min`,
+        position: item.position || (index + 1)
+      };
+    } else {
+      const svcObj = SERVICES_LIST.find(s => s.id === item.service);
+      const amount = item.amount || (svcObj ? svcObj.price * 80 : 499);
+      const serviceLabel = item.serviceLabel || (svcObj ? svcObj.label : item.service);
+      const waitTime = item.wait || fmtWaitLocal(index + 1, item.service);
+      
+      return {
+        ...item,
+        customer: item.customer || item.name,
+        mobile: item.mobile || item.phone,
+        service: serviceLabel,
+        amount,
+        time: item.time || (item.slot || new Date(item.joinedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })),
+        wait: waitTime,
+        position: index + 1
+      };
+    }
   });
 
   const [breakRequests] = useState([
@@ -179,19 +213,148 @@ export default function BarberDashboard() {
     return () => clearInterval(t);
   }, []);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setCurrentSvc({
-        id: "active-1",
-        customer: "Vikram Singh",
-        service: "Haircut + Beard Trim",
-        amount: 599,
-        startedAt: new Date(Date.now() - 12 * 60 * 1000),
-        mobile: "98765 12345",
-      });
+  const fetchData = async () => {
+    const barberId = localStorage.getItem("barberId");
+    if (!barberId) {
       setLoading(false);
-    }, 600);
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API}/barber/${barberId}/dashboard`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDbQueue(data.todayQueue || []);
+        if (data.stats) {
+          setDbStats(data.stats);
+        }
+        
+        // Find active service — preserve startedAt to avoid elapsed timer resetting on each poll
+        const activeInChair = (data.todayQueue || []).find(q => q.status === "in-progress");
+        if (activeInChair) {
+          setCurrentSvc(prev => {
+            // Same customer still in chair — keep existing startedAt so elapsed timer continues correctly
+            if (prev && prev.id === (activeInChair._id || activeInChair.id)) {
+              return {
+                ...prev,
+                customer: activeInChair.customer_id?.name || prev.customer,
+                mobile: activeInChair.customer_id?.mobile || prev.mobile,
+                service: activeInChair.booking_id?.services?.[0]?.service_name || prev.service,
+                amount: activeInChair.booking_id?.total_amount || prev.amount,
+              };
+            }
+            // New customer — use server timestamp if available, else record now
+            const serverStart = activeInChair.served_at || activeInChair.started_at;
+            return {
+              id: activeInChair._id,
+              customer: activeInChair.customer_id?.name || "Customer",
+              mobile: activeInChair.customer_id?.mobile || "—",
+              service: activeInChair.booking_id?.services?.[0]?.service_name || "Service",
+              amount: activeInChair.booking_id?.total_amount || 0,
+              startedAt: serverStart ? new Date(serverStart) : new Date(),
+            };
+          });
+        } else {
+          setCurrentSvc(null);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching barber dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 10000);
+    return () => clearInterval(interval);
   }, []);
+
+  const handleStartService = async (nextUp) => {
+    const barberId = localStorage.getItem("barberId");
+    if (!barberId) {
+      setCurrentSvc({
+        id: nextUp.id,
+        customer: nextUp.customer,
+        service: nextUp.service,
+        amount: nextUp.amount,
+        startedAt: new Date(),
+        mobile: nextUp.mobile
+      });
+      setGlobalQueue(prev => prev.filter(e => e.id !== nextUp.id));
+      setShowNextClient(false);
+      showToast(`Started service for ${nextUp.customer}`, "success");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API}/barber/${barberId}/queue/${nextUp.id}/start`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Started service for ${nextUp.customer}`, "success");
+        setCurrentSvc({
+          id: nextUp.id,
+          customer: nextUp.customer,
+          service: nextUp.service,
+          amount: nextUp.amount,
+          startedAt: new Date(),
+          mobile: nextUp.mobile
+        });
+        fetchData();
+        setShowNextClient(false);
+      } else {
+        showToast(data.message || "Failed to start service", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Network error starting service", "error");
+    }
+  };
+
+  const handleCompleteService = async () => {
+    const barberId = localStorage.getItem("barberId");
+    if (!barberId || !currentSvc) {
+      setCurrentSvc(null);
+      setServedCount(n => n + 1);
+      showToast(`Completed — ${currentSvc?.customer || "client"}`);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API}/barber/${barberId}/queue/${currentSvc.id}/complete`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Completed — ${currentSvc.customer}`, "success");
+        setCurrentSvc(null);
+        fetchData();
+      } else {
+        showToast(data.message || "Failed to complete service", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Network error completing service", "error");
+    }
+  };
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -205,7 +368,6 @@ export default function BarberDashboard() {
   };
 
   const maxVal = Math.max(...WEEK_DATA.map(d => d.val));
-  const sc = STATUS_CFG[status];
 
  if (loading) return (
     <>
@@ -309,12 +471,12 @@ export default function BarberDashboard() {
         <main className="flex-1 px-4 md:px-6 pt-6 pb-6 space-y-5 bg-[#FDFBF7] text-[#4A3E3D]">
 
   {/* ── STAT CARDS ── */}
-<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mx-auto w-full">
+  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mx-auto w-full">
     {[
-      { label: "Today's Revenue",  value: `₹${stats.todayRevenue.toLocaleString()}`, sub: "+17% vs yesterday", icon: IndianRupee, up: true,  color: "#8B5A2B" },
-      { label: "Live Queue",        value: stats.liveQueue,                         sub: "1 in service",     icon: Users,       up: null,  color: "#4A3E3D" },
+      { label: "Today's Revenue",  value: `₹${(dbStats?.todayRevenue || stats.todayRevenue).toLocaleString()}`, sub: "+17% vs yesterday", icon: IndianRupee, up: true,  color: "#8B5A2B" },
+      { label: "Live Queue",        value: useDbData ? queue.length : stats.liveQueue,                         sub: currentSvc ? "1 in service" : "0 in service",     icon: Users,       up: null,  color: "#4A3E3D" },
       { label: "Active Barbers",    value: stats.activeBarbers,                      sub: "1 on break",       icon: UserCheck,   up: null,  color: "#8B5A2B" },
-      { label: "Avg Wait Time",     value: `${stats.avgWait} min`,                    sub: "Peak: 28 min at 2PM", icon: Timer,    up: false, color: "#4A3E3D" },
+      { label: "Avg Wait Time",     value: useDbData ? `${queue.length * 20} min` : `${stats.avgWait} min`,                    sub: "Peak: 28 min at 2PM", icon: Timer,    up: false, color: "#4A3E3D" },
     ].map((s, i) => (
       <div key={i} className="bg-white/80 backdrop-blur-md p-4 md:p-5 rounded-2xl border border-[#E6D5C3] transition-all duration-300 hover:bg-white shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
         <div className="flex items-start justify-between mb-3">
@@ -363,11 +525,7 @@ export default function BarberDashboard() {
             <p className="font-serif tracking-normal font-black text-2xl text-[#4A3E3D]">₹{currentSvc.amount}</p>
           </div>
           <button
-            onClick={() => {
-              setCurrentSvc(null);
-              setServedCount(n => n + 1);
-              showToast(`Completed — ${currentSvc.customer}`);
-            }}
+            onClick={handleCompleteService}
             className="px-5 py-3 rounded-xl text-white hover:text-[#FDFBF7] font-black text-xs flex items-center gap-2 transition duration-300 shadow-md hover:shadow-lg cursor-pointer font-sans uppercase tracking-wider"
             style={{ background: "linear-gradient(135deg, #5C4D4C, #4A3E3D)" }}
           >
@@ -408,13 +566,8 @@ export default function BarberDashboard() {
         <Bar 
           dataKey="val" 
           radius={[8, 8, 8, 8]}
-          label={{ 
-            position: 'top', 
-            fontSize: 10, 
-            fontWeight: 700, 
-            fill: '#4A3E3D',
-            formatter: (val) => `₹${(val/1000).toFixed(1)}k` 
-          }}
+          label={<CustomBarLabel />}
+          isAnimationActive={false}
         >
           {WEEK_DATA.map((entry, index) => (
             <Cell 
@@ -592,17 +745,7 @@ export default function BarberDashboard() {
                       showToast("Please complete your current service first!", "error");
                       return;
                     }
-                    setCurrentSvc({
-                      id: nextUp.id,
-                      customer: nextUp.customer,
-                      service: nextUp.service,
-                      amount: nextUp.amount,
-                      startedAt: new Date(),
-                      mobile: nextUp.mobile
-                    });
-                    setGlobalQueue(prev => prev.filter(e => e.id !== nextUp.id));
-                    setShowNextClient(false);
-                    showToast(`Started service for ${nextUp.customer}`, "success");
+                    handleStartService(nextUp);
                   }}
                   className="w-full bg-[#3E362E] hover:bg-[#2D2620] text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all cursor-pointer border-none shadow-md font-sans"
                 >

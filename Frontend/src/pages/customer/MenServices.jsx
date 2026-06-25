@@ -145,7 +145,7 @@ export default function MenServices() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond','Georgia',serif", color: "#2C241E" }}>
 
         {/* FLOATING BACK BUTTON — fixed, same as WomenServices */}
-        <div style={{ position: "fixed", top: "90px", left: "20px", zIndex: 9999 }}>
+        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[90px] md:left-5 z-[9999]">
           <button
             onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
             style={{ width: 48, height: 48, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(10px)", cursor: "pointer", fontSize: 20, boxShadow: "0 8px 20px rgba(0,0,0,0.15)", transition: "all 0.3s ease" }}
@@ -247,10 +247,10 @@ export default function MenServices() {
         </div>
 
         {/* MAIN */}
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "22px 32px 80px", display: "flex", gap: 36, alignItems: "flex-start" }}>
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-col md:flex-row gap-6 md:gap-9 items-start">
 
           {/* SIDEBAR */}
-          <aside style={{ width: 248, flexShrink: 0, position: "sticky", top: 90 }}>
+          <aside className="w-full md:w-[248px] shrink-0 md:sticky md:top-[90px] mb-6 md:mb-0">
             <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0", overflow: "hidden" }}>
               <div style={{ padding: "16px 20px 13px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", fontFamily: "'Montserrat',sans-serif", color: "#2C241E" }}>⚙ Filters</span>
@@ -311,7 +311,7 @@ export default function MenServices() {
           </aside>
 
           {/* CARDS */}
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="flex-1 w-full min-w-0">
             {filtered.length === 0 ? (
               <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
                 <div style={{ fontSize: 36, marginBottom: 14 }}>✦</div>

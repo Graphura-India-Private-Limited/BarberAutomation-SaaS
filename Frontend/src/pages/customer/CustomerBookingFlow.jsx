@@ -326,7 +326,7 @@ export default function Wrapper() {
               {currentStep === 3 && (
                 <>
                   <span className="mb-3 inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full shadow-sm">Step 03 — Timeline Allocation</span>
-                  <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+                  <h2 className="font-serif text-2xl sm:text-4xl tracking-normal text-stone-900 flex flex-wrap items-center justify-center gap-2 text-center">
                     <span className="font-bold uppercase">Select Your</span>
                     <span className="italic text-[#C5A059] normal-case font-medium">Slot & Time</span>
                   </h2>
@@ -335,7 +335,7 @@ export default function Wrapper() {
               {currentStep === 4 && (
                 <>
                   <span className="mb-3 inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full shadow-sm">Step 04 — Guest Credentials</span>
-                  <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+                  <h2 className="font-serif text-2xl sm:text-4xl tracking-normal text-stone-900 flex flex-wrap items-center justify-center gap-2 text-center">
                     <span className="font-bold uppercase">Personal</span>
                     <span className="italic text-[#C5A059] normal-case font-medium">Information</span>
                   </h2>
@@ -344,7 +344,7 @@ export default function Wrapper() {
               {currentStep === 5 && (
                 <>
                   <span className="mb-3 inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full shadow-sm">Step 05 — Secure Checkout</span>
-                  <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+                  <h2 className="font-serif text-2xl sm:text-4xl tracking-normal text-stone-900 flex flex-wrap items-center justify-center gap-2 text-center">
                     <span className="font-bold uppercase">Payment</span>
                     <span className="italic text-[#C5A059] normal-case font-medium">Checkout</span>
                   </h2>
@@ -353,7 +353,7 @@ export default function Wrapper() {
               {currentStep === 6 && (
                 <>
                   <span className="mb-3 inline-block text-[11px] font-extrabold uppercase tracking-widest text-emerald-800 font-sans bg-emerald-50 border border-emerald-200 px-4 py-1.5 rounded-full shadow-sm">Allocation Successful</span>
-                  <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+                  <h2 className="font-serif text-2xl sm:text-4xl tracking-normal text-stone-900 flex flex-wrap items-center justify-center gap-2 text-center">
                     <span className="font-bold uppercase">Digital Receipt</span>
                     <span className="italic text-[#C5A059] normal-case font-medium">Ledger</span>
                   </h2>

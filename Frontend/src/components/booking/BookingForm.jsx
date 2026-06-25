@@ -31,7 +31,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto">
       <div className="flex items-center mb-8 pb-4 border-b">
         <button type="button" onClick={onBack} className="text-gray-400 hover:text-stone-700 transition-colors mr-4">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

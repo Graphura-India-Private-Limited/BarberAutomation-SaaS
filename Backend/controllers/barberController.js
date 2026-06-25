@@ -66,9 +66,12 @@ exports.createBarber = async (req, res) => {
 exports.updateBarberStatus = async (req, res) => {
   try {
     const { status } = req.body;
+    if (!["available", "break", "busy"].includes(status)) {
+      return res.status(400).json({ success: false, message: `Invalid status value: ${status}` });
+    }
     await Barber.findByIdAndUpdate(req.params.id, { status });
 
-    if (status === "break" || status === "offline") {
+    if (status === "break") {
       await Queue.updateMany({ barber_id: req.params.id, status: "waiting" }, { status: "paused" });
     }
     if (status === "available") {
@@ -123,7 +126,9 @@ exports.startService = async (req, res) => {
     await Queue.findByIdAndUpdate(req.params.queue_id, { status: "in-progress" });
     await Barber.findByIdAndUpdate(req.params.barber_id, { status: "busy" });
     const q = await Queue.findById(req.params.queue_id);
-    await Booking.findByIdAndUpdate(q.booking_id, { status: "in-progress" });
+    if (q && q.booking_id) {
+      await Booking.findByIdAndUpdate(q.booking_id, { status: "in-progress" });
+    }
 
     res.json({ success: true, message: "Service started!" });
   } catch (err) {
@@ -138,7 +143,9 @@ exports.completeService = async (req, res) => {
   try {
     const q = await Queue.findByIdAndUpdate(req.params.queue_id, { status: "completed", served_at: new Date() }, { new: true });
     await Barber.findByIdAndUpdate(req.params.barber_id, { status: "available" });
-    await Booking.findByIdAndUpdate(q.booking_id, { status: "completed" });
+    if (q && q.booking_id) {
+      await Booking.findByIdAndUpdate(q.booking_id, { status: "completed" });
+    }
     await Queue.updateMany(
       { barber_id: req.params.barber_id, status: "waiting", position: { $gt: q.position } },
       { $inc: { position: -1 } }
@@ -156,7 +163,9 @@ exports.completeService = async (req, res) => {
 exports.markNoShow = async (req, res) => {
   try {
     const q = await Queue.findByIdAndUpdate(req.params.queue_id, { status: "noshow" }, { new: true });
-    await Booking.findByIdAndUpdate(q.booking_id, { status: "noshow" });
+    if (q && q.booking_id) {
+      await Booking.findByIdAndUpdate(q.booking_id, { status: "noshow" });
+    }
     await Barber.findByIdAndUpdate(req.params.barber_id, { status: "available" });
     await Queue.updateMany(
       { barber_id: req.params.barber_id, status: "waiting", position: { $gt: q.position } },
@@ -175,7 +184,6 @@ exports.markNoShow = async (req, res) => {
 exports.submitBreakRequest = async (req, res) => {
   try {
     const { break_type, start_time, duration_mins, reason } = req.body;
-    const autoApprove = break_type === "short" || Number(duration_mins) < 30;
 
     const breakReq = await BreakRequest.create({
       barber_id: req.params.id,
@@ -183,14 +191,10 @@ exports.submitBreakRequest = async (req, res) => {
       start_time: start_time || new Date(),
       duration_mins: duration_mins || 15,
       reason: reason || "",
-      status: autoApprove ? "approved" : "pending"
+      status: "pending"
     });
 
-    if (autoApprove) {
-      await Barber.findByIdAndUpdate(req.params.id, { status: "break" });
-    }
-
-    res.json({ success: true, break: breakReq, autoApproved: autoApprove });
+    res.json({ success: true, break: breakReq, autoApproved: false });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

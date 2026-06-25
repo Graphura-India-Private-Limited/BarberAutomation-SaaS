@@ -44,8 +44,8 @@ export default function LiveQueue() {
         fetch(`${API}/owner/salon/${salonId}/dashboard`, { headers: headers() }).then(r => r.json()),
       ]);
       
-      if (qRes.success && qRes.queue && qRes.queue.length > 0) {
-        setQueue(qRes.queue);
+      if (qRes.success) {
+        setQueue(qRes.queue || []);
       } else {
         setQueue(MOCK_QUEUE);
       }
@@ -173,6 +173,7 @@ export default function LiveQueue() {
   const waiting      = queue.filter(q =>  q.barber_id && q.status === "waiting");
   const inProgress   = queue.filter(q =>  q.status === "in-progress");
   const availBarbers = barbers.filter(b => b.status === "available");
+  const assignableBarbers = barbers.filter(b => b.status === "available" || b.status === "busy");
 
   return (
     <div className="p-6 md:p-10 font-sans text-zinc-800 text-left min-h-screen" style={{ background: "#FAF6F0" }}>
@@ -265,15 +266,15 @@ export default function LiveQueue() {
             </h2>
             {unassigned.length === 0 ? (
               <EmptyCard text="All bookings assigned 🎉"/>
-            ) : unassigned.map(q => (
-              <QueueCard key={q._id} q={q}>
+            ) : unassigned.map((q, idx) => (
+              <QueueCard key={q._id} q={q} displayPosition={idx + 1}>
                 <button onClick={() => autoAssign(q)} disabled={busyId === q._id || availBarbers.length === 0}
                   className="w-full bg-[#8B6B3E] hover:bg-[#735A32] text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
                   <Sparkles className="w-4 h-4"/>
                   {busyId === q._id ? "Assigning..." : "Auto-Assign"}
                 </button>
-                {availBarbers.length === 0 && (
-                  <p className="text-[10px] text-red-600 text-center font-semibold mt-2">No available barbers</p>
+                {assignableBarbers.length === 0 && (
+                  <p className="text-[10px] text-red-600 text-center font-semibold mt-2">No active barbers</p>
                 )}
                 <select
                   className="mt-2 w-full bg-[#FAF6F0]/60 border border-[#EADBCE]/50 rounded-xl px-3 py-2 text-xs text-zinc-700 outline-none focus:border-[#8B6B3E] transition font-medium cursor-pointer"
@@ -281,7 +282,7 @@ export default function LiveQueue() {
                   onChange={(e) => { if (e.target.value) manualAssign(q, e.target.value); }}
                   disabled={busyId === q._id}>
                   <option value="" disabled>Or pick manually...</option>
-                  {availBarbers.map(b => (
+                  {assignableBarbers.map(b => (
                     <option key={b._id} value={b._id}>{b.name}</option>
                   ))}
                 </select>
@@ -297,8 +298,8 @@ export default function LiveQueue() {
             </h2>
             {waiting.length === 0 ? (
               <EmptyCard text="No one in waiting"/>
-            ) : waiting.map(q => (
-              <QueueCard key={q._id} q={q}>
+            ) : waiting.map((q, idx) => (
+              <QueueCard key={q._id} q={q} displayPosition={idx + 1}>
                 <div className="bg-[#FAF6F0] border border-[#EADBCE]/60 rounded-xl px-3 py-2.5 mb-3 text-xs flex items-center gap-2">
                   <Users className="w-4 h-4 text-[#8B6B3E]"/>
                   <span className="text-[#8B6B3E] font-medium">Barber:</span>
@@ -386,7 +387,7 @@ export default function LiveQueue() {
 /* ════════════════════════════════════════════
    SUB-COMPONENTS
    ════════════════════════════════════════════ */
-function QueueCard({ q, children }) {
+function QueueCard({ q, children, displayPosition }) {
   return (
     <div className="card p-5 mb-4">
       <div className="flex items-start gap-3 mb-3">
@@ -400,8 +401,12 @@ function QueueCard({ q, children }) {
           </p>
         </div>
         <div className="text-right flex-shrink-0">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-400">Position</p>
-          <p className="text-2xl font-bold text-[#8B6B3E] font-serif">#{q.position || "—"}</p>
+          <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-400">
+            {q.status === "in-progress" ? "Status" : "Position"}
+          </p>
+          <p className="text-xl font-bold text-[#8B6B3E] font-serif">
+            {q.status === "in-progress" ? "In Chair" : `#${displayPosition ?? q.position ?? "—"}`}
+          </p>
         </div>
       </div>
       <div className="bg-[#FAF6F0]/60 border border-[#EADBCE]/40 rounded-xl px-3 py-2.5 mb-3">

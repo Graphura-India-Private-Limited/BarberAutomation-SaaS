@@ -177,6 +177,7 @@ export default function CustomerProfile() {
   const [activeTab, setActiveTab] = useState("overview");
   const [activeQueue, setActiveQueue] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Auto-poll active queue status when queue tab is open
   useEffect(() => {
@@ -539,10 +540,18 @@ export default function CustomerProfile() {
       <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-[#1C1917] transition-colors duration-300">
         <div className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row min-h-screen">
 
+          {/* Backdrop Overlay for mobile drawer */}
+          {isSidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-black/45 backdrop-blur-xs z-[9998] lg:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
+
           {/* ── LEFT SIDEBAR ── */}
-          <aside className="w-full lg:w-64 shrink-0 bg-[#FFFFFF] text-[#1C1917] flex flex-col min-h-screen border-r border-[#E7E5E4] p-5 justify-between shadow-2xs">
+          <aside className={`fixed inset-y-0 left-0 w-64 bg-[#FFFFFF] text-[#1C1917] flex flex-col min-h-screen border-r border-[#E7E5E4] p-5 justify-between shadow-2xl z-[9999] transition-transform duration-300 lg:static lg:translate-x-0 lg:flex lg:shadow-2xs ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
             <div className="space-y-6">
-              <div className="px-1 py-3">
+              <div className="px-1 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#FDF9F3] flex items-center justify-center text-[#C5A059] shrink-0 border border-[#E7E5E4]">
                     <Scissors size={16} />
@@ -552,6 +561,14 @@ export default function CustomerProfile() {
                     <p className="text-[15px] font-bold text-[#1C1917] tracking-tight font-serif mt-1 leading-tight">Barber Pro</p>
                   </div>
                 </div>
+                {/* Close Button on mobile */}
+                <button
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 lg:hidden cursor-pointer border-none bg-transparent"
+                  title="Close navigation menu"
+                >
+                  <X size={18} />
+                </button>
               </div>
 
               <nav className="space-y-0.5 text-left px-1">
@@ -569,7 +586,7 @@ export default function CustomerProfile() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setActiveTab(item.id)}
+                      onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
                       className={`w-full flex items-center justify-between gap-[10px] px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200 group cursor-pointer border-none outline-none ${
                         isActive ? 'bg-[#FDF9F3] text-[#C5A059] font-semibold border-l-3 border-[#C5A059]' : 'text-[#78716C] hover:bg-[#FAF6F0] hover:text-[#1C1917] font-medium'
                       }`}
@@ -591,13 +608,13 @@ export default function CustomerProfile() {
 
             <div className="pt-4 border-t border-[#E7E5E4] space-y-1">
               <button
-                onClick={() => window.location.href = "/customer/booking"}
+                onClick={() => { setIsSidebarOpen(false); window.location.href = "/customer/booking"; }}
                 className="w-full bg-[#C5A059] hover:opacity-95 text-white rounded-lg py-2.5 text-[11px] font-bold tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border-none outline-none font-sans"
               >
                 <Scissors size={13} strokeWidth={2.5} /> Book Appointment
               </button>
               <button
-                onClick={handleLogout}
+                onClick={() => { setIsSidebarOpen(false); handleLogout(); }}
                 className="w-full bg-transparent hover:bg-[#FEF2F2] text-[#DC2626] rounded-lg py-2.5 text-[13px] font-medium transition-all duration-200 flex items-center justify-center gap-[10px] cursor-pointer border-none outline-none font-sans pl-3 text-left group"
               >
                 <LogOut size={16} className="text-[#DC2626] shrink-0" />
@@ -611,19 +628,32 @@ export default function CustomerProfile() {
 
             {/* ── HEADER ── */}
             <header className="bg-[#FFFDF9] border-b border-[#EADBCE] px-6 py-5 flex items-center justify-between sticky top-0 z-30 text-left shrink-0 shadow-2xs">
-              <div className="flex flex-col justify-center">
-                {/* ✅ FIX: NearbyBarbers removed from h1 — only text titles here */}
-                <h1 className="text-2xl font-black font-serif text-[#3D3126] leading-tight">
-                  {activeTab === "overview" && "Dashboard"}
-                  {activeTab === "queue" && "Live Queue Tracker"}
-                  {activeTab === "studios" && "Our Studios"}
-                  {activeTab === "history" && "Appointments Registry"}
-                  {activeTab === "dummy_services" && "Grooming Menu"}
-                  {activeTab === "membership" && "Membership Perks"}
-                  {activeTab === "preferences" && "Profile Settings"}
-                  {activeTab === "alerts" && "Live System Alerts"}
-                </h1>
-                <p className="text-xs text-[#8A7A6A] mt-1.5">Welcome back, {profile.name}!</p>
+              <div className="flex items-center gap-3">
+                {/* Hamburger menu button */}
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="p-2 -ml-2 rounded-xl text-[#3D3126] hover:bg-[#FAF6F0] lg:hidden cursor-pointer border-none bg-transparent flex items-center justify-center"
+                  title="Open navigation menu"
+                >
+                  <svg style={{ width: "24px", height: "24px" }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
+                  </svg>
+                </button>
+
+                <div className="flex flex-col justify-center">
+                  {/* ✅ FIX: NearbyBarbers removed from h1 — only text titles here */}
+                  <h1 className="text-2xl font-black font-serif text-[#3D3126] leading-tight">
+                    {activeTab === "overview" && "Dashboard"}
+                    {activeTab === "queue" && "Live Queue Tracker"}
+                    {activeTab === "studios" && "Our Studios"}
+                    {activeTab === "history" && "Appointments Registry"}
+                    {activeTab === "dummy_services" && "Grooming Menu"}
+                    {activeTab === "membership" && "Membership Perks"}
+                    {activeTab === "preferences" && "Profile Settings"}
+                    {activeTab === "alerts" && "Live System Alerts"}
+                  </h1>
+                  <p className="text-xs text-[#8A7A6A] mt-1.5">Welcome back, {profile.name}!</p>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">

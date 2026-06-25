@@ -2971,7 +2971,7 @@ export default function AdminOnboarding() {
                           <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>Password: <strong style={{ color:C.red }}>••••••••</strong></div>
                           <div style={{ fontSize:11, color:C.muted, marginBottom:12 }}>Registered: <strong style={{ color:C.ink }}>{b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—"}</strong></div>
                           <div style={{ display:"flex", gap:6 }}>
-                            {["available","break","offline"].map(s=>(
+                            {["available","break"].map(s=>(
                               <button key={s} className="action-btn" disabled={b.status===s}
                                 onClick={(e)=>{ e.stopPropagation(); changeBarberStatus(b._id,s); }}
                                 style={{ flex:1, padding:"6px 4px", fontSize:10, fontWeight:700, borderRadius:6, cursor:"pointer", border:`1px solid ${b.status===s?bStatus(s)+"50":C.border}`, background:b.status===s?`${bStatus(s)}20`:"#F7F5F2", color:b.status===s?bStatus(s):C.muted, fontFamily:"inherit", textAlign:"center", textTransform:"capitalize" }}>
