@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
 
 import {
@@ -25,52 +25,90 @@ const ScissorIcon = ({ className }) => (
   </svg>
 );
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 export default function CustomerManagement() {
   const navigate = useNavigate(); // ✅ Initialized the navigation router handle
   const [search, setSearch] = useState("");
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const customers = [
-    {
-      id: 1,
-      name: "Rahul Sharma",
-      email: "rahul@gmail.com",
-      bookings: 8,
-      visits: 12,
-      amount: 45000,
-      rating: 4.8,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Priya Patil",
-      email: "priya@gmail.com",
-      bookings: 5,
-      visits: 7,
-      amount: 28000,
-      rating: 4.5,
-      status: "Regular",
-    },
-    {
-      id: 3,
-      name: "Amit Joshi",
-      email: "amit@gmail.com",
-      bookings: 10,
-      visits: 15,
-      amount: 62000,
-      rating: 5.0,
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "Sneha Kulkarni",
-      email: "sneha@gmail.com",
-      bookings: 3,
-      visits: 4,
-      amount: 15000,
-      rating: 4.2,
-      status: "Regular",
-    },
-  ];
+  const salonId = localStorage.getItem("salonId");
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      if (!salonId) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/booking/salon/${salonId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (data.success && data.bookings) {
+          // Group bookings by customer
+          const customerMap = {};
+          data.bookings.forEach((booking) => {
+            if (!booking.customer_id) return;
+            const cId = booking.customer_id._id || booking.customer_id;
+            if (!cId) return;
+
+            if (!customerMap[cId]) {
+              customerMap[cId] = {
+                id: cId,
+                name: booking.customer_id.name || "Guest Customer",
+                email: booking.customer_id.email || booking.customer_id.mobile || "No Email",
+                bookingsList: []
+              };
+            }
+            customerMap[cId].bookingsList.push(booking);
+          });
+
+          const aggregatedCustomers = Object.values(customerMap).map((c) => {
+            const bookingsCount = c.bookingsList.length;
+            const completedBookings = c.bookingsList.filter(b => b.status === "completed");
+            const visitsCount = completedBookings.length || bookingsCount;
+            const totalSpent = c.bookingsList
+              .filter(b => b.status !== "cancelled")
+              .reduce((sum, b) => sum + (b.total_amount || 0), 0);
+            
+            const ratedBookings = c.bookingsList.filter(b => b.rating !== null && b.rating !== undefined);
+            const avgRating = ratedBookings.length > 0
+              ? ratedBookings.reduce((sum, b) => sum + b.rating, 0) / ratedBookings.length
+              : 5.0;
+
+            const status = bookingsCount >= 5 ? "Active" : "Regular";
+
+            return {
+              id: c.id,
+              name: c.name,
+              email: c.email,
+              bookings: bookingsCount,
+              visits: visitsCount,
+              amount: totalSpent,
+              rating: avgRating,
+              status: status
+            };
+          });
+
+          setCustomers(aggregatedCustomers);
+        } else {
+          setError(data.message || "Failed to load booking registry");
+        }
+      } catch (err) {
+        setError("Network error loading customers");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, [salonId, token]);
 
   const filtered = customers.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
@@ -78,6 +116,61 @@ export default function CustomerManagement() {
 
   const cardStyle =
     "bg-white/80 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-5 md:p-6 shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_15px_30px_rgba(62,54,46,0.04)] transition-all duration-300 text-left";
+
+  if (!salonId) {
+    return (
+      <div className="w-full min-h-[70vh] bg-[#FAF6F0] font-sans flex items-center justify-center py-12 px-4">
+        <div className="bg-white border border-[#EADDCA] p-12 text-center max-w-md w-full shadow-xl rounded-3xl">
+          <div className="w-16 h-16 mx-auto bg-rose-50 rounded-2xl flex items-center justify-center border border-rose-100 shadow-sm text-3xl mb-4">
+            ⚠️
+          </div>
+          <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold uppercase mb-2">Session Expired</h2>
+          <p className="mx-auto max-w-xs text-sm text-stone-400 font-sans leading-relaxed mb-6">
+            We couldn't detect your salon identification. Please log in again to manage your customer registry.
+          </p>
+          <button 
+            onClick={() => navigate("/owner/login")}
+            className="w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white shadow-sm hover:opacity-90 cursor-pointer transition-all active:scale-95"
+            style={{ background: "#C5A059" }}
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-[70vh] bg-[#FAF6F0] font-sans flex items-center justify-center py-12">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#C5A059]/10 flex items-center justify-center animate-pulse">
+            <Users className="w-6 h-6 text-[#C5A059]" />
+          </div>
+          <p className="text-stone-500 text-sm font-medium">Loading customer database...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Aggregate stats
+  const totalDatabase = customers.length;
+  const frequentUsers = customers.filter(c => c.visits >= 3).length;
+  const activeAccounts = customers.filter(c => c.status === "Active" || c.bookings > 0).length;
+  const avgRetention = customers.length > 0
+    ? Number(customers.reduce((sum, c) => sum + c.rating, 0) / customers.length).toFixed(1)
+    : "0.0";
+
+  // Filter lists for bottom sections
+  const frequentCustomersList = [...customers]
+    .sort((a, b) => b.visits - a.visits)
+    .slice(0, 5)
+    .filter(c => c.visits > 0);
+
+  const highValueSpendersList = [...customers]
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5)
+    .filter(c => c.amount > 0);
 
   return (
     <div className="w-full bg-[#FAF6F0] font-sans pb-12">
@@ -116,25 +209,25 @@ export default function CustomerManagement() {
         
         <div className={cardStyle}>
           <div className="text-[#3E362E] bg-[#EADDCA]/30 p-2.5 rounded-xl w-fit border border-[#EADDCA]/40"><Users size={18} /></div>
-          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">245</h3>
+          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{totalDatabase}</h3>
           <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Total Database</p>
         </div>
 
         <div className={cardStyle}>
           <div className="text-[#3E362E] bg-[#EADDCA]/30 p-2.5 rounded-xl w-fit border border-[#EADDCA]/40"><TrendingUp size={18} /></div>
-          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">52</h3>
+          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{frequentUsers}</h3>
           <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Frequent Users</p>
         </div>
 
         <div className={cardStyle}>
           <div className="text-[#C5A059] bg-[#C5A059]/10 p-2.5 rounded-xl w-fit border border-[#C5A059]/20"><Zap size={18} /></div>
-          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">78</h3>
+          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{activeAccounts}</h3>
           <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Active Accounts</p>
         </div>
 
         <div className={cardStyle}>
           <div className="text-emerald-700 bg-emerald-50 p-2.5 rounded-xl w-fit border border-emerald-100"><Star size={18} /></div>
-          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">4.8</h3>
+          <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{avgRetention}</h3>
           <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Avg Retention Score</p>
         </div>
 
@@ -155,65 +248,71 @@ export default function CustomerManagement() {
 
           {/* Table Body */}
           <div className="divide-y divide-stone-100">
-            {filtered.map((customer) => (
-              <div 
-                key={customer.id} 
-                className="grid gap-3 p-6 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr] md:items-center hover:bg-stone-50/30 transition-colors group text-left"
-              >
-                {/* Monogram, Name & Email */}
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-full bg-[#3E362E] text-white flex items-center justify-center font-serif font-black text-sm border border-[#2A241F] shadow-sm flex-shrink-0">
-                    {customer.name.charAt(0)}
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="font-serif font-bold text-[#3E362E] text-base tracking-tight leading-tight mb-1">
-                      {customer.name}
-                    </h4>
-                    <div className="flex items-center gap-1.5 text-stone-400">
-                      <Mail className="w-3 h-3 flex-shrink-0" />
-                      <p className="text-[11px] font-medium font-mono truncate tracking-tight">
-                        {customer.email}
-                      </p>
+            {filtered.length === 0 ? (
+              <div className="p-12 text-center">
+                <p className="text-stone-400 text-sm font-medium">No verified clients found in this salon's registry.</p>
+              </div>
+            ) : (
+              filtered.map((customer) => (
+                <div 
+                  key={customer.id} 
+                  className="grid gap-3 p-6 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr] md:items-center hover:bg-stone-50/30 transition-colors group text-left"
+                >
+                  {/* Monogram, Name & Email */}
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-full bg-[#3E362E] text-white flex items-center justify-center font-serif font-black text-sm border border-[#2A241F] shadow-sm flex-shrink-0">
+                      {customer.name.charAt(0)}
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-serif font-bold text-[#3E362E] text-base tracking-tight leading-tight mb-1">
+                        {customer.name}
+                      </h4>
+                      <div className="flex items-center gap-1.5 text-stone-400">
+                        <Mail className="w-3 h-3 flex-shrink-0" />
+                        <p className="text-[11px] font-medium font-mono truncate tracking-tight">
+                          {customer.email}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Bookings */}
-                <div className="md:block flex justify-between items-center">
-                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Bookings</span>
-                  <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none">{customer.bookings}</p>
-                </div>
-
-                {/* Visits */}
-                <div className="md:block flex justify-between items-center">
-                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Visits Logged</span>
-                  <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none">{customer.visits}</p>
-                </div>
-
-                {/* Rating */}
-                <div className="md:block flex justify-between items-center">
-                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Rating Given</span>
-                  <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none flex items-center gap-1">
-                    {customer.rating.toFixed(1)} <Star className="w-3.5 h-3.5 text-[#C5A059] fill-[#C5A059]" />
-                  </p>
-                </div>
-
-                {/* Revenue / Progress bar */}
-                <div className="md:block flex flex-col gap-1.5 justify-start">
-                  <div className="flex justify-between items-center mb-1 md:mb-0">
-                    <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Revenue</span>
-                    <p className="font-mono font-black text-xs text-[#3E362E] bg-[#FAF6F0] px-2 py-0.5 rounded border border-[#EADDCA]/40">₹{customer.amount}</p>
+                  {/* Bookings */}
+                  <div className="md:block flex justify-between items-center">
+                    <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Bookings</span>
+                    <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none">{customer.bookings}</p>
                   </div>
-                  <div className="hidden md:block w-3/4 h-1.5 rounded-full bg-[#FAF6F0] border border-[#EADDCA]/40 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#3E362E] to-[#C5A059]"
-                      style={{ width: `${Math.min(100, (customer.amount / 70000) * 100)}%` }}
-                    />
-                  </div>
-                </div>
 
-              </div>
-            ))}
+                  {/* Visits */}
+                  <div className="md:block flex justify-between items-center">
+                    <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Visits Logged</span>
+                    <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none">{customer.visits}</p>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="md:block flex justify-between items-center">
+                    <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Rating Given</span>
+                    <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none flex items-center gap-1">
+                      {customer.rating.toFixed(1)} <Star className="w-3.5 h-3.5 text-[#C5A059] fill-[#C5A059]" />
+                    </p>
+                  </div>
+
+                  {/* Revenue / Progress bar */}
+                  <div className="md:block flex flex-col gap-1.5 justify-start">
+                    <div className="flex justify-between items-center mb-1 md:mb-0">
+                      <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Revenue</span>
+                      <p className="font-mono font-black text-xs text-[#3E362E] bg-[#FAF6F0] px-2 py-0.5 rounded border border-[#EADDCA]/40">₹{customer.amount}</p>
+                    </div>
+                    <div className="hidden md:block w-3/4 h-1.5 rounded-full bg-[#FAF6F0] border border-[#EADDCA]/40 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-[#3E362E] to-[#C5A059]"
+                        style={{ width: `${Math.min(100, (customer.amount / 70000) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              ))
+            )}
           </div>
 
         </div>
@@ -233,16 +332,18 @@ export default function CustomerManagement() {
           </div>
 
           <div className="divide-y divide-[#FAF6F0]">
-            {customers
-              .filter((x) => x.visits > 8)
-              .map((x) => (
+            {frequentCustomersList.length === 0 ? (
+              <p className="text-stone-400 text-xs font-semibold py-4 text-center">No recurring visits logged yet.</p>
+            ) : (
+              frequentCustomersList.map((x) => (
                 <div key={x.id} className="flex justify-between items-center py-3.5 text-sm font-medium">
                   <p className="text-[#3E362E] font-semibold">{x.name}</p>
                   <p className="text-[10px] font-black uppercase bg-[#3E362E] text-white tracking-wider px-2.5 py-1 rounded-md">
                     {x.visits} visits
                   </p>
                 </div>
-              ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -257,16 +358,18 @@ export default function CustomerManagement() {
           </div>
 
           <div className="divide-y divide-[#FAF6F0]">
-            {customers
-              .filter((x) => x.amount > 30000)
-              .map((x) => (
+            {highValueSpendersList.length === 0 ? (
+              <p className="text-stone-400 text-xs font-semibold py-4 text-center">No spend history recorded yet.</p>
+            ) : (
+              highValueSpendersList.map((x) => (
                 <div key={x.id} className="flex justify-between items-center py-3.5 text-sm font-medium">
                   <p className="text-[#3E362E] font-semibold">{x.name}</p>
                   <p className="font-mono font-black text-[#C5A059] bg-[#FAF6F0] border border-[#EADDCA] px-3 py-1 rounded-md">
                     ₹{x.amount}
                   </p>
                 </div>
-              ))}
+              ))
+            )}
           </div>
         </div>
       </div>   

@@ -5,60 +5,7 @@ import Footer from "../../components/layout/Footer";
 import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 
 /* ─── DATA ─────────────────────────────────────────────────── */
-const BARBERS = [
-  {
-    id: 1,
-    name: "John Mercer",
-    role: "Senior Stylist",
-    experience: "5 yrs",
-    rating: 4.8,
-    reviews: 312,
-    status: "Available",
-    distance: 2,
-    specialties: ["Executive Cut", "Beard Sculpt", "Skin Fade"],
-    img: "https://i.pinimg.com/1200x/8d/21/29/8d2129c8a618f113eb8aa2bc596b1658.jpg",
-    aiWait: { queue: 0, pace: "15 mins/cut", wait: "Ready Now" },
-  },
-  {
-    id: 2,
-    name: "Mike Donovan",
-    role: "Colour Specialist",
-    experience: "3 yrs",
-    rating: 4.5,
-    reviews: 198,
-    status: "Busy",
-    distance: 5,
-    specialties: ["Grey Blending", "Highlights", "Toning"],
-    img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400",
-    aiWait: { queue: 3, pace: "25 mins/cut", wait: "~75 mins" },
-  },
-  {
-    id: 3,
-    name: "Alex Rivera",
-    role: "Master Barber",
-    experience: "6 yrs",
-    rating: 4.9,
-    reviews: 487,
-    status: "Available",
-    distance: 1,
-    specialties: ["Royal Shave", "Scalp Ritual", "Razor Art"],
-    img: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=400",
-    aiWait: { queue: 1, pace: "12 mins/cut", wait: "~12 mins" },
-  },
-  {
-    id: 4,
-    name: "Rahul Sharma",
-    role: "Senior Stylist",
-    experience: "4 yrs",
-    rating: 4.7,
-    reviews: 245,
-    status: "Available",
-    distance: 3,
-    specialties: ["Classic Cut", "Beard Trim", "Men's Grooming"],
-    img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=500&q=80",
-    aiWait: { queue: 2, pace: "18 mins/cut", wait: "~36 mins" },
-  },
-];
+// (Unused static BARBERS array removed; real barbers are fetched from database in useEffect)
 
 /* ─── HELPERS ───────────────────────────────────────────────── */
 function Stars({ rating }) {
@@ -411,7 +358,7 @@ export default function BarberSelection() {
         </div>
 
         {/* ── HERO ── */}
-        <div style={{ position: "relative", height: 420, overflow: "hidden", marginTop: 72 }}>
+        <div style={{ position: "relative", height: 420, overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.32)" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.78))" }} />
 

@@ -61,10 +61,10 @@ const Footer = () => {
     },
     {
       icon: MapPin,
-      text: "Pune, Maharashtra, India",
+      text: "Gurugram, Haryana, India",
       onClick: () => {
         // Opens Google Maps directly to this location
-        const address = encodeURIComponent("Pune, Maharashtra, India");
+        const address = encodeURIComponent("Gurugram, Haryana, India");
         window.open(
           `https://www.google.com/maps/search/?api=1&query=${address}`,
           "_blank",

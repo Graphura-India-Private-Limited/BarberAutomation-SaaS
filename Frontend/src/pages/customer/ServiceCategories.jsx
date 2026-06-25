@@ -233,7 +233,7 @@ export default function ServiceCategories() {
         </div>
 
         {/* ── HERO ── */}
-        <div style={{ position: "relative", height: 520, overflow: "hidden", marginTop: 72 }}>
+        <div style={{ position: "relative", height: 520, overflow: "hidden" }}>
           <div style={{
             position: "absolute", inset: 0,
             backgroundImage: "url('https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1600&q=80')",

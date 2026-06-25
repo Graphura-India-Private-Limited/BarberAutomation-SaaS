@@ -28,7 +28,7 @@ const StepBar = ({ step }) => (
             {step > n ? "✓" : n}
           </div>
           <span
-            className={`text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all hidden sm:inline ${
               step >= n ? "text-[#3E362E]" : "text-[#B0A090]"
             }`}
           >
@@ -268,6 +268,9 @@ const NearbyBarbers = () => {
   const [userAddress, setUserAddress] = useState("");
   const [userCoords, setUserCoords] = useState(null);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [manualAddressInput, setManualAddressInput] = useState("");
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
 
   const getDistanceInKm = (lat1, lon1, lat2, lon2) => {
     if (!lat1 || !lon1 || !lat2 || !lon2) return null;
@@ -335,6 +338,37 @@ const NearbyBarbers = () => {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
+  };
+
+  const handleManualAddressSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!manualAddressInput.trim()) return;
+    setIsSearchingAddress(true);
+    setLocationError(null);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          manualAddressInput
+        )}&limit=1`
+      );
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const { lat, lon, display_name } = data[0];
+        const latitude = parseFloat(lat);
+        const longitude = parseFloat(lon);
+        setUserCoords({ latitude, longitude });
+        setUserAddress(display_name);
+        setSortBy("distance");
+        setIsEditingAddress(false);
+      } else {
+        setLocationError("Address not found. Please try a different query.");
+      }
+    } catch (err) {
+      console.error(err);
+      setLocationError("Failed to search address. Please try again.");
+    } finally {
+      setIsSearchingAddress(false);
+    }
   };
 
   useEffect(() => {
@@ -512,38 +546,78 @@ const handleBook = async () => {
   const content = (
     <div className="w-full">
       {/* ── HEADER CARD ── */}
-      <div className="bg-[#F8F4EE] border border-[#E8DCCB] rounded-3xl p-7 mb-7">
+      <div className="bg-[#F8F4EE] border border-[#E8DCCB] rounded-2xl sm:rounded-3xl p-4 sm:p-7 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-[#B58B67] font-black mb-1">
+            <p className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#B58B67] font-black mb-1">
               Book a Grooming Session
             </p>
-            <h2 className="text-3xl font-black text-[#3E362E] tracking-tight leading-tight">
+            <h2 className="text-xl sm:text-3xl font-black text-[#3E362E] tracking-tight leading-tight">
               {step === 1
                 ? "Choose Your Studio"
                 : step === 2
                 ? `Services at ${selectedSalon?.name}`
                 : "Confirm Your Booking"}
             </h2>
-            <p className="text-[#8A7B6A] text-sm mt-1.5 font-medium">
+            <p className="text-[#8A7B6A] text-xs sm:text-sm mt-1.5 font-medium">
               {step === 1
                 ? "Pick a nearby salon to begin your booking."
                 : step === 2
                 ? "Select the service you'd like to book."
                 : "Review and confirm your appointment."}
             </p>
-            {userAddress && (
-              <div className="mt-3 flex items-center gap-2 text-stone-600 text-xs font-semibold bg-white/60 border border-[#E8DCCB] px-3.5 py-2 rounded-xl w-fit">
-                <Icons.MapPin size={12} className="text-[#C5A059] flex-shrink-0" />
-                <span className="truncate max-w-md sm:max-w-xl">Searching near: <strong className="text-[#3E362E]">{userAddress}</strong></span>
+            {isEditingAddress ? (
+              <form onSubmit={handleManualAddressSubmit} className="mt-3 flex items-center gap-2 w-full max-w-md">
+                <input
+                  type="text"
+                  placeholder="Enter location manually..."
+                  value={manualAddressInput}
+                  onChange={(e) => setManualAddressInput(e.target.value)}
+                  className="flex-1 px-3 py-1.5 bg-white border border-[#E8DCCB] rounded-lg text-xs font-semibold text-[#3E362E] focus:outline-none focus:border-[#C5A059]"
+                />
                 <button
-                  onClick={detectLocation}
-                  disabled={isDetectingLocation}
-                  className="text-[#C5A059] hover:text-[#3E362E] transition-colors ml-2 bg-transparent border-none cursor-pointer p-0 font-bold"
-                  title="Refresh Location"
+                  type="submit"
+                  disabled={isSearchingAddress}
+                  className="px-3 py-1.5 bg-[#3E362E] text-[#C5A059] rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-[#2A241F] disabled:opacity-50 cursor-pointer flex-shrink-0"
                 >
-                  <Icons.RefreshCw size={11} className={isDetectingLocation ? "animate-spin" : ""} />
+                  {isSearchingAddress ? "..." : "Search"}
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingAddress(false)}
+                  className="px-3 py-1.5 border border-stone-300 rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-stone-100 cursor-pointer flex-shrink-0 text-stone-500"
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              <div className="mt-3 flex items-center flex-wrap gap-2 text-stone-600 text-[11px] sm:text-xs font-semibold bg-white/60 border border-[#E8DCCB] px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl w-fit max-w-full">
+                <Icons.MapPin size={12} className="text-[#C5A059] flex-shrink-0" />
+                <span className="truncate max-w-[130px] min-[400px]:max-w-[200px] sm:max-w-md lg:max-w-xl">
+                  Searching near: <strong className="text-[#3E362E]">{userAddress || "Manually Selected Location"}</strong>
+                </span>
+                <div className="flex items-center gap-1.5 ml-auto sm:ml-2">
+                  <button
+                    type="button"
+                    onClick={detectLocation}
+                    disabled={isDetectingLocation}
+                    className="text-[#C5A059] hover:text-[#3E362E] transition-colors bg-transparent border-none cursor-pointer p-1 font-bold flex items-center"
+                    title="Refresh Location"
+                  >
+                    <Icons.RefreshCw size={11} className={isDetectingLocation ? "animate-spin" : ""} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditingAddress(true);
+                      setManualAddressInput(userAddress || "");
+                    }}
+                    className="px-2 py-1 bg-[#C5A059]/10 hover:bg-[#C5A059]/20 text-[#A07830] hover:text-[#3E362E] transition-all rounded-lg font-black text-[9px] uppercase tracking-wider flex items-center gap-1 border border-[#C5A059]/20 cursor-pointer"
+                  >
+                    <Icons.Edit3 size={10} className="stroke-[2.5px]" />
+                    Change Location
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -613,21 +687,45 @@ const handleBook = async () => {
           ) : (
             <>
               {/* 🔍 Search and Filters Section */}
-              <div className="bg-white border border-[#E8DCCB] rounded-2xl p-5 mb-6 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-                {/* Search Input */}
-                <div className="relative w-full md:max-w-md">
-                  <Icons.Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-                  <input
-                    type="text"
-                    placeholder="Search salons by name or address..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-sm font-semibold text-[#3E362E] placeholder-stone-400 focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all"
-                  />
+              <div className="bg-white border border-[#E8DCCB] rounded-2xl p-5 mb-6 shadow-sm flex flex-col xl:flex-row gap-4 items-center justify-between">
+                {/* Inputs Group */}
+                <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-1">
+                  {/* Search Input */}
+                  <div className="relative flex-1 sm:max-w-xs xl:max-w-md">
+                    <Icons.Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+                    <input
+                      type="text"
+                      placeholder="Search salons by name..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-sm font-semibold text-[#3E362E] placeholder-stone-400 focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all"
+                    />
+                  </div>
+
+                  {/* Manual Location Input Form */}
+                  <form onSubmit={handleManualAddressSubmit} className="relative flex-1 sm:max-w-xs xl:max-w-sm flex gap-2">
+                    <div className="relative flex-1">
+                      <Icons.MapPin size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C5A059] stroke-[2.5px]" />
+                      <input
+                        type="text"
+                        placeholder="Enter your location (e.g. Rajasthan)..."
+                        value={manualAddressInput}
+                        onChange={(e) => setManualAddressInput(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-sm font-semibold text-[#3E362E] placeholder-stone-400 focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSearchingAddress}
+                      className="px-4 py-3 bg-[#3E362E] text-[#C5A059] font-black uppercase text-xs tracking-widest rounded-xl transition-all hover:bg-[#2A241F] disabled:opacity-50 cursor-pointer flex-shrink-0"
+                    >
+                      {isSearchingAddress ? "..." : "Set"}
+                    </button>
+                  </form>
                 </div>
 
                 {/* Filter Group */}
-                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
                   {/* Location/City Dropdown */}
                   <div className="relative flex-grow sm:flex-grow-0">
                     <Icons.MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C5A059] stroke-[2.5px]" />
@@ -684,7 +782,7 @@ const handleBook = async () => {
                   <p className="text-stone-400 text-xs mt-1">Try adjusting your search keywords or filters.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
                   {filteredSalons.map((salon) => (
                     <SalonCard
                       key={salon.id}
@@ -983,24 +1081,66 @@ const handleBook = async () => {
           To browse grooming studios, view real-time queue lengths, and book slots with nearby stylists, please allow location access.
         </p>
 
-        <button
-          type="button"
-          onClick={detectLocation}
-          disabled={isDetectingLocation}
-          className="px-8 py-4 bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black uppercase text-xs tracking-widest rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none flex items-center gap-2"
-        >
-          {isDetectingLocation ? (
-            <>
-              <Icons.Loader2 className="w-4 h-4 animate-spin" />
-              Requesting...
-            </>
-          ) : (
-            <>
-              <Icons.MapPin className="w-4 h-4" />
-              Allow Location Access
-            </>
-          )}
-        </button>
+        {isEditingAddress ? (
+          <form onSubmit={handleManualAddressSubmit} className="w-full max-w-md mx-auto mb-8">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Enter city, state, or address..."
+                value={manualAddressInput}
+                onChange={(e) => setManualAddressInput(e.target.value)}
+                className="flex-1 px-4 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-sm font-semibold text-[#3E362E] placeholder-stone-400 focus:outline-none focus:border-[#C5A059] transition-all"
+              />
+              <button
+                type="submit"
+                disabled={isSearchingAddress}
+                className="px-6 py-3 bg-[#3E362E] text-[#C5A059] font-black uppercase text-xs tracking-widest rounded-xl transition-all hover:bg-[#2A241F] disabled:opacity-50 cursor-pointer"
+              >
+                {isSearchingAddress ? "Searching..." : "Search"}
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsEditingAddress(false)}
+              className="text-stone-400 hover:text-stone-600 text-xs font-bold mt-2"
+            >
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <button
+              type="button"
+              onClick={detectLocation}
+              disabled={isDetectingLocation}
+              className="px-8 py-4 bg-[#3E362E] hover:bg-[#C5A059] text-white hover:text-[#2A241F] font-black uppercase text-xs tracking-widest rounded-xl transition-all duration-300 shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer border-none flex items-center gap-2"
+            >
+              {isDetectingLocation ? (
+                <>
+                  <Icons.Loader2 className="w-4 h-4 animate-spin" />
+                  Requesting...
+                </>
+              ) : (
+                <>
+                  <Icons.MapPin className="w-4 h-4" />
+                  Allow Location Access
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsEditingAddress(true);
+                setManualAddressInput("");
+              }}
+              className="px-8 py-4 bg-white border border-[#3E362E] text-[#3E362E] hover:bg-[#FAF6F0] font-black uppercase text-xs tracking-widest rounded-xl transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center gap-2"
+            >
+              <Icons.Edit3 className="w-4 h-4" />
+              Set Location Manually
+            </button>
+          </div>
+        )}
 
         {locationError && (
           <div className="mt-6 p-4 bg-amber-50/60 border border-amber-200/50 rounded-2xl max-w-md text-left flex items-start gap-3">

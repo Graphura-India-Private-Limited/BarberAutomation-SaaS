@@ -71,7 +71,7 @@ export default function SalonSelectorBar({ onChange }) {
   });
 
   return (
-    <div className="w-full bg-white py-3.5 px-6 border-b border-[#E8DCCB] flex flex-col sm:flex-row items-center justify-between gap-4 font-sans text-left">
+    <div className="w-full mt-[56px] md:mt-[72px] bg-white py-3.5 px-6 border-b border-[#E8DCCB] flex flex-col sm:flex-row items-center justify-between gap-4 font-sans text-left">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-[#FEF3E2] flex items-center justify-center text-[#9E7452] shrink-0">
           <MapPin size={16} className="stroke-[2.5px]" />

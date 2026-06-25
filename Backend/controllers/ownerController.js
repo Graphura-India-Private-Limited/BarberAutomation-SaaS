@@ -4,6 +4,8 @@ const Booking = require("../models/Booking");
 const Queue = require("../models/Queue");
 const BreakRequest = require("../models/BreakRequest");
 const ApprovalRequest = require("../models/ApprovalRequest");
+const Customer = require("../models/Customer");
+const mongoose = require("mongoose");
 
 // @desc    Get owner dashboard statistics for a specific salon
 // @route   GET /api/owner/salon/:salon_id/dashboard
@@ -202,6 +204,77 @@ exports.startService = async (req, res) => {
   }
 };
 
+// @desc    Helper to seed one mock unassigned queue entry
+const seedOneMockUnassigned = async (salon_id) => {
+  try {
+    const mockNames = ["Rohit Sharma", "Kabir Dev", "Rohan Das", "Vikram Sen", "Aarav Mehta", "Priya Patil", "Amit Joshi", "Sneha Kulkarni"];
+    const randomName = mockNames[Math.floor(Math.random() * mockNames.length)];
+    const randomMobile = "9" + Math.floor(100000000 + Math.random() * 900000000);
+
+    let customer = await Customer.findOne({ mobile: randomMobile });
+    if (!customer) {
+      customer = await Customer.create({
+        name: randomName,
+        mobile: randomMobile
+      });
+    }
+
+    const servicesList = [
+      { name: "Classic Haircut", price: 300 },
+      { name: "Taper Fade & Trim", price: 350 },
+      { name: "Beard Sculpting & Oil", price: 200 },
+      { name: "Royal Head Massage", price: 250 },
+      { name: "Charcoal Face Mask", price: 300 }
+    ];
+    const randomService = servicesList[Math.floor(Math.random() * servicesList.length)];
+
+    const booking = await Booking.create({
+      customer_id: customer._id,
+      salon_id,
+      barber_id: null,
+      booking_type: "queue",
+      services: [{ service_id: new mongoose.Types.ObjectId(), service_name: randomService.name, price: randomService.price }],
+      total_amount: randomService.price,
+      status: "confirmed"
+    });
+
+    const position = await Queue.countDocuments({
+      salon_id,
+      status: { $in: ["waiting", "in-progress"] }
+    }) + 1;
+
+    await Queue.create({
+      salon_id,
+      barber_id: null,
+      booking_id: booking._id,
+      customer_id: customer._id,
+      position,
+      status: "waiting",
+      estimated_wait: position * 20
+    });
+    console.log(`Auto-seeded one mock unassigned customer: ${randomName}`);
+  } catch (err) {
+    console.error("Error seeding mock unassigned:", err);
+  }
+};
+
+// @desc    Helper to seed mock unassigned entries if count is less than 3
+const seedMockUnassignedIfNeeded = async (salon_id) => {
+  try {
+    const unassignedCount = await Queue.countDocuments({
+      salon_id,
+      barber_id: null,
+      status: "waiting"
+    });
+    const needed = Math.max(0, 3 - unassignedCount);
+    for (let i = 0; i < needed; i++) {
+      await seedOneMockUnassigned(salon_id);
+    }
+  } catch (err) {
+    console.error("Error ensuring mock unassigned count:", err);
+  }
+};
+
 // @desc    Complete service for a customer queue entry
 // @route   PUT /api/owner/queue/:queue_id/complete
 // @access  Private (Owner)
@@ -226,6 +299,9 @@ exports.completeService = async (req, res) => {
         { $inc: { position: -1 } }
       );
     }
+
+    // Auto-seed mock unassigned entries so owner dashboard remains populated
+    await seedMockUnassignedIfNeeded(q.salon_id);
 
     res.json({ success: true, message: "Service completed" });
   } catch (err) {

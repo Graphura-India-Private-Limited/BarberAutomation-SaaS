@@ -205,7 +205,7 @@ export default function MenServices() {
         </div>
 
         {/* HERO */}
-        <div style={{ position: "relative", height: 540, overflow: "hidden", marginTop: 72 }}>
+        <div style={{ position: "relative", height: 540, overflow: "hidden" }}>
           {/* Slideshow images */}
           {heroImages.map((img, idx) => (
             <div key={idx} style={{ position: "absolute", inset: 0, backgroundImage: `url('${img}')`, backgroundSize: "cover", backgroundPosition: "center", opacity: idx === slideIndex ? 1 : 0, transition: "opacity 1.2s ease", filter: "brightness(0.38)" }} />

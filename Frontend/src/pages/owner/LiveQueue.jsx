@@ -16,6 +16,7 @@ export default function LiveQueue() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [busyId,      setBusyId]      = useState(null);
   const [lastUpdate,  setLastUpdate]  = useState(null);
+  const [usingDemo,   setUsingDemo]   = useState(false);
   const intervalRef = useRef(null);
 
   const salonId = localStorage.getItem("salonId");
@@ -46,20 +47,31 @@ export default function LiveQueue() {
       
       if (qRes.success) {
         setQueue(qRes.queue || []);
+        setUsingDemo(false);
       } else {
-        setQueue(MOCK_QUEUE);
+        if (queue.length === 0) {
+          setQueue(MOCK_QUEUE);
+        }
+        setUsingDemo(true);
       }
       
       if (dRes.success && dRes.barbers && dRes.barbers.length > 0) {
         setBarbers(dRes.barbers);
       } else {
-        setBarbers(MOCK_BARBERS);
+        if (barbers.length === 0) {
+          setBarbers(MOCK_BARBERS);
+        }
       }
       setLastUpdate(new Date());
     } catch (e) {
-      setQueue(MOCK_QUEUE);
-      setBarbers(MOCK_BARBERS);
+      if (queue.length === 0) {
+        setQueue(MOCK_QUEUE);
+      }
+      if (barbers.length === 0) {
+        setBarbers(MOCK_BARBERS);
+      }
       setLastUpdate(new Date());
+      setUsingDemo(true);
       showToast("Using local offline demo queue data");
     } finally {
       setLoading(false);
@@ -80,27 +92,36 @@ export default function LiveQueue() {
   const autoAssign = async (q) => {
     setBusyId(q._id);
     const firstAvail = availBarbers[0] || MOCK_BARBERS.find(b => b.status === "available");
-    if (!firstAvail) {
-      showToast("No barbers available right now", "error");
-      setBusyId(null);
-      return;
-    }
+    
+    // Optimistic update
+    setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: firstAvail, status: "waiting" } : item));
+
     try {
-      const res = await fetch(`${API}/owner/queue/${q._id}/assign`, {
+      const res = await fetch(`${API}/owner/queue/${q._id}/auto-assign`, {
         method: "POST",
-        headers: headers(),
-        body: JSON.stringify({ barber_id: firstAvail._id })
+        headers: headers()
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`Auto-assigned to ${firstAvail.name}`);
+        showToast(data.message || "Auto-assigned successfully");
+        fetchData();
       } else {
-        showToast(`Local: Auto-assigned to ${firstAvail.name}`);
+        if (!usingDemo) {
+          // Revert if online and failed
+          setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: null, status: "waiting" } : item));
+          showToast(data.message || "Auto-assign failed", "error");
+        } else {
+          showToast(`Offline Demo: Auto-assigned to ${firstAvail?.name || "barber"}`);
+        }
       }
-      setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: firstAvail, status: "waiting" } : item));
     } catch {
-      setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: firstAvail, status: "waiting" } : item));
-      showToast(`Local: Auto-assigned to ${firstAvail.name}`);
+      if (!usingDemo) {
+        // Revert if online and failed
+        setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: null, status: "waiting" } : item));
+        showToast("Network error during auto-assign", "error");
+      } else {
+        showToast(`Offline Demo: Auto-assigned to ${firstAvail?.name || "barber"}`);
+      }
     } finally {
       setBusyId(null);
     }
@@ -109,6 +130,10 @@ export default function LiveQueue() {
   const manualAssign = async (q, bid) => {
     setBusyId(q._id);
     const targetBarber = barbers.find(b => b._id === bid) || MOCK_BARBERS.find(b => b._id === bid);
+    
+    // Optimistic update
+    setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: targetBarber, status: "waiting" } : item));
+
     try {
       const res = await fetch(`${API}/owner/queue/${q._id}/assign`, {
         method: "POST",
@@ -117,14 +142,25 @@ export default function LiveQueue() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`Assigned to ${targetBarber?.name}`);
+        showToast(`Assigned to ${targetBarber?.name || "barber"}`);
+        fetchData();
       } else {
-        showToast(`Local: Assigned to ${targetBarber?.name}`);
+        if (!usingDemo) {
+          // Revert if online and failed
+          setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: null, status: "waiting" } : item));
+          showToast(data.message || "Assignment failed", "error");
+        } else {
+          showToast(`Offline Demo: Assigned to ${targetBarber?.name}`);
+        }
       }
-      setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: targetBarber, status: "waiting" } : item));
     } catch {
-      setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: targetBarber, status: "waiting" } : item));
-      showToast(`Local: Assigned to ${targetBarber?.name}`);
+      if (!usingDemo) {
+        // Revert if online and failed
+        setQueue(prev => prev.map(item => item._id === q._id ? { ...item, barber_id: null, status: "waiting" } : item));
+        showToast("Network error during assignment", "error");
+      } else {
+        showToast(`Offline Demo: Assigned to ${targetBarber?.name}`);
+      }
     } finally {
       setBusyId(null);
     }
@@ -132,18 +168,33 @@ export default function LiveQueue() {
 
   const startService = async (q) => {
     setBusyId(q._id);
+    
+    // Optimistic update
+    setQueue(prev => prev.map(item => item._id === q._id ? { ...item, status: "in-progress" } : item));
+
     try {
       const res = await fetch(`${API}/owner/queue/${q._id}/start`, { method: "PUT", headers: headers() });
       const data = await res.json();
       if (data.success) {
         showToast("Service started");
+        fetchData();
       } else {
-        showToast("Local: Service started");
+        if (!usingDemo) {
+          // Revert if online and failed
+          setQueue(prev => prev.map(item => item._id === q._id ? { ...item, status: "waiting" } : item));
+          showToast(data.message || "Failed to start service", "error");
+        } else {
+          showToast("Offline Demo: Service started");
+        }
       }
-      setQueue(prev => prev.map(item => item._id === q._id ? { ...item, status: "in-progress" } : item));
     } catch {
-      setQueue(prev => prev.map(item => item._id === q._id ? { ...item, status: "in-progress" } : item));
-      showToast("Local: Service started");
+      if (!usingDemo) {
+        // Revert if online and failed
+        setQueue(prev => prev.map(item => item._id === q._id ? { ...item, status: "waiting" } : item));
+        showToast("Network error starting service", "error");
+      } else {
+        showToast("Offline Demo: Service started");
+      }
     } finally {
       setBusyId(null);
     }
@@ -151,18 +202,33 @@ export default function LiveQueue() {
 
   const completeServ = async (q) => {
     setBusyId(q._id);
+    
+    // Optimistic update
+    setQueue(prev => prev.filter(item => item._id !== q._id));
+
     try {
       const res = await fetch(`${API}/owner/queue/${q._id}/complete`, { method: "PUT", headers: headers() });
       const data = await res.json();
       if (data.success) {
         showToast("Service completed");
+        fetchData();
       } else {
-        showToast("Local: Service completed");
+        if (!usingDemo) {
+          // Revert if online and failed
+          setQueue(prev => [...prev, q]);
+          showToast(data.message || "Failed to complete service", "error");
+        } else {
+          showToast("Offline Demo: Service completed");
+        }
       }
-      setQueue(prev => prev.filter(item => item._id !== q._id));
     } catch {
-      setQueue(prev => prev.filter(item => item._id !== q._id));
-      showToast("Local: Service completed");
+      if (!usingDemo) {
+        // Revert if online and failed
+        setQueue(prev => [...prev, q]);
+        showToast("Network error completing service", "error");
+      } else {
+        showToast("Offline Demo: Service completed");
+      }
     } finally {
       setBusyId(null);
     }

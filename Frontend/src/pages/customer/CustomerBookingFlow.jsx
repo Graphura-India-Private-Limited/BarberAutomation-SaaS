@@ -158,52 +158,60 @@ export default function Wrapper() {
         else if (allServices.length > 0) { matchedServiceId = allServices[0]._id; matchedPrice = allServices[0].price; }
       }
 
-      const barbersRes = await fetch(`${API}/barber/salon/${salonId}`);
-      const barbersData = await barbersRes.json();
-      let matchedBarberId = null;
-
-      const getDistributedBarberId = (barberList, mockBarberName, mockBarberId) => {
-        if (!barberList || barberList.length === 0) return null;
-        if (mockBarberId) {
-          const directMatch = barberList.find(b => String(b._id) === String(mockBarberId) || String(b.id) === String(mockBarberId));
-          if (directMatch) return directMatch._id;
-        }
-        let match = barberList.find(
-          b => b.name.toLowerCase().includes(mockBarberName.toLowerCase()) ||
-               mockBarberName.toLowerCase().includes(b.name.toLowerCase())
-        );
-        if (match) return match._id;
-        const firstName = mockBarberName.toLowerCase().split(" ")[0];
-        match = barberList.find(b => b.name.toLowerCase().includes(firstName));
-        if (match) return match._id;
-        const mockId = parseInt(mockBarberId, 10);
-        if (!isNaN(mockId)) {
-          const index = (mockId - 1) % barberList.length;
-          return barberList[index >= 0 ? index : 0]._id;
-        }
-        return barberList[0]._id;
+      const isValidObjectId = (id) => {
+        return id && typeof id === "string" && /^[0-9a-fA-F]{24}$/.test(id);
       };
 
-      if (barbersData.success && barbersData.barbers && barbersData.barbers.length > 0) {
-        matchedBarberId = getDistributedBarberId(barbersData.barbers, finalBookingData.barber, finalBookingData.barber_id);
-      }
+      let matchedBarberId = null;
+      if (isValidObjectId(finalBookingData.barber_id)) {
+        matchedBarberId = finalBookingData.barber_id;
+      } else {
+        const barbersRes = await fetch(`${API}/barber/salon/${salonId}`);
+        const barbersData = await barbersRes.json();
 
-      if (!matchedBarberId) {
-        let allBarbers = [];
-        for (const sln of salonsData.salons) {
-          try {
-            const fallbackRes = await fetch(`${API}/barber/salon/${sln._id}`);
-            const fallbackData = await fallbackRes.json();
-            if (fallbackData.success && fallbackData.barbers) allBarbers.push(...fallbackData.barbers);
-          } catch (e) { console.error(e); }
+        const getDistributedBarberId = (barberList, mockBarberName, mockBarberId) => {
+          if (!barberList || barberList.length === 0) return null;
+          if (mockBarberId) {
+            const directMatch = barberList.find(b => String(b._id) === String(mockBarberId) || String(b.id) === String(mockBarberId));
+            if (directMatch) return directMatch._id;
+          }
+          let match = barberList.find(
+            b => b.name.toLowerCase().includes(mockBarberName.toLowerCase()) ||
+                 mockBarberName.toLowerCase().includes(b.name.toLowerCase())
+          );
+          if (match) return match._id;
+          const firstName = mockBarberName.toLowerCase().split(" ")[0];
+          match = barberList.find(b => b.name.toLowerCase().includes(firstName));
+          if (match) return match._id;
+          const mockId = parseInt(mockBarberId, 10);
+          if (!isNaN(mockId)) {
+            const index = (mockId - 1) % barberList.length;
+            return barberList[index >= 0 ? index : 0]._id;
+          }
+          return barberList[0]._id;
+        };
+
+        if (barbersData.success && barbersData.barbers && barbersData.barbers.length > 0) {
+          matchedBarberId = getDistributedBarberId(barbersData.barbers, finalBookingData.barber, finalBookingData.barber_id);
         }
-        allBarbers.sort((a, b) => {
-          if (a.salon_id === b.salon_id) return 0;
-          if (a.salon_id === "6a23177862fa6d8d2c894a3c") return -1;
-          if (b.salon_id === "6a23177862fa6d8d2c894a3c") return 1;
-          return 0;
-        });
-        matchedBarberId = getDistributedBarberId(allBarbers, finalBookingData.barber, finalBookingData.barber_id);
+
+        if (!matchedBarberId) {
+          let allBarbers = [];
+          for (const sln of salonsData.salons) {
+            try {
+              const fallbackRes = await fetch(`${API}/barber/salon/${sln._id}`);
+              const fallbackData = await fallbackRes.json();
+              if (fallbackData.success && fallbackData.barbers) allBarbers.push(...fallbackData.barbers);
+            } catch (e) { console.error(e); }
+          }
+          allBarbers.sort((a, b) => {
+            if (a.salon_id === b.salon_id) return 0;
+            if (a.salon_id === "6a23177862fa6d8d2c894a3c") return -1;
+            if (b.salon_id === "6a23177862fa6d8d2c894a3c") return 1;
+            return 0;
+          });
+          matchedBarberId = getDistributedBarberId(allBarbers, finalBookingData.barber, finalBookingData.barber_id);
+        }
       }
 
       if (!matchedServiceId) throw new Error("Could not map to a valid service in DB.");

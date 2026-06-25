@@ -249,6 +249,29 @@ export default function BarberTeam() {
     }
   };
 
+  if (!salonId) {
+    return (
+      <div className="min-h-screen p-6 md:p-10 font-sans text-stone-800 text-left flex items-center justify-center" style={{ background: "#FAF6F0" }}>
+        <div className="card p-12 text-center max-w-md w-full bg-white shadow-xl rounded-3xl border border-[#EADBCE]">
+          <div className="w-16 h-16 mx-auto bg-rose-50 rounded-2xl flex items-center justify-center border border-rose-100 shadow-sm text-3xl mb-4">
+            ⚠️
+          </div>
+          <h2 className="font-serif text-xl sm:text-2xl text-stone-900 font-bold uppercase mb-2">Session Expired</h2>
+          <p className="mx-auto max-w-xs text-sm text-stone-400 font-sans leading-relaxed mb-6">
+            We couldn't detect your salon identification. Please log in again to manage your team.
+          </p>
+          <button 
+            onClick={() => navigate("/owner/login")}
+            className="w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white shadow-sm hover:opacity-90 cursor-pointer transition-all active:scale-95 animate-fade-in"
+            style={{ background: GOLD }}
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen p-6 md:p-10 font-sans text-stone-800 text-left animate-fade-in" style={{ background: "#FAF6F0" }}>
       <style>{`

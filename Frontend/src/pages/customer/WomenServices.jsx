@@ -195,7 +195,7 @@ export default function WomenServices() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond','Georgia',serif", color: "#2C241E" }}>
 
         {/* HERO */}
-        <div style={{ position: "relative", height: 540, overflow: "hidden", marginTop: 72 }}>
+        <div style={{ position: "relative", height: 540, overflow: "hidden" }}>
           {heroImages.map((img, idx) => (
             <div key={idx} style={{ position: "absolute", inset: 0, backgroundImage: `url('${img}')`, backgroundSize: "cover", backgroundPosition: "center", opacity: idx === slideIndex ? 1 : 0, transition: "opacity 1.2s ease", filter: "brightness(0.38)" }} />
           ))}

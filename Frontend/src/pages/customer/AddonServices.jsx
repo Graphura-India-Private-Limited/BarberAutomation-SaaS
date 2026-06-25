@@ -571,7 +571,7 @@ export default function AddonServices() {
         </div>
 
         {/* ── HERO ── */}
-        <div style={{ position: "relative", height: 540, overflow: "hidden", marginTop: 72 }}>
+        <div style={{ position: "relative", height: 540, overflow: "hidden" }}>
           {HERO_IMAGES.map((img, idx) => (
             <div
               key={idx}
