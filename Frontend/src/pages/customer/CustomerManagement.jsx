@@ -145,13 +145,12 @@ export default function CustomerManagement() {
         <div className="bg-white/90 backdrop-blur-md border border-[#EADDCA] rounded-[24px] overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(62,54,46,0.04)] transition-all duration-300">
           
           {/* Table Header */}
-          <div className="hidden md:grid grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr_1fr] border-b border-stone-100 bg-stone-50/50 px-6 py-4 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">
+          <div className="hidden md:grid grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr] border-b border-stone-100 bg-stone-50/50 px-6 py-4 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">
             <span>Customer Details</span>
             <span>Bookings</span>
             <span>Visits Logged</span>
             <span>Rating Given</span>
             <span>Gross Revenue Spent</span>
-            <span className="text-right">Status</span>
           </div>
 
           {/* Table Body */}
@@ -159,7 +158,7 @@ export default function CustomerManagement() {
             {filtered.map((customer) => (
               <div 
                 key={customer.id} 
-                className="grid gap-3 p-6 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr_1fr] md:items-center hover:bg-stone-50/30 transition-colors group text-left"
+                className="grid gap-3 p-6 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr] md:items-center hover:bg-stone-50/30 transition-colors group text-left"
               >
                 {/* Monogram, Name & Email */}
                 <div className="flex items-center gap-3.5">
@@ -211,18 +210,6 @@ export default function CustomerManagement() {
                       style={{ width: `${Math.min(100, (customer.amount / 70000) * 100)}%` }}
                     />
                   </div>
-                </div>
-
-                {/* Status Tier */}
-                <div className="md:block flex justify-between items-center md:text-right">
-                  <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Status Tier</span>
-                  <span className={`inline-flex items-center justify-center text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${
-                    customer.status === "Active"
-                      ? "bg-amber-50 text-amber-800 border-amber-200"
-                      : "bg-blue-50 text-blue-800 border-blue-200"
-                  }`}>
-                    {customer.status}
-                  </span>
                 </div>
 
               </div>
