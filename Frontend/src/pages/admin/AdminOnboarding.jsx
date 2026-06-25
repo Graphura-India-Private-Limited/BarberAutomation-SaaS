@@ -63,27 +63,155 @@ const Avatar = ({ name, size = 32, color = C.gold, bg = C.goldLight }) => (
   </div>
 );
 
+
 const StatCard = ({ label, value, color, sub, icon: Icon, iconBg, iconColor, onClick }) => (
-  <div style={{
-    background: C.card, borderRadius: 12, padding: "18px 20px",
-    border: `1px solid ${C.border}`, boxShadow: "0 1px 4px rgba(0,0,0,.04)",
-    transition: "transform 0.2s, box-shadow 0.2s", cursor: onClick ? "pointer" : "default",
-  }}
+  <button
     onClick={onClick}
-    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"; }}
-    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)"; }}
+    style={{
+      background: "#FFFFFF",
+      borderRadius: 12,
+      padding: "18px 20px",
+      border: "1px solid #E7E5E4",
+      boxShadow: "0 1px 4px rgba(0,0,0,.04)",
+      cursor: onClick ? "pointer" : "default",
+      position: "relative",
+      overflow: "hidden",
+      transition: "transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease",
+      outline: "none",
+      textAlign: "left",
+      width: "100%",
+      fontFamily: "inherit",
+    }}
+    onMouseEnter={e => {
+      if (!onClick) return;
+      e.currentTarget.style.transform = "translateY(-3px)";
+      e.currentTarget.style.boxShadow = "0 8px 28px rgba(197,160,89,0.13), 0 2px 8px rgba(0,0,0,0.07)";
+      e.currentTarget.style.border = "1.5px solid #C5A059";
+      const arrow = e.currentTarget.querySelector(".sc-arrow");
+      if (arrow) {
+        arrow.style.transform = "translateX(3px)";
+        arrow.style.opacity = "1";
+      }
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)";
+      e.currentTarget.style.border = "1px solid #E7E5E4";
+      const arrow = e.currentTarget.querySelector(".sc-arrow");
+      if (arrow) {
+        arrow.style.transform = "translateX(0)";
+        arrow.style.opacity = "0.5";
+      }
+    }}
+    onFocus={e => {
+      if (!onClick) return;
+      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(197,160,89,0.35)";
+      e.currentTarget.style.transform = "translateY(-2px)";
+    }}
+    onBlur={e => {
+      e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)";
+      e.currentTarget.style.transform = "translateY(0)";
+    }}
   >
-    <div style={{ fontSize: 13, color: C.muted, fontWeight: 500, marginBottom: 12 }}>{label}</div>
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <div style={{ fontSize: 26, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1 }}>{value}</div>
+    {/* Label */}
+    <div
+      style={{
+        fontSize: 13,
+        color: C.muted,
+        fontWeight: 500,
+        marginBottom: 12,
+      }}
+    >
+      {label}
+    </div>
+
+    {/* Value + Icon row */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 26,
+          fontWeight: 700,
+          color: C.ink,
+          fontFamily: "Georgia, serif",
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
+
       {Icon && (
-        <div style={{ padding: 10, borderRadius: 8, background: iconBg || C.goldLight }}>
+        <div
+          style={{
+            padding: 10,
+            borderRadius: 8,
+            background: iconBg || C.goldLight,
+          }}
+        >
           <Icon size={20} color={iconColor || C.gold} />
         </div>
       )}
     </div>
-    {sub && <div style={{ fontSize: 12, color, fontWeight: 500, marginTop: 6 }}>{sub}</div>}
-  </div>
+
+    {/* Sub text */}
+    {sub && (
+      <div
+        style={{
+          fontSize: 12,
+          color,
+          fontWeight: 500,
+          marginTop: 6,
+        }}
+      >
+        {sub}
+      </div>
+    )}
+
+    {/* Footer — only rendered when card is clickable */}
+    {onClick && (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: 12,
+          paddingTop: 10,
+          borderTop: "1px solid #F0EDEA",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            color: "#A9A09A",
+            fontWeight: 500,
+            letterSpacing: "0.01em",
+          }}
+        >
+          View details
+        </span>
+
+        <span
+          className="sc-arrow"
+          style={{
+            fontSize: 13,
+            color: C.gold,
+            fontWeight: 700,
+            opacity: 0.5,
+            transition: "transform 0.2s ease, opacity 0.2s ease",
+            display: "inline-block",
+            lineHeight: 1,
+          }}
+        >
+          →
+        </span>
+      </div>
+    )}
+  </button>
 );
 
 const TH = ({ children }) => (
@@ -779,6 +907,8 @@ export default function AdminOnboarding() {
         .nav-btn:hover{background:#FAF6F0 !important; color:${C.ink} !important;}
         .action-btn:hover{filter:brightness(.95);transform:translateY(-1px);}
         .action-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none;}
+        button:focus:not(:focus-visible){outline:none;box-shadow:none;}
+
       `}</style>
 
       {/* ════ SIDEBAR ════ */}
@@ -2472,7 +2602,7 @@ export default function AdminOnboarding() {
                       iconColor={C.green}
                     />
                     <StatCard 
-                      label="Total Loss" 
+                      label="Total Refunded" 
                       value={`₹${totalLoss.toLocaleString("en-IN")}`} 
                       sub="Refunded to customers" 
                       color={C.red} 
@@ -2493,10 +2623,10 @@ export default function AdminOnboarding() {
 
                   {/* Graph Analytics Section */}
                   <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
-                    {/* Left: AreaChart showing Income vs Loss Trend */}
+                    {/* Left: AreaChart showing Income vs Refund Trend */}
                     <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
                       <span style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block", marginBottom: 16 }}>
-                        Income vs Loss Trend (₹)
+                        Income vs Refund Trend (₹)
                       </span>
                       <div style={{ width: "100%", height: 260 }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -2520,7 +2650,7 @@ export default function AdminOnboarding() {
                             />
                             <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
                             <Area type="monotone" dataKey="Income" stroke={C.green} strokeWidth={2.5} fillOpacity={1} fill="url(#colorIncome)" name="Income" />
-                            <Area type="monotone" dataKey="Loss" stroke={C.red} strokeWidth={2.5} fillOpacity={1} fill="url(#colorLoss)" name="Loss / Cancelled" />
+                            <Area type="monotone" dataKey="Loss" stroke={C.red} strokeWidth={2.5} fillOpacity={1} fill="url(#colorLoss)" name="Refunded / Cancelled" />
                           </AreaChart>
                         </ResponsiveContainer>
                       </div>
@@ -2748,7 +2878,7 @@ export default function AdminOnboarding() {
                     <StatCard 
                       label="Financial Warning" 
                       value={`${lossSalonsCount} Studios`} 
-                      sub="Negative net profit or high losses" 
+                      sub="Negative net profit or high refunds" 
                       color={C.red} 
                       icon={Activity} 
                       iconBg={C.redLight} 
@@ -2771,7 +2901,7 @@ export default function AdminOnboarding() {
                           <tr>
                             <TH>Salon / Studio</TH>
                             <TH>Financial Status</TH>
-                            <TH>Income / Loss</TH>
+                            <TH>Income / Refunds</TH>
                             <TH>Booking Success</TH>
                             <TH>Avg Rating</TH>
                             <TH>Action</TH>
@@ -2787,7 +2917,7 @@ export default function AdminOnboarding() {
                               const completionRate = p.bookingsCount > 0 
                                 ? Math.round((p.completedCount / p.bookingsCount) * 100)
                                 : 0;
-                              const profitLabel = p.netProfit >= 0 ? "Profit" : "Loss";
+                              const profitLabel = p.netProfit >= 0 ? "Profit" : "Deficit";
                               const profitColor = p.netProfit >= 0 ? C.green : C.red;
                               const profitBg = p.netProfit >= 0 ? C.greenLight : C.redLight;
 
@@ -2812,7 +2942,7 @@ export default function AdminOnboarding() {
                                   </TD>
                                   <TD style={{ fontSize: 12 }}>
                                     <div style={{ color: C.green, fontWeight: 600 }}>Inc: ₹{p.income.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
-                                    <div style={{ color: C.red, fontWeight: 600, marginTop: 2 }}>Loss: ₹{p.loss.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
+                                    <div style={{ color: C.red, fontWeight: 600, marginTop: 2 }}>Refunds: ₹{p.loss.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
                                   </TD>
                                   <TD>
                                     <div style={{ display: "flex", flexDirection: "column", gap: 4, width: 120 }}>
@@ -2888,15 +3018,7 @@ export default function AdminOnboarding() {
                           <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></div>
                           <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>Password: <strong style={{ color:C.red }}>••••••••</strong></div>
                           <div style={{ fontSize:11, color:C.muted, marginBottom:12 }}>Registered: <strong style={{ color:C.ink }}>{b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—"}</strong></div>
-                          <div style={{ display:"flex", gap:6 }}>
-                            {["available","break"].map(s=>(
-                              <button key={s} className="action-btn" disabled={b.status===s}
-                                onClick={(e)=>{ e.stopPropagation(); changeBarberStatus(b._id,s); }}
-                                style={{ flex:1, padding:"6px 4px", fontSize:10, fontWeight:700, borderRadius:6, cursor:"pointer", border:`1px solid ${b.status===s?bStatus(s)+"50":C.border}`, background:b.status===s?`${bStatus(s)}20`:"#F7F5F2", color:b.status===s?bStatus(s):C.muted, fontFamily:"inherit", textAlign:"center", textTransform:"capitalize" }}>
-                                {s}
-                              </button>
-                            ))}
-                          </div>
+                          
                         </div>
                       </div>
                     ))}
@@ -3952,7 +4074,7 @@ export default function AdminOnboarding() {
                   Performance Analysis: {selectedPerformanceSalon.salon.salon_name}
                 </h3>
                 <p style={{ fontSize: 12, color: C.muted, margin: "4px 0 0" }}>
-                  Detailed analysis of why this studio is in {selectedPerformanceSalon.netProfit >= 0 ? "Profit" : "Loss"}
+                  Detailed analysis of why this studio is in {selectedPerformanceSalon.netProfit >= 0 ? "Profit" : "Deficit"}
                 </p>
               </div>
               <button 
@@ -3979,13 +4101,13 @@ export default function AdminOnboarding() {
                       <span style={{ color: C.green }}>₹{selectedPerformanceSalon.income.toLocaleString("en-IN")}</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: C.muted }}>Total Loss/Refunds:</span>
+                      <span style={{ color: C.muted }}>Total Refunds:</span>
                       <span style={{ color: C.red }}>₹{selectedPerformanceSalon.loss.toLocaleString("en-IN")}</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px dashed ${C.border}`, paddingTop: 8, fontSize: 13, fontWeight: 700 }}>
                       <span style={{ color: C.ink }}>Net Financial Status:</span>
                       <span style={{ color: selectedPerformanceSalon.netProfit >= 0 ? C.green : C.red }}>
-                        ₹{selectedPerformanceSalon.netProfit.toLocaleString("en-IN")} ({selectedPerformanceSalon.netProfit >= 0 ? "Profit" : "Loss"})
+                        ₹{selectedPerformanceSalon.netProfit.toLocaleString("en-IN")} ({selectedPerformanceSalon.netProfit >= 0 ? "Profit" : "Deficit"})
                       </span>
                     </div>
                   </div>
@@ -4006,7 +4128,7 @@ export default function AdminOnboarding() {
                       <span style={{ color: C.green }}>{selectedPerformanceSalon.completedCount} ({selectedPerformanceSalon.bookingsCount > 0 ? Math.round((selectedPerformanceSalon.completedCount/selectedPerformanceSalon.bookingsCount)*100) : 0}%)</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: C.muted }}>Cancelled / Loss Rate:</span>
+                      <span style={{ color: C.muted }}>Cancellation Rate:</span>
                       <span style={{ color: C.red }}>{selectedPerformanceSalon.cancelledCount} ({selectedPerformanceSalon.bookingsCount > 0 ? Math.round((selectedPerformanceSalon.cancelledCount/selectedPerformanceSalon.bookingsCount)*100) : 0}%)</span>
                     </div>
                   </div>
