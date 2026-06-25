@@ -128,12 +128,13 @@ function TermsPage() {
               Legal Framework
             </span>
 
-            <h1 className="mt-6 text-4xl sm:text-6xl font-black uppercase tracking-tight text-[#3E362E] leading-none">
-              Terms &
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-[#3E362E] mt-6 leading-none">
+             Terms & 
               <span className="text-[#C5A059] italic font-serif normal-case block sm:inline sm:ml-3">
                 Conditions
               </span>
-            </h1>
+            </h2>
+
 
             <div className="w-16 h-[2px] bg-[#C5A059] mx-auto mt-6" />
 
