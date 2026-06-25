@@ -63,27 +63,155 @@ const Avatar = ({ name, size = 32, color = C.gold, bg = C.goldLight }) => (
   </div>
 );
 
+
 const StatCard = ({ label, value, color, sub, icon: Icon, iconBg, iconColor, onClick }) => (
-  <div style={{
-    background: C.card, borderRadius: 12, padding: "18px 20px",
-    border: `1px solid ${C.border}`, boxShadow: "0 1px 4px rgba(0,0,0,.04)",
-    transition: "transform 0.2s, box-shadow 0.2s", cursor: onClick ? "pointer" : "default",
-  }}
+  <button
     onClick={onClick}
-    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"; }}
-    onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)"; }}
+    style={{
+      background: "#FFFFFF",
+      borderRadius: 12,
+      padding: "18px 20px",
+      border: "1px solid #E7E5E4",
+      boxShadow: "0 1px 4px rgba(0,0,0,.04)",
+      cursor: onClick ? "pointer" : "default",
+      position: "relative",
+      overflow: "hidden",
+      transition: "transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease",
+      outline: "none",
+      textAlign: "left",
+      width: "100%",
+      fontFamily: "inherit",
+    }}
+    onMouseEnter={e => {
+      if (!onClick) return;
+      e.currentTarget.style.transform = "translateY(-3px)";
+      e.currentTarget.style.boxShadow = "0 8px 28px rgba(197,160,89,0.13), 0 2px 8px rgba(0,0,0,0.07)";
+      e.currentTarget.style.border = "1.5px solid #C5A059";
+      const arrow = e.currentTarget.querySelector(".sc-arrow");
+      if (arrow) {
+        arrow.style.transform = "translateX(3px)";
+        arrow.style.opacity = "1";
+      }
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)";
+      e.currentTarget.style.border = "1px solid #E7E5E4";
+      const arrow = e.currentTarget.querySelector(".sc-arrow");
+      if (arrow) {
+        arrow.style.transform = "translateX(0)";
+        arrow.style.opacity = "0.5";
+      }
+    }}
+    onFocus={e => {
+      if (!onClick) return;
+      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(197,160,89,0.35)";
+      e.currentTarget.style.transform = "translateY(-2px)";
+    }}
+    onBlur={e => {
+      e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)";
+      e.currentTarget.style.transform = "translateY(0)";
+    }}
   >
-    <div style={{ fontSize: 13, color: C.muted, fontWeight: 500, marginBottom: 12 }}>{label}</div>
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <div style={{ fontSize: 26, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1 }}>{value}</div>
+    {/* Label */}
+    <div
+      style={{
+        fontSize: 13,
+        color: C.muted,
+        fontWeight: 500,
+        marginBottom: 12,
+      }}
+    >
+      {label}
+    </div>
+
+    {/* Value + Icon row */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 26,
+          fontWeight: 700,
+          color: C.ink,
+          fontFamily: "Georgia, serif",
+          lineHeight: 1,
+        }}
+      >
+        {value}
+      </div>
+
       {Icon && (
-        <div style={{ padding: 10, borderRadius: 8, background: iconBg || C.goldLight }}>
+        <div
+          style={{
+            padding: 10,
+            borderRadius: 8,
+            background: iconBg || C.goldLight,
+          }}
+        >
           <Icon size={20} color={iconColor || C.gold} />
         </div>
       )}
     </div>
-    {sub && <div style={{ fontSize: 12, color, fontWeight: 500, marginTop: 6 }}>{sub}</div>}
-  </div>
+
+    {/* Sub text */}
+    {sub && (
+      <div
+        style={{
+          fontSize: 12,
+          color,
+          fontWeight: 500,
+          marginTop: 6,
+        }}
+      >
+        {sub}
+      </div>
+    )}
+
+    {/* Footer — only rendered when card is clickable */}
+    {onClick && (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: 12,
+          paddingTop: 10,
+          borderTop: "1px solid #F0EDEA",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            color: "#A9A09A",
+            fontWeight: 500,
+            letterSpacing: "0.01em",
+          }}
+        >
+          View details
+        </span>
+
+        <span
+          className="sc-arrow"
+          style={{
+            fontSize: 13,
+            color: C.gold,
+            fontWeight: 700,
+            opacity: 0.5,
+            transition: "transform 0.2s ease, opacity 0.2s ease",
+            display: "inline-block",
+            lineHeight: 1,
+          }}
+        >
+          →
+        </span>
+      </div>
+    )}
+  </button>
 );
 
 const TH = ({ children }) => (
@@ -779,6 +907,8 @@ export default function AdminOnboarding() {
         .nav-btn:hover{background:#FAF6F0 !important; color:${C.ink} !important;}
         .action-btn:hover{filter:brightness(.95);transform:translateY(-1px);}
         .action-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none;}
+        button:focus:not(:focus-visible){outline:none;box-shadow:none;}
+
       `}</style>
 
       {/* ════ SIDEBAR ════ */}
@@ -2888,15 +3018,7 @@ export default function AdminOnboarding() {
                           <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>Mobile: <strong style={{ color:C.ink }}>{b.mobile}</strong></div>
                           <div style={{ fontSize:11, color:C.muted, marginBottom:4 }}>Password: <strong style={{ color:C.red }}>••••••••</strong></div>
                           <div style={{ fontSize:11, color:C.muted, marginBottom:12 }}>Registered: <strong style={{ color:C.ink }}>{b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—"}</strong></div>
-                          <div style={{ display:"flex", gap:6 }}>
-                            {["available","break","offline"].map(s=>(
-                              <button key={s} className="action-btn" disabled={b.status===s}
-                                onClick={(e)=>{ e.stopPropagation(); changeBarberStatus(b._id,s); }}
-                                style={{ flex:1, padding:"6px 4px", fontSize:10, fontWeight:700, borderRadius:6, cursor:"pointer", border:`1px solid ${b.status===s?bStatus(s)+"50":C.border}`, background:b.status===s?`${bStatus(s)}20`:"#F7F5F2", color:b.status===s?bStatus(s):C.muted, fontFamily:"inherit", textAlign:"center", textTransform:"capitalize" }}>
-                                {s}
-                              </button>
-                            ))}
-                          </div>
+                          
                         </div>
                       </div>
                     ))}
