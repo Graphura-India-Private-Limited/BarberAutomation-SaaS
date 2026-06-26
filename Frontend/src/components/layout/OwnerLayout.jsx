@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { 
   Scissors, LayoutDashboard, Clock, Calendar, Coffee, 
   CreditCard, DollarSign, BarChart2, IndianRupee, Settings, 
-  LogOut, Menu, X, Users, Activity, UserPlus
+  LogOut, Menu, X, Users, Activity, UserPlus, HeadphonesIcon
 } from "lucide-react";
 
 export default function OwnerLayout() {
@@ -27,6 +27,7 @@ export default function OwnerLayout() {
     { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
     { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
     { id: "financial-analytics", label: "Financial Analytics", icon: BarChart2, route: "/owner/financial-analytics" },
+    { id: "support", label: "Support Tickets", icon: HeadphonesIcon, route: "/owner/support" },
     { id: "settings", label: "Profile ", icon: Settings, route: "/owner/settings" },
   ];
 

@@ -44,6 +44,7 @@ import OwnerLayout from "./components/layout/OwnerLayout";
 import BarberTeam from "./pages/owner/BarberTeam";
 import OwnerLiveMonitoring from "./pages/owner/OwnerLiveMonitoring";
 import AddBarber from "./pages/owner/AddBarber";
+import OwnerSupportPage from "./pages/owner/OwnerSupportPage";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import { DashboardPage } from "./pages/admin/DashboardPage";
@@ -217,6 +218,7 @@ function App() {
           <Route path="barbers" element={<BarberTeam />} />
           <Route path="add-barber" element={<AddBarber />} />
           <Route path="customers" element={<CustomerManagement />} />
+          <Route path="support" element={<OwnerSupportPage ticketState={ticketState} />} />
         </Route>
 
         {/* --- SUPER ADMIN CENTRAL PANEL (RESTRICTED BY RBAC) --- */}

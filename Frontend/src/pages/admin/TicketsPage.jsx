@@ -20,6 +20,7 @@ export function TicketsPage({
   filterStatus, setFilterStatus,
   filterType, setFilterType,
   filterPriority, setFilterPriority,
+  filterSalon, setFilterSalon,
   searchQuery, setSearchQuery,
   selectedTicket, setSelectedTicket,
   resolveTicket, escalateTicket, closeTicket, reopenTicket,
@@ -60,6 +61,7 @@ export function TicketsPage({
           filterStatus={filterStatus}     setFilterStatus={setFilterStatus}
           filterType={filterType}         setFilterType={setFilterType}
           filterPriority={filterPriority} setFilterPriority={setFilterPriority}
+          filterSalon={filterSalon}       setFilterSalon={setFilterSalon}
           searchQuery={searchQuery}       setSearchQuery={setSearchQuery}
           total={displayTickets.length}
         />
