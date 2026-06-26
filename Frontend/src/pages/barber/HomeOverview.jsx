@@ -5,8 +5,52 @@ import { ArrowLeft, Sparkles, Layers, Users, Clock, ShieldCheck } from "lucide-r
 
 export default function HomeOverview() {
   const { currentUser, canViewFinance } = useAuth();
-  const { queue, servedCount } = useQueue();
+  const { queue: mockQueue, servedCount: mockServedCount } = useQueue();
   const navigate = useNavigate();
+
+  const [dbQueue, setDbQueue] = React.useState([]);
+  const [dbStats, setDbStats] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  const barberId = localStorage.getItem("barberId");
+  const token = localStorage.getItem("token");
+  const useDbData = !!barberId;
+
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+  const fetchDbData = async () => {
+    if (!useDbData) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch(`${API}/barber/${barberId}/dashboard`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDbQueue(data.todayQueue || []);
+        if (data.stats) {
+          setDbStats(data.stats);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching overview data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchDbData();
+    if (useDbData) {
+      const interval = setInterval(fetchDbData, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [useDbData]);
 
   const SERVICE_MAP = {
     haircut: 'Haircut',
@@ -17,24 +61,37 @@ export default function HomeOverview() {
     kids: "Kids' Cut"
   };
 
-  const activeCount = queue.filter(q => q.status !== "done").length;
-  const myQueue = currentUser?.role === "barber"
-    ? queue.filter(q => {
-        if (q.status === "done" || q.status === "Completed") return false;
-        const qBarber = (q.barber || "").toLowerCase();
-        const curBarber = (currentUser.name || "").toLowerCase();
-        const firstWordCur = curBarber.split(" ")[0].replace(/[^a-zA-Z]/g, "");
-        const firstWordQ = qBarber.split(" ")[0].replace(/[^a-zA-Z]/g, "");
-        return firstWordCur === firstWordQ || curBarber.includes(qBarber) || qBarber.includes(curBarber);
-      })
-    : queue;
+  const activeCount = useDbData ? (dbStats?.liveQueue || 0) : mockQueue.filter(q => q.status !== "done").length;
+  
+  const myQueue = useDbData
+    ? dbQueue.map((item, index) => ({
+        id: item._id,
+        customer: item.customer_id?.name || "Customer",
+        name: item.customer_id?.name || "Customer",
+        service: item.booking_id?.services?.[0]?.service_name || "Service",
+        time: item.booking_id?.slot_time 
+          ? new Date(item.booking_id.slot_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+          : new Date(item.joined_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        status: item.status,
+        position: item.position || (index + 1)
+      }))
+    : (currentUser?.role === "barber"
+        ? mockQueue.filter(q => {
+            if (q.status === "done" || q.status === "Completed") return false;
+            const qBarber = (q.barber || "").toLowerCase();
+            const curBarber = (currentUser.name || "").toLowerCase();
+            const firstWordCur = curBarber.split(" ")[0].replace(/[^a-zA-Z]/g, "");
+            const firstWordQ = qBarber.split(" ")[0].replace(/[^a-zA-Z]/g, "");
+            return firstWordCur === firstWordQ || curBarber.includes(qBarber) || qBarber.includes(curBarber);
+          })
+        : mockQueue);
 
   const stats = [
     { label: "Your Queue", value: myQueue.length, color: "bg-white", icon: Clock },
     { label: "Active Customers", value: activeCount, color: "bg-white", icon: Users },
-    { label: "Completed Today", value: servedCount, color: "bg-white", icon: ShieldCheck },
+    { label: "Completed Today", value: useDbData ? (dbStats?.completedToday || 0) : mockServedCount, color: "bg-white", icon: ShieldCheck },
     ...(canViewFinance()
-      ? [{ label: "Today's Revenue", value: `₹${financeData.todayRevenue.toLocaleString()}`, color: "bg-white", icon: Sparkles }]
+      ? [{ label: "Today's Revenue", value: `₹${(useDbData ? (dbStats?.todayRevenue || 0) : financeData.todayRevenue).toLocaleString()}`, color: "bg-white", icon: Sparkles }]
       : []),
   ];
 
@@ -65,7 +122,7 @@ export default function HomeOverview() {
           </h2>
           <p className="text-stone-400 text-xs font-black uppercase tracking-widest mt-2 flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            {salon.name} · {salon.address}
+            {useDbData ? (localStorage.getItem("salonName") || "Our Salon") : salon.name} · {useDbData ? (localStorage.getItem("salonAddress") || "") : salon.address}
           </p>
         </div>
 
@@ -129,11 +186,11 @@ export default function HomeOverview() {
               Salon Workspace Info
             </h3>
             <div className="space-y-3.5 text-sm text-stone-700 font-medium">
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salon Node</span> <span className="font-bold text-stone-900">{salon.name}</span></div>
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Address</span> <span className="font-bold text-stone-900">{salon.address}</span></div>
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Support Phone</span> <span className="font-bold text-stone-900 font-mono text-xs">{salon.phone}</span></div>
+              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salon Node</span> <span className="font-bold text-stone-900">{useDbData ? (localStorage.getItem("salonName") || "Our Salon") : salon.name}</span></div>
+              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Address</span> <span className="font-bold text-stone-900">{useDbData ? (localStorage.getItem("salonAddress") || "") : salon.address}</span></div>
+              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Support Phone</span> <span className="font-bold text-stone-900 font-mono text-xs">{useDbData ? "" : salon.phone}</span></div>
               {currentUser?.role === "barber" && (
-                <div className="flex"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salary Model</span> <span className="font-bold text-[#A37B58] uppercase tracking-wider text-xs">{currentUser.salaryModel}</span></div>
+                <div className="flex"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salary Model</span> <span className="font-bold text-[#A37B58] uppercase tracking-wider text-xs">{currentUser.salaryModel || "Standard Split"}</span></div>
               )}
             </div>
           </div>

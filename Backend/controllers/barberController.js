@@ -3,6 +3,7 @@ const Barber = require("../models/Barber");
 const Queue = require("../models/Queue");
 const Booking = require("../models/Booking");
 const BreakRequest = require("../models/BreakRequest");
+const Payment = require("../models/Payment");
 
 // @desc    Get all active barbers of a salon
 // @route   GET /api/barber/salon/:salon_id
@@ -107,11 +108,77 @@ exports.getBarberDashboard = async (req, res) => {
     const completedToday = await Queue.countDocuments({ barber_id: req.params.id, status: "completed", joined_at: { $gte: today } });
     const totalServed = await Queue.countDocuments({ barber_id: req.params.id, status: "completed" });
 
+    // 1. Calculate today's revenue from successful payments
+    const todayPayments = await Payment.find({
+      barber_id: req.params.id,
+      status: "SUCCESS",
+      created_at: { $gte: today }
+    });
+    const todayRevenue = todayPayments.reduce((sum, p) => sum + p.amount, 0);
+
+    // 2. Calculate weekly revenue (last 7 days)
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const weekPayments = await Payment.find({
+      barber_id: req.params.id,
+      status: "SUCCESS",
+      created_at: { $gte: oneWeekAgo }
+    });
+    const weekRevenue = weekPayments.reduce((sum, p) => sum + p.amount, 0);
+
+    // 3. Calculate active/total barbers for the salon
+    const totalBarbers = await Barber.countDocuments({ salon_id: barber.salon_id, is_active: true });
+    const onlineBarbers = await Barber.countDocuments({ salon_id: barber.salon_id, is_active: true, status: { $ne: "break" } });
+    const activeBarbers = `${onlineBarbers}/${totalBarbers}`;
+
+    // 4. Calculate live queue count (waiting + in-progress today)
+    const liveQueue = await Queue.countDocuments({
+      barber_id: req.params.id,
+      status: { $in: ["waiting", "in-progress"] },
+      joined_at: { $gte: today }
+    });
+
+    // 5. Average wait calculation
+    const avgWait = liveQueue * 20;
+
+    // 6. Calculate weekly chart revenue breakdown for the last 7 days (Mon-Sun or relative)
+    const weekData = [];
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      d.setHours(0, 0, 0, 0);
+      const nextD = new Date(d);
+      nextD.setDate(nextD.getDate() + 1);
+
+      const dayPayments = await Payment.find({
+        barber_id: req.params.id,
+        status: "SUCCESS",
+        created_at: { $gte: d, $lt: nextD }
+      });
+      const dayVal = dayPayments.reduce((sum, p) => sum + p.amount, 0);
+      weekData.push({
+        day: dayNames[d.getDay()],
+        val: dayVal,
+        current: i === 0
+      });
+    }
+
     res.json({
       success: true,
       barber,
       todayQueue,
-      stats: { completedToday, totalServed, rating: barber.rating }
+      stats: {
+        completedToday,
+        totalServed,
+        rating: barber.rating || 5.0,
+        todayRevenue,
+        weekRevenue,
+        activeBarbers,
+        liveQueue,
+        avgWait,
+        weekData
+      }
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

@@ -159,6 +159,7 @@ export default function BarberDashboard() {
   });
 
   const rawQueue = useDbData ? dbQueue : myQueue;
+  const weekChartData = useDbData && dbStats?.weekData ? dbStats.weekData : WEEK_DATA;
 
   // Filter out any active in-progress item from the waiting queue list
   const waitingQueue = rawQueue.filter(item => item.status !== "in-progress");
@@ -196,16 +197,9 @@ export default function BarberDashboard() {
     }
   });
 
-  const [breakRequests] = useState([
-    { id:1, name:"Arjun Singh",  type:"Lunch",      time:"14:00–14:30", duration:"30min", status:"pending" },
-    { id:2, name:"Deepak Kumar", type:"Long Break",  time:"15:00–16:00", duration:"60min", status:"approved" },
-  ]);
+  const [breakRequests] = useState([]);
 
-  const [reviews] = useState([
-    { id:1, name:"Rohit Mehta",   rating:5, text:"Best fade I've ever had!", time:"2 hours ago" },
-    { id:2, name:"Priya Kumar",   rating:5, text:"Very professional and clean.",  time:"5 hours ago" },
-    { id:3, name:"Amit Joshi",    rating:4, text:"Great cut, slight wait time.", time:"1 day ago" },
-  ]);
+  const [reviews] = useState([]);
 
   /* Clock */
   useEffect(() => {
@@ -473,10 +467,38 @@ export default function BarberDashboard() {
   {/* ── STAT CARDS ── */}
   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mx-auto w-full">
     {[
-      { label: "Today's Revenue",  value: `₹${(dbStats?.todayRevenue || stats.todayRevenue).toLocaleString()}`, sub: "+17% vs yesterday", icon: IndianRupee, up: true,  color: "#8B5A2B" },
-      { label: "Live Queue",        value: useDbData ? queue.length : stats.liveQueue,                         sub: currentSvc ? "1 in service" : "0 in service",     icon: Users,       up: null,  color: "#4A3E3D" },
-      { label: "Active Barbers",    value: stats.activeBarbers,                      sub: "1 on break",       icon: UserCheck,   up: null,  color: "#8B5A2B" },
-      { label: "Avg Wait Time",     value: useDbData ? `${queue.length * 20} min` : `${stats.avgWait} min`,                    sub: "Peak: 28 min at 2PM", icon: Timer,    up: false, color: "#4A3E3D" },
+      { 
+        label: "Today's Revenue",  
+        value: `₹${(useDbData ? (dbStats?.todayRevenue || 0) : stats.todayRevenue).toLocaleString()}`, 
+        sub: useDbData ? "Today's earnings" : "+17% vs yesterday", 
+        icon: IndianRupee, 
+        up: useDbData ? null : true,  
+        color: "#8B5A2B" 
+      },
+      { 
+        label: "Live Queue",        
+        value: useDbData ? (dbStats?.liveQueue || 0) : stats.liveQueue,                         
+        sub: currentSvc ? "1 in service" : "0 in service",     
+        icon: Users,       
+        up: null,  
+        color: "#4A3E3D" 
+      },
+      { 
+        label: "Active Barbers",    
+        value: useDbData ? (dbStats?.activeBarbers || "1/1") : stats.activeBarbers,                      
+        sub: useDbData ? "Salon staff active" : "1 on break",       
+        icon: UserCheck,   
+        up: null,  
+        color: "#8B5A2B" 
+      },
+      { 
+        label: "Avg Wait Time",     
+        value: useDbData ? `${dbStats?.avgWait || 0} min` : `${stats.avgWait} min`,                    
+        sub: useDbData ? "Estimated wait" : "Peak: 28 min at 2PM", 
+        icon: Timer,    
+        up: null, 
+        color: "#4A3E3D" 
+      },
     ].map((s, i) => (
       <div key={i} className="bg-white/80 backdrop-blur-md p-4 md:p-5 rounded-2xl border border-[#E6D5C3] transition-all duration-300 hover:bg-white shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
         <div className="flex items-start justify-between mb-3">
@@ -548,14 +570,14 @@ export default function BarberDashboard() {
       <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Mon — Sun</p>
     </div>
     <div className="px-4 py-2 rounded-full border border-[#E6D5C3] text-[11px] font-bold text-[#4A3E3D]">
-      THIS WEEK ₹52,300
+      THIS WEEK ₹{useDbData ? (dbStats?.weekRevenue || 0).toLocaleString() : stats.weekRevenue.toLocaleString()}
     </div>
   </div>
 
   {/* Chart Section */}
   <div className="h-48 w-full">
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={WEEK_DATA} barGap={8}>
+      <BarChart data={weekChartData} barGap={8}>
         <XAxis 
           dataKey="day" 
           axisLine={false} 
@@ -569,7 +591,7 @@ export default function BarberDashboard() {
           label={<CustomBarLabel />}
           isAnimationActive={false}
         >
-          {WEEK_DATA.map((entry, index) => (
+          {weekChartData.map((entry, index) => (
             <Cell 
               key={`cell-${index}`} 
               fill={entry.current ? "#8B5A2B" : "#F5EFE9"} 
@@ -585,10 +607,10 @@ export default function BarberDashboard() {
 <div className="bg-white/50 p-4 rounded-2xl border border-[#E6D5C3] mt-2">
   <div className="flex justify-between text-[10px] font-black uppercase mb-1">
     <span className="text-[#8B5A2B]">Daily Target</span>
-    <span className="text-stone-500">{(stats.todayRevenue / 15000 * 100).toFixed(0)}%</span>
+    <span className="text-stone-500">{((useDbData ? (dbStats?.todayRevenue || 0) : stats.todayRevenue) / 15000 * 100).toFixed(0)}%</span>
   </div>
   <div className="h-1.5 w-full bg-[#E6D5C3] rounded-full overflow-hidden">
-    <div className="h-full bg-[#8B5A2B]" style={{ width: `${(stats.todayRevenue / 15000 * 100)}%` }} />
+    <div className="h-full bg-[#8B5A2B]" style={{ width: `${((useDbData ? (dbStats?.todayRevenue || 0) : stats.todayRevenue) / 15000 * 100)}%` }} />
   </div>
 </div>
 
