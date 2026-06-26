@@ -67,7 +67,7 @@ export default function BreakApprovalDashboard() {
 
   const breakStats = useMemo(() => {
     const lunchCount = requests.filter(r => r.break_type === "lunch").length;
-    const teaCount = requests.filter(r => r.break_type === "tea" || r.break_type === "break").length;
+    const teaCount = requests.filter(r => r.break_type === "short" || r.break_type === "long").length;
     return { total: requests.length, lunch: lunchCount, tea: teaCount };
   }, [requests]);
 

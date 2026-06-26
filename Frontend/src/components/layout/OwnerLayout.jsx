@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import { 
   Scissors, LayoutDashboard, Clock, Calendar, Coffee, 
@@ -6,14 +6,41 @@ import {
   LogOut, Menu, X, Users, Activity, UserPlus, HeadphonesIcon
 } from "lucide-react";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 export default function OwnerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sideOpen, setSideOpen] = useState(false);
+  const [pendingBreakCount, setPendingBreakCount] = useState(0);
 
   const salonName = localStorage.getItem("salonName") || "Barber Salon";
   const ownerName = localStorage.getItem("name") || "Owner";
   const initials = ownerName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "OW";
+
+  useEffect(() => {
+    const fetchPendingCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch(`${API}/breaks/pending`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setPendingBreakCount(data.data?.length || 0);
+        }
+      } catch (err) {
+        console.error("Error fetching pending breaks count:", err);
+      }
+    };
+
+    fetchPendingCount();
+    const interval = setInterval(fetchPendingCount, 15000); // Poll every 15 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const NAV = [
     { id: "dashboard", label: "Console Home", icon: LayoutDashboard, route: "/owner/dashboard" },
@@ -93,6 +120,9 @@ export default function OwnerLayout() {
               >
                 <n.icon className="w-4 h-4 shrink-0 transition-colors" style={{ color: isActive ? "#8B5A2B" : "#A39796" }} />
                 <span className="text-xs uppercase tracking-wider font-sans">{n.label}</span>
+                {n.id === "approvals" && pendingBreakCount > 0 && (
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 animate-pulse ml-2 shrink-0" />
+                )}
                 
                 {isActive && (
                   <div className="w-1.5 h-4 rounded-full bg-[#8B5A2B] ml-auto" />

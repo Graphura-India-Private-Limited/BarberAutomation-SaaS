@@ -52,6 +52,16 @@ exports.createBooking = async (req, res) => {
       }
     }
 
+    if (barber_id) {
+      const barber = await Barber.findById(barber_id);
+      if (barber && (barber.status === "break" || barber.status === "offline")) {
+        return res.status(400).json({
+          success: false,
+          message: "This stylist is currently on break or offline and cannot accept new bookings."
+        });
+      }
+    }
+
     const serviceDetails = await Promise.all(
       (servicesToProcess || []).map(async (s) => {
         const svc = await Service.findById(s.service_id);

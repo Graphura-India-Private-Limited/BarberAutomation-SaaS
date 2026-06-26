@@ -30,13 +30,16 @@ function Stars({ rating }) {
 function BarberCard({ b, isSelected, onSelect, index, visible }) {
   const [hovered, setHovered] = useState(false);
   const isBusy = b.status === "Busy";
+  const isOnBreak = b.status === "On Break";
+  const isOffline = b.status === "Offline";
+  const isUnavailable = isBusy || isOnBreak || isOffline;
   const active = isSelected || hovered;
 
   return (
     <div
-      onMouseEnter={() => !isBusy && setHovered(true)}
+      onMouseEnter={() => !isUnavailable && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => !isBusy && onSelect(b)}
+      onClick={() => !isUnavailable && onSelect(b)}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0)" : "translateY(28px)",
@@ -44,13 +47,13 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
         background: "#fff",
         borderRadius: 20,
         overflow: "hidden",
-        border: isSelected ? "2px solid #C5A059" : `1.5px solid ${hovered && !isBusy ? "#C5A05966" : "#EAE0D0"}`,
+        border: isSelected ? "2px solid #C5A059" : `1.5px solid ${hovered && !isUnavailable ? "#C5A05966" : "#EAE0D0"}`,
         boxShadow: isSelected
           ? "0 20px 48px rgba(197,160,89,0.14)"
-          : hovered && !isBusy
+          : hovered && !isUnavailable
           ? "0 16px 40px rgba(44,36,30,0.09)"
           : "0 2px 12px rgba(44,36,30,0.03)",
-        cursor: isBusy ? "not-allowed" : "pointer",
+        cursor: isUnavailable ? "not-allowed" : "pointer",
         display: "flex",
         flexDirection: "column",
         position: "relative",
@@ -69,8 +72,8 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
           loading="lazy"
           style={{
             width: "100%", height: "100%", objectFit: "cover",
-            filter: isBusy ? "grayscale(40%) brightness(0.9)" : "none",
-            transform: active && !isBusy ? "scale(1.06)" : "scale(1)",
+            filter: isUnavailable ? "grayscale(40%) brightness(0.9)" : "none",
+            transform: active && !isUnavailable ? "scale(1.06)" : "scale(1)",
             transition: "transform 0.6s ease, filter 0.3s",
           }}
         />
@@ -80,9 +83,9 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
         {/* status badge */}
         <span style={{
           position: "absolute", top: 14, right: 14,
-          background: isBusy ? "rgba(251,191,36,0.15)" : "rgba(16,185,129,0.12)",
-          border: `1px solid ${isBusy ? "rgba(251,191,36,0.4)" : "rgba(16,185,129,0.35)"}`,
-          color: isBusy ? "#B45309" : "#065F46",
+          background: isBusy ? "rgba(251,191,36,0.15)" : (isOnBreak || isOffline) ? "rgba(239, 68, 68, 0.12)" : "rgba(16,185,129,0.12)",
+          border: `1px solid ${isBusy ? "rgba(251,191,36,0.4)" : (isOnBreak || isOffline) ? "rgba(239, 68, 68, 0.35)" : "rgba(16,185,129,0.35)"}`,
+          color: isBusy ? "#B45309" : (isOnBreak || isOffline) ? "#991B1B" : "#065F46",
           fontSize: 10, fontFamily: "'Montserrat',sans-serif", fontWeight: 700,
           letterSpacing: "0.08em", textTransform: "uppercase",
           padding: "4px 11px", borderRadius: 20, backdropFilter: "blur(8px)",
@@ -101,7 +104,7 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
       <div style={{ padding: "18px 20px 20px", flex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
 
         {/* rating + meta */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", justifycontent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <Stars rating={b.rating} />
             <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 12, fontWeight: 700, color: "#2C241E" }}>{b.rating}</span>
@@ -140,11 +143,11 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
               </div>
             ))}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 6, borderTop: "1px dashed #DDD4C4", marginTop: 2 }}>
-              <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 700, color: "#2C241E" }}>Est. wait</span>
+              <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, color: "#AAA" }}>Est. wait</span>
               <span style={{
                 fontFamily: "'Cormorant Garamond',serif", fontSize: 15, fontWeight: 700,
-                color: isBusy ? "#B45309" : "#065F46",
-                background: isBusy ? "#FFF8EC" : "#ECFDF5",
+                color: isBusy ? "#B45309" : (isOnBreak || isOffline) ? "#991B1B" : "#065F46",
+                background: isBusy ? "#FFF8EC" : (isOnBreak || isOffline) ? "#FEF2F2" : "#ECFDF5",
                 padding: "2px 10px", borderRadius: 6,
               }}>
                 {b.aiWait.wait}
@@ -154,9 +157,9 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
         </div>
 
         {/* CTA */}
-        {isBusy ? (
+        {isUnavailable ? (
           <button disabled style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", background: "#F5F0EA", color: "#C0B8B0", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "not-allowed" }}>
-            Fully Booked Today
+            {b.status === "Busy" ? "Fully Booked Today" : b.status === "On Break" ? "Stylist On Break" : "Stylist Offline"}
           </button>
         ) : (
           <button
