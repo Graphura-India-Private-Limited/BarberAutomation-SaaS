@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Store, Users, UserSquare2, UserPlus2, 
   CalendarCheck, Scissors, CreditCard, Star, Activity, Settings, LogOut,
-  Bell, RefreshCw, ChevronDown, X, Eye, Minimize2, Maximize2, Award, Phone, ShieldCheck, FileText, Inbox
+  Bell, RefreshCw, ChevronDown, X, Eye, Minimize2, Maximize2, Award, Phone, ShieldCheck, FileText, Inbox, Menu
 } from "lucide-react";  
 import { useTickets } from "../../utils/useTickets";
 import { TicketsPage } from "./TicketsPage";
@@ -393,6 +393,7 @@ export default function AdminOnboarding() {
   const photoRef  = useRef();
   const docRef    = useRef();
   const adminMenuRef = useRef(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const ROUTE_TAB_MAP = {
     "/admin": "dashboard",
@@ -431,6 +432,7 @@ export default function AdminOnboarding() {
   const handleTabChange = (tabKey, salonId = "") => {
     setTab(tabKey);
     setSelectedSalonId(salonId);
+    setIsSidebarOpen(false);
     if (tabKey === "dashboard") {
       navigate("/admin");
     } else if (tabKey === "salons") {
@@ -911,26 +913,45 @@ export default function AdminOnboarding() {
 
       `}</style>
 
+      {/* Mobile Sidebar Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-stone-900/60 z-50 md:hidden animate-in fade-in duration-200" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* ════ SIDEBAR ════ */}
-      <aside style={{
-        width: 256, background: C.sidebar, display: "flex", flexDirection: "column",
-        flexShrink: 0, position: "sticky", top: 0, height: "100vh", overflowY: "auto",
-        borderRight: `1px solid ${C.border}`,
-      }}>
+      <aside 
+        className={`bg-white border-r border-stone-200 h-screen md:sticky md:top-0 overflow-y-auto z-50 transition-all duration-300 flex flex-col shrink-0
+          ${isSidebarOpen 
+            ? "fixed inset-y-0 left-0 w-64 translate-x-0 shadow-2xl md:translate-x-0 md:relative md:w-64" 
+            : "fixed inset-y-0 left-0 w-64 -translate-x-full md:translate-x-0 md:relative md:w-64"
+          }
+        `}
+      >
         {/* Brand */}
         <div style={{ padding: "24px 20px 20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 8,
-              background: C.goldLight,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <Scissors size={16} color={C.gold} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8,
+                background: C.goldLight,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Scissors size={16} color={C.gold} />
+              </div>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", letterSpacing: "-0.01em", lineHeight: 1 }}>Barber Pro</div>
+                <div style={{ fontSize: 9, color: C.gold, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 3 }}>ADMIN CONSOLE</div>
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", letterSpacing: "-0.01em", lineHeight: 1 }}>Barber Pro</div>
-              <div style={{ fontSize: 9, color: C.gold, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 3 }}>ADMIN CONSOLE</div>
-            </div>
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="md:hidden p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg cursor-pointer"
+            >
+              <X size={18} />
+            </button>
           </div>
         </div>
 
@@ -1000,15 +1021,24 @@ export default function AdminOnboarding() {
       </aside>
 
       {/* ════ MAIN ════ */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <div style={{ padding: "0 32px" }}>
+      <div className="flex-1 flex flex-col min-w-0">
+        <div className="px-4 md:px-8">
 
-          {/* ── HEADER (matches File 1 large serif style) ── */}
-          <header style={{ paddingTop: 48, paddingBottom: 24, display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-            <div>
-              <h1 style={{ fontSize: 42, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 8 }}>
-                {currentNavLabel}
-              </h1>
+          {/* ── HEADER ── */}
+          <header 
+            className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-12 pb-6"
+          >
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
+              >
+                <Menu size={18} className="text-[#C5A059]" />
+              </button>
+              <div>
+                <h1 style={{ fontSize: 42, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 8 }}>
+                  {currentNavLabel}
+                </h1>
               {tab === "dashboard" ? (
                 <p style={{ fontSize: 15, fontWeight: 500, color: C.muted }}>Welcome back, Admin!</p>
               ) : (
@@ -1018,8 +1048,9 @@ export default function AdminOnboarding() {
                   <span style={{ color: C.ink }}>{currentNavLabel}</span>
                 </p>
               )}
+              </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, paddingBottom: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, paddingBottom: 4, flexWrap: "wrap" }}>
               <span style={{ fontSize: 13, fontWeight: 500, color: C.muted }}>
                 {new Date().toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}
               </span>
@@ -1188,7 +1219,7 @@ export default function AdminOnboarding() {
           <main style={{ paddingBottom: 60 }}>
 
             {/* STAT CARDS — shown on all tabs */}
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14, marginBottom:24 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
               <StatCard label="Total Customers" value={displayCustomersCount} sub={selectedSalonId ? "Booked in Studio" : "Registered users"} color={C.blue} icon={Users} iconBg={C.blueLight} iconColor={C.blue} onClick={() => { handleTabChange("customers", "all"); setCustPage(1); }}/>
               <StatCard label="Active Salons"   value={displaySalonsCount} sub={selectedSalonId ? "Selected Studio" : "Approved & live"} color={C.green} icon={Store} iconBg={C.greenLight} iconColor={C.green} onClick={() => handleTabChange("salons")}/>
               <StatCard label="Total Bookings"  value={displayBookingsCount} sub={`${displayPendingBookingsCount} pending`} color={C.purple} icon={CalendarCheck} iconBg={C.purpleLight} iconColor={C.purple} onClick={() => handleTabChange("appointments")}/>
@@ -1198,7 +1229,7 @@ export default function AdminOnboarding() {
              {/* ══ DASHBOARD ══ */}
              {tab==="dashboard" && (
                <div className="fade-in">
-                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
  
                    {/* Recent Bookings */}
                    <SectionCard title="Recent Bookings" actionLabel="View All →" onAction={()=>handleTabChange("appointments")}>
@@ -1466,7 +1497,8 @@ export default function AdminOnboarding() {
                       : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No customers found</div>
                       : (
                         <>
-                          <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                          <div className="w-full overflow-x-auto">
+                            <table style={{ width:"100%", borderCollapse:"collapse" }}>
                             <thead><tr>{["Customer","Mobile","Email","Loyalty Points","Joined","Status","Studio / Saloon"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
                             <tbody>
                               {paginated.map(c=>(
@@ -1507,6 +1539,7 @@ export default function AdminOnboarding() {
                               ))}
                             </tbody>
                           </table>
+                        </div>
                           
                           {/* Premium Pagination Control Footer */}
                           <div style={{
@@ -1824,7 +1857,8 @@ export default function AdminOnboarding() {
                       : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No appointments found</div>
                       : (
                         <>
-                          <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                          <div className="w-full overflow-x-auto">
+                            <table style={{ width:"100%", borderCollapse:"collapse" }}>
                             <thead><tr>{["Customer","Service","Barber","Date","Amount","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
                             <tbody>
                               {paginated.map(b=>(
@@ -1847,6 +1881,7 @@ export default function AdminOnboarding() {
                               ))}
                             </tbody>
                           </table>
+                        </div>
 
                           {/* Premium Pagination Control Footer */}
                           <div style={{
@@ -2047,7 +2082,8 @@ export default function AdminOnboarding() {
                         const paginated = filteredServices.slice(startIndex, startIndex + servPerPage);
                         return (
                           <>
-                            <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                            <div className="w-full overflow-x-auto">
+                              <table style={{ width:"100%", borderCollapse:"collapse" }}>
                               <thead><tr>{["Service","Category","Price","Duration","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
                               <tbody>
                                 {paginated.map(s=>(
@@ -2067,6 +2103,7 @@ export default function AdminOnboarding() {
                                 ))}
                               </tbody>
                             </table>
+                          </div>
 
                             {/* Premium Pagination Control Footer */}
                             <div style={{
@@ -2591,7 +2628,7 @@ export default function AdminOnboarding() {
                   </div>
 
                   {/* Analytics Stats Cards */}
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                     <StatCard 
                       label="Total Income" 
                       value={`₹${totalIncome.toLocaleString("en-IN")}`} 
@@ -2622,9 +2659,9 @@ export default function AdminOnboarding() {
                   </div>
 
                   {/* Graph Analytics Section */}
-                  <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Left: AreaChart showing Income vs Refund Trend */}
-                    <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
+                    <div className="lg:col-span-2" style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
                       <span style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block", marginBottom: 16 }}>
                         Income vs Refund Trend (₹)
                       </span>
@@ -2697,7 +2734,8 @@ export default function AdminOnboarding() {
                       <div style={{ padding:40, textAlign:"center", color:C.muted }}>No payments found for the selected criteria</div>
                     ) : (
                       <>
-                        <table style={{ width:"100%", borderCollapse:"collapse" }}>
+                        <div className="w-full overflow-x-auto">
+                          <table style={{ width:"100%", borderCollapse:"collapse" }}>
                           <thead>
                             <tr>
                               {["Customer", "Payment ID", "Amount", "Type", "Status", "Date"].map(h=><TH key={h}>{h}</TH>)}
@@ -2745,6 +2783,7 @@ export default function AdminOnboarding() {
                             ))}
                           </tbody>
                         </table>
+                      </div>
                         
                         {/* Pagination Footer */}
                         <div style={{ padding: "12px 20px", background: "#FAFAF8", borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
@@ -3125,7 +3164,8 @@ export default function AdminOnboarding() {
                      </div>
                    ) : (
                      <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
-                       <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+                       <div className="w-full overflow-x-auto">
+                        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
                          <thead>
                            <tr style={{ background: "#FAFAF8", borderBottom: `1px solid ${C.border}` }}>
                              <th style={{ padding: "14px 20px", fontSize: 10, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Salon & Owner</th>
@@ -3180,6 +3220,7 @@ export default function AdminOnboarding() {
                            })}
                          </tbody>
                        </table>
+                      </div>
                      </div>
                    )}
 
@@ -3227,7 +3268,8 @@ export default function AdminOnboarding() {
                                </div>
                              ) : (
                                <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, overflow: "hidden" }}>
-                                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
+                                 <div className="w-full overflow-x-auto">
+                                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
                                    <thead>
                                      <tr style={{ background: "#FAFAF8", borderBottom: `1px solid ${C.border}` }}>
                                        <th style={{ padding: "8px 12px", fontWeight: 700, color: C.muted }}>Field</th>
@@ -3255,6 +3297,7 @@ export default function AdminOnboarding() {
                                      })}
                                    </tbody>
                                  </table>
+                                 </div>
                                </div>
                              )}
                            </div>
