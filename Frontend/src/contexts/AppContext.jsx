@@ -26,22 +26,10 @@ export const financeData = {
   ],
 };
 
-const initialQueue = [
-  { id: 1, name: 'Amit Shah', customer: 'Amit Shah', phone: '9876543210', mobile: '9876543210', service: 'combo', barber: 'ali', position: 1, joinedAt: Date.now() - 900000, source: 'walk-in', status: 'waiting' },
-  { id: 2, name: 'Priya Nair', customer: 'Priya Nair', phone: '9123456789', mobile: '9123456789', service: 'haircut', barber: 'ravi', position: 2, joinedAt: Date.now() - 600000, source: 'booked', status: 'waiting' },
-  { id: 3, name: 'Rahul Gupta', customer: 'Rahul Gupta', phone: '9988776655', mobile: '9988776655', service: 'beard', barber: 'james', position: 3, joinedAt: Date.now() - 300000, source: 'walk-in', status: 'waiting' },
-  { id: 4, name: 'Sneha Patil', customer: 'Sneha Patil', phone: '9765432109', mobile: '9765432109', service: 'shave', barber: 'ali', position: 4, joinedAt: Date.now() - 120000, source: 'walk-in', status: 'waiting' },
-];
+const initialQueue = [];
 
 const getInitialBookings = () => {
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  const today = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-  return [
-    { id: 101, name: 'Kiran Desai', customer: 'Kiran Desai', phone: '9871234560', mobile: '9871234560', service: 'color', barber: 'ravi', slot: '2:00 PM', date: today, status: 'confirmed' },
-    { id: 102, name: 'Meera Joshi', customer: 'Meera Joshi', phone: '9845671230', mobile: '9845671230', service: 'haircut', barber: 'ali', slot: '3:30 PM', date: today, status: 'confirmed' },
-    { id: 103, name: 'Arjun Mehta', customer: 'Arjun Mehta', phone: '9732145670', mobile: '9732145670', service: 'combo', barber: 'james', slot: '4:00 PM', date: today, status: 'confirmed' },
-  ];
+  return [];
 };
 
 

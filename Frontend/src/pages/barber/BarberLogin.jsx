@@ -50,6 +50,8 @@ export default function BarberLogin() {
         localStorage.setItem("barberId",   data.barber?._id || "");
         localStorage.setItem("barberName", data.barber?.name || "");
         localStorage.setItem("salonId",    data.barber?.salon_id?._id || "");
+        localStorage.setItem("salonName",  data.barber?.salon_id?.salon_name || "");
+        localStorage.setItem("salonAddress", data.barber?.salon_id?.address || "");
         localStorage.setItem("name",       data.barber?.name || "Barber");
         localStorage.setItem("email",      data.barber?.email || "");
         syncAuth();

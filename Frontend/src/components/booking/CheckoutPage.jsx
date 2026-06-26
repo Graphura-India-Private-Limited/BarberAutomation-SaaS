@@ -123,7 +123,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
           <span className="text-[9px] font-black uppercase tracking-widest text-[#C5A059]">Option A</span>
           <h4 className="font-serif text-lg font-bold text-[#3E362E] mt-1">Partial Payment</h4>
           <p className="text-stone-500 text-xs mt-1 leading-relaxed">
-            Pay ₹50 per person now to confirm your reservation. Balance due at salon.
+            Pay ₹50 per person now to confirm your reservation. Balance due at salon. <span className="text-red-600 font-semibold">(Non-refundable)</span>
           </p>
           <div className="mt-4 text-2xl font-black font-mono text-[#3E362E]">₹{tokenAmount}</div>
         </div>
