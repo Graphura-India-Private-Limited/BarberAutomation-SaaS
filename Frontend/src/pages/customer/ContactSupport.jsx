@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   MessageSquare, HelpCircle, ArrowLeft, Mail, Phone, Clock, 
@@ -9,6 +9,7 @@ import Footer from "../../components/layout/Footer";
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const MOCK_FAQS = [
   { q: "How do I cancel or reschedule my active booking?", a: "You can change your timeline allocation straight from your Customer Profile dashboard up to 2 hours before your session. Alternatively, call your assigned studio branch location directly for an emergency slot lock shift." },
@@ -28,6 +29,19 @@ export default function ContactSupport({ onCreateTicket }) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
+  const [salons, setSalons] = useState([]);
+  const [selectedSalon, setSelectedSalon] = useState("");
+
+  useEffect(() => {
+    fetch(`${API}/salon`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.salons) {
+          setSalons(data.salons);
+        }
+      })
+      .catch(err => console.error("Error fetching salons:", err));
+  }, []);
 
   /* ── Form Submission Pipeline Handler ── */
   const handleSupportSubmit = async (e) => {
@@ -44,11 +58,14 @@ export default function ContactSupport({ onCreateTicket }) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1400));
       if (onCreateTicket) {
+        const salonObj = salons.find(s => s._id === selectedSalon);
         onCreateTicket({
           title: subject,
           description: message,
           email: email,
           category: category,
+          salonId: selectedSalon,
+          salonName: salonObj ? salonObj.salon_name : "",
         });
       }
       setSubmitted(true);
@@ -216,6 +233,21 @@ export default function ContactSupport({ onCreateTicket }) {
                         </button>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Salon Selector Dropdown */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 block">Select Salon / Studio (Optional)</label>
+                    <select
+                      value={selectedSalon}
+                      onChange={(e) => setSelectedSalon(e.target.value)}
+                      className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm font-bold text-stone-900 outline-none focus:border-[#C5A059] transition-all cursor-pointer shadow-3xs"
+                    >
+                      <option value="">General Platform Inquiry</option>
+                      {salons.map(s => (
+                        <option key={s._id} value={s._id}>{s.salon_name}</option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Input Element 1: Email Profile coordinates */}

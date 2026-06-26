@@ -40,7 +40,9 @@ export function TicketTable({ tickets, onSelect }) {
               </div>
               <div className="col-span-3">
                 <p className="text-sm font-medium text-[#3D3126] truncate">{ticket.title}</p>
-                <p className="text-xs text-[#8A7A6A] truncate">{ticket.customer}</p>
+                <p className="text-xs text-[#8A7A6A] truncate">
+                  {ticket.customer} {ticket.salonName && ` · Salon: ${ticket.salonName}`}
+                </p>
               </div>
               <div className="col-span-2"><TypeBadge type={ticket.type} /></div>
               <div className="col-span-2"><StatusBadge status={ticket.status} /></div>
@@ -68,7 +70,9 @@ export function TicketTable({ tickets, onSelect }) {
                     <TypeBadge type={ticket.type} />
                   </div>
                   <p className="text-sm font-medium text-[#3D3126] line-clamp-2">{ticket.title}</p>
-                  <p className="text-xs text-[#8A7A6A] mt-0.5">{ticket.customer}</p>
+                  <p className="text-xs text-[#8A7A6A] mt-0.5">
+                    {ticket.customer} {ticket.salonName && ` · Salon: ${ticket.salonName}`}
+                  </p>
                 </div>
                 <PriorityBadge priority={ticket.priority} />
               </div>

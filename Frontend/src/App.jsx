@@ -44,6 +44,7 @@ import OwnerLayout from "./components/layout/OwnerLayout";
 import BarberTeam from "./pages/owner/BarberTeam";
 import OwnerLiveMonitoring from "./pages/owner/OwnerLiveMonitoring";
 import AddBarber from "./pages/owner/AddBarber";
+import OwnerSupportPage from "./pages/owner/OwnerSupportPage";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import { DashboardPage } from "./pages/admin/DashboardPage";
@@ -217,6 +218,7 @@ function App() {
           <Route path="barbers" element={<BarberTeam />} />
           <Route path="add-barber" element={<AddBarber />} />
           <Route path="customers" element={<CustomerManagement />} />
+          <Route path="support" element={<OwnerSupportPage ticketState={ticketState} />} />
         </Route>
 
         {/* --- SUPER ADMIN CENTRAL PANEL (RESTRICTED BY RBAC) --- */}
@@ -234,10 +236,10 @@ function App() {
           <Route path="onboarding" element={<AdminOnboarding />} />
           <Route path="user-management" element={<AdminLayout page="users"><AdminUserManagement /></AdminLayout>} />
           <Route path="analytics" element={<AdminLayout page="analytics"><AdminAnalytics /></AdminLayout>} />
-          <Route path="dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
+          <Route path="dashboard" element={<Navigate to="/admin" replace />} />
           <Route path="tickets" element={<AdminOnboarding />} />
-          <Route path="reports" element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />
-          <Route path="settings" element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
+          <Route path="reports" element={<Navigate to="/admin" replace />} />
+          <Route path="settings" element={<AdminOnboarding />} />
           <Route path="customer-issues" element={<AdminOnboarding />} />
           <Route path="salon-issues" element={<AdminOnboarding />} />
           <Route path="owner-requests" element={<AdminOnboarding />} />

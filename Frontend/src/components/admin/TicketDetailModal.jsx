@@ -3,7 +3,7 @@ import { Modal, Button, Select } from './UIComponents.jsx'
 import { StatusBadge, PriorityBadge, TypeBadge } from './TicketBadges.jsx'
 import { formatDateTime } from '../../utils/date.jsx'
 import { TICKET_STATUS, mockAgents } from '../../utils/tickets.jsx'
-import { User, Mail, Phone, Tag, Clock, MessageSquare, CheckCircle, AlertTriangle, XCircle, RefreshCw } from 'lucide-react'
+import { User, Mail, Phone, Tag, Clock, MessageSquare, CheckCircle, AlertTriangle, XCircle, RefreshCw, Building } from 'lucide-react'
 
 export function TicketDetailModal({ ticket, isOpen, onClose, onResolve, onEscalate, onCloseTicket, onReopen, onAssign, onAddNote }) {
   const [noteText, setNoteText] = useState('')
@@ -48,6 +48,11 @@ export function TicketDetailModal({ ticket, isOpen, onClose, onResolve, onEscala
               <div className="flex items-center gap-2 text-sm text-stone-600">
                 <User size={14} className="text-stone-400 shrink-0" /><span>{ticket.customer}</span>
               </div>
+              {ticket.salonName && (
+                <div className="flex items-center gap-2 text-sm text-stone-600">
+                  <Building size={14} className="text-stone-400 shrink-0" /><span>Salon: {ticket.salonName}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-sm text-stone-600">
                 <Mail size={14} className="text-stone-400 shrink-0" /><span className="truncate">{ticket.email}</span>
               </div>

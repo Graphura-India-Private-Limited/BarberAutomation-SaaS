@@ -13,6 +13,7 @@ export function useTickets() {
   const [filterStatus, setFilterStatus] = useState('All')
   const [filterType, setFilterType] = useState('All')
   const [filterPriority, setFilterPriority] = useState('All')
+  const [filterSalon, setFilterSalon] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTicket, setSelectedTicket] = useState(null)
 
@@ -21,14 +22,18 @@ export function useTickets() {
       const matchesStatus = filterStatus === 'All' || ticket.status === filterStatus
       const matchesType = filterType === 'All' || ticket.type === filterType
       const matchesPriority = filterPriority === 'All' || ticket.priority === filterPriority
+      const matchesSalon = filterSalon === 'All' || 
+        (ticket.salonId && ticket.salonId === filterSalon) || 
+        (ticket.salonName && ticket.salonName === filterSalon) ||
+        (ticket.customer && ticket.customer === filterSalon);
       const matchesSearch =
         searchQuery === '' ||
         ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         ticket.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         ticket.customer.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesStatus && matchesType && matchesPriority && matchesSearch
+      return matchesStatus && matchesType && matchesPriority && matchesSalon && matchesSearch
     })
-  }, [tickets, filterStatus, filterType, filterPriority, searchQuery])
+  }, [tickets, filterStatus, filterType, filterPriority, filterSalon, searchQuery])
 
   const updateTicketStatus = (ticketId, newStatus) => {
     setTickets(prev =>
@@ -103,6 +108,8 @@ export function useTickets() {
       updatedAt: new Date().toISOString(),
       tags: tags,
       notes: [],
+      salonId: ticketData.salonId || "",
+      salonName: ticketData.salonName || "",
     };
     
     setTickets(prev => [newTicket, ...prev]);
@@ -115,6 +122,7 @@ export function useTickets() {
     filterStatus, setFilterStatus,
     filterType, setFilterType,
     filterPriority, setFilterPriority,
+    filterSalon, setFilterSalon,
     searchQuery, setSearchQuery,
     selectedTicket, setSelectedTicket,
     resolveTicket,

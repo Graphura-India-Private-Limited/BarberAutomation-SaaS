@@ -1,5 +1,6 @@
 
 
+import React, { useState, useEffect } from 'react'
 import { Search, X } from 'lucide-react'
 import { TICKET_STATUS, TICKET_PRIORITY, TICKET_TYPE } from '../../utils/tickets.jsx'
 
@@ -7,15 +8,31 @@ export function TicketFilters({
   filterStatus, setFilterStatus,
   filterType, setFilterType,
   filterPriority, setFilterPriority,
+  filterSalon, setFilterSalon,
   searchQuery, setSearchQuery,
   total,
 }) {
-  const hasFilters = filterStatus !== 'All' || filterType !== 'All' || filterPriority !== 'All' || searchQuery !== ''
+  const [salons, setSalons] = useState([])
+
+  useEffect(() => {
+    const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+    fetch(`${API}/salon`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.salons) {
+          setSalons(data.salons)
+        }
+      })
+      .catch(err => console.error("Error fetching salons:", err))
+  }, [])
+
+  const hasFilters = filterStatus !== 'All' || filterType !== 'All' || filterPriority !== 'All' || (filterSalon && filterSalon !== 'All') || searchQuery !== ''
 
   const clearAll = () => {
     setFilterStatus('All')
     setFilterType('All')
     setFilterPriority('All')
+    if (setFilterSalon) setFilterSalon('All')
     setSearchQuery('')
   }
 
@@ -75,6 +92,23 @@ export function TicketFilters({
             ))}
           </div>
         </div>
+
+        {/* Salon Selector (Rendered on Admin panel only) */}
+        {setFilterSalon && (
+          <div>
+            <p className="text-xs font-semibold text-[#8A7A6A] mb-2 uppercase tracking-wider">Salon / Studio</p>
+            <select
+              value={filterSalon}
+              onChange={e => setFilterSalon(e.target.value)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium border bg-white text-[#8A7A6A] border-[#E8DDD0] hover:border-[#B58B67] hover:text-[#9E7452] outline-none cursor-pointer h-[28px]"
+            >
+              <option value="All">All Salons</option>
+              {salons.map(s => (
+                <option key={s._id} value={s.salon_name}>{s.salon_name}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between pt-1 border-t border-[#E8DDD0]">

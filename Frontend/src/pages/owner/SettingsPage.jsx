@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AppContext";
-import { Scissors, Edit, MapPin, Image as ImageIcon } from "lucide-react";
+import { Scissors, Edit, MapPin, Image as ImageIcon, Bell, Shield } from "lucide-react";
 import CustomSelect from "../../components/common/CustomSelect";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -43,6 +43,34 @@ export default function SettingsPage() {
   const salonId = localStorage.getItem("salonId");
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role") || currentUser?.role;
+
+  // Support Toggles State
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    const saved = localStorage.getItem(`owner_notif_${salonId}`);
+    return saved ? JSON.parse(saved) : { emailNewTicket: true, emailEscalation: true, dailyDigest: false };
+  });
+
+  const [securityPrefs, setSecurityPrefs] = useState(() => {
+    const saved2FA = localStorage.getItem(`owner_sec_2fa_${salonId}`) === "true";
+    const savedTimeout = localStorage.getItem(`owner_sec_timeout_${salonId}`) !== "false";
+    return { twoFactor: saved2FA, sessionTimeout: savedTimeout };
+  });
+
+  const toggleNotif = (key) => {
+    setNotifPrefs(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem(`owner_notif_${salonId}`, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const toggleSecurity = (key) => {
+    setSecurityPrefs(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem(`owner_sec_${key}_${salonId}`, next[key] ? "true" : "false");
+      return next;
+    });
+  };
 
   const headers = () => ({
     "Content-Type": "application/json",
@@ -600,6 +628,79 @@ export default function SettingsPage() {
             {barbers.length === 0 && (
               <p className="text-center text-xs text-zinc-400 py-4 italic">No active barbers registered to your salon.</p>
             )}
+          </div>
+        </div>
+
+        {/* Support & Escalation Preferences */}
+        <div className="card p-6 mt-6 bg-white text-left">
+          <h3 className="text-lg font-bold font-serif text-[#3E362E] mb-1 flex items-center gap-2">
+            <Bell className="w-5 h-5 text-[#C5A059]" /> Support & Escalation Preferences
+          </h3>
+          <p className="text-xs text-zinc-500 font-sans mb-6 leading-relaxed">
+            Configure how support inquiries are handled and define notifications and security rules for your salon.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-stone-100">
+            {/* Notifications */}
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">Notification Triggers</h4>
+              {[
+                { key: "emailNewTicket", label: "Email on new support tickets" },
+                { key: "emailEscalation", label: "Email on critical escalations" },
+                { key: "dailyDigest", label: "Receive daily ticket summaries digest" }
+              ].map(pref => (
+                <label key={pref.key} className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm font-semibold text-stone-600 group-hover:text-stone-900 transition-colors">{pref.label}</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={notifPrefs[pref.key]}
+                    onClick={() => toggleNotif(pref.key)}
+                    className={`relative w-11 h-6 rounded-full transition-colors outline-none cursor-pointer ${notifPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
+                  >
+                    <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${notifPrefs[pref.key] ? "translate-x-5" : ""}`} />
+                  </button>
+                </label>
+              ))}
+            </div>
+
+            {/* Security */}
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">Escalation Security Checks</h4>
+              {[
+                { key: "twoFactor", label: "Enforce multi-factor verification on resolutions" },
+                { key: "sessionTimeout", label: "Support terminal session timeout (30 min)" }
+              ].map(pref => (
+                <label key={pref.key} className="flex items-center justify-between cursor-pointer group">
+                  <span className="text-sm font-semibold text-stone-600 group-hover:text-stone-900 transition-colors">{pref.label}</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={securityPrefs[pref.key]}
+                    onClick={() => toggleSecurity(pref.key)}
+                    className={`relative w-11 h-6 rounded-full transition-colors outline-none cursor-pointer ${securityPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
+                  >
+                    <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${securityPrefs[pref.key] ? "translate-x-5" : ""}`} />
+                  </button>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end items-center gap-4 pt-4">
+            {saved && <span className="text-emerald-700 text-xs font-bold animate-fade-in">Saved support preferences!</span>}
+            <button
+              onClick={() => {
+                localStorage.setItem(`owner_notif_${salonId}`, JSON.stringify(notifPrefs));
+                localStorage.setItem(`owner_sec_2fa_${salonId}`, securityPrefs.twoFactor ? "true" : "false");
+                localStorage.setItem(`owner_sec_timeout_${salonId}`, securityPrefs.sessionTimeout ? "true" : "false");
+                setSaved(true);
+                setTimeout(() => setSaved(false), 3000);
+              }}
+              className="bg-[#2E2824] hover:bg-[#3F3630] text-white font-sans text-xs font-bold uppercase tracking-wider px-6 py-3.5 rounded-xl shadow-md transition-all cursor-pointer"
+            >
+              SAVE SUPPORT PREFERENCES
+            </button>
           </div>
         </div>
 
