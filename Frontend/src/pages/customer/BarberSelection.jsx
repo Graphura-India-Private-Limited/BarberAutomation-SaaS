@@ -392,7 +392,7 @@ export default function BarberSelection() {
         </div>
 
         {/* ── MAIN ── */}
-        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10">
+        <div className={`max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 ${selectedBarber ? "pb-28 sm:pb-10" : ""}`}>
 
           {/* ── SERVICE CONTEXT STRIP ── */}
           {selectedService && (
@@ -578,14 +578,14 @@ export default function BarberSelection() {
 
               {/* CONTINUE CTA */}
               {selectedBarber && (
-                <div className="mt-10 p-5 md:p-7 bg-white border border-[#EAE0D0] rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="w-full sm:w-auto text-left">
-                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#AAA", margin: "0 0 4px" }}>Selected Artist</p>
+                <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-[#EAE0D0] flex flex-row items-center justify-between gap-3 shadow-[0_-10px_30px_rgba(44,36,30,0.12)] sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:z-0 sm:mt-10 sm:p-5 md:p-7 sm:bg-white sm:border sm:rounded-2xl sm:flex-row sm:gap-4 sm:shadow-none">
+                  <div className="w-auto text-left">
+                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#AAA", margin: "0 0 4px" }} className="hidden sm:block">Selected Artist</p>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <img src={selectedBarber.img} alt={selectedBarber.name} style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A059" }} />
+                      <img src={selectedBarber.img} alt={selectedBarber.name} style={{ borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A059" }} className="w-9 h-9 sm:w-10 sm:h-10" />
                       <div>
-                        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 20, fontWeight: 600, color: "#2C241E", margin: 0 }}>{selectedBarber.name}</p>
-                        <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, color: "#AAA", margin: 0 }}>{selectedBarber.role}</p>
+                        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, color: "#2C241E", margin: 0 }} className="text-[16px] sm:text-[20px] leading-tight">{selectedBarber.name}</p>
+                        <p style={{ fontFamily: "'Montserrat',sans-serif", color: "#AAA", margin: 0 }} className="text-[10px] sm:text-[11px]">{selectedBarber.role}</p>
                       </div>
                     </div>
                   </div>
@@ -606,8 +606,8 @@ export default function BarberSelection() {
                         navigate("/customer/look", { state: { service: selectedService, barber: selectedBarber, gender } });
                       }
                     }}
-                    className="w-full sm:w-auto justify-center"
-                    style={{ background: "#C5A059", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s", display: "flex", alignItems: "center", gap: 8 }}
+                    className="w-auto justify-center py-2.5 px-4 sm:py-3.5 sm:px-8 text-[10px] sm:text-[11px]"
+                    style={{ background: "#C5A059", color: "#fff", border: "none", borderRadius: 10, fontFamily: "'Montserrat',sans-serif", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s", display: "flex", alignItems: "center", gap: 8 }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "#2C241E"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "#C5A059"; }}
                   >

@@ -420,6 +420,7 @@ const Navbar = () => {
                   <div className="bg-[#1E1A17]/50 py-1 px-2 mb-2 rounded-xl border border-stone-800/30">
                     {SERVICE_LINKS.map((svc) => (
                       <Link
+                        key={svc.path}
                         to={svc.path}
                         onClick={() => setMenuOpen(false)}
                         className="w-full flex items-center gap-3 p-3 hover:bg-[#2A241F] rounded-lg transition-all text-left"

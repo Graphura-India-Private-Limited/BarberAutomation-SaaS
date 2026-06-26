@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Scissors, User, Mail, Phone, Plus, Trash2, X, 
   Calendar, Clock, Award, Image, ChevronRight, ArrowLeft, Save,
   Bell, CheckCircle, ShieldAlert, Sparkles, LogOut, CheckSquare, 
   Square, Edit3, Settings, Gift, List, Heart, CalendarPlus, Star,
   RefreshCw, Play, Search, ShoppingBag, Compass, HelpCircle, LifeBuoy,
-  Upload
+  Upload, Home
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import NearbyBarbers from "../../components/queue/NearbyBarbers";
 import barberBookingVideo from "../../assets/barber_booking.mp4";
@@ -174,6 +175,7 @@ const LiveVisualQueue = ({ activeQueue }) => {
 };
 
 export default function CustomerProfile() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [activeQueue, setActiveQueue] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -248,6 +250,11 @@ export default function CustomerProfile() {
     { id: 1, type: "status", title: "Booking Confirmed", message: "Your booking with Barber Ajay has been confirmed for June 15th.", date: "Just now", read: false },
     { id: 2, type: "announcement", title: "Festive Discount Active", message: "Special festive discount: 15% off all premium haircut styling packages this weekend!", date: "1 day ago", read: false },
   ]);
+  const [dbNotifications, setDbNotifications] = useState([]);
+
+  useEffect(() => {
+    compileNotifications(profile, appointments, dbNotifications, stamps);
+  }, [profile.marketing_emails, profile.monthly_reminders, profile.new_services_alerts, profile.newsletter_opt_in]);
 
   const [dummyServices] = useState([
     { id: "s1", name: "Classic Haircut", description: "Standard scissor and clipper cutting, tailored to your head structure.", price: 400, category: "Men", duration: "30 min" },
@@ -276,6 +283,27 @@ export default function CustomerProfile() {
     { id: "2", subject: "Stylist Ajay not available", category: "Booking", message: "Cannot select Ajay Barber for haircut booking slots.", status: "In Progress", date: "2026-06-08" }
   ]);
 
+  const [incomingBarberNotification, setIncomingBarberNotification] = useState(null);
+  const shownNotifIdsRef = useRef(new Set());
+
+  const dismissBarberNotification = async () => {
+    if (incomingBarberNotification) {
+      const token = getToken();
+      if (token) {
+        try {
+          await fetch(`${API}/auth/notifications/mark-read`, {
+            method: "PUT",
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          syncData();
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      setIncomingBarberNotification(null);
+    }
+  };
+
   const triggerToast = (msg, type = "success") => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
@@ -290,12 +318,16 @@ export default function CustomerProfile() {
     if (upcoming.length > 0) {
       list.push({ id: idCounter++, type: "status", title: "Booking Active", message: `Your appointment for ${upcoming[0].service} with ${upcoming[0].barberName} is scheduled for ${upcoming[0].date} at ${upcoming[0].time}.`, date: "Active", read: false });
     } else {
-      list.push({ id: idCounter++, type: "announcement", title: "Ready to Refresh?", message: "No active appointment scheduled. Browse our Premium Grooming Catalog and secure a booking slot today!", date: "Now", read: false });
+      if (uProfile.monthly_reminders !== false) {
+        list.push({ id: idCounter++, type: "announcement", title: "Ready to Refresh?", message: "No active appointment scheduled. Browse our Premium Grooming Catalog and secure a booking slot today!", date: "Now", read: false });
+      }
     }
     if (stampsCount > 0) {
       list.push({ id: idCounter++, type: "status", title: "Fidelity Stamps Verified", message: `You have successfully gathered ${stampsCount} fidelity stamp${stampsCount > 1 ? 's' : ''}! Only ${10 - stampsCount} more sessions until your 10% discount reward.`, date: "Updated", read: false });
     }
-    list.push({ id: idCounter++, type: "announcement", title: "Festive Discount Active", message: "Special styling discount: 15% off all premium haircut packages and styling treatments this weekend!", date: "1 day ago", read: false });
+    if (uProfile.marketing_emails !== false) {
+      list.push({ id: idCounter++, type: "announcement", title: "Festive Discount Active", message: "Special styling discount: 15% off all premium haircut packages and styling treatments this weekend!", date: "1 day ago", read: false });
+    }
     setNotifications(prev => {
       const readMap = {};
       prev.forEach(n => { if (n.read) readMap[n.id || n.title] = true; });
@@ -389,6 +421,33 @@ export default function CustomerProfile() {
           date: new Date(n.created_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) + " " + new Date(n.created_at).toLocaleDateString("en-IN"),
           read: n.read
         }));
+        setDbNotifications(dbNotifs);
+
+        // Find any unread barber/queue_turn notifications
+        const unreadQueueTurn = notifData.notifications.find(n => 
+          !n.read && 
+          (n.type === "queue_turn" || n.type === "queue_update" || 
+           n.title.toLowerCase().includes("beginning") || 
+           n.message.toLowerCase().includes("salon") || 
+           n.message.toLowerCase().includes("station"))
+        );
+        
+        if (unreadQueueTurn && !shownNotifIdsRef.current.has(unreadQueueTurn._id)) {
+          shownNotifIdsRef.current.add(unreadQueueTurn._id);
+          setIncomingBarberNotification({
+            id: unreadQueueTurn._id,
+            title: unreadQueueTurn.title,
+            message: unreadQueueTurn.message
+          });
+        }
+      }
+
+      const queueRes = await fetch(`${API}/queue/customer/active`, { headers: { Authorization: `Bearer ${token}` } });
+      const queueData = await queueRes.json();
+      if (queueData.success && queueData.active && queueData.queue) {
+        setActiveQueue(queueData.queue);
+      } else {
+        setActiveQueue(null);
       }
     } catch (err) {
       console.log("Offline local data fallback active.", err.message);
@@ -516,8 +575,23 @@ export default function CustomerProfile() {
   };
 
   const handleBookDummyService = (service) => {
+    const salonId = localStorage.getItem("selectedSalonId");
+    if (!salonId) {
+      triggerToast("Please select a studio/salon first!");
+      setTimeout(() => { navigate("/nearby"); }, 1000);
+      return;
+    }
     triggerToast(`Initiating booking for ${service.name}...`);
-    setTimeout(() => { window.location.href = `/customer/booking?svcId=${service.id}&price=${service.price}`; }, 1200);
+    const serviceObj = {
+      id: service.id,
+      _id: service.id,
+      name: service.name,
+      price: service.price,
+      description: service.description
+    };
+    setTimeout(() => {
+      navigate("/customer/barber", { state: { service: serviceObj } });
+    }, 1200);
   };
 
   const upcomingAppts = appointments.filter(a => a.status === "Upcoming" || a.status === "Pending" || a.status === "Confirmed" || a.status === "In-progress");
@@ -580,13 +654,15 @@ export default function CustomerProfile() {
                   { id: "history", label: "Appointments Registry", icon: Calendar },
                   { id: "dummy_services", label: "Grooming Menu", icon: ShoppingBag },
                   { id: "preferences", label: "Profile Settings", icon: User },
-                  { id: "alerts", label: "Live System Alerts", icon: Bell, count: notifications.filter(n => !n.read).length }
+                  { id: "alerts", label: "Live System Alerts", icon: Bell, count: notifications.filter(n => !n.read).length },
+                  { id: "homepage", label: "Return to Homepage", icon: Home, action: () => navigate("/home") }
                 ].map(item => {
                   const isActive = activeTab === item.id;
+                  const handleClick = item.action || (() => { setActiveTab(item.id); setIsSidebarOpen(false); });
                   return (
                     <button
                       key={item.id}
-                      onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+                      onClick={handleClick}
                       className={`w-full flex items-center justify-between gap-[10px] px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200 group cursor-pointer border-none outline-none ${
                         isActive ? 'bg-[#FDF9F3] text-[#C5A059] font-semibold border-l-3 border-[#C5A059]' : 'text-[#78716C] hover:bg-[#FAF6F0] hover:text-[#1C1917] font-medium'
                       }`}
@@ -608,7 +684,15 @@ export default function CustomerProfile() {
 
             <div className="pt-4 border-t border-[#E7E5E4] space-y-1">
               <button
-                onClick={() => { setIsSidebarOpen(false); window.location.href = "/customer/booking"; }}
+                onClick={() => {
+                  setIsSidebarOpen(false);
+                  const salonId = localStorage.getItem("selectedSalonId");
+                  if (salonId) {
+                    navigate("/customer/services");
+                  } else {
+                    navigate("/nearby");
+                  }
+                }}
                 className="w-full bg-[#C5A059] hover:opacity-95 text-white rounded-lg py-2.5 text-[11px] font-bold tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border-none outline-none font-sans"
               >
                 <Scissors size={13} strokeWidth={2.5} /> Book Appointment
@@ -925,42 +1009,6 @@ export default function CustomerProfile() {
               {/* TAB: OVERVIEW HUB */}
               {activeTab === "overview" && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  {/* Loyalty Reward Voucher Card if >= 10 bookings */}
-                  {unusedRewards > 0 && (
-                    <div className="bg-gradient-to-r from-[#3D3126] via-[#4E4032] to-[#3D3126] border border-[#B58B67]/50 rounded-3xl p-6 text-left shadow-lg flex flex-col md:flex-row justify-between items-center gap-6 hover:shadow-xl transition-all relative overflow-hidden text-white">
-                      <div className="absolute right-0 top-0 opacity-15 text-[#B58B67] -mr-12 -mt-12 pointer-events-none">
-                        <Gift size={260} />
-                      </div>
-                      <div className="space-y-3 max-w-xl relative z-10">
-                        <span className="bg-[#B58B67] text-white text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider shadow-3xs animate-pulse">Loyalty Reward Unlocked</span>
-                        <h2 className="text-2xl font-black font-serif text-white tracking-tight">Congratulations! You've Earned a 10% Discount!</h2>
-                        <p className="text-xs text-stone-300 leading-relaxed font-sans">
-                          As a thank you for completing <strong className="text-[#B58B67] font-black">{profile.total_visits}</strong> premium appointments, your next haircut is 10% off. Use the exclusive coupon code below at checkout to redeem your reward:
-                        </p>
-                        <div className="flex items-center gap-2 pt-1.5">
-                          <span className="font-mono text-sm bg-white/10 border border-[#B58B67]/40 px-3 py-1.5 rounded-lg font-black text-[#B58B67] tracking-wider select-all cursor-pointer">
-                            LOYAL10
-                          </span>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText("LOYAL10");
-                              triggerToast("Promo code copied to clipboard!");
-                            }}
-                            className="bg-[#B58B67] hover:bg-[#a67d58] text-white text-[9px] font-black uppercase px-3 py-2.5 rounded-lg border-none cursor-pointer transition-all"
-                          >
-                            Copy Code
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => window.location.href = "/customer/booking"}
-                        className="relative z-10 shrink-0 px-6 py-3.5 bg-white hover:bg-stone-50 text-[#3D3126] text-[10px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer border-none shadow-md hover:scale-102 flex items-center gap-1.5"
-                      >
-                        <Scissors size={12} /> Book Discounted Cut
-                      </button>
-                    </div>
-                  )}
-
                   {/* Onboarding Tutorial & Discount Card */}
                   <div className="bg-[#FEF9EE] border border-[#EADBCE] rounded-3xl p-6 text-left shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 hover:shadow-md transition-shadow relative overflow-hidden">
                     <div className="absolute right-0 top-0 opacity-10 text-[#B58B67] -mr-8 -mt-8 pointer-events-none">
@@ -973,7 +1021,17 @@ export default function CustomerProfile() {
                         Experience the pinnacle of premium men's grooming. Book your first haircut today and unlock your customized styling record. Use coupon code <strong className="text-[#9E7452] font-mono text-sm bg-white border border-[#EADBCE] px-2 py-0.5 rounded-md font-black">FIRSTCUT20</strong> for a flat <strong className="text-[#9E7452]">20% off</strong> on your checkout!
                       </p>
                       <div className="flex flex-wrap gap-3 pt-2">
-                        <button onClick={() => window.location.href = "/customer/booking"} className="bg-[#B58B67] hover:bg-[#9E7452] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-xs hover:scale-102 flex items-center gap-1.5 font-sans">
+                        <button 
+                          onClick={() => {
+                            const salonId = localStorage.getItem("selectedSalonId");
+                            if (salonId) {
+                              navigate("/customer/services");
+                            } else {
+                              navigate("/nearby");
+                            }
+                          }} 
+                          className="bg-[#B58B67] hover:bg-[#9E7452] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-xs hover:scale-102 flex items-center gap-1.5 font-sans"
+                        >
                           <Scissors size={12} /> Book Your First Cut
                         </button>
                         <button onClick={() => setShowVideoModal(true)} className="bg-white hover:bg-[#FAF6F0] text-[#3D3126] border border-[#EADBCE] px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-3xs hover:scale-102 flex items-center gap-1.5 font-sans">
@@ -1247,7 +1305,7 @@ export default function CustomerProfile() {
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 border-[#EADBCE] gap-4">
                     <div>
                       <h2 className="text-lg font-black uppercase tracking-wider text-[#3D3126]">Premium Grooming Catalog</h2>
-                      <p className="text-xs text-[#8A7A6A]">Browse and search through all of our available salon options.</p>
+                      <p className="text-xs text-[#8A7A6A]">Browse and search through all of our premium grooming services.</p>
                     </div>
                     <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white select-none shadow-3xs">
                       {["All", "Men", "Addons"].map(cat => (
@@ -1538,6 +1596,54 @@ export default function CustomerProfile() {
               <div className="w-5 h-5 rounded-full flex items-center justify-center text-white bg-emerald-500"><CheckCircle size={12} strokeWidth={3} /></div>
             )}
             {toast.msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Barber Notification Top-Right Popup */}
+      <AnimatePresence>
+        {incomingBarberNotification && (
+          <motion.div
+            initial={{ opacity: 0, x: 100, y: -20 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            exit={{ opacity: 0, x: 100, y: -20 }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+            className="fixed top-6 right-6 z-[9999] max-w-sm w-full bg-gradient-to-br from-[#FEF9EE] to-white border-2 border-[#B58B67] rounded-2xl shadow-2xl p-5 flex flex-col gap-3 text-left border-solid"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#FEF9EE] border border-[#EADBCE] border-solid flex items-center justify-center text-[#B58B67] animate-pulse">
+                  <Scissors size={20} className="text-[#B58B67]" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-sm font-black text-stone-900 tracking-tight">
+                    {incomingBarberNotification.title}
+                  </h3>
+                  <p className="text-[10px] text-[#B58B67] font-black uppercase tracking-wider mt-0.5">
+                    Live Broadcast from Stylist
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={dismissBarberNotification}
+                className="text-stone-400 hover:text-stone-700 hover:bg-stone-100 p-1 rounded-lg transition-colors cursor-pointer border-none bg-transparent"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <p className="text-xs text-stone-600 leading-relaxed font-sans font-medium">
+              {incomingBarberNotification.message}
+            </p>
+            <div className="flex justify-end gap-2 pt-1 border-t border-[#EADBCE]/40 border-solid border-0">
+              <button
+                type="button"
+                onClick={dismissBarberNotification}
+                className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-[#FFFBF2] text-[10px] font-black uppercase tracking-widest rounded-xl transition-all cursor-pointer border-none shadow-xs"
+              >
+                I am coming
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -6,21 +6,15 @@ import {
 
 
 const MOCK_EARNINGS_SUMMARY = {
-  todayEarned: 1840,
-  thisWeekEarned: 12450,
-  commissionRate: "45%",
-  totalTipsCollected: 2350,
+  todayEarned: 0,
+  thisWeekEarned: 0,
+  commissionRate: "0%",
+  totalTipsCollected: 0,
 };
 
-const MOCK_PAYOUT_HISTORY = [
-  { id: "PAY-99321", date: "25 May 2026", amount: 11200, type: "Weekly Payout", status: "Settled" },
-  { id: "PAY-98110", date: "18 May 2026", amount: 9850, type: "Weekly Payout", status: "Settled" },
-];
+const MOCK_PAYOUT_HISTORY = [];
 
-const MOCK_DAILY_COMMISSIONS = [
-  { id: "TR-881", service: "Classic Haircut + Beard Combo", time: "10:30 AM", basePrice: 599, cutEarned: 270, tip: 50 },
-  { id: "TR-884", service: "Premium Grooming & Facial Spa", time: "11:45 AM", basePrice: 799, cutEarned: 360, tip: 100 },
-];
+const MOCK_DAILY_COMMISSIONS = [];
 
 export default function BarberEarnings() {
   const [payouts] = useState(MOCK_PAYOUT_HISTORY);

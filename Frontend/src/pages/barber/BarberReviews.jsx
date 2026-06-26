@@ -8,65 +8,14 @@ const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
 const MOCK_REVIEW_STATS = {
-  averageRating: 4.9,
-  totalReviews: 124,
-  fiveStars: 112,
-  fourStars: 10,
-  threeStars: 2,
+  averageRating: 5.0,
+  totalReviews: 0,
+  fiveStars: 0,
+  fourStars: 0,
+  threeStars: 0,
 };
 
-const MOCK_REVIEWS_LIST = [
-  { 
-    id: "REV-801", 
-    client: "Mayur K.", 
-    rating: 5, 
-    date: "Today", 
-    service: "Classic Haircut + Beard Styling", 
-    text: "Best haircut experience in town! Sameer has insane precision with hair fades.", 
-    helpfulCount: 12, 
-    verified: true 
-  },
-  { 
-    id: "REV-794", 
-    client: "Rohan M.", 
-    rating: 5, 
-    date: "Yesterday", 
-    service: "Skin Fade Expert + Luxury Hot Towel Shave", 
-    text: "Absolute masterclass profile. The razor lining is clean and the hot towel massage is incredibly relaxing.", 
-    helpfulCount: 8, 
-    verified: true 
-  },
-  { 
-    id: "REV-789", 
-    client: "Arvinder Singh", 
-    rating: 4, 
-    date: "2 days ago", 
-    service: "Premium Executive Grooming", 
-    text: "Excellent service and grooming routine. Spacing was great and the staff is highly professional. Will book again.", 
-    helpfulCount: 4, 
-    verified: true 
-  },
-  { 
-    id: "REV-772", 
-    client: "Vikramaditya R.", 
-    rating: 5, 
-    date: "4 days ago", 
-    service: "Complete Grooming + Monthly Skin Detox", 
-    text: "Pure luxury experience. The attention to detail on my beard trim matches upscale premium standards. Worth every single rupee.", 
-    helpfulCount: 15, 
-    verified: true 
-  },
-  { 
-    id: "REV-756", 
-    client: "Kabir J.", 
-    rating: 4, 
-    date: "1 week ago", 
-    service: "Classic Haircut", 
-    text: "Great haircut and crisp styling. Took slightly longer than expected but the precision and finish look absolutely stellar.", 
-    helpfulCount: 2, 
-    verified: false 
-  }
-];
+const MOCK_REVIEWS_LIST = [];
 
 export default function BarberReviews() {
   // ✅ FIX: Reviews must sit in local state to mutate helpful numbers dynamically

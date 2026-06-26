@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Scissors, BarChart2, CreditCard, DollarSign, UserCheck, 
   MapPin, Clock, ShieldAlert, Edit, LogOut, LayoutDashboard,
-  TrendingUp, Users, Activity, Sparkles, Image as ImageIcon 
+  TrendingUp, Users, Activity, Sparkles, Image as ImageIcon, RefreshCw 
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -101,6 +101,14 @@ export default function OwnerDashboard() {
           </div>
           
           <div className="flex items-center gap-3">
+            <button 
+              onClick={fetchProfile}
+              disabled={loading}
+              className="flex items-center justify-center p-2.5 rounded-xl bg-white border border-[#EADBCE] hover:bg-stone-50 cursor-pointer transition shadow-2xs"
+              title="Refresh Dashboard"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+            </button>
             <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#EADBCE] shadow-2xs">
               <span className={`h-2 w-2 rounded-full ${statusMeta.dot}`} />
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">{statusMeta.label}</span>

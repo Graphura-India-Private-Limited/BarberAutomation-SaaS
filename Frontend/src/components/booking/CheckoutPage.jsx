@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreditCard, Landmark, Phone, ArrowLeft, ShieldCheck, Sparkles, Building, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,15 +15,56 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
   const [appliedPromo, setAppliedPromo] = useState(null); // { code: '...', type: '...', value: 100 }
   const [promoError, setPromoError] = useState("");
 
+  const [unusedRewards, setUnusedRewards] = useState(0);
+  const [hasPreviousBookings, setHasPreviousBookings] = useState(false);
+
+  useEffect(() => {
+    const fetchUserRewards = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        const bookingsRes = await fetch(`${API_URL}/booking/my`, { 
+          headers: { Authorization: `Bearer ${token}` } 
+        });
+        const bookingsData = await bookingsRes.json();
+        if (bookingsData.success && bookingsData.bookings) {
+          const activeBookings = bookingsData.bookings.filter(a => 
+            a.status === "completed" || a.status === "confirmed" || a.status === "pending" || a.status === "in-progress" ||
+            a.status === "Completed" || a.status === "Confirmed" || a.status === "Pending" || a.status === "In-progress"
+          );
+          setHasPreviousBookings(activeBookings.length > 0);
+          const usedRewardsCount = activeBookings.filter(a => a.promo_code === "LOYAL10" || a.promoCode === "LOYAL10").length;
+          const paidVisitsCount = activeBookings.filter(a => a.promo_code !== "LOYAL10" && a.promoCode !== "LOYAL10").length;
+          const calculatedUnused = Math.max(0, Math.floor(paidVisitsCount / 10) - usedRewardsCount);
+          setUnusedRewards(calculatedUnused);
+        }
+      } catch (err) {
+        console.error("Error fetching user rewards at checkout:", err);
+      }
+    };
+    fetchUserRewards();
+  }, []);
+
   const handleApplyPromo = () => {
     setPromoError("");
     const code = promoCode.trim().toUpperCase();
     if (!code) return;
 
     if (code === "FIRSTCUT20") {
-      setAppliedPromo({ code, type: "PERCENT", value: 20 });
+      if (hasPreviousBookings) {
+        setPromoError("FIRSTCUT20 is only valid for your first appointment.");
+        setAppliedPromo(null);
+      } else {
+        setAppliedPromo({ code, type: "PERCENT", value: 20 });
+      }
     } else if (code === "LOYAL10") {
-      setAppliedPromo({ code, type: "PERCENT", value: 10 });
+      if (unusedRewards <= 0) {
+        setPromoError("You do not have any loyalty rewards available.");
+        setAppliedPromo(null);
+      } else {
+        setAppliedPromo({ code, type: "PERCENT", value: 10 });
+      }
     } else {
       setPromoError("Invalid promo code.");
       setAppliedPromo(null);
@@ -123,7 +164,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
           <span className="text-[9px] font-black uppercase tracking-widest text-[#C5A059]">Option A</span>
           <h4 className="font-serif text-lg font-bold text-[#3E362E] mt-1">Partial Payment</h4>
           <p className="text-stone-500 text-xs mt-1 leading-relaxed">
-            Pay ₹50 per person now to confirm your reservation. Balance due at salon.
+            Pay ₹50 per person now to confirm your reservation. Balance due at salon. <span className="text-red-600 font-semibold">(Non-refundable)</span>
           </p>
           <div className="mt-4 text-2xl font-black font-mono text-[#3E362E]">₹{tokenAmount}</div>
         </div>
@@ -199,6 +240,21 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
               </div>
             )}
           </div>
+          {unusedRewards > 0 && !appliedPromo && (
+            <div className="flex justify-end mt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setAppliedPromo({ code: "LOYAL10", type: "PERCENT", value: 10 });
+                  setPromoCode("LOYAL10");
+                  setPromoError("");
+                }}
+                className="text-[10px] text-[#C5A059] font-black uppercase hover:underline flex items-center gap-1 cursor-pointer border-none bg-transparent"
+              >
+                <Sparkles className="w-3 h-3 text-[#C5A059] fill-[#C5A059]" /> Apply Unused Loyalty Reward (10% Off)
+              </button>
+            </div>
+          )}
           {promoError && (
             <p className="text-[10px] text-red-500 font-semibold text-right mt-0.5">{promoError}</p>
           )}

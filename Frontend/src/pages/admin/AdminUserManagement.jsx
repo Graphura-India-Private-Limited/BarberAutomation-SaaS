@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { RefreshCw } from "lucide-react";
 
 export default function AdminUserManagement() {
   const [activeTab, setActiveTab] = useState("owners");
@@ -71,21 +72,32 @@ export default function AdminUserManagement() {
         }
       `}</style>
 
-      {/* Tab Controls Navigation */}
-      <div className="flex gap-2 mb-2 bg-white p-1.5 rounded-2xl shadow-sm border border-[#EADBCE] max-w-md">
-        {["owners", "barbers", "customers"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 rounded-xl font-sans font-extrabold text-xs uppercase tracking-wider transition-all cubic-bezier(0.4,0,0.2,1) cursor-pointer ${
-              activeTab === tab
-                ? "bg-[#251F1B] text-white shadow-md"
-                : "text-stone-400 hover:text-stone-900"
-            }`}
-          >
-            {tab === "owners" ? "Salons / Owners" : tab}
-          </button>
-        ))}
+      {/* Tab Controls Navigation Row with Refresh */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+        <div className="flex gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-[#EADBCE] w-full sm:max-w-md">
+          {["owners", "barbers", "customers"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 py-3 rounded-xl font-sans font-extrabold text-xs uppercase tracking-wider transition-all cubic-bezier(0.4,0,0.2,1) cursor-pointer ${
+                activeTab === tab
+                  ? "bg-[#251F1B] text-white shadow-md"
+                  : "text-stone-400 hover:text-stone-900"
+              }`}
+            >
+              {tab === "owners" ? "Salons / Owners" : tab}
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={fetchUsers}
+          disabled={loading}
+          className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white border border-[#EADBCE] text-xs font-black uppercase tracking-wider text-stone-700 shadow-sm hover:bg-stone-50 cursor-pointer disabled:opacity-50 transition-all active:scale-95 font-sans"
+        >
+          <RefreshCw size={14} className={loading ? "animate-spin text-[#C5A059]" : "text-stone-500"} />
+          Sync Directory
+        </button>
       </div>
 
       {/* Workspace Display View */}

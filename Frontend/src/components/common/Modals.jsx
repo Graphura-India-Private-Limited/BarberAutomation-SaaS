@@ -281,6 +281,20 @@ export function DetailModal({ entry, isQueue, onClose, onServe, onRemove }) {
             ))}
           </div>
 
+          {entry.services && entry.services.length > 1 && (
+            <div className="mb-6 p-4 bg-[#FAF6F0] border border-[#EADBCE] rounded-2xl animate-in fade-in duration-200">
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mb-2.5">Attendees & Services</p>
+              <div className="space-y-2">
+                {entry.services.map((s, sIdx) => (
+                  <div key={sIdx} className="flex justify-between items-center bg-white border border-[#EADBCE]/60 p-2.5 rounded-xl text-xs">
+                    <span className="font-bold text-stone-850">👤 {s.member_name}</span>
+                    <span className="text-stone-500 font-semibold italic">{s.service_name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Action Operations Controller Hub */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button 

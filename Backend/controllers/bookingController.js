@@ -1,17 +1,59 @@
+const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
 const Queue = require("../models/Queue");
 const Service = require("../models/Service");
+const Customer = require("../models/Customer");
 const Barber = require("../models/Barber");
 
 // @desc    Create a new booking & add customer to the queue
 // @route   POST /api/booking
-// @access  Private (Customer)
+// @access  Private (Customer/Owner)
 exports.createBooking = async (req, res) => {
   try {
-    const { salon_id, barber_id, booking_type, services, slot_time, payment_type, attendees, promo_code } = req.body;
+    const { salon_id, barber_id, booking_type, services, slot_time, payment_type, attendees, promo_code, customer_name, customer_mobile } = req.body;
 
-    if (barber_id) {
-      const barber = await Barber.findById(barber_id);
+    let finalCustomerId = req.body.customer_id || (req.user ? req.user.id : null);
+
+    if (customer_mobile) {
+      let customer = await Customer.findOne({ mobile: customer_mobile });
+      if (!customer) {
+        customer = await Customer.create({
+          name: customer_name || "Walk-in Guest",
+          mobile: customer_mobile
+        });
+      } else if (customer_name && customer.name !== customer_name) {
+        customer.name = customer_name;
+        await customer.save();
+      }
+      finalCustomerId = customer._id;
+    }
+
+    if (!finalCustomerId) {
+      return res.status(400).json({ success: false, message: "Customer identification required." });
+    }
+
+    let finalBarberId = barber_id || null;
+    if (!finalBarberId) {
+      const activeBarbers = await Barber.find({ salon_id, is_active: true, status: { $nin: ["break", "offline"] } });
+      if (activeBarbers.length > 0) {
+        const availableBarber = activeBarbers.find(b => b.status === "available");
+        finalBarberId = availableBarber ? availableBarber._id : activeBarbers[0]._id;
+      }
+    }
+
+    let servicesToProcess = services;
+    if (!servicesToProcess || servicesToProcess.length === 0) {
+      const salonServices = await Service.find({ salon_id });
+      if (salonServices.length > 0) {
+        servicesToProcess = [{ service_id: salonServices[0]._id }];
+      } else {
+        const tempServiceId = new mongoose.Types.ObjectId();
+        servicesToProcess = [{ service_id: tempServiceId }];
+      }
+    }
+
+    if (finalBarberId) {
+      const barber = await Barber.findById(finalBarberId);
       if (barber && (barber.status === "break" || barber.status === "offline")) {
         return res.status(400).json({
           success: false,
@@ -21,7 +63,7 @@ exports.createBooking = async (req, res) => {
     }
 
     const serviceDetails = await Promise.all(
-      (services || []).map(async (s) => {
+      (servicesToProcess || []).map(async (s) => {
         const svc = await Service.findById(s.service_id);
         return {
           service_id: s.service_id,
@@ -66,9 +108,9 @@ exports.createBooking = async (req, res) => {
     }
 
     const booking = await Booking.create({
-      customer_id: req.user.id,
+      customer_id: finalCustomerId,
       salon_id,
-      barber_id: barber_id || null,
+      barber_id: finalBarberId,
       booking_type: booking_type || "queue",
       services: serviceDetails,
       total_amount: total,
@@ -78,16 +120,16 @@ exports.createBooking = async (req, res) => {
     });
 
     const position = await Queue.countDocuments({
-      barber_id: barber_id || null,
+      barber_id: finalBarberId,
       salon_id,
       status: { $in: ["waiting", "in-progress"] }
     }) + 1;
 
     const queue = await Queue.create({
       salon_id,
-      barber_id: barber_id || null,
+      barber_id: finalBarberId,
       booking_id: booking._id,
-      customer_id: req.user.id,
+      customer_id: finalCustomerId,
       position,
       estimated_wait: position * 20
     });
@@ -106,9 +148,9 @@ exports.createBooking = async (req, res) => {
     const Payment = require("../models/Payment");
     const payment = await Payment.create({
       booking_id: booking._id,
-      customer_id: req.user.id,
+      customer_id: finalCustomerId,
       salon_id,
-      barber_id: barber_id || null,
+      barber_id: finalBarberId,
       amount: payAmount,
       payment_type: payType,
       status: "SUCCESS"
@@ -143,6 +185,7 @@ exports.getSalonBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ salon_id: req.params.id })
       .populate("customer_id", "name mobile email")
+      .populate("barber_id", "name")
       .sort({ created_at: -1 });
 
     res.json({ success: true, bookings });

@@ -5,17 +5,14 @@ import {
 } from "lucide-react";
 
 // Reservation ledger — customer names synced with LiveQueue mock data
-const INITIAL_BOOKINGS = [
-  { id: "BK-2026-01", customer: "Aarav Mehta", service: "Premium Haircut & Beard Grooming", time: "10:30 AM", date: "Today", price: 450, status: "confirmed", notes: "Prefers low fade drop" },
-  { id: "BK-2026-02", customer: "Kabir Dev", service: "Royal Oil Head Massage", time: "11:45 AM", date: "Today", price: 250, status: "confirmed", notes: "Relaxing session preferred" },
-  { id: "BK-2026-03", customer: "Rohan Das", service: "Charcoal Face Scrub & Cleanse", time: "1:00 PM", date: "Today", price: 350, status: "pending", notes: "First-time client" },
-  { id: "BK-2026-04", customer: "Vikram Sen", service: "Classic Hair Wash & Conditioning", time: "2:30 PM", date: "Today", price: 200, status: "pending", notes: "" },
-];
+const INITIAL_BOOKINGS = [];
 
 const STATUS_CONFIG = {
   "pending": { label: "Awaiting Check-in", css: "bg-amber-50 text-amber-700 border-amber-200/60" },
   "confirmed": { label: "Confirmed Slot", css: "bg-stone-100 text-stone-800 border-stone-300/50" },
   "in-service": { label: "Live In Service", css: "bg-emerald-50 text-emerald-700 border-emerald-200/60" },
+  "in-progress": { label: "Live In Service", css: "bg-emerald-50 text-emerald-700 border-emerald-200/60" },
+  "completed": { label: "Completed Service", css: "bg-emerald-100 text-emerald-800 border-emerald-300/60" },
   "cancelled": { label: "Cancelled Log", css: "bg-rose-50 text-rose-700 border-rose-200/40" }
 };
 
@@ -23,21 +20,105 @@ export default function BarberBookings() {
   const [bookings, setBookings] = useState(INITIAL_BOOKINGS);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
-  
-  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
-  const filteredBookings = bookings.filter(booking => {
+  const barberId = localStorage.getItem("barberId");
+  const salonId = localStorage.getItem("salonId");
+  const token = localStorage.getItem("token");
+  const useDbData = !!barberId && !!salonId;
+
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+  const [dbBookings, setDbBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchBookings = async () => {
+    if (!useDbData) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch(`${API}/booking/salon/${salonId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        const activeBookings = (data.bookings || []).filter(b => {
+          const bBarberId = b.barber_id?._id || b.barber_id;
+          return bBarberId === barberId;
+        });
+        setDbBookings(activeBookings);
+      }
+    } catch (err) {
+      console.error("Error fetching bookings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchBookings();
+    if (useDbData) {
+      const interval = setInterval(fetchBookings, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [useDbData]);
+
+  const mappedBookings = useDbData
+    ? dbBookings.map(item => ({
+        id: item._id,
+        customer: item.customer_id?.name || "Customer",
+        phone: item.customer_id?.mobile || "—",
+        service: item.services?.[0]?.service_name || "Haircut",
+        time: item.slot_time ? new Date(item.slot_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Walk-in Queue",
+        date: item.slot_time ? new Date(item.slot_time).toLocaleDateString() : new Date(item.created_at || Date.now()).toLocaleDateString(),
+        price: item.total_amount || 0,
+        status: item.status,
+        notes: item.notes || ""
+      }))
+    : bookings;
+  
+  const profile = { 
+    salonName: useDbData ? (localStorage.getItem("salonName") || "Our Salon") : "Master Barber Lounge", 
+    initials: "MB" 
+  };
+
+  const filteredBookings = mappedBookings.filter(booking => {
     const matchesSearch = booking.customer.toLowerCase().includes(search.toLowerCase()) || 
                           booking.service.toLowerCase().includes(search.toLowerCase());
     if (!matchesSearch) return false;
-    if (filter === "today") return booking.date === "Today";
+    if (filter === "today") return booking.date === "Today" || booking.date === new Date().toLocaleDateString();
     if (filter === "pending") return booking.status === "pending";
-    if (filter === "in-service") return booking.status === "in-service";
+    if (filter === "in-service") return booking.status === "in-service" || booking.status === "in-progress";
     return true;
   });
 
-  const updateBookingStatus = (id, nextStatus) => {
-    setBookings(prev => prev.map(b => b.id === id ? { ...b, status: nextStatus } : b));
+  const updateBookingStatus = async (id, nextStatus) => {
+    if (!useDbData) {
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: nextStatus } : b));
+      return;
+    }
+    try {
+      const res = await fetch(`${API}/booking/${id}/status`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status: nextStatus })
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchBookings();
+      } else {
+        alert(data.message || "Failed to update booking status");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error updating status");
+    }
   };
 
   return (
@@ -153,7 +234,7 @@ export default function BarberBookings() {
                         </span>
 
                         {/* Action controls - barbers can confirm or start service only, no cancel */}
-                        {item.status !== "cancelled" && (
+                        {item.status !== "cancelled" && item.status !== "completed" && (
                           <div className="flex gap-1.5">
                             {item.status === "pending" && (
                               <button 
@@ -166,15 +247,15 @@ export default function BarberBookings() {
                             )}
                             {item.status === "confirmed" && (
                               <button 
-                                onClick={() => updateBookingStatus(item.id, "in-service")}
+                                onClick={() => updateBookingStatus(item.id, useDbData ? "in-progress" : "in-service")}
                                 className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-xs"
                               >
                                 Start Service
                               </button>
                             )}
-                            {item.status === "in-service" && (
+                            {(item.status === "in-service" || item.status === "in-progress") && (
                               <button 
-                                onClick={() => updateBookingStatus(item.id, "confirmed")}
+                                onClick={() => updateBookingStatus(item.id, useDbData ? "completed" : "confirmed")}
                                 className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-[#C5A059] text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-xs"
                               >
                                 Complete 🏁

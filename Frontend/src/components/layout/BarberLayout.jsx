@@ -4,7 +4,7 @@ import {
   Scissors, User, Coffee, AlertCircle, LogOut, Check, 
   ChevronDown, Menu, X, Clock, Settings, Users, 
   Calendar, IndianRupee, Star, Scissors as ServicesIcon, Play,
-  UserCheck, Bell, Layers
+  UserCheck, Bell, Layers, RefreshCw
 } from "lucide-react";
 
 const STATUS_CFG = {
@@ -225,6 +225,15 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
           
           <div className="flex items-center gap-3">
             
+            {/* Refresh button */}
+            <button 
+              onClick={() => window.location.reload()} 
+              className="p-2 text-zinc-400 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+              title="Refresh Console"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+
             {/* Bell button */}
             <div className="relative">
               <button 
