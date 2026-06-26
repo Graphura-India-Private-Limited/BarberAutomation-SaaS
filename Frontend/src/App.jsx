@@ -236,10 +236,10 @@ function App() {
           <Route path="onboarding" element={<AdminOnboarding />} />
           <Route path="user-management" element={<AdminLayout page="users"><AdminUserManagement /></AdminLayout>} />
           <Route path="analytics" element={<AdminLayout page="analytics"><AdminAnalytics /></AdminLayout>} />
-          <Route path="dashboard" element={<AdminLayout page="dashboard"><DashboardPage tickets={ticketState.tickets} onSelectTicket={(t) => ticketState.setSelectedTicket(t)} /></AdminLayout>} />
+          <Route path="dashboard" element={<Navigate to="/admin" replace />} />
           <Route path="tickets" element={<AdminOnboarding />} />
-          <Route path="reports" element={<AdminLayout page="reports"><ReportsPage tickets={ticketState.tickets} /></AdminLayout>} />
-          <Route path="settings" element={<AdminLayout page="settings"><AdminSettings /></AdminLayout>} />
+          <Route path="reports" element={<Navigate to="/admin" replace />} />
+          <Route path="settings" element={<AdminOnboarding />} />
           <Route path="customer-issues" element={<AdminOnboarding />} />
           <Route path="salon-issues" element={<AdminOnboarding />} />
           <Route path="owner-requests" element={<AdminOnboarding />} />
