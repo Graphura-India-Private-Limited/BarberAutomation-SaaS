@@ -138,20 +138,23 @@ exports.getActiveCustomerQueue = async (req, res, next) => {
 // @access  Private (Owner, Admin, Barber)
 exports.notifyCustomer = async (req, res, next) => {
   try {
-    const { queue_id } = req.body;
+    const { queue_id, message } = req.body;
 
     const queueEntry = await Queue.findById(queue_id);
     if (!queueEntry) {
       return res.status(404).json({ success: false, message: "Queue entry not found" });
     }
 
+    const defaultMessage = "Your service is beginning! Please come to the salon.";
+    const finalMessage = message || defaultMessage;
+
     // Create an in-app system notification document for the specific client
     const notification = await Notification.create({
-      user_id: queueEntry.customer_id,
-      title: "Your Turn is Approaching! 🎯",
-      message: `Please head over to the station. You are currently next in line!`,
-      type: "queue_update",
-      is_read: false
+      customer_id: queueEntry.customer_id,
+      title: "Your Service is Beginning! ✂️",
+      message: finalMessage,
+      type: "queue_turn",
+      read: false
     });
 
     res.status(200).json({

@@ -32,6 +32,29 @@ exports.createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: "Customer identification required." });
     }
 
+    if (promo_code === "LOYAL10") {
+      const userBookings = await Booking.find({ customer_id: finalCustomerId });
+      const activeBookings = userBookings.filter(a =>
+        a.status === "Completed" || a.status === "Confirmed" || a.status === "Pending" || a.status === "In-progress" ||
+        a.status === "completed" || a.status === "confirmed" || a.status === "pending" || a.status === "in-progress"
+      );
+      const usedRewardsCount = activeBookings.filter(a => a.promo_code === "LOYAL10").length;
+      const paidVisitsCount = activeBookings.filter(a => a.promo_code !== "LOYAL10").length;
+      const calculatedUnused = Math.max(0, Math.floor(paidVisitsCount / 10) - usedRewardsCount);
+      if (calculatedUnused <= 0) {
+        return res.status(400).json({ success: false, message: "You do not have any loyalty rewards available to redeem." });
+      }
+    } else if (promo_code === "FIRSTCUT20") {
+      const userBookings = await Booking.find({ customer_id: finalCustomerId });
+      const activeBookings = userBookings.filter(a =>
+        a.status === "Completed" || a.status === "Confirmed" || a.status === "Pending" || a.status === "In-progress" ||
+        a.status === "completed" || a.status === "confirmed" || a.status === "pending" || a.status === "in-progress"
+      );
+      if (activeBookings.length > 0) {
+        return res.status(400).json({ success: false, message: "FIRSTCUT20 is only valid for your first appointment." });
+      }
+    }
+
     let finalBarberId = barber_id || null;
     if (!finalBarberId) {
       const activeBarbers = await Barber.find({ salon_id, is_active: true });
