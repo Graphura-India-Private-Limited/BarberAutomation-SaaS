@@ -163,15 +163,21 @@ export default function BreakManagement() {
     e.preventDefault();
     const durationVal = parseInt(duration);
 
+    // Map frontend break types to backend-compatible enum values ("short" or "long")
+    let backendBreakType = "short";
+    if (durationVal > 30) {
+      backendBreakType = "long";
+    }
+
     try {
       const res = await fetch(`${API}/barber/${barberId}/break-request`, {
         method: "POST",
         headers: headers(),
         body: JSON.stringify({
-          break_type: breakType,
+          break_type: backendBreakType,
           start_time: new Date().toISOString(),
           duration_mins: durationVal,
-          reason: reason || ""
+          reason: reason ? `Type: ${breakType} - ${reason}` : `Type: ${breakType}`
         })
       });
       const data = await res.json();

@@ -1,6 +1,7 @@
 const Booking = require("../models/Booking");
 const Queue = require("../models/Queue");
 const Service = require("../models/Service");
+const Barber = require("../models/Barber");
 
 // @desc    Create a new booking & add customer to the queue
 // @route   POST /api/booking
@@ -8,6 +9,16 @@ const Service = require("../models/Service");
 exports.createBooking = async (req, res) => {
   try {
     const { salon_id, barber_id, booking_type, services, slot_time, payment_type, attendees, promo_code } = req.body;
+
+    if (barber_id) {
+      const barber = await Barber.findById(barber_id);
+      if (barber && (barber.status === "break" || barber.status === "offline")) {
+        return res.status(400).json({
+          success: false,
+          message: "This stylist is currently on break or offline and cannot accept new bookings."
+        });
+      }
+    }
 
     const serviceDetails = await Promise.all(
       (services || []).map(async (s) => {

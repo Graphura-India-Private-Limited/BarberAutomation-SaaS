@@ -7,7 +7,14 @@ const Queue = require("../models/Queue");
 // @access  Private (Owner)
 exports.getPendingBreaks = async (req, res) => {
   try {
-    const pending = await BreakRequest.find({ status: "pending" })
+    let filter = { status: "pending" };
+    if (req.user && req.user.role === "owner") {
+      const barbers = await Barber.find({ salon_id: req.user._id }, "_id");
+      const ids = barbers.map(b => b._id);
+      filter.barber_id = { $in: ids };
+    }
+
+    const pending = await BreakRequest.find(filter)
       .populate("barber_id", "name");
 
     res.json({ success: true, data: pending });
