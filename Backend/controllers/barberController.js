@@ -89,7 +89,7 @@ exports.updateBarberStatus = async (req, res) => {
 // @access  Private (Barber)
 exports.getBarberDashboard = async (req, res) => {
   try {
-    const barber = await Barber.findById(req.params.id).populate("salon_id", "salon_name address");
+    const barber = await Barber.findById(req.params.id).populate("salon_id", "salon_name address support_number salary_model");
     if (!barber) return res.status(404).json({ success: false, message: "Not found" });
 
     const today = new Date();

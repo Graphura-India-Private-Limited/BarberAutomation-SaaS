@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   X,
 } from "lucide-react";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const SERVICES = [
   "Classic Haircut",
@@ -182,26 +183,18 @@ const visibleQueue = isOwner
                 }
               />
 
-              <select
-                className="p-3 rounded-xl border border-[#E6D5C3] bg-[#FDFBF7] outline-none focus:border-[#8B5A2B]"
+              <CustomSelect
                 value={newCustomer.service}
-                onChange={(e) =>
+                onChange={(val) =>
                   setNewCustomer({
                     ...newCustomer,
-                    service: e.target.value,
+                    service: val,
                   })
                 }
-              >
-                <option value="">
-                  Select Service
-                </option>
-
-                {SERVICES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+                options={SERVICES}
+                placeholder="Select Service"
+                className="!border-[#E6D5C3] !bg-[#FDFBF7] !h-[46px] !rounded-xl !text-sm"
+              />
 
               <button
                 onClick={handleAddCustomer}

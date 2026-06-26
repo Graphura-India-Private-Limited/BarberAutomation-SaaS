@@ -70,6 +70,7 @@ export default function Login() {
         localStorage.setItem("role",   "customer");
         localStorage.setItem("name",   data.user?.name || "Customer");
         localStorage.setItem("email",  data.user?.email || "");
+        localStorage.setItem("mobile", data.user?.mobile || mobile || "");
 
         if (data.user?.name) {
           localStorage.setItem("userName", data.user.name);

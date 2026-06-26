@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
+import { Lock } from 'lucide-react';
 
 export default function BookingForm({ bookingData, onBack, onConfirm }) {
-  const [mobile, setMobile] = useState('');
+  // Check if customer is logged in
+  const isLoggedIn = !!localStorage.getItem("token") && localStorage.getItem("role") === "customer";
+  const storedMobile = localStorage.getItem("mobile") || "";
+
+  const [mobile, setMobile] = useState(storedMobile);
   const [attendees, setAttendees] = useState([
     { id: 1, name: '', type: 'Primary' }
   ]);
@@ -30,6 +35,9 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
     onConfirm({ mobile, attendees }); 
   };
 
+  const lockedInputClass = "w-full border border-stone-200 bg-stone-100 px-4 py-3 rounded-xl text-stone-500 text-sm font-medium cursor-not-allowed select-none";
+  const editableInputClass = "w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none transition-all";
+
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center mb-8 pb-4 border-b">
@@ -41,7 +49,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
         <h2 className="text-2xl font-bold text-gray-900">Confirm Details</h2>
       </div>
 
-      {/* 🧾 Booking Summary Panel (FIXED: Replaced unconfigured bg-salonBg with light theme container) */}
+      {/* Booking Summary */}
       <div className="bg-[#FEF3E2] bg-opacity-40 p-6 rounded-xl mb-8 border border-[#FEF3E2]">
         <h3 className="font-bold text-[#3E362E] mb-4 text-sm uppercase tracking-wider">Booking Summary</h3>
         <div className="space-y-3 text-sm text-gray-600">
@@ -57,19 +65,48 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
         </div>
       </div>
 
-      {/* Dynamic Multi-User Form */}
+      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* Mobile Number — locked when logged in */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Primary Mobile Number</label>
-          <input 
-            type="tel" name="mobile" required
-            value={mobile}
-            onChange={(e) => setMobile(e.target.value)}
-            className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none transition-all" 
-            placeholder="10-digit mobile number for SMS updates"
-          />
+          <label className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+            Primary Mobile Number
+            {isLoggedIn && (
+              <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                <Lock size={9} /> Verified
+              </span>
+            )}
+          </label>
+
+          {isLoggedIn ? (
+            <>
+              <input
+                type="tel"
+                name="mobile"
+                value={mobile}
+                readOnly
+                className={lockedInputClass}
+              />
+              <p className="text-[10px] text-stone-400 mt-1.5 font-medium flex items-center gap-1">
+                <Lock size={9} className="text-stone-400" />
+                Linked to your registered account. Cannot be changed here.
+              </p>
+            </>
+          ) : (
+            <input
+              type="tel"
+              name="mobile"
+              required
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              className={editableInputClass}
+              placeholder="10-digit mobile number for SMS updates"
+            />
+          )}
         </div>
 
+        {/* Attendees */}
         <div className="space-y-3 mt-6">
           <div className="flex justify-between items-end mb-2">
             <label className="block text-sm font-semibold text-gray-700">Attendees</label>
@@ -89,7 +126,7 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
                   type="text" required
                   value={member.name}
                   onChange={(e) => handleNameChange(member.id, e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:ring-2 focus:ring-[#C5A059] focus:border-[#C5A059] outline-none transition-all" 
+                  className={editableInputClass}
                   placeholder={`Name of ${member.type}`}
                 />
               </div>
@@ -110,7 +147,6 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
           ))}
         </div>
 
-        {/* 🏁 FIXED SUBMIT BUTTON: Hardcoded premium background */}
         <button 
           type="submit" 
           className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-white py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-200 mt-8 cursor-pointer"

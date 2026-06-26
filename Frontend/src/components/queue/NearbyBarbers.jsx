@@ -4,6 +4,7 @@ import * as Icons from "lucide-react";
 import Navbar from "../layout/Navbar";
 import Footer from "../layout/Footer";
 import defaultShopImage from "../../assets/shop.jpg";
+import CustomSelect from "../common/CustomSelect";
 
 
 /* ─────────────────────────────────────────────
@@ -727,50 +728,45 @@ const handleBook = async () => {
                 {/* Filter Group */}
                 <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
                   {/* Location/City Dropdown */}
-                  <div className="relative flex-grow sm:flex-grow-0">
-                    <Icons.MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C5A059] stroke-[2.5px]" />
-                    <select
+                  <div className="flex-grow sm:flex-grow-0 min-w-[140px]">
+                    <CustomSelect
                       value={selectedCity}
-                      onChange={(e) => setSelectedCity(e.target.value)}
-                      className="pl-8 pr-8 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-xs font-black uppercase tracking-wider text-[#3E362E] focus:outline-none focus:border-[#C5A059] appearance-none cursor-pointer w-full min-w-[140px]"
-                    >
-                      <option value="">All Locations</option>
-                      {uniqueCities.map((city) => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
-                    </select>
-                    <Icons.ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A7B6A] pointer-events-none" />
+                      onChange={setSelectedCity}
+                      options={[{ value: "", label: "All Locations" }, ...uniqueCities.map(city => ({ value: city, label: city }))]}
+                      icon={Icons.MapPin}
+                      className="!bg-[#FAF6F0] !border-[#E8DCCB] !rounded-xl !text-xs !font-black !uppercase !tracking-wider !text-[#3E362E] !h-11"
+                    />
                   </div>
 
                   {/* Rating Dropdown */}
-                  <div className="relative flex-grow sm:flex-grow-0">
-                    <Icons.Star size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C5A059] fill-[#C5A059]" />
-                    <select
+                  <div className="flex-grow sm:flex-grow-0 min-w-[120px]">
+                    <CustomSelect
                       value={minRating}
-                      onChange={(e) => setMinRating(Number(e.target.value))}
-                      className="pl-8 pr-8 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-xs font-black uppercase tracking-wider text-[#3E362E] focus:outline-none focus:border-[#C5A059] appearance-none cursor-pointer w-full min-w-[120px]"
-                    >
-                      <option value={0}>All Ratings</option>
-                      <option value={4.5}>4.5+ ★</option>
-                      <option value={4.0}>4.0+ ★</option>
-                    </select>
-                    <Icons.ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A7B6A] pointer-events-none" />
+                      onChange={(val) => setMinRating(Number(val))}
+                      options={[
+                        { value: 0, label: "All Ratings" },
+                        { value: 4.5, label: "4.5+ ★" },
+                        { value: 4.0, label: "4.0+ ★" }
+                      ]}
+                      icon={Icons.Star}
+                      className="!bg-[#FAF6F0] !border-[#E8DCCB] !rounded-xl !text-xs !font-black !uppercase !tracking-wider !text-[#3E362E] !h-11"
+                    />
                   </div>
 
                   {/* Sort By Dropdown */}
-                  <div className="relative flex-grow sm:flex-grow-0">
-                    <Icons.SlidersHorizontal size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C5A059]" />
-                    <select
+                  <div className="flex-grow sm:flex-grow-0 min-w-[140px]">
+                    <CustomSelect
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="pl-8 pr-8 py-3 bg-[#FAF6F0] border border-[#E8DCCB] rounded-xl text-xs font-black uppercase tracking-wider text-[#3E362E] focus:outline-none focus:border-[#C5A059] appearance-none cursor-pointer w-full min-w-[140px]"
-                    >
-                      <option value="">Sort By</option>
-                      {userCoords && <option value="distance">Distance (Closest)</option>}
-                      <option value="rating">Rating (High to Low)</option>
-                      <option value="name">Name (A-Z)</option>
-                    </select>
-                    <Icons.ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A7B6A] pointer-events-none" />
+                      onChange={setSortBy}
+                      options={[
+                        { value: "", label: "Sort By" },
+                        ...(userCoords ? [{ value: "distance", label: "Distance (Closest)" }] : []),
+                        { value: "rating", label: "Rating (High to Low)" },
+                        { value: "name", label: "Name (A-Z)" }
+                      ]}
+                      icon={Icons.SlidersHorizontal}
+                      className="!bg-[#FAF6F0] !border-[#E8DCCB] !rounded-xl !text-xs !font-black !uppercase !tracking-wider !text-[#3E362E] !h-11"
+                    />
                   </div>
                 </div>
               </div>

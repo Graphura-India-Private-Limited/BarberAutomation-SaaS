@@ -1,19 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, useQueue, salon, financeData } from "../../contexts/AppContext";
-import { ArrowLeft, Sparkles, Layers, Users, Clock, ShieldCheck } from "lucide-react";
+import { useAuth, useQueue } from "../../contexts/AppContext";
+import { ArrowLeft, Sparkles, Layers, Users, Clock, ShieldCheck, MapPin, Phone, Briefcase } from "lucide-react";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function HomeOverview() {
   const { currentUser, canViewFinance } = useAuth();
   const { queue, servedCount } = useQueue();
   const navigate = useNavigate();
 
+  const barberId = localStorage.getItem("barberId");
+  const token = localStorage.getItem("token");
+
+  const [salonInfo, setSalonInfo] = useState({
+    name: localStorage.getItem("salonName") || "—",
+    address: "—",
+    phone: "—",
+    salaryModel: "—",
+  });
+  const [loadingSalon, setLoadingSalon] = useState(false);
+
+  useEffect(() => {
+    if (!barberId || !token) return;
+    setLoadingSalon(true);
+    fetch(`${API}/barber/${barberId}/dashboard`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.barber?.salon_id) {
+          const s = data.barber.salon_id;
+          setSalonInfo({
+            name: s.salon_name || "—",
+            address: s.address || "—",
+            phone: s.support_number || "—",
+            salaryModel: s.salary_model || "—",
+          });
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoadingSalon(false));
+  }, [barberId, token]);
+
   const SERVICE_MAP = {
-    haircut: 'Haircut',
-    shave: 'Shave',
-    beard: 'Beard Trim',
-    combo: 'Haircut + Shave',
-    color: 'Hair Color',
+    haircut: "Haircut",
+    shave: "Shave",
+    beard: "Beard Trim",
+    combo: "Haircut + Shave",
+    color: "Hair Color",
     kids: "Kids' Cut"
   };
 
@@ -30,19 +65,19 @@ export default function HomeOverview() {
     : queue;
 
   const stats = [
-    { label: "Your Queue", value: myQueue.length, color: "bg-white", icon: Clock },
-    { label: "Active Customers", value: activeCount, color: "bg-white", icon: Users },
-    { label: "Completed Today", value: servedCount, color: "bg-white", icon: ShieldCheck },
+    { label: "Your Queue",       value: myQueue.length,   color: "bg-white", icon: Clock },
+    { label: "Active Customers", value: activeCount,      color: "bg-white", icon: Users },
+    { label: "Completed Today",  value: servedCount,      color: "bg-white", icon: ShieldCheck },
     ...(canViewFinance()
-      ? [{ label: "Today's Revenue", value: `₹${financeData.todayRevenue.toLocaleString()}`, color: "bg-white", icon: Sparkles }]
+      ? [{ label: "Salon Model", value: salonInfo.salaryModel.toUpperCase(), color: "bg-white", icon: Sparkles }]
       : []),
   ];
 
   return (
     <div className="p-6 md:p-10 font-sans text-stone-800 min-h-screen text-left" style={{ backgroundColor: "#FAF6F0" }}>
       <div className="max-w-6xl mx-auto w-full">
-        
-        {/* ── 🌟 ENHANCED: PREMIUM SERIF THEMED BACK HEADER STREAM ── */}
+
+        {/* ── HEADER ── */}
         <div className="mb-6 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
@@ -51,25 +86,24 @@ export default function HomeOverview() {
             <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-0.5" />
             <span className="font-sans font-bold tracking-wider uppercase text-[10px]">Back</span>
           </button>
-
           <div className="flex items-center gap-1.5 opacity-60">
             <Layers className="w-3 h-3 text-[#C5A059]" />
             <span className="text-[9px] font-black text-[#3E362E] uppercase tracking-[0.2em]">Console Terminal</span>
           </div>
         </div>
 
-        {/* Welcome Card Box */}
+        {/* Welcome Card */}
         <div className="mb-8 border-b border-stone-200/60 pb-6">
           <h2 className="text-4xl font-bold font-serif text-stone-900 tracking-tight">
             Welcome, <span className="text-[#C5A059] italic font-normal">{currentUser?.name || "Stylist"}</span>
           </h2>
           <p className="text-stone-400 text-xs font-black uppercase tracking-widest mt-2 flex items-center gap-2">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            {salon.name} · {salon.address}
+            {loadingSalon ? "Loading salon..." : `${salonInfo.name} · ${salonInfo.address}`}
           </p>
         </div>
 
-        {/* Metric parameters grid tracking counters */}
+        {/* Stat Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {stats.map((s, i) => (
             <div key={i} className={`rounded-2xl p-5 ${s.color} border border-stone-200/80 shadow-2xs hover:border-[#C5A059] transition-all duration-300 group`}>
@@ -85,7 +119,7 @@ export default function HomeOverview() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Live active scheduling pipeline rows wrapper */}
+          {/* Your Next Customers */}
           <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-2xs flex flex-col justify-between">
             <div>
               <h3 className="text-sm font-black uppercase tracking-wider text-stone-900 mb-4 border-b pb-2 border-stone-100 flex items-center gap-2">
@@ -101,7 +135,7 @@ export default function HomeOverview() {
                       <div>
                         <p className="font-extrabold text-stone-900 text-sm tracking-tight">{item.customer || item.name}</p>
                         <p className="text-xs font-bold text-stone-400 uppercase tracking-wider mt-0.5">
-                          {(SERVICE_MAP[item.service] || item.service)} · {item.time || (item.slot || new Date(item.joinedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
+                          {(SERVICE_MAP[item.service] || item.service)} · {item.time || (item.slot || new Date(item.joinedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}
                         </p>
                       </div>
                       <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded border shadow-3xs ${
@@ -122,20 +156,44 @@ export default function HomeOverview() {
             </button>
           </div>
 
-          {/* Salon Information Details Box */}
+          {/* Salon Workspace Info — live from API */}
           <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-2xs">
             <h3 className="text-sm font-black uppercase tracking-wider text-stone-900 mb-4 border-b pb-2 border-stone-100 flex items-center gap-2">
               <span className="w-1 h-3 bg-[#C5A059] rounded-full" />
               Salon Workspace Info
             </h3>
-            <div className="space-y-3.5 text-sm text-stone-700 font-medium">
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salon Node</span> <span className="font-bold text-stone-900">{salon.name}</span></div>
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Address</span> <span className="font-bold text-stone-900">{salon.address}</span></div>
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Support Phone</span> <span className="font-bold text-stone-900 font-mono text-xs">{salon.phone}</span></div>
-              {currentUser?.role === "barber" && (
-                <div className="flex"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salary Model</span> <span className="font-bold text-[#A37B58] uppercase tracking-wider text-xs">{currentUser.salaryModel}</span></div>
-              )}
-            </div>
+            {loadingSalon ? (
+              <div className="space-y-3 animate-pulse">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="h-5 bg-stone-100 rounded w-3/4" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-3.5 text-sm text-stone-700 font-medium">
+                <div className="flex items-start border-b pb-2.5 border-stone-100 gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0 pt-0.5">Salon Node</span>
+                  <span className="font-bold text-stone-900">{salonInfo.name}</span>
+                </div>
+                <div className="flex items-start border-b pb-2.5 border-stone-100 gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0 pt-0.5">
+                    <MapPin className="inline w-3 h-3 mr-0.5" />Address
+                  </span>
+                  <span className="font-bold text-stone-900">{salonInfo.address}</span>
+                </div>
+                <div className="flex items-start border-b pb-2.5 border-stone-100 gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0 pt-0.5">
+                    <Phone className="inline w-3 h-3 mr-0.5" />Support
+                  </span>
+                  <span className="font-bold text-stone-900 font-mono text-xs">{salonInfo.phone || "Not set"}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0 pt-0.5">
+                    <Briefcase className="inline w-3 h-3 mr-0.5" />Salary Model
+                  </span>
+                  <span className="font-bold text-[#A37B58] uppercase tracking-wider text-xs">{salonInfo.salaryModel}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

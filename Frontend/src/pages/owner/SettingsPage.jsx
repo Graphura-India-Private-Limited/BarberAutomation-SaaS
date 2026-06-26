@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AppContext";
 import { Scissors, Edit, MapPin, Image as ImageIcon } from "lucide-react";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
@@ -505,14 +506,15 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-2">PAYOUT ARCHITECTURE</label>
-                <select
+                <CustomSelect
                   value={salaryModel}
-                  onChange={e => setSalaryModel(e.target.value)}
-                  className="w-full bg-white border border-zinc-200 rounded-xl px-4 py-3.5 text-sm font-semibold text-zinc-800 outline-none hover:border-amber-600/50 focus:border-amber-600 transition cursor-pointer"
-                >
-                  <option value="commission">Commission Percentage Split</option>
-                  <option value="salary">Fixed Salary Base</option>
-                </select>
+                  onChange={setSalaryModel}
+                  options={[
+                    { value: "commission", label: "Commission Percentage Split" },
+                    { value: "salary", label: "Fixed Salary Base" }
+                  ]}
+                  className="!h-12 !rounded-xl !border-zinc-200 !text-sm !font-semibold !text-zinc-800"
+                />
               </div>
 
               <div>
@@ -679,16 +681,21 @@ function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, bu
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <div>
           <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Branch State</label>
-          <select className={inputClass} value={form.state} onChange={e => setField("state", e.target.value)}>
-            <option value="Maharashtra">Maharashtra</option>
-            <option value="Madhya Pradesh">Madhya Pradesh</option>
-            <option value="Gujarat">Gujarat</option>
-            <option value="Delhi">Delhi</option>
-            <option value="Karnataka">Karnataka</option>
-            <option value="Rajasthan">Rajasthan</option>
-            <option value="Uttar Pradesh">Uttar Pradesh</option>
-            <option value="Tamil Nadu">Tamil Nadu</option>
-          </select>
+          <CustomSelect
+            value={form.state}
+            onChange={val => setField("state", val)}
+            options={[
+              "Maharashtra",
+              "Madhya Pradesh",
+              "Gujarat",
+              "Delhi",
+              "Karnataka",
+              "Rajasthan",
+              "Uttar Pradesh",
+              "Tamil Nadu"
+            ]}
+            className="!h-[46px] !rounded-xl !border-[#EADBCE] !text-stone-700 !text-xs !font-medium"
+          />
         </div>
       </div>
 

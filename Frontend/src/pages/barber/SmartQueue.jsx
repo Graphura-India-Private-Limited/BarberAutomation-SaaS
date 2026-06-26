@@ -63,6 +63,11 @@ function QueueRow({ entry, idx, onClick, onServe }) {
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
           <SourceTag src={entry.source} />
+          {entry.memberName && entry.memberName !== 'Self' && (
+            <span className="text-[9px] font-black px-2 py-0.5 rounded-md border bg-amber-50 border-amber-200 text-amber-700">
+              for {entry.memberName}
+            </span>
+          )}
           {isFirst && (
             <Chip color={entry.status === 'in-progress' ? '#2E8B57' : '#A37B58'}>
               {entry.status === 'in-progress' ? '● SERVING' : '● NEXT UP'}
@@ -114,16 +119,21 @@ function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
       className="animate-slide-up flex items-center gap-4 px-5 py-4 cursor-pointer bg-white border border-stone-200/50 rounded-2xl transition-all hover:shadow-sm"
       style={{ animationDelay: `${idx * 0.07}s` }}
     >
-      {/* Slot layout bubble */}
-      <div className="w-14 flex-shrink-0 text-center rounded-xl py-1.5 bg-[#FAF7F2] border border-[#EAD8C0]">
-        <p className="font-black text-xs text-stone-900 leading-tight">{entry.slot.split(' ')[0]}</p>
-        <p className="text-[9px] uppercase font-black tracking-wider text-[#A37B58] mt-0.5">{entry.slot.split(' ')[1]}</p>
+      {/* Slot layout bubble — formatted date/time */}
+      <div className="w-20 flex-shrink-0 text-center rounded-xl py-1.5 bg-[#FAF7F2] border border-[#EAD8C0]">
+        <p className="font-black text-[10px] text-stone-900 leading-tight">{entry.slotDate || entry.slot?.split(' ')[0] || '—'}</p>
+        <p className="text-[9px] uppercase font-black tracking-wider text-[#A37B58] mt-0.5">{entry.slotTime || entry.slot?.split(' ')[1] || ''}</p>
       </div>
 
       {/* Core Profile Metadata */}
       <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
+          {entry.memberName && entry.memberName !== 'Self' && (
+            <span className="text-[9px] font-black px-2 py-0.5 rounded-md border bg-amber-50 border-amber-200 text-amber-700">
+              for {entry.memberName}
+            </span>
+          )}
           <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${ss.bg} ${ss.border} ${ss.text}`}>
             {entry.status}
           </span>
@@ -224,6 +234,22 @@ function StatsPanel({ queue, bookings, servedCount, liveActive }) {
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const getToken = () => localStorage.getItem("token");
 
+// Helper: format ISO slot_time to { slotDate, slotTime } for display
+const formatSlotTime = (isoStr) => {
+  if (!isoStr || isoStr === '—') return { slotDate: '—', slotTime: '' };
+  try {
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return { slotDate: isoStr, slotTime: '' };
+    const now = new Date();
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+    const isToday = d.toDateString() === now.toDateString();
+    const isTomorrow = d.toDateString() === tomorrow.toDateString();
+    const dateLabel = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    const timeLabel = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' }).replace(':',':').toUpperCase();
+    return { slotDate: dateLabel, slotTime: timeLabel };
+  } catch { return { slotDate: '—', slotTime: '' }; }
+};
+
 // ─── MAIN APP VIEW PANEL ──────────────────────────────────────────────────────
 export default function SmartQueue() {
   const navigate = useNavigate();
@@ -315,34 +341,48 @@ export default function SmartQueue() {
   }, [useDbData]);
 
   const myQueue = useDbData
-    ? dbQueue.map((item, idx) => ({
-        id: item._id,
-        bookingId: item.booking_id?._id || item.booking_id,
-        name: item.customer_id?.name || "Customer",
-        phone: item.customer_id?.mobile || "—",
-        service: mapDbServiceToId(item.booking_id?.services?.[0]?.service_name || item.service),
-        barber: currentBarberId,
-        position: item.position || (idx + 1),
-        joinedAt: new Date(item.joined_at || item.created_at || Date.now()).getTime(),
-        source: item.booking_id?.booking_type === "slot" ? "booked" : "walk-in",
-        status: item.status
-      }))
+    ? dbQueue.map((item, idx) => {
+        // Extract family member name from booking services
+        const memberName = item.booking_id?.services?.[0]?.member_name || 'Self';
+        const customerName = item.customer_id?.name || 'Customer';
+        return {
+          id: item._id,
+          bookingId: item.booking_id?._id || item.booking_id,
+          name: customerName,
+          memberName: memberName,
+          phone: item.customer_id?.mobile || '—',
+          service: mapDbServiceToId(item.booking_id?.services?.[0]?.service_name || item.service),
+          barber: currentBarberId,
+          position: item.position || (idx + 1),
+          joinedAt: new Date(item.joined_at || item.created_at || Date.now()).getTime(),
+          source: item.booking_id?.booking_type === 'slot' ? 'booked' : 'walk-in',
+          status: item.status
+        };
+      })
     : queue.filter(e => {
         if (!currentBarberId) return true;
         return e.barber === currentBarberId;
       });
 
   const myBookings = useDbData
-    ? dbBookings.map(item => ({
-        id: item._id,
-        name: item.customer_id?.name || "Customer",
-        phone: item.customer_id?.mobile || "—",
-        service: mapDbServiceToId(item.services?.[0]?.service_name || "Haircut"),
-        barber: currentBarberId,
-        slot: item.slot_time || "—",
-        date: new Date(item.created_at || Date.now()).toLocaleDateString(),
-        status: item.status
-      }))
+    ? dbBookings.map(item => {
+        const { slotDate, slotTime } = formatSlotTime(item.slot_time);
+        const memberName = item.services?.[0]?.member_name || 'Self';
+        const customerName = item.customer_id?.name || 'Customer';
+        return {
+          id: item._id,
+          name: customerName,
+          memberName: memberName,
+          phone: item.customer_id?.mobile || '—',
+          service: mapDbServiceToId(item.services?.[0]?.service_name || 'Haircut'),
+          barber: currentBarberId,
+          slot: `${slotDate} ${slotTime}`.trim(),
+          slotDate,
+          slotTime,
+          date: new Date(item.created_at || Date.now()).toLocaleDateString(),
+          status: item.status
+        };
+      })
     : bookings.filter(e => {
         if (!currentBarberId) return true;
         return e.barber === currentBarberId;

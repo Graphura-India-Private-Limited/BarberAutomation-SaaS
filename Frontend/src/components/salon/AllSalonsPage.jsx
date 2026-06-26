@@ -23,6 +23,7 @@ import {
   AlertCircle,
   RefreshCw
 } from "lucide-react";
+import CustomSelect from "../common/CustomSelect";
 
 export default function AllSalonsPage() {
   const navigate = useNavigate();
@@ -243,51 +244,46 @@ export default function AllSalonsPage() {
           {/* Filters Row */}
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             {/* Location dropdown */}
-            <div className="relative flex-grow sm:flex-grow-0">
-              <MapPin size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C5A059] stroke-[2.5px]" />
-              <select
+            <div className="flex-grow sm:flex-grow-0 min-w-[140px]">
+              <CustomSelect
                 value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                className="pl-9 pr-9 py-3.5 bg-[#FAF6F0] border border-[#E8DCCB] rounded-2xl text-xs font-black uppercase tracking-wider text-[#3E362E] focus:outline-none focus:border-[#C5A059] appearance-none cursor-pointer w-full min-w-[140px]"
-              >
-                <option value="">All Cities</option>
-                {uniqueCities.map((city) => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
-              <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A7B6A] pointer-events-none" />
+                onChange={setSelectedCity}
+                options={[{ value: "", label: "All Cities" }, ...uniqueCities.map(city => ({ value: city, label: city }))]}
+                icon={MapPin}
+                className="!bg-[#FAF6F0] !border-[#E8DCCB] !rounded-2xl !text-xs !font-black !uppercase !tracking-wider !text-[#3E362E] !h-11"
+              />
             </div>
 
             {/* Rating Filter */}
-            <div className="relative flex-grow sm:flex-grow-0">
-              <Star size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C5A059] fill-[#C5A059]" />
-              <select
+            <div className="flex-grow sm:flex-grow-0 min-w-[130px]">
+              <CustomSelect
                 value={minRating}
-                onChange={(e) => setMinRating(Number(e.target.value))}
-                className="pl-9 pr-9 py-3.5 bg-[#FAF6F0] border border-[#E8DCCB] rounded-2xl text-xs font-black uppercase tracking-wider text-[#3E362E] focus:outline-none focus:border-[#C5A059] appearance-none cursor-pointer w-full min-w-[130px]"
-              >
-                <option value={0}>All Ratings</option>
-                <option value={4.7}>4.7+ ★ Excellent</option>
-                <option value={4.5}>4.5+ ★ Premium</option>
-                <option value={4.0}>4.0+ ★ Good</option>
-              </select>
-              <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A7B6A] pointer-events-none" />
+                onChange={(val) => setMinRating(Number(val))}
+                options={[
+                  { value: 0, label: "All Ratings" },
+                  { value: 4.7, label: "4.7+ ★ Excellent" },
+                  { value: 4.5, label: "4.5+ ★ Premium" },
+                  { value: 4.0, label: "4.0+ ★ Good" }
+                ]}
+                icon={Star}
+                className="!bg-[#FAF6F0] !border-[#E8DCCB] !rounded-2xl !text-xs !font-black !uppercase !tracking-wider !text-[#3E362E] !h-11"
+              />
             </div>
 
             {/* Sort Dropdown */}
-            <div className="relative flex-grow sm:flex-grow-0">
-              <SlidersHorizontal size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#C5A059]" />
-              <select
+            <div className="flex-grow sm:flex-grow-0 min-w-[140px]">
+              <CustomSelect
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="pl-9 pr-9 py-3.5 bg-[#FAF6F0] border border-[#E8DCCB] rounded-2xl text-xs font-black uppercase tracking-wider text-[#3E362E] focus:outline-none focus:border-[#C5A059] appearance-none cursor-pointer w-full min-w-[140px]"
-              >
-                <option value="">Sort By</option>
-                {userCoords && <option value="distance">Distance (Closest)</option>}
-                <option value="rating">Rating (High to Low)</option>
-                <option value="name">Name (A-Z)</option>
-              </select>
-              <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A7B6A] pointer-events-none" />
+                onChange={setSortBy}
+                options={[
+                  { value: "", label: "Sort By" },
+                  ...(userCoords ? [{ value: "distance", label: "Distance (Closest)" }] : []),
+                  { value: "rating", label: "Rating (High to Low)" },
+                  { value: "name", label: "Name (A-Z)" }
+                ]}
+                icon={SlidersHorizontal}
+                className="!bg-[#FAF6F0] !border-[#E8DCCB] !rounded-2xl !text-xs !font-black !uppercase !tracking-wider !text-[#3E362E] !h-11"
+              />
             </div>
           </div>
         </div>

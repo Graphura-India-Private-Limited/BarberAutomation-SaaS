@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
+import CustomSelect from "../../components/common/CustomSelect";
+import { SlidersHorizontal, X } from "lucide-react";
 
 const services = [
   // styling (Cuts & Styling) - 1 to 10
@@ -39,7 +41,7 @@ const services = [
   { id: 27, name: "Ayurvedic Hair Vitality Ritual", desc: "Bhringraj and amla oil head massage for structural hair strength.", price: 1399, duration: "70 min", category: "spa", rating: 5, reviews: 63, tag: "Premium", img: "https://i.pinimg.com/736x/d5/42/e3/d542e36a5630e84bcc7f0214474247e3.jpg?w=600&auto=format&fit=crop&q=80" },
   { id: 28, name: "Detoxifying Charcoal Spa", desc: "Absorbent charcoal scalp spa to clear product build-up.", price: 1199, duration: "50 min", category: "spa", rating: 4, reviews: 52, tag: null, img: "https://i.pinimg.com/736x/32/38/c2/3238c237da8df8e986de51ee9ee02f9b.jpg?w=600&auto=format&fit=crop&q=80" },
   { id: 29, name: "Deep Moisture Oil Therapy", desc: "Hot coconut and almond oil scalp massage treatment.", price: 600, duration: "40 min", category: "spa", rating: 5, reviews: 154, tag: "Popular", img: "https://i.pinimg.com/736x/28/74/2e/28742e65243fd1b4edb58f71f49a7816.jpg?w=600&auto=format&fit=crop&q=80" },
-  { id: 30, name: "Aromatic Scalp Soothing Treatment", desc: "Lavender oil infused scalp massage to relieve deep stress.", price: 950, duration: "45 min", category: "spa", rating: 5, reviews: 83, tag: "Luxury", img: "https://media.istockphoto.com/id/1305824214/photo/woman-dyeing-her-hair-at-the-salon.jpg?w=600&auto=format&fit=crop&q=80" },
+  { id: 30, name: "Aromatic Scalp Soothing Treatment", desc: "Lavender oil infused scalp massage to relieve deep stress.", price: 950, duration: "45 min", category: "spa", rating: 5, reviews: 83, tag: "Luxury", img: "/sandra-gabriel-4PQ0aGtzGGI-unsplash.jpg" },
 
   // treatment (Treatments) - 31 to 40
   { id: 31, name: "Cysteine Smoothing Treatment", desc: "Premium safe protein smoothing treatment for frizz-free hair.", price: 4999, duration: "180 min", category: "treatment", rating: 5, reviews: 176, tag: "Luxury", img: "https://i.pinimg.com/736x/ae/65/e3/ae65e3f17deb79872414b037fd997045.jpg?w=600&auto=format&fit=crop&q=80" },
@@ -132,6 +134,7 @@ export default function WomenServices() {
   const [searchFocused, setSearchFocused]   = useState(false);
   const [slideIndex, setSlideIndex]         = useState(0);
   const [visibleCards, setVisibleCards]     = useState(new Set());
+  const [showFilters, setShowFilters]       = useState(false);
   const cardRefs = useRef({});
 
   useEffect(() => {
@@ -310,19 +313,56 @@ export default function WomenServices() {
             Showing <strong style={{ color: "#2C241E" }}>{filtered.length}</strong> of {services.length} services
             {hasActive && <button onClick={clearAll} style={{ marginLeft: 10, fontSize: 11, color: "#C5A059", background: "none", border: "none", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", textDecoration: "underline", padding: 0 }}>Clear all</button>}
           </p>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: "#AAA", fontFamily: "'Montserrat',sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Sort:</span>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={{ border: "1px solid #DDD4C4", background: "#fff", borderRadius: 8, padding: "7px 12px", fontSize: 13, color: "#2C241E", fontFamily: "'Montserrat',sans-serif", cursor: "pointer", outline: "none" }}>
-              {SORT_OPTIONS.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-            </select>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button
+              onClick={() => setShowFilters(true)}
+              className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 border border-[#DDD4C4] rounded-lg bg-white text-[11px] font-bold text-[#2C241E] cursor-pointer hover:bg-stone-50 transition-colors h-9"
+              style={{ fontFamily: "'Montserrat',sans-serif" }}
+            >
+              <SlidersHorizontal size={12} className="text-[#C5A059]" />
+              <span>Filters</span>
+            </button>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 155 }}>
+              <span style={{ fontSize: 11, color: "#AAA", fontFamily: "'Montserrat',sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Sort:</span>
+              <CustomSelect
+                value={sortBy}
+                onChange={setSortBy}
+                options={SORT_OPTIONS}
+                className="!h-9 !rounded-lg !border-[#DDD4C4] font-sans !text-[13px] !py-1"
+              />
+            </div>
           </div>
         </div>
 
         {/* MAIN */}
         <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-col md:flex-row gap-6 md:gap-9 items-start">
 
+          {/* Mobile Backdrop */}
+          {showFilters && (
+            <div 
+              className="fixed inset-0 bg-stone-900/60 z-50 md:hidden animate-in fade-in duration-200" 
+              onClick={() => setShowFilters(false)}
+            />
+          )}
+
           {/* SIDEBAR */}
-          <aside className="w-full md:w-[248px] shrink-0 md:sticky md:top-[100px] mb-6 md:mb-0">
+          <aside className={`
+            shrink-0 md:w-[248px] md:sticky md:top-[100px] md:mb-0 md:block
+            ${showFilters 
+              ? "fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
+              : "hidden md:block"
+            }
+          `}>
+            {showFilters && (
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-stone-100 md:hidden">
+                <span className="text-xs font-bold text-[#2C241E] uppercase tracking-wider">Filters</span>
+                <button onClick={() => setShowFilters(false)} className="text-stone-500 hover:text-stone-900">
+                  <X size={18} />
+                </button>
+              </div>
+            )}
+
             <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0", overflow: "hidden" }}>
 
               <div style={{ padding: "16px 20px 13px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>

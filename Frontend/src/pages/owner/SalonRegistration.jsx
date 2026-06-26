@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Upload, AlertTriangle, ShieldCheck, ChevronDown, X } from "lucide-react";
 import shopImage from "../../assets/shop.jpg";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
@@ -732,16 +733,22 @@ export default function SalonRegistration() {
 
           <div className="grid gap-5 md:grid-cols-2 mb-4">
             <Field label="Branch State *">
-              <select required value={form.state} onChange={e => setField("state", e.target.value)} className={inputClass}>
-                <option value="Maharashtra">Maharashtra</option>
-                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                <option value="Gujarat">Gujarat</option>
-                <option value="Delhi">Delhi</option>
-                <option value="Karnataka">Karnataka</option>
-                <option value="Rajasthan">Rajasthan</option>
-                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                <option value="Tamil Nadu">Tamil Nadu</option>
-              </select>
+              <CustomSelect
+                value={form.state}
+                onChange={val => setField("state", val)}
+                options={[
+                  "Maharashtra",
+                  "Madhya Pradesh",
+                  "Gujarat",
+                  "Delhi",
+                  "Karnataka",
+                  "Rajasthan",
+                  "Uttar Pradesh",
+                  "Tamil Nadu"
+                ]}
+                placeholder="Select State"
+                className="!h-11 !rounded-2xl !border-[#EADBCE] !text-[#3e362e] !text-sm !font-medium"
+              />
             </Field>
           </div>
 

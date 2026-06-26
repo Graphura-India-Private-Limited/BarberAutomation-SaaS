@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
+import { SlidersHorizontal, X } from "lucide-react";
 
 /* ─── DATA ─────────────────────────────────────────────────── */
 // (Unused static BARBERS array removed; real barbers are fetched from database in useEffect)
@@ -205,6 +206,7 @@ export default function BarberSelection() {
   const [maxDistance,    setMaxDistance]     = useState(20);
   const [showAll,        setShowAll]         = useState(true);
   const [visibleCards,   setVisibleCards]    = useState(new Set());
+  const [showFilters,    setShowFilters]     = useState(false);
   const cardRefs = useRef({});
 
   const [barbersList,    setBarbersList]     = useState([]);
@@ -411,8 +413,31 @@ export default function BarberSelection() {
           {/* ── LAYOUT ── */}
           <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
 
+            {/* Mobile Backdrop */}
+            {showFilters && (
+              <div 
+                className="fixed inset-0 bg-stone-900/60 z-50 md:hidden animate-in fade-in duration-200" 
+                onClick={() => setShowFilters(false)}
+              />
+            )}
+
             {/* ── SIDEBAR ── */}
-            <aside className="w-full md:w-[240px] shrink-0 md:sticky md:top-[90px] mb-6 md:mb-0">
+            <aside className={`
+              shrink-0 md:w-[240px] md:sticky md:top-[90px] md:mb-0 md:block
+              ${showFilters 
+                ? "fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
+                : "hidden md:block"
+              }
+            `}>
+              {showFilters && (
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-stone-100 md:hidden">
+                  <span className="text-xs font-bold text-[#2C241E] uppercase tracking-wider">Filters</span>
+                  <button onClick={() => setShowFilters(false)} className="text-stone-500 hover:text-stone-900">
+                    <X size={18} />
+                  </button>
+                </div>
+              )}
+
               <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0", overflow: "hidden" }}>
                 <div style={{ padding: "15px 20px 12px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2C241E" }}>⚙ Filters</span>
@@ -484,15 +509,25 @@ export default function BarberSelection() {
                   Showing <strong style={{ color: "#2C241E" }}>{filtered.length}</strong> of {barbersList.length} stylists
                   {hasFilters && <button onClick={clearFilters} style={{ marginLeft: 10, fontSize: 11, color: "#C5A059", background: "none", border: "none", cursor: "pointer", fontFamily: "'Montserrat',sans-serif", textDecoration: "underline", padding: 0 }}>Clear all</button>}
                 </p>
-                <button
-                  onClick={handleAutoAssign}
-                  style={{ display: "flex", alignItems: "center", gap: 8, background: "#2C241E", color: "#F5EFE0", border: "none", borderRadius: 10, padding: "10px 20px", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  Auto-Assign Best
-                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <button
+                    onClick={() => setShowFilters(true)}
+                    className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 border border-[#DDD4C4] rounded-lg bg-white text-[11px] font-bold text-[#2C241E] cursor-pointer hover:bg-stone-50 transition-colors h-9"
+                    style={{ fontFamily: "'Montserrat',sans-serif" }}
+                  >
+                    <SlidersHorizontal size={12} className="text-[#C5A059]" />
+                    <span>Filters</span>
+                  </button>
+                  <button
+                    onClick={handleAutoAssign}
+                    style={{ display: "flex", alignItems: "center", gap: 8, background: "#2C241E", color: "#F5EFE0", border: "none", borderRadius: 10, padding: "10px 20px", fontFamily: "'Montserrat',sans-serif", fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Auto-Assign Best
+                  </button>
+                </div>
               </div>
 
               {/* grid */}

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
+import CustomSelect from "../../components/common/CustomSelect";
+import { SlidersHorizontal, X } from "lucide-react";
 
 
 /* ─── DATA ─────────────────────────────────────────────────── */
@@ -466,6 +468,7 @@ export default function AddonServices() {
   const [searchFocused,  setSearchFocused]   = useState(false);
   const [slideIndex,     setSlideIndex]      = useState(0);
   const [visibleCards,   setVisibleCards]    = useState(new Set());
+  const [showFilters,    setShowFilters]     = useState(false);
 
   const cardRefs = useRef({});
 
@@ -670,23 +673,56 @@ export default function AddonServices() {
               </button>
             )}
           </p>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: "#AAA", fontFamily: "'Montserrat',sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Sort:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              style={{ border: "1px solid #DDD4C4", background: "#fff", borderRadius: 8, padding: "7px 12px", fontSize: 13, color: "#2C241E", fontFamily: "'Montserrat',sans-serif", cursor: "pointer", outline: "none" }}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button
+              onClick={() => setShowFilters(true)}
+              className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 border border-[#DDD4C4] rounded-lg bg-white text-[11px] font-bold text-[#2C241E] cursor-pointer hover:bg-stone-50 transition-colors h-9"
+              style={{ fontFamily: "'Montserrat',sans-serif" }}
             >
-              {SORT_OPTIONS.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
-            </select>
+              <SlidersHorizontal size={12} className="text-[#C5A059]" />
+              <span>Filters</span>
+            </button>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 155 }}>
+              <span style={{ fontSize: 11, color: "#AAA", fontFamily: "'Montserrat',sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>Sort:</span>
+              <CustomSelect
+                value={sortBy}
+                onChange={setSortBy}
+                options={SORT_OPTIONS}
+                className="!h-9 !rounded-lg !border-[#DDD4C4] font-sans !text-[13px] !py-1"
+              />
+            </div>
           </div>
         </div>
 
         {/* ── MAIN LAYOUT ── */}
         <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-col md:flex-row gap-6 md:gap-9 items-start">
+          
+          {/* Mobile Backdrop */}
+          {showFilters && (
+            <div 
+              className="fixed inset-0 bg-stone-900/60 z-50 md:hidden animate-in fade-in duration-200" 
+              onClick={() => setShowFilters(false)}
+            />
+          )}
 
           {/* ── SIDEBAR ── */}
-          <aside className="w-full md:w-[248px] shrink-0 md:sticky md:top-[90px] mb-6 md:mb-0">
+          <aside className={`
+            shrink-0 md:w-[248px] md:sticky md:top-[90px] md:mb-0 md:block
+            ${showFilters 
+              ? "fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
+              : "hidden md:block"
+            }
+          `}>
+            {showFilters && (
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-stone-100 md:hidden">
+                <span className="text-xs font-bold text-[#2C241E] uppercase tracking-wider">Filters</span>
+                <button onClick={() => setShowFilters(false)} className="text-stone-500 hover:text-stone-900">
+                  <X size={18} />
+                </button>
+              </div>
+            )}
+
             <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0", overflow: "hidden" }}>
               {/* header */}
               <div style={{ padding: "16px 20px 13px", borderBottom: "1px solid #EAE0D0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>

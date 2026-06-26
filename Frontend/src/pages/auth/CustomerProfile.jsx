@@ -627,12 +627,12 @@ export default function CustomerProfile() {
           <main className="flex-1 flex flex-col bg-[#FAF6F0] overflow-auto">
 
             {/* ── HEADER ── */}
-            <header className="bg-[#FFFDF9] border-b border-[#EADBCE] px-6 py-5 flex items-center justify-between sticky top-0 z-30 text-left shrink-0 shadow-2xs">
-              <div className="flex items-center gap-3">
+            <header className="bg-[#FFFDF9] border-b border-[#EADBCE] px-4 sm:px-6 py-3 sm:py-5 flex items-center justify-between sticky top-0 z-30 text-left shrink-0 shadow-2xs">
+              <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
                 {/* Hamburger menu button */}
                 <button
                   onClick={() => setIsSidebarOpen(true)}
-                  className="p-2 -ml-2 rounded-xl text-[#3D3126] hover:bg-[#FAF6F0] lg:hidden cursor-pointer border-none bg-transparent flex items-center justify-center"
+                  className="p-2 -ml-2 rounded-xl text-[#3D3126] hover:bg-[#FAF6F0] lg:hidden cursor-pointer border-none bg-transparent flex items-center justify-center shrink-0"
                   title="Open navigation menu"
                 >
                   <svg style={{ width: "24px", height: "24px" }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -640,9 +640,9 @@ export default function CustomerProfile() {
                   </svg>
                 </button>
 
-                <div className="flex flex-col justify-center">
+                <div className="flex flex-col justify-center min-w-0">
                   {/* ✅ FIX: NearbyBarbers removed from h1 — only text titles here */}
-                  <h1 className="text-2xl font-black font-serif text-[#3D3126] leading-tight">
+                  <h1 className="text-lg sm:text-2xl font-black font-serif text-[#3D3126] leading-tight truncate">
                     {activeTab === "overview" && "Dashboard"}
                     {activeTab === "queue" && "Live Queue Tracker"}
                     {activeTab === "studios" && "Our Studios"}
@@ -652,20 +652,20 @@ export default function CustomerProfile() {
                     {activeTab === "preferences" && "Profile Settings"}
                     {activeTab === "alerts" && "Live System Alerts"}
                   </h1>
-                  <p className="text-xs text-[#8A7A6A] mt-1.5">Welcome back, {profile.name}!</p>
+                  <p className="text-[10px] sm:text-xs text-[#8A7A6A] mt-0.5 sm:mt-1.5 truncate max-w-[120px] sm:max-w-none">Welcome back, {profile.name}!</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
                 <span className="hidden md:block text-[11px] font-black uppercase text-[#8A7A6A] tracking-wider font-mono">
                   {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}
                 </span>
                 <button
                   onClick={syncData}
-                  className="relative px-4 py-2 rounded-full border border-[#EADBCE] bg-white hover:bg-[#FEF9EE] text-[#9E7452] transition-all duration-300 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer shadow-3xs hover:scale-105"
+                  className="relative p-2 sm:px-4 sm:py-2 rounded-full border border-[#EADBCE] bg-white hover:bg-[#FEF9EE] text-[#9E7452] transition-all duration-300 flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-wider cursor-pointer shadow-3xs hover:scale-105"
                 >
                   <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
-                  <span>Refresh</span>
+                  <span className="hidden sm:inline">Refresh</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("alerts")}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, ShieldCheck, Briefcase, Phone, Award, Save } from "lucide-react";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const API      = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const CHARCOAL = "#3E362E";
@@ -204,16 +205,17 @@ function BarberProfile() {
                     <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-0.5 font-sans">
                       Specialization
                     </label>
-                    <select
+                    <CustomSelect
                       disabled={isBarber}
                       value={profile.specialization}
-                      onChange={e => setProfile({ ...profile, specialization: e.target.value })}
-                      className={`w-full bg-[#FAF6F0]/40 border border-stone-200 px-4 py-3 text-sm text-stone-900 font-extrabold outline-none focus:border-stone-900 rounded-xl h-[46px] font-sans ${isBarber ? 'opacity-65 cursor-not-allowed' : 'cursor-pointer'}`}
-                    >
-                      <option value="Haircut & Beard">Haircut & Beard Styling</option>
-                      <option value="Skin Fade Expert">Skin Fade Specialist</option>
-                      <option value="Complete Grooming">Premium Executive Grooming</option>
-                    </select>
+                      onChange={val => setProfile({ ...profile, specialization: val })}
+                      options={[
+                        { value: "Haircut & Beard", label: "Haircut & Beard Styling" },
+                        { value: "Skin Fade Expert", label: "Skin Fade Specialist" },
+                        { value: "Complete Grooming", label: "Premium Executive Grooming" }
+                      ]}
+                      className="!bg-[#FAF6F0]/40 !border-stone-200 !text-stone-900 font-extrabold !h-[46px]"
+                    />
                     {isBarber && (
                       <span className="inline-flex items-center gap-1 text-[9px] text-stone-400 font-black uppercase tracking-widest mt-1 font-sans">
                         <ShieldCheck size={10} className="text-stone-400 stroke-[2.5px]" /> Locked by Management

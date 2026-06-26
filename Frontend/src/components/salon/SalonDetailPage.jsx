@@ -22,6 +22,7 @@ import {
   Mail,
   ChevronDown
 } from "lucide-react";
+import CustomSelect from "../common/CustomSelect";
 
 const demoSalons = [
   {
@@ -435,20 +436,18 @@ export default function SalonDetailPage() {
                 <p className="text-[10px] font-black uppercase tracking-wider text-[#B58B67] sm:mb-0">Filter By Category:</p>
                 
                 {/* Dropdown Selector for Category Filtering */}
-                <div className="relative w-full sm:w-auto min-w-[200px]">
-                  <select
+                <div className="w-full sm:w-auto min-w-[200px]">
+                  <CustomSelect
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full text-[10px] font-black uppercase tracking-widest bg-[#FAF6F0] text-[#3E362E] border border-[#E8DCCB] rounded-xl px-4 py-2.5 outline-none appearance-none cursor-pointer pr-10"
-                  >
-                    <option value="all">All Services</option>
-                    <option value="men">Men Services</option>
-                    <option value="women">Women Services</option>
-                    <option value="addon">Addon Services</option>
-                  </select>
-                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#9E7452]">
-                    <ChevronDown size={14} className="stroke-[2.5px]" />
-                  </div>
+                    onChange={setSelectedCategory}
+                    options={[
+                      { value: "all", label: "All Services" },
+                      { value: "men", label: "Men Services" },
+                      { value: "women", label: "Women Services" },
+                      { value: "addon", label: "Addon Services" }
+                    ]}
+                    className="!text-[10px] !font-black !uppercase !tracking-widest !bg-[#FAF6F0] !text-[#3E362E] !border-[#E8DCCB] !rounded-xl !h-10"
+                  />
                 </div>
               </div>
             </div>

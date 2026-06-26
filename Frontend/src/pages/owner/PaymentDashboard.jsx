@@ -4,6 +4,7 @@ import {
   Calendar, ChevronLeft, ChevronRight, CreditCard, RefreshCw, 
   Search, X, Scissors, LogOut, LayoutDashboard, BarChart2, DollarSign 
 } from "lucide-react";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
@@ -246,21 +247,25 @@ function ClockIcon() {
 }
 
 function FilterSelect({ label, value, onChange, options, objectOptions = false }) {
+  const selectOptions = options.map(opt => {
+    if (objectOptions && typeof opt === 'object' && opt !== null) {
+      return { value: opt.id, label: opt.name };
+    }
+    return { value: opt, label: String(opt) };
+  });
+
   return (
-    <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
-      {label}
-      <select 
-        value={value} 
-        onChange={(e) => onChange(e.target.value)} 
-        className="mt-2 w-full bg-stone-50/50 border border-stone-200 rounded-xl px-3 py-2.5 text-xs font-bold text-stone-700 outline-none hover:bg-white focus:border-[#C5A059] focus:bg-white transition cursor-pointer font-sans"
-      >
-        {options.map(option => objectOptions ? (
-          <option key={option.id} value={option.id}>{option.name}</option>
-        ) : (
-          <option key={option} value={option}>{option}</option>
-        ))}
-      </select>
-    </label>
+    <div className="flex flex-col gap-1.5 text-left">
+      <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans pl-0.5">
+        {label}
+      </span>
+      <CustomSelect
+        value={value}
+        onChange={onChange}
+        options={selectOptions}
+        className="!bg-stone-50/50 !border-stone-200 !text-stone-700 !text-xs !font-bold !h-10"
+      />
+    </div>
   );
 }
 function PaymentRow({ payment, onOpen, onRetry }) {
