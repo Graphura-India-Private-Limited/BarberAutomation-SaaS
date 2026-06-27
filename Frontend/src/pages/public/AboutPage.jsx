@@ -96,7 +96,7 @@ export default function AboutPage() {
           <div className="relative group">
             <div className="absolute inset-0 bg-[#C5A059]/10 rounded-[2.5rem] transform rotate-3 scale-[1.01] z-0" />
             <img 
-              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80" 
+              src="https://images.unsplash.com/photo-1672642150048-fbfa1634804f?q=80&w=600&auto=format&fit=crop"
               alt="Grooming Consultation"
               className="w-full aspect-[4/3] object-cover rounded-[2.5rem] border border-[#E8DCCB] relative z-10 shadow-lg group-hover:scale-[1.01] transition-transform duration-500"
             />

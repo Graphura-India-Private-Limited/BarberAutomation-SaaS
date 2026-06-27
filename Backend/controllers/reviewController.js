@@ -1,4 +1,6 @@
 const Review = require("../models/Review");
+const Barber = require("../models/Barber");
+const Salon = require("../models/Salon");
 
 // @desc    Submit a new review
 // @route   POST /api/review
@@ -41,6 +43,29 @@ exports.createReview = async (req, res) => {
       wait_time: wait_time || "",
       review_text: formattedText
     });
+
+    // Recalculate and update Barber average rating in real-time
+    if (barber_id) {
+      const allBarberReviews = await Review.find({ barber_id, is_approved: true });
+      const validRatings = allBarberReviews.map(r => r.barber_rating).filter(r => r > 0);
+      if (validRatings.length > 0) {
+        const avg = validRatings.reduce((sum, r) => sum + r, 0) / validRatings.length;
+        await Barber.findByIdAndUpdate(barber_id, { rating: Number(avg.toFixed(1)) });
+      }
+    }
+
+    // Recalculate and update Salon average rating in real-time
+    if (salon_id) {
+      const allSalonReviews = await Review.find({ salon_id, is_approved: true });
+      const validSalonRatings = allSalonReviews.map(r => r.salon_rating).filter(r => r > 0);
+      if (validSalonRatings.length > 0) {
+        const avg = validSalonRatings.reduce((sum, r) => sum + r, 0) / validSalonRatings.length;
+        await Salon.findByIdAndUpdate(salon_id, {
+          rating: Number(avg.toFixed(1)),
+          total_reviews: allSalonReviews.length
+        });
+      }
+    }
 
     res.json({ success: true, message: "Review submitted!", review });
   } catch (err) {
@@ -118,7 +143,31 @@ exports.getMyReviews = async (req, res) => {
 // @access  Private (Admin)
 exports.deleteReview = async (req, res) => {
   try {
+    const review = await Review.findById(req.params.id);
+    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
+
+    const { barber_id, salon_id } = review;
     await Review.findByIdAndDelete(req.params.id);
+
+    // Update Barber rating
+    if (barber_id) {
+      const allBarberReviews = await Review.find({ barber_id, is_approved: true });
+      const validRatings = allBarberReviews.map(r => r.barber_rating).filter(r => r > 0);
+      const avg = validRatings.length > 0 ? validRatings.reduce((sum, r) => sum + r, 0) / validRatings.length : 0;
+      await Barber.findByIdAndUpdate(barber_id, { rating: Number(avg.toFixed(1)) });
+    }
+
+    // Update Salon rating
+    if (salon_id) {
+      const allSalonReviews = await Review.find({ salon_id, is_approved: true });
+      const validSalonRatings = allSalonReviews.map(r => r.salon_rating).filter(r => r > 0);
+      const avg = validSalonRatings.length > 0 ? validSalonRatings.reduce((sum, r) => sum + r, 0) / validSalonRatings.length : 0;
+      await Salon.findByIdAndUpdate(salon_id, {
+        rating: Number(avg.toFixed(1)),
+        total_reviews: allSalonReviews.length
+      });
+    }
+
     res.json({ success: true, message: "Review removed" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

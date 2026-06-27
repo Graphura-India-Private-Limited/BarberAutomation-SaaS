@@ -450,11 +450,12 @@ useEffect(() => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4">
-                  <img src="https://i.pinimg.com/736x/89/90/e0/8990e0304c44794197af164ab0138011.jpg" alt="Barber"   className="w-full h-40 md:h-44 object-cover rounded-[28px] border border-white/10 hover:scale-[1.03] hover:border-[#C5A059]/40 transition-all duration-500" />
-                  <img src="https://i.pinimg.com/736x/bd/10/db/bd10db8df4573f03415a898584459188.jpg" alt="Salon"    className="w-full h-28 md:h-32 object-cover rounded-[28px] border border-white/10 hover:scale-[1.03] hover:border-[#C5A059]/40 transition-all duration-500" />
+                 
+                 <img src="https://images.unsplash.com/photo-1682693299902-9a749e6cc55b?q=80&w=600&auto=format&fit=crop" alt="Barber"   className="w-full h-40 md:h-44 object-cover rounded-[28px] border border-white/10 hover:scale-[1.03] hover:border-[#C5A059]/40 transition-all duration-500" />
+                  <img  src="https://images.unsplash.com/photo-1672257493626-038f96997ade?q=80&w=600&auto=format&fit=crop"alt="Salon"    className="w-full h-28 md:h-32 object-cover rounded-[28px] border border-white/10 hover:scale-[1.03] hover:border-[#C5A059]/40 transition-all duration-500" />
                 </div>
                 <div className="space-y-4 mt-6">
-                  <img src="https://i.pinimg.com/1200x/35/e1/16/35e116f3d65f94e0525f4810f94b5fc7.jpg" alt="Interior" className="w-full h-28 md:h-32 object-cover rounded-[28px] border border-white/10 hover:scale-[1.03] hover:border-[#C5A059]/40 transition-all duration-500" />
+                  <img src="https://images.unsplash.com/photo-1718364673840-4bf5de5240b5?q=80&w=600&auto=format&fit=crop" alt="Interior" className="w-full h-28 md:h-32 object-cover rounded-[28px] border border-white/10 hover:scale-[1.03] hover:border-[#C5A059]/40 transition-all duration-500" />
                   <img src="https://i.pinimg.com/1200x/c0/7c/78/c07c78a373ee1bfd8c122578be42e0c2.jpg" alt="Service"  className="w-full h-40 md:h-44 object-cover rounded-[28px] border border-white/10 hover:scale-[1.03] hover:border-[#C5A059]/40 transition-all duration-500" />
                 </div>
               </div>

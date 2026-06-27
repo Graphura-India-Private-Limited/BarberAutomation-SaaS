@@ -10,4 +10,7 @@ router.post("/", protect, bookingFeedbackController.createFeedback);
 /* ── GET /api/booking-feedback — View all booking feedback (requires admin role) ── */
 router.get("/", protect, requireRoles("admin"), bookingFeedbackController.getAllFeedback);
 
+/* ── GET /api/booking-feedback/public — View public booking feedback ── */
+router.get("/public", bookingFeedbackController.getPublicFeedback);
+
 module.exports = router;

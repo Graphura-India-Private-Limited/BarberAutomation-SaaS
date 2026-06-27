@@ -44,16 +44,22 @@ export default function CustomerManagement() {
         return;
       }
       try {
-        const res = await fetch(`${API}/booking/salon/${salonId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        const data = await res.json();
-        if (data.success && data.bookings) {
+        const [bookingsRes, reviewsRes] = await Promise.all([
+          fetch(`${API}/booking/salon/${salonId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          fetch(`${API}/review/salon/${salonId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => null)
+        ]);
+
+        const bookingsData = await bookingsRes.json();
+        const reviewsData = reviewsRes ? await reviewsRes.json() : { success: false, reviews: [] };
+
+        if (bookingsData.success && bookingsData.bookings) {
           // Group bookings by customer
           const customerMap = {};
-          data.bookings.forEach((booking) => {
+          bookingsData.bookings.forEach((booking) => {
             if (!booking.customer_id) return;
             const cId = booking.customer_id._id || booking.customer_id;
             if (!cId) return;
@@ -69,6 +75,20 @@ export default function CustomerManagement() {
             customerMap[cId].bookingsList.push(booking);
           });
 
+          // Group reviews by customer
+          const reviewMap = {};
+          if (reviewsData.success && reviewsData.reviews) {
+            reviewsData.reviews.forEach((rev) => {
+              if (!rev.customer_id) return;
+              const custId = rev.customer_id._id || rev.customer_id;
+              if (!custId) return;
+              if (!reviewMap[custId]) {
+                reviewMap[custId] = [];
+              }
+              reviewMap[custId].push(rev.salon_rating);
+            });
+          }
+
           const aggregatedCustomers = Object.values(customerMap).map((c) => {
             const bookingsCount = c.bookingsList.length;
             const completedBookings = c.bookingsList.filter(b => b.status === "completed");
@@ -77,10 +97,11 @@ export default function CustomerManagement() {
               .filter(b => b.status !== "cancelled")
               .reduce((sum, b) => sum + (b.total_amount || 0), 0);
             
-            const ratedBookings = c.bookingsList.filter(b => b.rating !== null && b.rating !== undefined);
-            const avgRating = ratedBookings.length > 0
-              ? ratedBookings.reduce((sum, b) => sum + b.rating, 0) / ratedBookings.length
-              : 5.0;
+            // Sync with real-time salon reviews
+            const customerReviews = reviewMap[c.id] || [];
+            const avgRating = customerReviews.length > 0
+              ? customerReviews.reduce((sum, val) => sum + val, 0) / customerReviews.length
+              : null;
 
             const status = bookingsCount >= 5 ? "Active" : "Regular";
 
@@ -98,7 +119,7 @@ export default function CustomerManagement() {
 
           setCustomers(aggregatedCustomers);
         } else {
-          setError(data.message || "Failed to load booking registry");
+          setError(bookingsData.message || "Failed to load booking registry");
         }
       } catch (err) {
         setError("Network error loading customers");
@@ -157,9 +178,10 @@ export default function CustomerManagement() {
   const totalDatabase = customers.length;
   const frequentUsers = customers.filter(c => c.visits >= 3).length;
   const activeAccounts = customers.filter(c => c.status === "Active" || c.bookings > 0).length;
-  const avgRetention = customers.length > 0
-    ? Number(customers.reduce((sum, c) => sum + c.rating, 0) / customers.length).toFixed(1)
-    : "0.0";
+  const ratedCustomers = customers.filter(c => c.rating !== null && c.rating !== undefined);
+  const avgRetention = ratedCustomers.length > 0
+    ? Number(ratedCustomers.reduce((sum, c) => sum + c.rating, 0) / ratedCustomers.length).toFixed(1)
+    : "—";
 
   // Filter lists for bottom sections
   const frequentCustomersList = [...customers]
@@ -292,7 +314,13 @@ export default function CustomerManagement() {
                   <div className="md:block flex justify-between items-center">
                     <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Rating Given</span>
                     <p className="font-serif font-black text-[#3E362E] text-sm md:text-base leading-none flex items-center gap-1">
-                      {customer.rating.toFixed(1)} <Star className="w-3.5 h-3.5 text-[#C5A059] fill-[#C5A059]" />
+                      {customer.rating !== null && customer.rating !== undefined ? (
+                        <>
+                          {Number(customer.rating).toFixed(1)} <Star className="w-3.5 h-3.5 text-[#C5A059] fill-[#C5A059]" />
+                        </>
+                      ) : (
+                        <span className="text-stone-300 font-sans text-xs font-normal">—</span>
+                      )}
                     </p>
                   </div>
 

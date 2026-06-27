@@ -75,8 +75,8 @@ exports.createBooking = async (req, res) => {
       }
     }
 
-    if (finalBarberId) {
-      const barber = await Barber.findById(finalBarberId);
+    if (barber_id) {
+      const barber = await Barber.findById(barber_id);
       if (barber && (barber.status === "break" || barber.status === "offline")) {
         return res.status(400).json({
           success: false,

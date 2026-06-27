@@ -102,13 +102,13 @@ export default function VisitRelaxPage() {
     {
       name: "Mid Skin Fade with Crop",
       category: "Men's Cuts",
-      img: "https://i.pinimg.com/1200x/ad/ab/19/adab19435d74cd2ba6f7cd13bf25c45c.jpg",
+      img: "https://images.unsplash.com/photo-1644409840040-5130284fe1d6?q=80&w=600&auto=format&fit=crop",
       desc: "A highly architectural cut featuring blended skin textures and a clean textured fringe on top. Perfect for hot climates."
     },
     {
       name: "Caramel Balayage Highlights",
       category: "Women's Colour",
-      img: "https://i.pinimg.com/736x/d9/b8/d3/d9b8d3829e277c0d92f00d941409e8f8.jpg",
+      img: "https://images.unsplash.com/photo-1682450239611-e2c845970926?q=80&w=600&auto=format&fit=crop",
       desc: "Bespoke hand-painted sun-kissed caramel ribbons that lift dark bases and add rich three-dimensional hair texture."
     },
     {
@@ -130,7 +130,7 @@ export default function VisitRelaxPage() {
       title: "How to Maintain a Sharp Fade",
       readTime: "3 min read",
       snippet: "Discover the golden rules of hair health, styling wax selections, and barber visit schedules to keep your fade crisp.",
-      img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&q=80",
+      img: "https://images.unsplash.com/photo-1672642150228-3fcd5826ec26?q=80&w=600&auto=format&fit=crop",
       content: `Maintaining a pristine fade requires consistency, the right products, and healthy habits. 
 
 Here are the golden rules directly from our master barbers:
@@ -146,7 +146,7 @@ With these simple steps, your fade will remain crisp, clean, and healthy from on
       title: "Why Scalp Care is the New Skincare",
       readTime: "4 min read",
       snippet: "A healthy style starts at the roots. We explain the benefits of tea tree oil detox, exfoliation, and hot steam spa rituals.",
-      img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=400&q=80",
+      img: "https://images.unsplash.com/photo-1634449571010-02389ed0f9b0?q=80&w=600&auto=format&fit=crop",
       content: `Just like great makeup requires a clear canvas, great hair relies on a healthy, nourished scalp. Product build-up, dry skin, and excess sebum can clog follicles, leading to thinning and dullness.
 
 Our scalp care guide explains how to revitalize your roots:
@@ -162,7 +162,7 @@ Invest in your scalp health today, and you'll see the difference in your style's
       title: "Selecting the Perfect Beard Shape",
       readTime: "5 min read",
       snippet: "Round, square, oval, or heart? Read our master stylists guide on tailoring beard cheeklines to match your jaw shape.",
-      img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=400&q=80",
+      img: "https://images.unsplash.com/photo-1662145349402-f78c521eccb0?q=80&w=600&auto=format&fit=crop",
       content: `Your beard is one of your most defining features, but one shape does not fit all. By matching your beard style to your facial geometry, you can enhance your best features and create a balanced profile.
 
 Here is how to select your perfect shape:
