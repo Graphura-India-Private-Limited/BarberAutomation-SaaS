@@ -394,6 +394,9 @@ export default function AdminOnboarding() {
   const docRef    = useRef();
   const adminMenuRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showBranchDropdown, setShowBranchDropdown] = useState(false);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [showMobileStatsDropdown, setShowMobileStatsDropdown] = useState(false);
 
   const ROUTE_TAB_MAP = {
     "/admin": "dashboard",
@@ -1063,11 +1066,11 @@ export default function AdminOnboarding() {
               <span style={{ fontSize: 13, fontWeight: 500, color: C.muted }}>
                 {new Date().toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}
               </span>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: `1px solid ${C.border}`, borderRadius: 99, padding: "2px 8px 2px 14px", marginRight: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: `1px solid ${C.border}`, borderRadius: 99, padding: "2px 8px 2px 14px", marginRight: 4, position: "relative" }}>
                 <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, color: C.muted }}>Branch:</span>
-                <select
-                  value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
+                <button
+                  type="button"
+                  onClick={() => setShowBranchDropdown(!showBranchDropdown)}
                   style={{
                     border: "none",
                     background: "transparent",
@@ -1076,19 +1079,65 @@ export default function AdminOnboarding() {
                     color: C.gold,
                     outline: "none",
                     cursor: "pointer",
-                    padding: "6px 8px 6px 0px"
+                    padding: "6px 8px 6px 0px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
                   }}
                 >
-                  <option value="All India">All India</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Madhya Pradesh">Madhya Pradesh</option>
-                  <option value="Gujarat">Gujarat</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Rajasthan">Rajasthan</option>
-                  <option value="Uttar Pradesh">Uttar Pradesh</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                </select>
+                  <span>{selectedState}</span>
+                  <ChevronDown size={12} style={{ transform: showBranchDropdown ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: C.muted }} />
+                </button>
+
+                {showBranchDropdown && (
+                  <>
+                    <div 
+                      onClick={() => setShowBranchDropdown(false)} 
+                      style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
+                    />
+                    <div style={{
+                      position: "absolute",
+                      top: "calc(100% + 4px)",
+                      left: 0,
+                      minWidth: 150,
+                      background: "#FFFFFF",
+                      border: `1px solid ${C.border}`,
+                      borderRadius: 12,
+                      boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                      zIndex: 999,
+                      padding: "4px 0",
+                    }}>
+                      {["All India", "Maharashtra", "Madhya Pradesh", "Gujarat", "Delhi", "Karnataka", "Rajasthan", "Uttar Pradesh", "Tamil Nadu"].map((st) => (
+                        <button
+                          key={st}
+                          type="button"
+                          onClick={() => {
+                            setSelectedState(st);
+                            setShowBranchDropdown(false);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "8px 16px",
+                            background: selectedState === st ? `${C.gold}15` : "transparent",
+                            border: "none",
+                            textAlign: "left",
+                            fontSize: 13,
+                            color: C.ink,
+                            fontWeight: selectedState === st ? 700 : 500,
+                            cursor: "pointer",
+                            outline: "none",
+                            display: "block",
+                            transition: "background 0.15s",
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = `${C.gold}25`; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = selectedState === st ? `${C.gold}15` : "transparent"; }}
+                        >
+                          {st}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
               <button type="button"
                 onClick={() => fetchAll(selectedState)}
@@ -1191,17 +1240,11 @@ export default function AdminOnboarding() {
               </span>
             </div>
             
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative" }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: C.muted }}>Filter Studio:</span>
-              <select
-                value={selectedSalonId}
-                onChange={(e) => {
-                  setSelectedSalonId(e.target.value);
-                  setCustPage(1);
-                  setApptPage(1);
-                  setServPage(1);
-                }}
-                className="inp"
+              <button
+                type="button"
+                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                 style={{
                   padding: "6px 14px",
                   borderRadius: 10,
@@ -1213,22 +1256,320 @@ export default function AdminOnboarding() {
                   outline: "none",
                   cursor: "pointer",
                   minWidth: 200,
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.03)"
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
                 }}
               >
-                <option value="">✨ All Studios / Salons</option>
-                {salons.filter(s => s.status === "approved").map(s => (
-                  <option key={s._id} value={s._id}>💈 {s.salon_name}</option>
-                ))}
-              </select>
+                <span>
+                  {selectedSalonId ? `💈 ${salons.find(s => s._id === selectedSalonId)?.salon_name}` : "✨ All Studios / Salons"}
+                </span>
+                <ChevronDown size={12} style={{ transform: showFilterDropdown ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: C.muted }} />
+              </button>
+
+              {showFilterDropdown && (
+                <>
+                  <div 
+                    onClick={() => setShowFilterDropdown(false)} 
+                    style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
+                  />
+                  <div style={{
+                    position: "absolute",
+                    top: "calc(100% + 4px)",
+                    right: 0,
+                    minWidth: "100%",
+                    maxHeight: 250,
+                    overflowY: "auto",
+                    background: "#FAF9F6",
+                    border: `1px solid ${C.gold}50`,
+                    borderRadius: 10,
+                    boxShadow: "0 8px 30px rgba(197,160,89,0.15)",
+                    zIndex: 999,
+                    padding: "4px 0",
+                    textAlign: "left",
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedSalonId("");
+                        setCustPage(1);
+                        setApptPage(1);
+                        setServPage(1);
+                        setShowFilterDropdown(false);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "8px 14px",
+                        background: !selectedSalonId ? `${C.gold}15` : "transparent",
+                        border: "none",
+                        textAlign: "left",
+                        fontSize: 12,
+                        color: C.ink,
+                        fontWeight: !selectedSalonId ? 750 : 500,
+                        cursor: "pointer",
+                        outline: "none",
+                        display: "block",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = `${C.gold}25`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = !selectedSalonId ? `${C.gold}15` : "transparent"; }}
+                    >
+                      ✨ All Studios / Salons
+                    </button>
+                    {salons.filter(s => s.status === "approved").map(s => {
+                      const isSelected = selectedSalonId === s._id;
+                      return (
+                        <button
+                          key={s._id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSalonId(s._id);
+                            setCustPage(1);
+                            setApptPage(1);
+                            setServPage(1);
+                            setShowFilterDropdown(false);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "8px 14px",
+                            background: isSelected ? `${C.gold}15` : "transparent",
+                            border: "none",
+                            textAlign: "left",
+                            fontSize: 12,
+                            color: C.ink,
+                            fontWeight: isSelected ? 750 : 500,
+                            cursor: "pointer",
+                            outline: "none",
+                            display: "block",
+                            transition: "background 0.15s",
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = `${C.gold}25`; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = isSelected ? `${C.gold}15` : "transparent"; }}
+                        >
+                          💈 {s.salon_name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
           {/* ════ MAIN CONTENT ════ */}
           <main style={{ paddingBottom: 60 }}>
 
+            {/* Mobile Stats Dropdown */}
+            <div className="block sm:hidden mb-6" style={{ position: "relative" }}>
+              <button
+                type="button"
+                onClick={() => setShowMobileStatsDropdown(!showMobileStatsDropdown)}
+                style={{
+                  width: "100%",
+                  padding: "14px 18px",
+                  borderRadius: 12,
+                  border: `1px solid ${C.border}`,
+                  background: "#FFFFFF",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: C.ink,
+                  outline: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <Activity size={18} color={C.gold} />
+                  <span>View Details & Stats Summary</span>
+                </div>
+                <ChevronDown size={16} style={{ transform: showMobileStatsDropdown ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: C.muted }} />
+              </button>
+
+              {showMobileStatsDropdown && (
+                <>
+                  <div 
+                    onClick={() => setShowMobileStatsDropdown(false)} 
+                    style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
+                  />
+                  <div style={{
+                    position: "absolute",
+                    top: "calc(100% + 6px)",
+                    left: 0,
+                    right: 0,
+                    background: "#FFFFFF",
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 12,
+                    boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                    zIndex: 999,
+                    padding: "6px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                  }}>
+                    {/* Customers option */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleTabChange("customers", "all");
+                        setCustPage(1);
+                        setShowMobileStatsDropdown(false);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        background: tab === "customers" ? `${C.blue}08` : "transparent",
+                        border: "none",
+                        width: "100%",
+                        cursor: "pointer",
+                        outline: "none",
+                        textAlign: "left",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = `${C.blue}08`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = tab === "customers" ? `${C.blue}08` : "transparent"; }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ padding: 6, borderRadius: 6, background: C.blueLight }}>
+                          <Users size={16} color={C.blue} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>Total Customers</div>
+                          <div style={{ fontSize: 11, color: C.muted }}>{selectedSalonId ? "Booked in Studio" : "Registered users"}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>{displayCustomersCount}</span>
+                        <span style={{ color: C.muted, fontSize: 12 }}>→</span>
+                      </div>
+                    </button>
+
+                    {/* Salons option */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleTabChange("salons");
+                        setShowMobileStatsDropdown(false);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        background: tab === "salons" ? `${C.green}08` : "transparent",
+                        border: "none",
+                        width: "100%",
+                        cursor: "pointer",
+                        outline: "none",
+                        textAlign: "left",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = `${C.green}08`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = tab === "salons" ? `${C.green}08` : "transparent"; }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ padding: 6, borderRadius: 6, background: C.greenLight }}>
+                          <Store size={16} color={C.green} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>Active Salons</div>
+                          <div style={{ fontSize: 11, color: C.muted }}>{selectedSalonId ? "Selected Studio" : "Approved & live"}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>{displaySalonsCount}</span>
+                        <span style={{ color: C.muted, fontSize: 12 }}>→</span>
+                      </div>
+                    </button>
+
+                    {/* Bookings option */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleTabChange("appointments");
+                        setShowMobileStatsDropdown(false);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        background: tab === "appointments" ? `${C.purple}08` : "transparent",
+                        border: "none",
+                        width: "100%",
+                        cursor: "pointer",
+                        outline: "none",
+                        textAlign: "left",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = `${C.purple}08`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = tab === "appointments" ? `${C.purple}08` : "transparent"; }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ padding: 6, borderRadius: 6, background: C.purpleLight }}>
+                          <CalendarCheck size={16} color={C.purple} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>Total Bookings</div>
+                          <div style={{ fontSize: 11, color: C.muted }}>{displayPendingBookingsCount} pending</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>{displayBookingsCount}</span>
+                        <span style={{ color: C.muted, fontSize: 12 }}>→</span>
+                      </div>
+                    </button>
+
+                    {/* Revenue option */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleTabChange("payments");
+                        setShowMobileStatsDropdown(false);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        background: tab === "payments" ? `${C.orange}08` : "transparent",
+                        border: "none",
+                        width: "100%",
+                        cursor: "pointer",
+                        outline: "none",
+                        textAlign: "left",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = `${C.orange}08`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = tab === "payments" ? `${C.orange}08` : "transparent"; }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ padding: 6, borderRadius: 6, background: C.orangeLight }}>
+                          <CreditCard size={16} color={C.orange} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>Revenue</div>
+                          <div style={{ fontSize: 11, color: C.muted }}>Total collected</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>{displayRevenue}</span>
+                        <span style={{ color: C.muted, fontSize: 12 }}>→</span>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
             {/* STAT CARDS — shown on all tabs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
+            <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-6">
               <StatCard label="Total Customers" value={displayCustomersCount} sub={selectedSalonId ? "Booked in Studio" : "Registered users"} color={C.blue} icon={Users} iconBg={C.blueLight} iconColor={C.blue} onClick={() => { handleTabChange("customers", "all"); setCustPage(1); }}/>
               <StatCard label="Active Salons"   value={displaySalonsCount} sub={selectedSalonId ? "Selected Studio" : "Approved & live"} color={C.green} icon={Store} iconBg={C.greenLight} iconColor={C.green} onClick={() => handleTabChange("salons")}/>
               <StatCard label="Total Bookings"  value={displayBookingsCount} sub={`${displayPendingBookingsCount} pending`} color={C.purple} icon={CalendarCheck} iconBg={C.purpleLight} iconColor={C.purple} onClick={() => handleTabChange("appointments")}/>

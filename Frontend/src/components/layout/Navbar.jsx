@@ -317,7 +317,7 @@ const Navbar = () => {
 
                 {/* ── PROFILE DROPDOWN ── */}
                 {profileOpen && (
-                  <div className="absolute top-[calc(100%+10px)] right-0 w-56 rounded-2xl bg-[#1E1A17]/98 backdrop-blur-2xl border border-white/10 shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-fade-in">
+                  <div className="absolute top-[calc(100%+10px)] right-0 w-56 rounded-2xl bg-[#1E1A17]/95 backdrop-blur-2xl border border-white/10 shadow-[0_24px_64px_rgba(0,0,0,0.6)] overflow-hidden z-50 animate-fade-in">
                     {/* Header */}
                     <div className="p-4 border-b border-white/[0.07]">
                       <div className="flex items-center gap-3">

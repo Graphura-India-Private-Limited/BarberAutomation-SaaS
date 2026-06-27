@@ -383,11 +383,12 @@ export default function ServiceConsole() {
     await handleAPIStatusUpdate(cur.id, "completed");
     clearInterval(activeTimerRef.current);
     setElapsedTimes(prev => ({ ...prev, [cur.id]: 0 }));
-    alert(`Service Completed ✅\n\nCustomer: ${cur.customer_name}\nTotal Bill: ₹${totalAmount}`);
+    setModal({
+      type: "completed",
+      customerName: cur.customer_name,
+      amount: totalAmount
+    });
     toast_(`Completed - ${cur.customer_name}`);
-    setTimeout(() => {
-      navigate("/barber/overview");
-    }, 1000);
   };
 
   const handleRemove = async () => {
@@ -851,6 +852,44 @@ export default function ServiceConsole() {
                   <div className="flex gap-2.5 pt-2 border-t border-stone-50 justify-end">
                     <button type="button" onClick={() => setModal(null)} className="text-xs font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 px-4 py-2 bg-transparent border-none cursor-pointer">Cancel</button>
                     <button type="button" onClick={handleRemove} className="py-3 px-5 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-rose-600 hover:bg-rose-700 shadow-xs border-none cursor-pointer">Purge Log</button>
+                  </div>
+                </div>
+              )}
+
+              {modal.type === "completed" && (
+                <div className="space-y-5">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-4">
+                      <CheckCircle size={32} className="text-emerald-600" />
+                    </div>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-stone-900">Service Completed</h3>
+                    <p className="text-xs text-stone-500 mt-1.5 font-medium leading-relaxed">
+                      Treatment session finalized for <span className="font-extrabold text-stone-800">{modal.customerName}</span>.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-[#FAF6F0] rounded-2xl p-4 border border-stone-200/50 space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-stone-500 font-medium">Customer:</span>
+                      <span className="font-bold text-stone-800">{modal.customerName}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs border-t border-stone-200/60 pt-2">
+                      <span className="text-stone-500 font-medium">Total Bill:</span>
+                      <span className="font-mono font-black text-stone-900 text-sm">₹{modal.amount.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2.5 pt-2 border-t border-stone-50 justify-end">
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setModal(null);
+                        navigate("/barber/overview");
+                      }} 
+                      className="w-full py-3 px-5 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-stone-900 hover:bg-stone-800 shadow-xs border-none cursor-pointer text-center"
+                    >
+                      Done & Return
+                    </button>
                   </div>
                 </div>
               )}

@@ -299,7 +299,7 @@ export default function BarberServices() {
               />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {[
                 { id: "all", label: "Complete Menu" },
                 { id: "Men", label: "Men's Grooming" },

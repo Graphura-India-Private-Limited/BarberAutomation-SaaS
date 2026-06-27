@@ -34,7 +34,16 @@ exports.getBarbersBySalon = async (req, res) => {
             await Barber.findByIdAndUpdate(barber._id, { status: "available" });
           }
         }
-        return barber;
+
+        const queueCount = await Queue.countDocuments({
+          barber_id: barber._id,
+          status: { $in: ["waiting", "in-progress"] },
+          joined_at: { $gte: today }
+        });
+
+        const barberObj = barber.toObject();
+        barberObj.queue_count = queueCount;
+        return barberObj;
       })
     );
 

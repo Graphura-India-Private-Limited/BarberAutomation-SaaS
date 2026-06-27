@@ -19,6 +19,12 @@ const MOCK_DAILY_COMMISSIONS = [];
 export default function BarberEarnings() {
   const [payouts] = useState(MOCK_PAYOUT_HISTORY);
   const [dailyCuts] = useState(MOCK_DAILY_COMMISSIONS);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
 
@@ -206,7 +212,7 @@ export default function BarberEarnings() {
               </button> */}
               <button
                 type="button"
-                onClick={() => alert("Payout Audit Loaded")}
+                onClick={() => showToast("Payout Audit Loaded")}
                 className="w-full mt-6 bg-stone-50 hover:bg-stone-900 text-stone-500 hover:text-white border border-stone-200/80 rounded-xl text-[10px] font-black uppercase tracking-widest py-3.5 transition-all duration-300 shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
               >
                 Query Payout Audits <ArrowRight size={12} />
@@ -220,6 +226,13 @@ export default function BarberEarnings() {
 
       {/* ── ✅ BRAND FOOTER: Custom dark-wood theme module attaches at viewport bottom edge ── */}
 
+
+      {toast && (
+        <div className="fixed right-4 top-6 z-50 rounded-xl bg-stone-900 px-5 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-xl font-sans flex items-center gap-2 border border-white/10 animate-fade-in">
+          <CheckCircle2 size={14} className="text-emerald-400" />
+          <span>{toast}</span>
+        </div>
+      )}
 
     </div>
   );

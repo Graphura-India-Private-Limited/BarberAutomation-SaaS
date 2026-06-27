@@ -83,7 +83,7 @@ header[class*="bg-[#1A1A1A]"]::after {
   height: 2px;
   background: #A1804E !important;
   opacity: 0.9 !important;
-  z-index: 100;
+  z-index: 1;
 }
 
 /* Header titles color override */
@@ -156,7 +156,7 @@ header[class*="bg-[#3E362E]"]::after {
   height: 2px;
   background: #A1804E !important;
   opacity: 0.9 !important;
-  z-index: 100;
+  z-index: 1;
 }
 
 header.bg-\[\#3E362E\] h1,

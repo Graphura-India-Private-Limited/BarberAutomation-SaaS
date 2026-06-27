@@ -264,13 +264,17 @@ export default function BarberSelection() {
             else if (b.status === "break") status = "On Break";
             else if (b.status === "offline") status = "Offline";
 
+            const queueCount = b.queue_count || 0;
             let aiWait = { queue: 0, pace: "15 mins/cut", wait: "Ready Now" };
+
             if (b.status === "busy") {
-              aiWait = { queue: 2, pace: "20 mins/cut", wait: "~40 mins" };
+              aiWait = { queue: queueCount, pace: "20 mins/cut", wait: queueCount > 0 ? `~${queueCount * 20} mins` : "Ready Now" };
             } else if (b.status === "break") {
               aiWait = { queue: 0, pace: "15 mins/cut", wait: "On Break" };
             } else if (b.status === "offline") {
               aiWait = { queue: 0, pace: "—", wait: "Offline" };
+            } else if (queueCount > 0) {
+              aiWait = { queue: queueCount, pace: "20 mins/cut", wait: `~${queueCount * 20} mins` };
             }
 
             return {
