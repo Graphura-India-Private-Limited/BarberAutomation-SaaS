@@ -680,7 +680,7 @@ export function SalonsModule({
                     <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Support Hotline:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.support_number || "—"}</span></div>
                     <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Opening Time:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.opening_time || "—"}</span></div>
                     <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Closing Time:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.closing_time || "—"}</span></div>
-                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Active Chairs/Barbers:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.number_of_barbers || viewingSalon.numBarbers || "—"}</span></div>
+                    <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Active Chairs/Barbers:</span> <span className="text-stone-850 font-sans font-semibold">{typeof viewingSalon.number_of_barbers === 'number' ? viewingSalon.number_of_barbers : (typeof viewingSalon.numBarbers === 'number' ? viewingSalon.numBarbers : "—")}</span></div>
                     <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Salary Model:</span> <span className="text-stone-850 capitalize font-sans font-semibold">{viewingSalon.salary_model || "—"}</span></div>
                     {viewingSalon.salary_model === "commission" && (
                       <div className="flex justify-between"><span className="text-stone-400 uppercase tracking-wider">Commission Percent:</span> <span className="text-stone-850 font-sans font-semibold">{viewingSalon.commission_percent}%</span></div>
@@ -898,7 +898,7 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
                     </button>
                     {menuId === b._id && (
                       <div className="absolute right-0 top-full mt-1 z-10 min-w-[160px] rounded-md border bg-white py-1 shadow-lg" style={{ borderColor: C.border }}>
-                        {["available", "break"].map((s) => (
+                        {["available", "busy", "break"].map((s) => (
                           <button key={s} type="button" onClick={() => { changeBarberStatus(b._id, s); setMenuId(null); }}
                             className="w-full px-4 py-2 text-left font-sans text-sm font-normal hover:bg-gray-50 capitalize" style={{ color: C.ink }}>
                             Set {s}
@@ -1522,14 +1522,23 @@ export function LiveMonitoringModule({ barbers, loading, changeBarberStatus }) {
               </div>
               <div className="p-4">
                 <p className="font-sans text-xs font-normal mb-3" style={{ color: C.muted }}>Salon: <span className="font-semibold" style={{ color: C.gold }}>{b.salon_id?.salon_name || "—"}</span></p>
-                <div className="flex gap-2">
-                  {["available", "break"].map((s) => (
-                    <button key={s} type="button" disabled={b.status === s} onClick={() => changeBarberStatus(b._id, s)}
-                      className="flex-1 py-1.5 rounded-md font-sans text-[10px] font-extrabold tracking-wider disabled:opacity-60 capitalize"
-                      style={{ background: b.status === s ? C.greenLight : "#F5F5F4", color: b.status === s ? C.green : C.muted, border: `1px solid ${C.border}` }}>
-                      {s}
-                    </button>
-                  ))}
+                <div className="flex gap-1.5 w-full">
+                  {["available", "busy", "break"].map((s) => {
+                    const isActive = b.status === s;
+                    const bg = isActive 
+                      ? (s === "available" ? C.greenLight : s === "busy" ? C.amberLight || "#FEF3C7" : C.blueLight) 
+                      : "#F5F5F4";
+                    const color = isActive 
+                      ? (s === "available" ? C.green : s === "busy" ? C.amber || "#D97706" : C.blue) 
+                      : C.muted;
+                    return (
+                      <button key={s} type="button" disabled={isActive} onClick={() => changeBarberStatus(b._id, s)}
+                        className="flex-1 py-1.5 rounded-md font-sans text-[9px] font-extrabold tracking-wider disabled:opacity-70 capitalize"
+                        style={{ background: bg, color: color, border: `1px solid ${C.border}` }}>
+                        {s}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -135,7 +135,7 @@ const SalonCard = ({ salon, onSelect }) => {
             <div className="flex items-center gap-1.5">
               <Icons.Users size={9} className="text-[#C5A059] flex-shrink-0" />
               <span>
-                {salon.number_of_barbers || salon.max_barbers_limit || "3"} Stylists
+                {typeof salon.number_of_barbers === 'number' ? salon.number_of_barbers : (salon.max_barbers_limit || "3")} Stylists
               </span>
             </div>
 

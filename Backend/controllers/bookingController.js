@@ -222,11 +222,70 @@ exports.getSalonBookings = async (req, res) => {
 // @access  Private
 exports.updateBookingStatus = async (req, res) => {
   try {
-    const booking = await Booking.findByIdAndUpdate(
-      req.params.id,
-      { status: req.body.status },
-      { new: true }
-    );
+    const { status } = req.body;
+    
+    // Find the booking first to get barber_id and other details
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    // Check if there is an associated Queue entry
+    const queueEntry = await Queue.findOne({ booking_id: booking._id });
+
+    if (status === "in-progress") {
+      // Validate that the barber is not already attending another customer
+      const assignedBarberId = booking.barber_id || (queueEntry ? queueEntry.barber_id : null);
+      if (assignedBarberId) {
+        const activeService = await Queue.findOne({
+          barber_id: assignedBarberId,
+          status: "in-progress",
+          booking_id: { $ne: booking._id }
+        });
+        if (activeService) {
+          return res.status(400).json({ success: false, message: "Barber is already attending another customer" });
+        }
+      }
+    }
+
+    // Update Booking status
+    booking.status = status;
+    await booking.save();
+
+    // If there is an associated Queue entry, keep it in sync
+    if (queueEntry) {
+      queueEntry.status = status;
+      if (status === "in-progress") {
+        queueEntry.served_at = new Date();
+      }
+      await queueEntry.save();
+
+      // Keep Barber status in sync
+      const assignedBarberId = booking.barber_id || queueEntry.barber_id;
+      if (assignedBarberId) {
+        if (status === "in-progress") {
+          await Barber.findByIdAndUpdate(assignedBarberId, { status: "busy" });
+        } else if (status === "completed" || status === "noshow") {
+          await Barber.findByIdAndUpdate(assignedBarberId, { status: "available" });
+
+          // Update positions of other waiting customers for this barber
+          await Queue.updateMany(
+            { barber_id: assignedBarberId, status: "waiting", position: { $gt: queueEntry.position } },
+            { $inc: { position: -1 } }
+          );
+        }
+      }
+    } else {
+      // If no queue entry but status changed to in-progress or completed, update barber status directly
+      const assignedBarberId = booking.barber_id;
+      if (assignedBarberId) {
+        if (status === "in-progress") {
+          await Barber.findByIdAndUpdate(assignedBarberId, { status: "busy" });
+        } else if (status === "completed" || status === "noshow") {
+          await Barber.findByIdAndUpdate(assignedBarberId, { status: "available" });
+        }
+      }
+    }
 
     res.json({ success: true, booking });
   } catch (err) {

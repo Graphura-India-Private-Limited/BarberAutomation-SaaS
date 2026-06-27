@@ -16,16 +16,9 @@ export default function OwnerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedDay, setSelectedDay] = useState(null);
+  const [pendingBreaks, setPendingBreaks] = useState([]);
 
   const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    if (!token) {
-      navigate("/owner/login");
-      return;
-    }
-    fetchProfile();
-  }, []);
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -43,6 +36,59 @@ export default function OwnerDashboard() {
       setLoading(false);
     }
   };
+
+  const fetchPendingBreaks = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/breaks/pending`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPendingBreaks(data.data || []);
+      }
+    } catch (err) {
+      console.error("Error fetching pending breaks:", err);
+    }
+  };
+
+  const handleBreakAction = async (id, action) => {
+    try {
+      const res = await fetch(`${API}/breaks/action/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status: action === "approve" ? "approved" : "rejected" })
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchPendingBreaks();
+        fetchProfile();
+      } else {
+        alert(data.message || "Failed to update break status");
+      }
+    } catch (err) {
+      console.error("Error handling break request:", err);
+      alert("Error handling break request");
+    }
+  };
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/owner/login");
+      return;
+    }
+    fetchProfile();
+    fetchPendingBreaks();
+
+    const interval = setInterval(() => {
+      fetchPendingBreaks();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const statusMeta = useMemo(() => {
     if (salon?.status === "approved") return { label: "Approved & Live", dot: "bg-emerald-500", panel: "bg-emerald-50/60 border-emerald-200 text-emerald-800" };
@@ -142,7 +188,7 @@ export default function OwnerDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Active Staff</p>
-              <h3 className="text-xl font-black text-stone-900 font-serif">{salon?.number_of_barbers || "3"} / 4</h3>
+              <h3 className="text-xl font-black text-stone-900 font-serif">{typeof salon?.number_of_barbers === 'number' ? salon.number_of_barbers : "0"} / {salon?.max_barbers_limit || "3"}</h3>
             </div>
           </div>
           <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs">
@@ -311,6 +357,51 @@ export default function OwnerDashboard() {
               );
             })()}
           </div>
+        </div>
+      )}
+
+      {/* 🚨 FLOATING BREAK REQUEST NOTIFICATIONS (RIGHT SIDE) */}
+      {pendingBreaks.length > 0 && (
+        <div className="fixed top-24 right-6 z-40 w-full max-w-xs space-y-3 pointer-events-none">
+          {pendingBreaks.map((req) => (
+            <div 
+              key={req._id}
+              className="pointer-events-auto bg-white border border-[#EADBCE] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 animate-in slide-in-from-right-10 text-left font-sans"
+            >
+              <div className="flex items-start gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+                  <ShieldAlert className="text-amber-600 w-4 h-4 animate-pulse" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-[10px] font-black uppercase tracking-wider text-[#3E362E]">
+                    Break Request
+                  </h4>
+                  <p className="text-sm font-black text-[#8B5A2B] mt-0.5 leading-tight">
+                    {req.barber_id?.name || "A Barber"}
+                  </p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-normal">
+                    Type: <span className="font-semibold capitalize text-stone-700">{req.break_type}</span> ({req.duration_mins || 15}m)
+                    {req.reason && <span className="block italic mt-1 bg-stone-50 p-1.5 rounded border border-stone-100 text-stone-600">"{req.reason}"</span>}
+                  </p>
+                  
+                  <div className="flex gap-2 mt-3">
+                    <button 
+                      onClick={() => handleBreakAction(req._id, "approve")}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[9px] uppercase tracking-wider py-1.5 rounded-lg transition cursor-pointer font-sans shadow-3xs border-none"
+                    >
+                      Approve
+                    </button>
+                    <button 
+                      onClick={() => handleBreakAction(req._id, "reject")}
+                      className="flex-1 bg-white border border-red-200 hover:border-red-400 text-red-600 font-extrabold text-[9px] uppercase tracking-wider py-1.5 rounded-lg transition cursor-pointer font-sans"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

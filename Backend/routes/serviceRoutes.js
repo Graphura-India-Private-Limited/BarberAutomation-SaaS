@@ -7,5 +7,6 @@ const { requireRoles } = require("../middleware/roleMiddleware");
 router.get("/:salon_id", serviceController.getSalonServices);
 router.post("/", protect, requireRoles("owner", "admin"), serviceController.createService);
 router.delete("/:id", protect, requireRoles("owner", "admin"), serviceController.deleteService);
+router.put("/:id", protect, requireRoles("owner", "admin", "barber"), serviceController.updateService);
 
 module.exports = router;

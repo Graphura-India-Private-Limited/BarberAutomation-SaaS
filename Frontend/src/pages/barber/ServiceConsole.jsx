@@ -109,7 +109,13 @@ export default function ServiceConsole() {
   }, [activeQueue, selectedId]);
 
   // Derive activeSeconds
-  const activeSeconds = cur ? (elapsedTimes[cur.id] !== undefined ? elapsedTimes[cur.id] : (cur.status === "in-progress" || cur.status === "busy" ? 720 : 0)) : 0;
+  const activeSeconds = cur 
+    ? (elapsedTimes[cur.id] !== undefined 
+        ? elapsedTimes[cur.id] 
+        : ((cur.status === "in-progress" || cur.status === "busy") && cur.served_at 
+            ? Math.max(0, Math.floor((Date.now() - new Date(cur.served_at).getTime()) / 1000)) 
+            : 0)) 
+    : 0;
 
   // Twin Timers
   const [graceSeconds, setGraceSeconds] = useState(15 * 60);
@@ -123,10 +129,19 @@ export default function ServiceConsole() {
   const graceTimerRef = useRef(null);
   const activeTimerRef = useRef(null);
 
-  const baseService = {
-    name: "Premium Haircut",
-    price: 499,
-  };
+  const baseService = React.useMemo(() => {
+    if (cur && cur.services && cur.services.length > 0) {
+      const s = cur.services[0];
+      return {
+        name: s.service_name || s.service || "Grooming Session",
+        price: s.price !== undefined ? s.price : 499
+      };
+    }
+    return {
+      name: "Premium Haircut",
+      price: 499,
+    };
+  }, [cur]);
 
   const extraServices = [
     { id: 1, name: "Beard Shape", price: 150 },
@@ -155,9 +170,10 @@ export default function ServiceConsole() {
           position: q.position,
           customer_name: q.customer_id?.name || q.name || "Walk-in Customer",
           customer_mobile: q.customer_id?.mobile || q.phone || "No Mobile",
-          services: q.booking_id?.services || [{ service: q.service || "Grooming Session" }],
+          services: q.booking_id?.services || [{ service_name: q.service || "Grooming Session", price: q.booking_id?.total_amount || 499 }],
           status: q.status, // waiting, in-progress, paused, delayed, noshow, completed
           joined_at: q.joined_at,
+          served_at: q.served_at,
           barber_id: q.barber_id?._id || q.barber_id || null
         }));
         setQueue(mapped);
@@ -230,7 +246,11 @@ export default function ServiceConsole() {
       activeTimerRef.current = setInterval(() => {
         setElapsedTimes((prev) => ({
           ...prev,
-          [cur.id]: (prev[cur.id] !== undefined ? prev[cur.id] : (cur.status === "in-progress" || cur.status === "busy" ? 720 : 0)) + 1
+          [cur.id]: (prev[cur.id] !== undefined 
+            ? prev[cur.id] 
+            : ((cur.status === "in-progress" || cur.status === "busy") && cur.served_at 
+                ? Math.max(0, Math.floor((Date.now() - new Date(cur.served_at).getTime()) / 1000)) 
+                : 0)) + 1
         }));
       }, 1000);
     }
@@ -448,7 +468,7 @@ export default function ServiceConsole() {
                   <div className="flex-1 min-w-0 space-y-1">
                     <p className="text-sm font-extrabold text-stone-900 truncate leading-none">{c.customer_name}</p>
                     <p className="text-xs text-stone-400 font-bold uppercase tracking-wider truncate leading-none">
-                      {c.services?.[0]?.service || "Grooming"}
+                      {c.services?.[0]?.service_name || c.services?.[0]?.service || "Grooming"}
                     </p>
                     <div className="pt-0.5">
                       <StatusBadge status={c.status} small />

@@ -36,6 +36,7 @@ export default function BookingManagement() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
   const [time, setTime] = useState(new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }));
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Form State for Add/Edit
   const [formData, setFormData] = useState({
@@ -139,6 +140,10 @@ export default function BookingManagement() {
     fetchBookings();
     fetchBarbersAndServices();
   }, [salonId, token]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedTypeFilter]);
 
   const [activities] = useState([
     { id: 1, text: "Rahul booked haircut", time: "2 sec ago" },
@@ -357,6 +362,14 @@ export default function BookingManagement() {
       return matchesSearch && matchesType;
     });
   }, [bookings, search, selectedTypeFilter]);
+
+  const itemsPerPage = 10;
+  const paginatedBookings = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredBookings.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredBookings, currentPage]);
+
+  const totalPages = Math.ceil(filteredBookings.length / itemsPerPage) || 1;
 
   const stats = useMemo(() => {
     const todayStr = new Date().toISOString().split("T")[0];
@@ -902,7 +915,7 @@ export default function BookingManagement() {
                       </td>
                     </tr>
                   ) : (
-                    filteredBookings.map((booking) => (
+                    paginatedBookings.map((booking) => (
                       <tr key={booking.id} className="hover:bg-stone-50/60 transition-colors group">
                         <td className="py-4.5 pr-4 whitespace-nowrap font-bold text-stone-900 text-sm">{booking.name}</td>
                         <td className="pr-4 whitespace-nowrap">
@@ -949,6 +962,31 @@ export default function BookingManagement() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {filteredBookings.length > 0 && (
+              <div className="flex justify-between items-center mt-6 pt-4 border-t border-stone-100 font-sans text-xs">
+                <span className="text-stone-500 font-medium">
+                  Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredBookings.length)} of {filteredBookings.length} bookings
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-40 disabled:hover:bg-stone-100 rounded-xl font-extrabold uppercase tracking-wider transition cursor-pointer disabled:cursor-not-allowed border-none outline-none"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-40 disabled:hover:bg-stone-100 rounded-xl font-extrabold uppercase tracking-wider transition cursor-pointer disabled:cursor-not-allowed border-none outline-none"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

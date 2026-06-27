@@ -15,7 +15,30 @@ exports.getOwnerDashboardStats = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const barbers = await Barber.find({ salon_id: req.params.salon_id, is_active: true });
+    const barbersList = await Barber.find({ salon_id: req.params.salon_id, is_active: true });
+
+    // Sync barber status based on active in-progress queue entries today
+    const barbers = await Promise.all(
+      barbersList.map(async (barber) => {
+        const hasInProgress = await Queue.findOne({
+          barber_id: barber._id,
+          status: "in-progress",
+          joined_at: { $gte: today }
+        });
+        if (hasInProgress) {
+          if (barber.status !== "busy") {
+            barber.status = "busy";
+            await Barber.findByIdAndUpdate(barber._id, { status: "busy" });
+          }
+        } else {
+          if (barber.status === "busy") {
+            barber.status = "available";
+            await Barber.findByIdAndUpdate(barber._id, { status: "available" });
+          }
+        }
+        return barber;
+      })
+    );
 
     const [pending, completed, liveQ, pendingBreaks] = await Promise.all([
       Booking.countDocuments({ salon_id: req.params.salon_id, status: "pending", created_at: { $gte: today } }),
@@ -189,6 +212,16 @@ exports.startService = async (req, res) => {
     const q = await Queue.findById(req.params.queue_id);
     if (!q) return res.status(404).json({ success: false, message: "Queue entry not found" });
     if (!q.barber_id) return res.status(400).json({ success: false, message: "Assign a barber first" });
+
+    // Validate that the barber is not already attending another customer
+    const activeService = await Queue.findOne({
+      barber_id: q.barber_id,
+      status: "in-progress",
+      _id: { $ne: q._id }
+    });
+    if (activeService) {
+      return res.status(400).json({ success: false, message: "Barber is already attending another customer" });
+    }
 
     await Queue.findByIdAndUpdate(req.params.queue_id, { status: "in-progress" });
     if (q.booking_id) {

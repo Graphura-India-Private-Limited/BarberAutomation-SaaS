@@ -10,7 +10,34 @@ const Payment = require("../models/Payment");
 // @access  Public
 exports.getBarbersBySalon = async (req, res) => {
   try {
-    const barbers = await Barber.find({ salon_id: req.params.salon_id, is_active: true });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const barbersList = await Barber.find({ salon_id: req.params.salon_id, is_active: true });
+
+    // Sync barber status based on active in-progress queue entries today
+    const barbers = await Promise.all(
+      barbersList.map(async (barber) => {
+        const hasInProgress = await Queue.findOne({
+          barber_id: barber._id,
+          status: "in-progress",
+          joined_at: { $gte: today }
+        });
+        if (hasInProgress) {
+          if (barber.status !== "busy") {
+            barber.status = "busy";
+            await Barber.findByIdAndUpdate(barber._id, { status: "busy" });
+          }
+        } else {
+          if (barber.status === "busy") {
+            barber.status = "available";
+            await Barber.findByIdAndUpdate(barber._id, { status: "available" });
+          }
+        }
+        return barber;
+      })
+    );
+
     res.json({ success: true, barbers });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -190,10 +217,22 @@ exports.getBarberDashboard = async (req, res) => {
 // @access  Private (Barber)
 exports.startService = async (req, res) => {
   try {
+    const q = await Queue.findById(req.params.queue_id);
+    if (!q) return res.status(404).json({ success: false, message: "Queue entry not found" });
+
+    // Validate that the barber is not already attending another customer
+    const activeService = await Queue.findOne({
+      barber_id: req.params.barber_id,
+      status: "in-progress",
+      _id: { $ne: q._id }
+    });
+    if (activeService) {
+      return res.status(400).json({ success: false, message: "Barber is already attending another customer" });
+    }
+
     await Queue.findByIdAndUpdate(req.params.queue_id, { status: "in-progress" });
     await Barber.findByIdAndUpdate(req.params.barber_id, { status: "busy" });
-    const q = await Queue.findById(req.params.queue_id);
-    if (q && q.booking_id) {
+    if (q.booking_id) {
       await Booking.findByIdAndUpdate(q.booking_id, { status: "in-progress" });
     }
 

@@ -16,5 +16,35 @@ const barberSchema = new mongoose.Schema({
   created_at:{type:Date,default:Date.now}
 });
 barberSchema.methods.matchPassword = async function(p){ return bcrypt.compare(p,this.password_hash); };
+
+const updateSalonBarberCount = async (salonId) => {
+  if (!salonId) return;
+  try {
+    const Barber = mongoose.model("Barber");
+    let Salon;
+    try {
+      Salon = mongoose.model("Salon");
+    } catch (e) {
+      Salon = require("./Salon");
+    }
+    const count = await Barber.countDocuments({ salon_id: salonId, is_active: true });
+    await Salon.findByIdAndUpdate(salonId, { number_of_barbers: count });
+  } catch (err) {
+    console.error("Failed to update salon barber count in Barber middleware:", err);
+  }
+};
+
+barberSchema.post("save", async function(doc) {
+  if (doc && doc.salon_id) {
+    await updateSalonBarberCount(doc.salon_id);
+  }
+});
+
+barberSchema.post("findOneAndUpdate", async function(doc) {
+  if (doc && doc.salon_id) {
+    await updateSalonBarberCount(doc.salon_id);
+  }
+});
+
 module.exports = mongoose.model("Barber", barberSchema);
 

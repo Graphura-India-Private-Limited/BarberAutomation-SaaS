@@ -56,6 +56,16 @@ exports.updateQueueStatus = async (req, res) => {
 
     entry.status = status;
     if (status === "in-progress") {
+      if (entry.barber_id) {
+        const activeService = await Queue.findOne({
+          barber_id: entry.barber_id,
+          status: "in-progress",
+          _id: { $ne: entry._id }
+        });
+        if (activeService) {
+          return res.status(400).json({ success: false, message: "Barber is already attending another customer" });
+        }
+      }
       entry.served_at = new Date();
     }
     await entry.save();

@@ -188,7 +188,7 @@ export default function OwnerLiveMonitoring() {
 
                   <div className="p-5 text-left space-y-4">
                     <div className="flex gap-2">
-                      {["available", "break"].map(s => (
+                      {["available", "busy", "break"].map(s => (
                         <button
                           key={s}
                           disabled={b.status === s || busyId === b._id}

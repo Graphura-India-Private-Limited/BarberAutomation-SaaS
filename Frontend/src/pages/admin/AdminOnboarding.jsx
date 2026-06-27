@@ -621,6 +621,8 @@ export default function AdminOnboarding() {
       if (d.success) {
         setBarbers(p => p.map(b => b._id===id ? {...b, status} : b));
         pop(`Barber set to ${status}!`);
+        const salonsRes = await fetch(`${API}/admin/salons${selectedState && selectedState !== "All India" ? `?state=${encodeURIComponent(selectedState)}` : ""}`, { headers:h() }).then(r=>r.json());
+        if (salonsRes.success) setSalons(salonsRes.salons||[]);
       } else pop(d.message||"Failed","error");
     } catch { pop("Server error","error"); }
   };
@@ -629,7 +631,12 @@ export default function AdminOnboarding() {
     try {
       const r = await fetch(`${API}/admin/barber/${id}`, { method:"DELETE", headers:h() });
       const d = await r.json();
-      if (d.success) { setBarbers(p => p.filter(b => b._id!==id)); pop("Barber removed!"); }
+      if (d.success) { 
+        setBarbers(p => p.filter(b => b._id!==id)); 
+        pop("Barber removed!"); 
+        const salonsRes = await fetch(`${API}/admin/salons${selectedState && selectedState !== "All India" ? `?state=${encodeURIComponent(selectedState)}` : ""}`, { headers:h() }).then(r=>r.json());
+        if (salonsRes.success) setSalons(salonsRes.salons||[]);
+      }
       else pop(d.message||"Failed","error");
     } catch { pop("Server error","error"); }
   };
@@ -660,6 +667,8 @@ export default function AdminOnboarding() {
         setNewBarber({ name:"", mobile:"", password:"", specialization:"", experience:"", salon_id:"", email:"", photo:null, photoPreview:null, document:null, documentName:"" });
         const br = await fetch(`${API}/admin/barbers`, { headers:h() }).then(r=>r.json());
         if (br.success) setBarbers(br.barbers||[]);
+        const salonsRes = await fetch(`${API}/admin/salons${selectedState && selectedState !== "All India" ? `?state=${encodeURIComponent(selectedState)}` : ""}`, { headers:h() }).then(r=>r.json());
+        if (salonsRes.success) setSalons(salonsRes.salons||[]);
       } else pop(d.message||"Failed","error");
     } catch { pop("Server error","error"); }
     finally { setBusy(false); }
@@ -782,15 +791,15 @@ export default function AdminOnboarding() {
     // Payments for this salon
     const salonPayments = payments.filter(p => (p.salon_id?._id || p.salon_id) === salonId);
     
-    // Income: captured payments for bookings that are NOT cancelled
+    // Income: captured or success payments for bookings that are NOT cancelled
     const income = salonPayments
-      .filter(p => p.status === "captured")
-      .reduce((a, b) => a + (b.amount || 0), 0) / 100;
+      .filter(p => p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success")
+      .reduce((a, b) => a + (b.amount || 0), 0);
 
-    // Loss: failed/refunded payments + captured payments for CANCELLED bookings
+    // Loss: failed/refunded payments + captured/success payments for CANCELLED bookings
     const loss = salonPayments
-      .filter(p => p.status === "refunded" || p.status === "failed" || (p.status === "captured" && salonBookings.find(b => b._id === p.booking_id && b.status === "cancelled")))
-      .reduce((a, b) => a + (b.amount || 0), 0) / 100;
+      .filter(p => p.status?.toLowerCase() === "refunded" || p.status?.toLowerCase() === "failed" || ((p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success") && salonBookings.find(b => b._id === p.booking_id && b.status === "cancelled")))
+      .reduce((a, b) => a + (b.amount || 0), 0);
 
     const netProfit = income - loss;
 
@@ -829,7 +838,7 @@ export default function AdminOnboarding() {
     ? (() => {
         const salonCustomerIds = new Set(
           bookings
-            .filter(b => (b.salon_id?._id || b.salon_id) === selectedSalonId)
+             .filter(b => (b.salon_id?._id || b.salon_id) === selectedSalonId)
             .map(b => b.customer_id?._id || b.customer_id)
             .filter(Boolean)
         );
@@ -841,7 +850,7 @@ export default function AdminOnboarding() {
   const getSalonCustomers = (salonId) => {
     const customerIds = new Set(
       bookings
-        .filter(b => (b.salon_id?._id || b.salon_id) === salonId)
+         .filter(b => (b.salon_id?._id || b.salon_id) === salonId)
         .map(b => b.customer_id?._id || b.customer_id)
         .filter(Boolean)
     );
@@ -866,7 +875,7 @@ export default function AdminOnboarding() {
   const displayPendingBookingsCount = filteredBookings.filter(b => b.status === "pending").length;
   const displayRevenue = loading
     ? "—"
-    : `₹${(filteredPayments.filter(p => p.status === "captured").reduce((a, b) => a + (b.amount || 0), 0) / 100).toLocaleString("en-IN")}`;
+    : `₹${(filteredPayments.filter(p => p.status?.toLowerCase() === "captured" || p.status?.toLowerCase() === "success").reduce((a, b) => a + (b.amount || 0), 0)).toLocaleString("en-IN")}`;
 
   const globalPendingBookings = bookings.filter(b => b.status === "pending").length;
 
@@ -2293,7 +2302,7 @@ export default function AdminOnboarding() {
                           const booking = bookings.find(b => b._id === bId);
                           return booking?.status?.toLowerCase() !== "cancelled";
                         });
-                        const totalIncome = capturedPayments.reduce((sum, p) => sum + (p.amount || 0), 0) / 100;
+                        const totalIncome = capturedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
                         return (
                           <div 
                             key={salon._id}
@@ -2396,7 +2405,7 @@ export default function AdminOnboarding() {
                 const booking = bookings.find(b => b._id === bId);
                 return booking?.status?.toLowerCase() !== "cancelled";
               });
-              const totalIncome = capturedList.reduce((sum, p) => sum + (p.amount || 0), 0) / 100;
+              const totalIncome = capturedList.reduce((sum, p) => sum + (p.amount || 0), 0);
 
               const lossList = periodPayments.filter(p => {
                 const isFailed = p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded";
@@ -2405,7 +2414,7 @@ export default function AdminOnboarding() {
                 const isCancelled = booking?.status?.toLowerCase() === "cancelled";
                 return isFailed || isCancelled;
               });
-              const totalLoss = lossList.reduce((sum, p) => sum + (p.amount || 0), 0) / 100;
+              const totalLoss = lossList.reduce((sum, p) => sum + (p.amount || 0), 0);
 
               const netProfit = totalIncome - totalLoss;
 
@@ -2444,7 +2453,7 @@ export default function AdminOnboarding() {
                     const booking = bookings.find(b => b._id === bId);
                     const isCancelled = booking?.status?.toLowerCase() === "cancelled";
                     
-                    const amt = (p.amount || 0) / 100;
+                    const amt = (p.amount || 0);
                     if (isSuccess && !isCancelled) {
                       hours[hour].Income += amt;
                     } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
@@ -2466,7 +2475,7 @@ export default function AdminOnboarding() {
                     const booking = bookings.find(b => b._id === bId);
                     const isCancelled = booking?.status?.toLowerCase() === "cancelled";
                     
-                    const amt = (p.amount || 0) / 100;
+                    const amt = (p.amount || 0);
                     if (isSuccess && !isCancelled) {
                       weekData[dayIdx].Income += amt;
                     } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
@@ -2501,7 +2510,7 @@ export default function AdminOnboarding() {
                       const booking = bookings.find(b => b._id === bId);
                       const isCancelled = booking?.status?.toLowerCase() === "cancelled";
                       
-                      const amt = (p.amount || 0) / 100;
+                      const amt = (p.amount || 0);
                       if (isSuccess && !isCancelled) {
                         monthData[dateNum - 1].Income += amt;
                       } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
@@ -2525,7 +2534,7 @@ export default function AdminOnboarding() {
                     const booking = bookings.find(b => b._id === bId);
                     const isCancelled = booking?.status?.toLowerCase() === "cancelled";
                     
-                    const amt = (p.amount || 0) / 100;
+                    const amt = (p.amount || 0);
                     if (isSuccess && !isCancelled) {
                       yearData[monthIdx].Income += amt;
                     } else if (p.status?.toLowerCase() === "failed" || p.status?.toLowerCase() === "refunded" || isCancelled) {
@@ -2552,7 +2561,7 @@ export default function AdminOnboarding() {
                   const booking = bookings.find(b => b._id === bId);
                   if (booking?.status?.toLowerCase() === "cancelled") return;
 
-                  const amt = (p.amount || 0) / 100;
+                  const amt = (p.amount || 0);
                   if (p.payment_type?.toUpperCase() === "FULL") {
                     fullCount++;
                     fullAmount += amt;
@@ -2757,7 +2766,7 @@ export default function AdminOnboarding() {
                                   {p.razorpay_payment_id || p.razorpay_order_id || "Manual/Offline"}
                                 </TD>
                                 <TD style={{ fontSize:13, fontWeight:700, color:C.ink }}>
-                                  ₹{(p.amount||0)/100}
+                                  ₹{(p.amount||0).toLocaleString("en-IN")}
                                 </TD>
                                 <TD>
                                   <Badge label={p.payment_type||"TOKEN"} color={p.payment_type?.toUpperCase()==="FULL"?C.green:C.blue}/>

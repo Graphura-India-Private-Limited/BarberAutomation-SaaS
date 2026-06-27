@@ -146,27 +146,113 @@ export default function BarberServices() {
     category: ""
   });
 
-  // Header States
-  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
+  const barberId = localStorage.getItem("barberId");
+  const salonId = localStorage.getItem("salonId");
+  const token = localStorage.getItem("token");
+  const useDbData = !!barberId && !!salonId;
 
-  const toggleServiceStatus = (id) => {
-    setServices(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+  const fetchServices = async () => {
+    if (!useDbData) return;
+    try {
+      const res = await fetch(`${API}/services/${salonId}`);
+      const data = await res.json();
+      if (data.success && data.services) {
+        setServices(data.services.map(s => ({
+          id: s._id,
+          name: s.name,
+          category: s.category === "men" ? "Men" : s.category === "women" ? "Women" : "Addon",
+          price: s.price,
+          duration: `${s.duration} min`,
+          active: s.is_active,
+          popular: true
+        })));
+      }
+    } catch (err) {
+      console.error("Error fetching services:", err);
+    }
   };
 
-  const saveServiceChanges = () => {
-    setServices(prev =>
-      prev.map(service =>
-        service.id === selectedService.id
-          ? {
-            ...service,
-            name: editForm.name,
-            price: Number(editForm.price),
-            duration: editForm.duration,
-            category: editForm.category
-          }
-          : service
-      )
-    );
+  React.useEffect(() => {
+    fetchServices();
+  }, [useDbData]);
+
+  // Header States
+  const profile = { 
+    salonName: useDbData ? (localStorage.getItem("salonName") || "Our Salon") : "Master Barber Lounge", 
+    initials: "MB" 
+  };
+
+  const toggleServiceStatus = async (id) => {
+    const targetService = services.find(s => s.id === id);
+    if (!targetService) return;
+
+    // Toggle in state first for smooth UX
+    setServices(prev => prev.map(s => s.id === id ? { ...s, active: !s.active } : s));
+
+    if (!useDbData) return;
+    try {
+      await fetch(`${API}/services/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ is_active: !targetService.active })
+      });
+    } catch (err) {
+      console.error("Failed to toggle service status:", err);
+    }
+  };
+
+  const saveServiceChanges = async () => {
+    if (!selectedService) return;
+
+    if (!useDbData) {
+      setServices(prev =>
+        prev.map(service =>
+          service.id === selectedService.id
+            ? {
+              ...service,
+              name: editForm.name,
+              price: Number(editForm.price),
+              duration: editForm.duration,
+              category: editForm.category
+            }
+            : service
+        )
+      );
+      setSelectedService(null);
+      return;
+    }
+
+    try {
+      const updatedData = {
+        name: editForm.name,
+        price: Number(editForm.price),
+        duration: parseInt(editForm.duration) || 30,
+        category: editForm.category.toLowerCase()
+      };
+
+      const res = await fetch(`${API}/services/${selectedService.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchServices();
+      } else {
+        alert(data.message || "Failed to update service changes");
+      }
+    } catch (err) {
+      console.error("Failed to save service changes:", err);
+      alert("Error updating service");
+    }
 
     setSelectedService(null);
   };

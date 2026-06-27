@@ -48,3 +48,18 @@ exports.deleteService = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Update a service (including toggle is_active)
+// @route   PUT /api/services/:id
+// @access  Private (Owner/Admin/Barber)
+exports.updateService = async (req, res) => {
+  try {
+    const service = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+    res.json({ success: true, service });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
