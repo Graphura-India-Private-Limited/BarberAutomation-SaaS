@@ -41,3 +41,19 @@ exports.getAllFeedback = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// @desc    Get all booking feedback for public display
+// @route   GET /api/booking-feedback/public
+// @access  Public
+exports.getPublicFeedback = async (req, res) => {
+  try {
+    const feedbackList = await BookingFeedback.find()
+      .populate("customer_id", "name")
+      .sort({ created_at: -1 })
+      .limit(30);
+
+    res.json({ success: true, feedback: feedbackList });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

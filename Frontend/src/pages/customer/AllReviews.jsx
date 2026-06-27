@@ -8,41 +8,65 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function AllReviews() {
   const navigate = useNavigate();
-  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [ratingFilter, setRatingFilter] = useState(0);
   const [selectedReview, setSelectedReview] = useState(null);
   const [stats, setStats] = useState({ total: 0, avgSalon: 0, avgBarber: 0 });
 
+  const [activeTab, setActiveTab] = useState("service"); // "service" or "booking"
+  const [serviceReviews, setServiceReviews] = useState([]);
+  const [bookingReviews, setBookingReviews] = useState([]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetch(`${API}/review`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) {
-          const all = d.reviews || [];
-          setReviews(all);
-          if (all.length) {
-            const salonAvg  = all.reduce((s, r) => s + (r.salon_rating || 0), 0) / all.length;
-            const barberAvg = all.reduce((s, r) => s + (r.barber_rating || 0), 0) / all.length;
-            setStats({ total: all.length, avgSalon: salonAvg.toFixed(1), avgBarber: barberAvg.toFixed(1) });
-          }
-        }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    setLoading(true);
+    Promise.all([
+      fetch(`${API}/review`).then(r => r.json()).catch(() => ({ success: false, reviews: [] })),
+      fetch(`${API}/booking-feedback/public`).then(r => r.json()).catch(() => ({ success: false, feedback: [] }))
+    ]).then(([reviewsData, bookingData]) => {
+      let svc = [];
+      let bk = [];
+      if (reviewsData.success) {
+        svc = reviewsData.reviews || [];
+        setServiceReviews(svc);
+      }
+      if (bookingData.success) {
+        bk = bookingData.feedback || [];
+        setBookingReviews(bk);
+      }
+
+      if (svc.length) {
+        const salonAvg  = svc.reduce((s, r) => s + (r.salon_rating || 0), 0) / svc.length;
+        const barberAvg = svc.reduce((s, r) => s + (r.barber_rating || 0), 0) / svc.length;
+        setStats({ total: svc.length + bk.length, avgSalon: salonAvg.toFixed(1), avgBarber: barberAvg.toFixed(1) });
+      } else {
+        setStats({ total: bk.length, avgSalon: "0.0", avgBarber: "0.0" });
+      }
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
   /* ── Filter Logic ── */
-  const filtered = reviews.filter(r => {
-    const matchSearch = !search ||
-      r.customer_id?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      r.review_text?.toLowerCase().includes(search.toLowerCase());
-    const maxRating = Math.max(r.salon_rating || 0, r.barber_rating || 0);
-    const matchRating = !ratingFilter || maxRating === ratingFilter;
-    return matchSearch && matchRating;
-  });
+  const filtered = activeTab === "service"
+    ? serviceReviews.filter(r => {
+        const matchSearch = !search ||
+          r.customer_id?.name?.toLowerCase().includes(search.toLowerCase()) ||
+          r.review_text?.toLowerCase().includes(search.toLowerCase());
+        const maxRating = Math.max(r.salon_rating || 0, r.barber_rating || 0);
+        const matchRating = !ratingFilter || Math.round(maxRating) === ratingFilter;
+        return matchSearch && matchRating;
+      })
+    : bookingReviews.filter(r => {
+        const matchSearch = !search ||
+          r.customer_id?.name?.toLowerCase().includes(search.toLowerCase()) ||
+          r.feedback_text?.toLowerCase().includes(search.toLowerCase());
+        const avgRating = ((r.booking_process_rating || 0) + (r.payment_process_rating || 0) + (r.website_usability_rating || 0)) / 3;
+        const matchRating = !ratingFilter || Math.round(avgRating) === ratingFilter;
+        return matchSearch && matchRating;
+      });
+
+  const currentReviewsList = activeTab === "service" ? serviceReviews : bookingReviews;
 
   return (
     <>
@@ -72,7 +96,7 @@ export default function AllReviews() {
           {/* WRITE REVIEW BUTTON (Top Right) */}
           <div className="absolute top-6 right-4 sm:right-6 md:left-auto z-20">
             <button
-              onClick={() => navigate("/write-review")}
+              onClick={() => navigate(activeTab === "service" ? "/write-review" : "/write-booking-review")}
               className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
             >
               <Heart className="w-3.5 h-3.5 fill-current text-[#C5A059] group-hover:text-[#2A241F]" />
@@ -132,6 +156,34 @@ export default function AllReviews() {
             </div>
           </div>
 
+          {/* ═══ TAB OPTIONS: SERVICE REVIEW & BOOKING EXPERIENCE ═══ */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-white/80 backdrop-blur-md p-1.5 rounded-2xl border border-[#EADDCA] shadow-sm flex gap-2">
+              <button
+                type="button"
+                onClick={() => { setActiveTab("service"); setRatingFilter(0); }}
+                className={`px-6 py-3 rounded-xl font-sans text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer ${
+                  activeTab === "service"
+                    ? "bg-[#3E362E] text-white shadow-md"
+                    : "text-[#3E362E] hover:bg-[#FAF6F0]"
+                }`}
+              >
+                Service Reviews
+              </button>
+              <button
+                type="button"
+                onClick={() => { setActiveTab("booking"); setRatingFilter(0); }}
+                className={`px-6 py-3 rounded-xl font-sans text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer ${
+                  activeTab === "booking"
+                    ? "bg-[#3E362E] text-white shadow-md"
+                    : "text-[#3E362E] hover:bg-[#FAF6F0]"
+                }`}
+              >
+                Booking Experience
+              </button>
+            </div>
+          </div>
+
           {/* ═══ FILTERS ═══ */}
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-4 sm:p-5 mb-8 border border-white/60 shadow-sm flex flex-col lg:flex-row gap-4 lg:items-center">
             {/* Search */}
@@ -181,18 +233,58 @@ export default function AllReviews() {
               <p className="font-serif italic text-base text-[#C5A059] normal-case mb-4">your current criteria</p>
               {/* Body — Rule 3 */}
               <p className="font-sans text-sm font-normal leading-relaxed text-stone-600 max-w-sm mx-auto mb-6">
-                {reviews.length === 0 ? "Be the first to share your ultimate experience with us!" : "Try modifying your search tags or rating options."}
+                {currentReviewsList.length === 0 
+                  ? "Be the first to share your ultimate experience with us!" 
+                  : "Try modifying your search tags or rating options."}
               </p>
               {/* Button — Rule 4 */}
-              <button onClick={() => navigate("/write-review")}
+              <button onClick={() => navigate(activeTab === "service" ? "/write-review" : "/write-booking-review")}
                 className="bg-[#3E362E] text-white py-3.5 px-8 rounded-xl font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 hover:bg-[#C5A059] hover:text-[#2A241F] shadow-sm cursor-pointer">
-                Write the First Review
+                {currentReviewsList.length === 0 ? "Write the First Review" : "Write a Review"}
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map(r => {
-                const rating = Math.max(r.salon_rating || 0, r.barber_rating || 0);
+                const isService = activeTab === "service";
+                const rating = isService
+                  ? Math.max(r.salon_rating || 0, r.barber_rating || 0)
+                  : Math.round(((r.booking_process_rating || 0) + (r.payment_process_rating || 0) + (r.website_usability_rating || 0)) / 3);
+                
+                const rawText = isService ? r.review_text || "" : r.feedback_text || "";
+                let cleanText = rawText;
+                let mcqDetails = null;
+
+                if (isService) {
+                  if (rawText.startsWith("[")) {
+                    const closeIndex = rawText.indexOf("]");
+                    if (closeIndex !== -1) {
+                      const bracketed = rawText.substring(1, closeIndex);
+                      cleanText = rawText.substring(closeIndex + 1).trim();
+                      if (!cleanText) {
+                        cleanText = "Bespoke styling and premium grooming experience.";
+                      }
+                      
+                      mcqDetails = {};
+                      const parts = bracketed.split("|");
+                      parts.forEach(p => {
+                        const colonIndex = p.indexOf(":");
+                        if (colonIndex !== -1) {
+                          const key = p.substring(0, colonIndex).trim();
+                          const val = p.substring(colonIndex + 1).trim();
+                          mcqDetails[key] = val;
+                        }
+                      });
+                    }
+                  }
+                } else {
+                  mcqDetails = {
+                    "Booking Process": `${r.booking_process_rating || 5} ★`,
+                    "Payment Flow": `${r.payment_process_rating || 5} ★`,
+                    "Website Usability": `${r.website_usability_rating || 5} ★`
+                  };
+                }
+
                 return (
                   <div key={r._id}
                     onClick={() => setSelectedReview(r)}
@@ -203,7 +295,7 @@ export default function AllReviews() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex gap-0.5">
                           {[...Array(5)].map((_, k) => (
-                            <Star key={k} className={`w-3.5 h-3.5 ${k < rating ? "fill-[#C5A059] text-[#C5A059]" : "text-stone-200"}`}/>
+                            <Star key={k} className={`w-3.5 h-3.5 ${k < Math.round(rating) ? "fill-[#C5A059] text-[#C5A059]" : "text-stone-200"}`}/>
                           ))}
                         </div>
                         {/* Date — Rule 2 kicker style */}
@@ -216,50 +308,19 @@ export default function AllReviews() {
                       <div className="text-[#C5A059] font-serif text-4xl leading-none -mb-1 opacity-60">"</div>
 
                       {/* Review text — serif italic luxury accent (Rule 1 Line 2 style) */}
-                      {(() => {
-                        const rawText = r.review_text || "";
-                        let cleanText = rawText;
-                        let mcqDetails = null;
-                        if (rawText.startsWith("[")) {
-                          const closeIndex = rawText.indexOf("]");
-                          if (closeIndex !== -1) {
-                            const bracketed = rawText.substring(1, closeIndex);
-                            cleanText = rawText.substring(closeIndex + 1).trim();
-                            if (!cleanText) {
-                              cleanText = "Bespoke styling and premium grooming experience.";
-                            }
-                            
-                            mcqDetails = {};
-                            const parts = bracketed.split("|");
-                            parts.forEach(p => {
-                              const colonIndex = p.indexOf(":");
-                              if (colonIndex !== -1) {
-                                const key = p.substring(0, colonIndex).trim();
-                                const val = p.substring(colonIndex + 1).trim();
-                                mcqDetails[key] = val;
-                              }
-                            });
-                          }
-                        }
-                        
-                        return (
-                          <>
-                            <p className="font-serif italic text-[#3E362E] text-base leading-relaxed line-clamp-4 mb-4">
-                              {cleanText || "(No written feedback provided by customer)"}
-                            </p>
-                            
-                            {mcqDetails && (
-                              <div className="flex flex-wrap gap-1 mb-5">
-                                {Object.entries(mcqDetails).map(([key, val]) => (
-                                  <span key={key} className="text-[7.5px] font-sans font-black uppercase tracking-widest bg-[#C5A059]/10 text-[#C5A059] px-2 py-0.5 rounded-full border border-[#C5A059]/20 whitespace-nowrap">
-                                    {key}: {val}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      <p className="font-serif italic text-[#3E362E] text-base leading-relaxed line-clamp-4 mb-4">
+                        {cleanText || "(No written feedback provided by customer)"}
+                      </p>
+                      
+                      {mcqDetails && (
+                        <div className="flex flex-wrap gap-1 mb-5">
+                          {Object.entries(mcqDetails).map(([key, val]) => (
+                            <span key={key} className="text-[7.5px] font-sans font-black uppercase tracking-widest bg-[#C5A059]/10 text-[#C5A059] px-2 py-0.5 rounded-full border border-[#C5A059]/20 whitespace-nowrap">
+                              {key}: {val}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Profile Wrapper */}
@@ -270,10 +331,15 @@ export default function AllReviews() {
                       <div className="flex-1 min-w-0">
                         {/* Customer name — serif bold */}
                         <p className="font-serif font-bold text-sm text-[#3E362E] truncate">{r.customer_id?.name || "Anonymous"}</p>
-                        {r.barber_id?.name && (
+                        {isService && r.barber_id?.name && (
                           /* Stylist tag — Rule 2 kicker */
                           <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-stone-400 truncate mt-0.5">
                             Stylist: <span className="text-[#C5A059]">{r.barber_id.name}</span>
+                          </p>
+                        )}
+                        {!isService && (
+                          <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-stone-400 truncate mt-0.5">
+                            Booking Rating
                           </p>
                         )}
                       </div>
@@ -313,53 +379,80 @@ export default function AllReviews() {
             </div>
 
             {/* Dual-Rating Scorecard */}
-            {(selectedReview.salon_rating > 0 || selectedReview.barber_rating > 0) && (
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {selectedReview.salon_rating > 0 && (
-                  <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
-                    {/* Label — Rule 2 */}
-                    <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Salon Experience</p>
-                    {/* Stars — body weight */}
-                    <p className="font-sans text-sm font-normal text-[#3E362E]">
-                      {"★".repeat(selectedReview.salon_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.salon_rating)}</span>
-                    </p>
-                  </div>
-                )}
-                {selectedReview.barber_rating > 0 && (
-                  <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
-                    <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Stylist Service</p>
-                    <p className="font-sans text-sm font-normal text-[#3E362E]">
-                      {"★".repeat(selectedReview.barber_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.barber_rating)}</span>
-                    </p>
-                  </div>
-                )}
+            {activeTab === "service" ? (
+              (selectedReview.salon_rating > 0 || selectedReview.barber_rating > 0) && (
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  {selectedReview.salon_rating > 0 && (
+                    <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
+                      {/* Label — Rule 2 */}
+                      <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Salon Experience</p>
+                      {/* Stars — body weight */}
+                      <p className="font-sans text-sm font-normal text-[#3E362E]">
+                        {"★".repeat(selectedReview.salon_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.salon_rating)}</span>
+                      </p>
+                    </div>
+                  )}
+                  {selectedReview.barber_rating > 0 && (
+                    <div className="bg-[#FAF6F0] rounded-xl p-3 text-center border border-[#EADDCA]/60">
+                      <p className="font-sans text-[11px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Stylist Service</p>
+                      <p className="font-sans text-sm font-normal text-[#3E362E]">
+                        {"★".repeat(selectedReview.barber_rating)}<span className="text-stone-200">{"★".repeat(5-selectedReview.barber_rating)}</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )
+            ) : (
+              <div className="grid grid-cols-3 gap-2 mb-6">
+                <div className="bg-[#FAF6F0] rounded-xl p-2.5 text-center border border-[#EADDCA]/60">
+                  <p className="font-sans text-[9px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Booking</p>
+                  <p className="font-sans text-xs font-bold text-[#3E362E]">{selectedReview.booking_process_rating || 5} ★</p>
+                </div>
+                <div className="bg-[#FAF6F0] rounded-xl p-2.5 text-center border border-[#EADDCA]/60">
+                  <p className="font-sans text-[9px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Payment</p>
+                  <p className="font-sans text-xs font-bold text-[#3E362E]">{selectedReview.payment_process_rating || 5} ★</p>
+                </div>
+                <div className="bg-[#FAF6F0] rounded-xl p-2.5 text-center border border-[#EADDCA]/60">
+                  <p className="font-sans text-[9px] font-extrabold tracking-widest uppercase text-[#C5A059] mb-1">Usability</p>
+                  <p className="font-sans text-xs font-bold text-[#3E362E]">{selectedReview.website_usability_rating || 5} ★</p>
+                </div>
               </div>
             )}
 
             {(() => {
-              const rawText = selectedReview.review_text || "";
+              const isService = activeTab === "service";
+              const rawText = isService ? selectedReview.review_text || "" : selectedReview.feedback_text || "";
               let cleanText = rawText;
               let mcqDetails = null;
-              if (rawText.startsWith("[")) {
-                const closeIndex = rawText.indexOf("]");
-                if (closeIndex !== -1) {
-                  const bracketed = rawText.substring(1, closeIndex);
-                  cleanText = rawText.substring(closeIndex + 1).trim();
-                  if (!cleanText) {
-                    cleanText = "Bespoke styling and premium grooming experience.";
-                  }
-                  
-                  mcqDetails = {};
-                  const parts = bracketed.split("|");
-                  parts.forEach(p => {
-                    const colonIndex = p.indexOf(":");
-                    if (colonIndex !== -1) {
-                      const key = p.substring(0, colonIndex).trim();
-                      const val = p.substring(colonIndex + 1).trim();
-                      mcqDetails[key] = val;
+
+              if (isService) {
+                if (rawText.startsWith("[")) {
+                  const closeIndex = rawText.indexOf("]");
+                  if (closeIndex !== -1) {
+                    const bracketed = rawText.substring(1, closeIndex);
+                    cleanText = rawText.substring(closeIndex + 1).trim();
+                    if (!cleanText) {
+                      cleanText = "Bespoke styling and premium grooming experience.";
                     }
-                  });
+                    
+                    mcqDetails = {};
+                    const parts = bracketed.split("|");
+                    parts.forEach(p => {
+                      const colonIndex = p.indexOf(":");
+                      if (colonIndex !== -1) {
+                        const key = p.substring(0, colonIndex).trim();
+                        const val = p.substring(colonIndex + 1).trim();
+                        mcqDetails[key] = val;
+                      }
+                    });
+                  }
                 }
+              } else {
+                mcqDetails = {
+                  "Booking Process": `${selectedReview.booking_process_rating || 5} ★`,
+                  "Payment Flow": `${selectedReview.payment_process_rating || 5} ★`,
+                  "Website Usability": `${selectedReview.website_usability_rating || 5} ★`
+                };
               }
               
               return (
@@ -389,7 +482,7 @@ export default function AllReviews() {
               );
             })()}
 
-            {selectedReview.barber_id?.name && (
+            {activeTab === "service" && selectedReview.barber_id?.name && (
               <div className="bg-[#FAF6F0] border-l-2 border-[#C5A059] px-4 py-2.5 rounded-r-xl mb-6">
                 {/* Body text — Rule 3 */}
                 <span className="font-sans text-sm font-normal leading-relaxed text-stone-600">
