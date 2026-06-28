@@ -100,10 +100,10 @@ export default function SalonSelectorBar({ onChange }) {
 
       {/* Selector Modal Overlay */}
       {showModal && (
-        <div className="fixed inset-0 z-[99999] bg-stone-900/40 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
-          <div className="w-full max-w-2xl bg-[#FAF6F0] rounded-[2rem] border border-[#EADBCE] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[99999] bg-stone-900/40 backdrop-blur-xs overflow-y-auto flex items-start sm:items-center justify-center p-4" onClick={() => setShowModal(false)}>
+          <div className="w-full max-w-2xl bg-[#FAF6F0] rounded-[2rem] border border-[#EADBCE] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] my-auto relative animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b border-[#EADBCE]/50 bg-white">
+            <div className="flex justify-between items-center px-6 py-5 border-b border-[#EADBCE]/50 bg-white shrink-0">
               <div className="text-left">
                 <h3 className="font-serif text-2xl font-black text-stone-900 tracking-tight">Select Salon Location</h3>
                 <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1">Choose a studio near you to start booking services</p>
@@ -114,7 +114,7 @@ export default function SalonSelectorBar({ onChange }) {
             </div>
 
             {/* City Filters */}
-            <div className="px-6 py-4 bg-white/50 border-b border-[#EADBCE]/35 flex flex-wrap gap-2">
+            <div className="px-6 py-4 bg-white/50 border-b border-[#EADBCE]/35 flex flex-wrap gap-2 max-h-[120px] overflow-y-auto shrink-0 custom-scrollbar">
               <button
                 onClick={() => setSelectedCity("")}
                 className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider border transition cursor-pointer ${
@@ -141,7 +141,7 @@ export default function SalonSelectorBar({ onChange }) {
             </div>
 
             {/* Salon List Grid */}
-            <div className="p-6 max-h-[50vh] overflow-y-auto space-y-3">
+            <div className="p-6 overflow-y-auto space-y-3 flex-1 custom-scrollbar">
               {loading ? (
                 <p className="text-center text-xs text-stone-500 py-10 font-bold uppercase tracking-widest animate-pulse">Loading salons list...</p>
               ) : filteredSalons.length === 0 ? (

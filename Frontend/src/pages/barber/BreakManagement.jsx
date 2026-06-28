@@ -260,8 +260,8 @@ export default function BreakManagement() {
   ];
 
   return (
-    <div className="w-full text-[#3E362E] font-sans antialiased">
-      <main className="max-w-5xl mx-auto w-full py-10">
+    <div className="w-full text-[#3E362E] font-sans antialiased px-4 sm:px-6 md:px-8">
+      <main className="max-w-5xl mx-auto w-full py-6 md:py-10 pb-24">
 
         {/* HEADER */}
         <div className="mb-10 border-b border-[#EADDCA]/60 pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

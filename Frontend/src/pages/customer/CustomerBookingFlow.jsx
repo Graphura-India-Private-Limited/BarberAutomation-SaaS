@@ -26,6 +26,7 @@ export default function Wrapper() {
     let serviceName = "Classic Haircut & Beard Styling";
     let price = 500;
     let serviceId = null;
+    let duration = 30;
     let barberName = "Barber Ajay";
     let barberId = null;
 
@@ -33,6 +34,13 @@ export default function Wrapper() {
       serviceName = service.name || serviceName;
       price = service.price || price;
       serviceId = service._id || service.id || null;
+      if (service.duration) {
+        if (typeof service.duration === "number") {
+          duration = service.duration;
+        } else if (typeof service.duration === "string") {
+          duration = parseInt(service.duration.replace(/\D/g, ""), 10) || 30;
+        }
+      }
     } else if (querySvcId) {
       serviceId = querySvcId;
       const dummyMap = {
@@ -47,6 +55,18 @@ export default function Wrapper() {
       };
       serviceName = dummyMap[querySvcId] || "Premium Grooming Service";
       price = queryPrice ? parseInt(queryPrice, 10) : price;
+
+      const dummyDurations = {
+        s1: 35,
+        s2: 40,
+        s3: 30,
+        s4: 45,
+        s5: 20,
+        s6: 60,
+        s7: 45,
+        s8: 30
+      };
+      duration = dummyDurations[querySvcId] || 30;
     }
 
     if (barber) {
@@ -58,6 +78,7 @@ export default function Wrapper() {
       service: serviceName,
       price: price,
       service_id: serviceId,
+      duration: duration,
       barber: barberName,
       barber_id: barberId,
       date: null,

@@ -241,7 +241,7 @@ export default function SelectLook() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E", paddingBottom: 120 }}>
 
         {/* ── BACK BUTTON ── */}
-        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
+        <div className="absolute top-[72px] left-5 md:top-[88px] md:left-5 z-[9999]">
           <button
             onClick={() => navigate(-1)}
             style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
@@ -251,7 +251,7 @@ export default function SelectLook() {
         </div>
 
         {/* ── HERO ── */}
-        <div style={{ position: "relative", height: 400, overflow: "hidden", marginTop: 72 }}>
+        <div className="relative h-[400px] overflow-hidden mt-[56px] md:mt-[72px]">
           <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.3)" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.8))" }} />
 
@@ -356,7 +356,7 @@ export default function SelectLook() {
         </div>
 
         {/* ── STICKY BOTTOM BAR ── */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/92 backdrop-blur-md border-t border-[#EAE0D0] shadow-[0_-8px_32px_rgba(44,36,30,0.07)] z-50 p-4 md:px-8">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#EAE0D0] shadow-[0_-8px_32px_rgba(44,36,30,0.07)] z-50 p-4 md:px-8">
           <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
             {/* left: selected look preview */}
             <div className="flex items-center gap-3.5 min-w-0 w-full sm:w-auto justify-start">

@@ -99,9 +99,7 @@ function TermsPage() {
   return (
     <>
       <Navbar />
-      <div className="w-full flex-grow pt-24"></div>
-
-      <div className="min-h-screen bg-[#FAF6F0] overflow-hidden relative selection:bg-[#C5A059] selection:text-white">
+      <div className="min-h-screen bg-[#FAF6F0] overflow-hidden relative selection:bg-[#C5A059] selection:text-white mt-[56px] md:mt-[72px] pt-8 md:pt-12">
         
         {/* Luxury Soft Glow Backgrounds */}
         <div className="absolute top-[-5%] left-[-10%] w-[600px] h-[600px] bg-[#C5A059]/10 blur-[150px] rounded-full pointer-events-none" />

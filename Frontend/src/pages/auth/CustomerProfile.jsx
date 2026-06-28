@@ -261,6 +261,8 @@ export default function CustomerProfile() {
     { id: "s2", name: "Taper Fade & Trim", description: "High-precision bald or shadow taper fade with line-up styling.", price: 500, category: "Men", duration: "40 min" },
     { id: "s3", name: "Beard Sculpting & Oil", description: "Hot towel lineup, custom beard trimming, and premium beard oil massage.", price: 250, category: "Men", duration: "25 min" },
     { id: "s4", name: "Luxury Hot Stone Shave", description: "Infused hot towels, straight-razor close shave, and stone facial calming.", price: 600, category: "Men", duration: "45 min" },
+    { id: "s9", name: "Layer Cut & Styling", description: "Modern layers haircut completed with a premium blow dry and styling session.", price: 700, category: "Women", duration: "45 min" },
+    { id: "s10", name: "Global Hair Coloring", description: "Premium ammonia-free permanent color transformation for rich shine.", price: 1800, category: "Women", duration: "90 min" },
     { id: "s5", name: "Charcoal Face Mask", description: "Deep cleansing mask that removes oil, toxins, and blackheads instantly.", price: 300, category: "Addons", duration: "20 min" },
     { id: "s6", name: "Organic Hair Color", description: "Scalp-friendly, Ammonia-free coloring to refresh or change your style.", price: 1200, category: "Men", duration: "60 min" },
     { id: "s7", name: "Royal Head Massage", description: "Relaxing 20-minute coconut or almond oil head massage to relieve stress.", price: 350, category: "Addons", duration: "20 min" },
@@ -611,8 +613,8 @@ export default function CustomerProfile() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#FAF6F0] flex flex-col font-sans text-[#1C1917] transition-colors duration-300">
-        <div className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row min-h-screen">
+      <div className="h-screen bg-[#FAF6F0] flex flex-col font-sans text-[#1C1917] transition-colors duration-300 overflow-hidden">
+        <div className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row h-full overflow-hidden">
 
           {/* Backdrop Overlay for mobile drawer */}
           {isSidebarOpen && (
@@ -1308,7 +1310,7 @@ export default function CustomerProfile() {
                       <p className="text-xs text-[#8A7A6A]">Browse and search through all of our premium grooming services.</p>
                     </div>
                     <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white select-none shadow-3xs">
-                      {["All", "Men", "Addons"].map(cat => (
+                      {["All", "Men", "Women", "Addons"].map(cat => (
                         <button key={cat} onClick={() => setSelectedServiceCategory(cat)} className={`px-4 py-2.5 text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer ${selectedServiceCategory === cat ? "bg-[#3D3126] text-white" : "text-[#8A7A6A] hover:bg-[#FEF9EE] hover:text-[#3D3126]"}`}>{cat}</button>
                       ))}
                     </div>
@@ -1324,7 +1326,7 @@ export default function CustomerProfile() {
                       filteredServices.map(service => (
                         <div key={service.id} className="bg-white border border-[#EADBCE] rounded-2xl p-5 flex flex-col justify-between shadow-3xs hover:shadow-xs transition-shadow">
                           <div className="space-y-2">
-                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${service.category === "Men" ? "bg-amber-50 text-[#B06000]" : "bg-purple-50 text-purple-600"}`}>{service.category}</span>
+                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${service.category === "Men" ? "bg-amber-50 text-[#B06000]" : service.category === "Women" ? "bg-purple-50 text-purple-600" : "bg-blue-50 text-blue-600"}`}>{service.category}</span>
                             <h4 className="text-sm font-black text-[#3D3126] leading-snug">{service.name}</h4>
                             <p className="text-[10px] text-[#8A7A6A] leading-relaxed line-clamp-3 font-medium">{service.description}</p>
                           </div>
@@ -1608,7 +1610,7 @@ export default function CustomerProfile() {
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={{ opacity: 0, x: 100, y: -20 }}
             transition={{ type: "spring", stiffness: 100, damping: 15 }}
-            className="fixed top-6 right-6 z-[9999] max-w-sm w-full bg-gradient-to-br from-[#FEF9EE] to-white border-2 border-[#B58B67] rounded-2xl shadow-2xl p-5 flex flex-col gap-3 text-left border-solid"
+            className="fixed top-4 right-4 left-4 sm:left-auto sm:right-6 sm:top-6 sm:max-w-sm z-[9999] bg-gradient-to-br from-[#FEF9EE] to-white border-2 border-[#B58B67] rounded-2xl shadow-2xl p-5 flex flex-col gap-3 text-left border-solid"
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">

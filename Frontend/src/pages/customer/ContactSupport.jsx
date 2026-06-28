@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   MessageSquare, HelpCircle, ArrowLeft, Mail, Phone, Clock, 
@@ -31,6 +31,19 @@ export default function ContactSupport({ onCreateTicket }) {
   const [openFaq, setOpenFaq] = useState(null);
   const [salons, setSalons] = useState([]);
   const [selectedSalon, setSelectedSalon] = useState("");
+
+  const [salonDropdownOpen, setSalonDropdownOpen] = useState(false);
+  const salonDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (salonDropdownRef.current && !salonDropdownRef.current.contains(event.target)) {
+        setSalonDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetch(`${API}/salon`)
@@ -88,7 +101,7 @@ export default function ContactSupport({ onCreateTicket }) {
         <Navbar />
 
         {/* ── EXIT BACK NAVIGATION CAPSULE CHIP ── */}
-        <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
+        <div className="w-full max-w-7xl mx-auto px-6 pt-[72px] md:pt-[96px] relative z-50 flex justify-start">
           <button 
             onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")} 
             className="flex items-center gap-2 text-xs font-black tracking-widest uppercase transition-all duration-300 hover:opacity-80 group text-[#3E362E] bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADBCE] shadow-md hover:bg-white cursor-pointer select-none"
@@ -236,18 +249,62 @@ export default function ContactSupport({ onCreateTicket }) {
                   </div>
 
                   {/* Salon Selector Dropdown */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5" ref={salonDropdownRef}>
                     <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 block">Select Salon / Studio (Optional)</label>
-                    <select
-                      value={selectedSalon}
-                      onChange={(e) => setSelectedSalon(e.target.value)}
-                      className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm font-bold text-stone-900 outline-none focus:border-[#C5A059] transition-all cursor-pointer shadow-3xs"
-                    >
-                      <option value="">General Platform Inquiry</option>
-                      {salons.map(s => (
-                        <option key={s._id} value={s._id}>{s.salon_name}</option>
-                      ))}
-                    </select>
+                    <div className="relative font-sans">
+                      <button
+                        type="button"
+                        onClick={() => setSalonDropdownOpen(!salonDropdownOpen)}
+                        className="w-full bg-white border border-stone-200 text-stone-900 px-4 py-3 rounded-xl text-sm font-bold transition-all outline-none flex items-center justify-between cursor-pointer text-left shadow-3xs select-none"
+                        style={{ borderColor: salonDropdownOpen ? "#C5A059" : "#E5E7EB" }}
+                      >
+                        <span>
+                          {selectedSalon ? (salons.find(s => s._id === selectedSalon)?.salon_name || "Selected Salon") : "General Platform Inquiry"}
+                        </span>
+                        <ChevronDown size={16} className={`text-stone-400 transition-transform duration-300 ${salonDropdownOpen ? "rotate-180" : ""}`} />
+                      </button>
+
+                      {salonDropdownOpen && (
+                        <div className="absolute left-0 right-0 mt-2 bg-white border border-[#EADBCE] rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
+                          <div className="py-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedSalon("");
+                                setSalonDropdownOpen(false);
+                              }}
+                              className={`w-full px-4 py-2.5 text-left text-xs font-bold transition-colors border-none outline-none ${
+                                selectedSalon === ""
+                                  ? "bg-[#FEF3E2] text-[#3E362E] font-black"
+                                  : "text-stone-700 hover:bg-amber-50/30 hover:text-[#C5A059] cursor-pointer"
+                              }`}
+                            >
+                              General Platform Inquiry
+                            </button>
+                            {salons.map(s => {
+                              const isSelected = selectedSalon === s._id;
+                              return (
+                                <button
+                                  key={s._id}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSalon(s._id);
+                                    setSalonDropdownOpen(false);
+                                  }}
+                                  className={`w-full px-4 py-2.5 text-left text-xs font-bold transition-colors border-none outline-none ${
+                                    isSelected
+                                      ? "bg-[#FEF3E2] text-[#3E362E] font-black"
+                                      : "text-stone-700 hover:bg-amber-50/30 hover:text-[#C5A059] cursor-pointer"
+                                  }`}
+                                >
+                                  {s.salon_name}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Input Element 1: Email Profile coordinates */}
@@ -316,6 +373,13 @@ export default function ContactSupport({ onCreateTicket }) {
 
       {/* ── GLOBAL BRAND FOOTER ── */}
       <Footer />
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #F5F5F4; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E6D5C3; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #C5A059; }
+      `}</style>
 
     </div>
   );

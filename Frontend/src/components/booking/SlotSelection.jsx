@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Clock, RefreshCw } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-// Generate 30-min interval time slots between openTime and closeTime ("09:00" format, 24hr)
+// Generate 15-min interval time slots between openTime and closeTime ("09:00" format, 24hr)
 function generateSlots(openTime = "09:00", closeTime = "21:00") {
   const slots = [];
   const [openH, openM] = openTime.split(":").map(Number);
@@ -14,7 +14,7 @@ function generateSlots(openTime = "09:00", closeTime = "21:00") {
     const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h;
     const displayM = String(m).padStart(2, "0");
     slots.push(`${displayH}:${displayM} ${suffix}`);
-    m += 30;
+    m += 15;
     if (m >= 60) { m -= 60; h++; }
   }
   return slots;
@@ -26,6 +26,19 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
   const [existingBookings, setExistingBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [salonHours, setSalonHours] = useState({ opening_time: "09:00", closing_time: "21:00" });
+  
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const availableDates = ['Today', 'Tomorrow', 'Day After'];
 
@@ -88,7 +101,7 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
     fetchData();
   }, []);
 
-  // All 30-min slots between salon hours
+  // All 15-min slots between salon hours
   const allSlots = generateSlots(salonHours.opening_time, salonHours.closing_time);
 
   const getSlotISOString = (dateLabel, timeStr) => {
@@ -105,13 +118,27 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
   };
 
   const isSlotBooked = (dateLabel, timeStr) => {
-    const candidateSlot = getSlotISOString(dateLabel, timeStr);
+    const candidateStartStr = getSlotISOString(dateLabel, timeStr);
+    const candidateStart = new Date(candidateStartStr);
+    const duration = bookingData?.duration || 30; // default to 30 mins
+    const candidateEnd = new Date(candidateStart.getTime() + duration * 60 * 1000);
+
     return existingBookings.some(b => {
       const matchBarber =
         String(b.barber_id?._id || b.barber_id) === String(bookingData?.barber_id) ||
         (b.barber_id?.name?.toLowerCase().includes(bookingData?.barber?.toLowerCase()));
       const isActive = !["cancelled", "completed", "noshow"].includes(b.status);
-      return matchBarber && isActive && b.slot_time === candidateSlot;
+      
+      if (matchBarber && isActive && b.slot_time) {
+        const bStart = new Date(b.slot_time);
+        // calculate booking duration (sum of service durations)
+        const bDuration = (b.services || []).reduce((sum, s) => sum + (s.duration || 30), 0);
+        const bEnd = new Date(bStart.getTime() + bDuration * 60 * 1000);
+
+        // check if candidate slot overlaps with booking: candidateStart < bEnd && candidateEnd > bStart
+        return candidateStart < bEnd && candidateEnd > bStart;
+      }
+      return false;
     });
   };
 
@@ -133,9 +160,7 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
     }
   };
 
-  // Slots to display: all - booked ones; past ones shown as disabled
-  const displayedSlots = allSlots.filter(t => !isSlotBooked(selectedDate, t));
-  const availableCount = displayedSlots.filter(t => !isSlotInPast(selectedDate, t)).length;
+  const availableCount = allSlots.filter(t => !isSlotBooked(selectedDate, t) && !isSlotInPast(selectedDate, t)).length;
 
   return (
     <div className="max-w-xl mx-auto">
@@ -169,11 +194,11 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
       </div>
 
       {/* Time Selection */}
-      <div className="mb-8">
+      <div className="mb-8 text-left">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
             <Clock size={13} className="text-[#C5A059]" />
-            Available Times
+            Choose Time Slot
           </h3>
           {!loading && (
             <span className="text-[10px] font-bold text-stone-400 bg-stone-100 px-2.5 py-1 rounded-full">
@@ -187,39 +212,68 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
             <RefreshCw size={14} className="animate-spin text-[#C5A059]" />
             <p className="text-sm font-semibold">Loading availability…</p>
           </div>
-        ) : displayedSlots.length === 0 ? (
-          <p className="text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-            No slots available for {selectedDate}. Please select another date.
-          </p>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
-            {displayedSlots.map(time => {
-              const isPast = isSlotInPast(selectedDate, time);
-              const isSelected = selectedTime === time;
-              return (
-                <button
-                  key={time}
-                  type="button"
-                  disabled={isPast}
-                  onClick={() => setSelectedTime(time)}
-                  className={`py-2.5 px-2 rounded-xl font-semibold border transition-all duration-150 text-xs text-center leading-tight ${
-                    isPast
-                      ? 'border-stone-100 bg-stone-50 text-stone-300 cursor-not-allowed line-through'
-                      : isSelected
-                        ? 'border-[#C5A059] bg-[#FEF3E2] text-[#3E362E] shadow-sm font-black ring-2 ring-[#C5A059]/30'
-                        : 'border-gray-200 text-gray-600 hover:border-[#C5A059] hover:text-[#C5A059] hover:bg-amber-50/30'
-                  }`}
-                >
-                  {time}
-                </button>
-              );
-            })}
+          <div className="relative font-sans" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-full bg-[#FAF9F6] border border-[#EBE6DF] text-[#3E362E] px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 outline-none flex items-center justify-between cursor-pointer text-left select-none"
+              style={{ borderColor: dropdownOpen ? "#C5A059" : "#EBE6DF" }}
+            >
+              <span className={selectedTime ? "text-[#3E362E] font-bold" : "text-stone-400 font-medium"}>
+                {selectedTime || "-- Select a comfortable time --"}
+              </span>
+              <Clock size={16} className="text-[#C5A059] shrink-0 ml-2" />
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute left-0 right-0 mt-2 bg-white border border-[#EADBCE] rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="py-1.5">
+                  {allSlots.map(time => {
+                    const isPast = isSlotInPast(selectedDate, time);
+                    const isBooked = isSlotBooked(selectedDate, time);
+                    const isDisabled = isPast || isBooked;
+                    const isSelected = selectedTime === time;
+
+                    let label = time;
+                    let badge = null;
+                    if (isBooked) {
+                      badge = <span className="text-[9px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Booked</span>;
+                    } else if (isPast) {
+                      badge = <span className="text-[9px] font-bold uppercase tracking-wider text-stone-400 bg-stone-100 px-2 py-0.5 rounded-md">Passed</span>;
+                    }
+
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        disabled={isDisabled}
+                        onClick={() => {
+                          setSelectedTime(time);
+                          setDropdownOpen(false);
+                        }}
+                        className={`w-full px-4 py-3 text-left text-xs font-semibold flex items-center justify-between transition-colors border-none outline-none ${
+                          isDisabled
+                            ? "bg-stone-50/50 text-stone-300 cursor-not-allowed"
+                            : isSelected
+                              ? "bg-[#FEF3E2] text-[#3E362E] font-black"
+                              : "text-stone-700 hover:bg-amber-50/30 hover:text-[#C5A059] cursor-pointer"
+                        }`}
+                      >
+                        <span className={isSelected ? "text-[#3E362E] font-extrabold" : "text-stone-800"}>{label}</span>
+                        {badge}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {!loading && availableCount === 0 && displayedSlots.length > 0 && (
+        {!loading && availableCount === 0 && (
           <p className="text-xs text-stone-400 text-center mt-3 font-medium">
-            All future slots for {selectedDate} have passed. Try Tomorrow.
+            All future slots for {selectedDate} have passed or are booked. Try another date.
           </p>
         )}
       </div>

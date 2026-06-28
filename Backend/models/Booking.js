@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const bsSchema = new mongoose.Schema({
   service_id:{type:mongoose.Schema.Types.ObjectId,ref:"Service"},
-  service_name:String, price:Number, member_name:{type:String,default:"Self"}
+  service_name:String, price:Number, duration:{type:Number,default:30}, member_name:{type:String,default:"Self"}
 });
 const bookingSchema = new mongoose.Schema({
   customer_id:{type:mongoose.Schema.Types.ObjectId,ref:"Customer",required:true},

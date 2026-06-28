@@ -32,7 +32,7 @@ function BarberCard({ b, isSelected, onSelect, index, visible }) {
   const isBusy = b.status === "Busy";
   const isOnBreak = b.status === "On Break";
   const isOffline = b.status === "Offline";
-  const isUnavailable = isBusy || isOnBreak || isOffline;
+  const isUnavailable = isOnBreak || isOffline;
   const active = isSelected || hovered;
 
   return (

@@ -530,7 +530,7 @@ export default function SalonDetailPage() {
                         Showing {servicesStartIndex + 1} - {Math.min(servicesStartIndex + SERVICES_PER_PAGE, filteredServices.length)} of {filteredServices.length} Services
                       </span>
                       
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex flex-wrap items-center justify-center gap-1.5">
                         <button
                           disabled={servicesPage === 1}
                           onClick={() => {
@@ -692,7 +692,7 @@ export default function SalonDetailPage() {
 
               <div className="border-b last:border-0 pb-3 last:pb-0">
                 <label className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] block">Admin Approver Email</label>
-                <p className="font-extrabold text-[#3E362E] mt-0.5 text-sm font-mono">{salon.email || "contact@barberpro.com"}</p>
+                <p className="font-extrabold text-[#3E362E] mt-0.5 text-sm font-mono break-all">{salon.email || "contact@barberpro.com"}</p>
               </div>
 
               <div className="border-b last:border-0 pb-3 last:pb-0">

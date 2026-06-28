@@ -92,6 +92,7 @@ exports.createBooking = async (req, res) => {
           service_id: s.service_id,
           service_name: svc?.name || "Service",
           price: svc?.price || 0,
+          duration: svc?.duration || 30,
           member_name: s.member_name || "Self"
         };
       })
@@ -127,6 +128,35 @@ exports.createBooking = async (req, res) => {
 
       if (slotUTC < nowLocalComponents) {
         return res.status(400).json({ success: false, message: "Cannot book a slot in the past." });
+      }
+
+      // Check overlapping bookings for the same barber
+      const newStart = slotDate;
+      const newDuration = serviceDetails.reduce((sum, s) => sum + (s.duration || 30), 0);
+      const newEnd = new Date(newStart.getTime() + newDuration * 60 * 1000);
+
+      const overlappingBookings = await Booking.find({
+        barber_id: finalBarberId,
+        status: { $in: ["confirmed", "pending", "in-progress"] },
+        booking_type: "slot",
+        slot_time: { $ne: null }
+      });
+
+      for (const ob of overlappingBookings) {
+        const obStart = new Date(ob.slot_time);
+        const obDuration = ob.services.reduce((sum, s) => sum + (s.duration || 30), 0);
+        const obEnd = new Date(obStart.getTime() + obDuration * 60 * 1000);
+
+        // Check overlap: StartA < EndB and EndA > StartB
+        if (newStart < obEnd && newEnd > obStart) {
+          const timeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+          const formattedStart = obStart.toLocaleTimeString('en-US', timeFormatOptions);
+          const formattedEnd = obEnd.toLocaleTimeString('en-US', timeFormatOptions);
+          return res.status(400).json({
+            success: false,
+            message: `This slot overlaps with an existing booking. The stylist is busy from ${formattedStart} to ${formattedEnd}.`
+          });
+        }
       }
     }
 

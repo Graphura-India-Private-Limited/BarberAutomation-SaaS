@@ -314,6 +314,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
               value={upiId}
               onChange={(e) => setUpiId(e.target.value)}
               placeholder="username@okhdfcbank"
+              autoComplete="off"
               className="w-full bg-[#FAF6F0] border border-[#EADBCE] rounded-xl px-4 py-2.5 text-xs outline-none focus:border-[#C5A059] transition-all font-semibold"
             />
           </div>

@@ -78,7 +78,7 @@ export const StatusPill = ({ active, label }) => {
   const text = raw.charAt(0).toUpperCase() + raw.slice(1);
   return (
     <span
-      className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold capitalize"
+      className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold capitalize whitespace-nowrap"
       style={{
         background: isActive ? "#ECFDF5" : "#FEF2F2",
         color: isActive ? "#047857" : "#B91C1C",

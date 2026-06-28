@@ -106,10 +106,8 @@ function PrivacyPolicy() {
   return (
     <>
       <Navbar />
-      <div className="w-full flex-grow pt-24"></div>
-
       {/* ORIGINAL LIGHT BACKGROUND */}
-      <div className="min-h-screen bg-[#FAF6F0] overflow-hidden relative selection:bg-[#C5A059] selection:text-white">
+      <div className="min-h-screen bg-[#FAF6F0] overflow-hidden relative selection:bg-[#C5A059] selection:text-white mt-[56px] md:mt-[72px] pt-8 md:pt-12">
         
         {/* LIGHT GOLD AMBIENT BLURS */}
         <div className="absolute top-[-100px] left-[-100px] w-[600px] h-[600px] bg-[#C5A059]/10 blur-[140px] rounded-full pointer-events-none" />
@@ -189,7 +187,7 @@ function PrivacyPolicy() {
         <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pb-20 mt-10">
           
           {/* MOBILE HORIZONTAL TABS */}
-          <div className="lg:hidden flex overflow-x-auto pb-4 mb-6 gap-2 no-scrollbar snap-x">
+          <div className="lg:hidden flex flex-wrap justify-center items-center gap-2 mb-6">
             {menuGroups.map((group) => (
               <button
                 key={`mobile-tab-${group.pairIndex}`}
@@ -197,10 +195,10 @@ function PrivacyPolicy() {
                   setActivePairIndex(group.pairIndex);
                   setSearchQuery("");
                 }}
-                className={`snap-center flex-shrink-0 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 ${
+                className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all duration-300 cursor-pointer ${
                   activePairIndex === group.pairIndex && !searchQuery
                     ? "bg-[#3E362E] text-white shadow-sm"
-                    : "bg-white text-[#3E362E] border border-[#EADDCA]"
+                    : "bg-white text-[#3E362E] border border-[#EADDCA] hover:bg-[#C5A059]/10"
                 }`}
               >
                 {group.label}

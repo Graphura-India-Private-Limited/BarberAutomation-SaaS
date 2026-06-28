@@ -311,10 +311,14 @@ export default function FinancialAnalytics() {
             
             {/* Range picker only visible on revenue tab */}
             {activeTab === "revenue" && (
-              <div className="flex gap-3 bg-stone-50 border border-stone-200/80 p-3.5 rounded-2xl w-full md:max-w-xs shrink-0 items-center shadow-inner font-sans">
-                <DateInput label="From" value={range.from} onChange={value => setRange(prev => ({ ...prev, from: value }))} />
-                <div className="h-6 w-px bg-stone-300 mt-5 shrink-0" />
-                <DateInput label="To" value={range.to} onChange={value => setRange(prev => ({ ...prev, to: value }))} />
+              <div className="flex flex-col sm:flex-row gap-4 bg-stone-50 border border-[#EADBCE] p-4 rounded-3xl w-full md:max-w-md shrink-0 sm:items-center shadow-inner font-sans">
+                <div className="flex-1 w-full">
+                  <DateInput label="From" value={range.from} onChange={value => setRange(prev => ({ ...prev, from: value }))} />
+                </div>
+                <div className="hidden sm:block h-6 w-px bg-stone-300 mt-5 shrink-0" />
+                <div className="flex-1 w-full">
+                  <DateInput label="To" value={range.to} onChange={value => setRange(prev => ({ ...prev, to: value }))} />
+                </div>
               </div>
             )}
           </div>
@@ -974,8 +978,8 @@ function LineChart({ data }) {
 
   if (!data.length) return <EmptyChart label="No revenue trend data" />;
   return (
-    <div className="relative overflow-x-auto custom-scrollbar font-sans">
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-72 min-w-[640px] mx-auto overflow-visible">
+    <div className="relative w-full overflow-hidden font-sans">
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto max-h-72 mx-auto overflow-visible">
         {[0, 1, 2, 3].map(i => <line key={i} x1={pad} x2={width - pad} y1={pad + i * 58} y2={pad + i * 58} stroke="#EADBCE" strokeDasharray="4,2" opacity="0.6" />)}
         <polygon points={`${pad},${height - pad} ${pointsStr} ${width - pad},${height - pad}`} fill={GOLD} opacity="0.04" />
         <polyline points={pointsStr} fill="none" stroke={GOLD} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />

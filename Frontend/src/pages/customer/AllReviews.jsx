@@ -354,9 +354,9 @@ export default function AllReviews() {
 
       {/* ═══ LUXURY EXPAND MODAL ═══ */}
       {selectedReview && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-all duration-300"
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] overflow-y-auto flex items-start sm:items-center justify-center p-4 transition-all duration-300"
           onClick={() => setSelectedReview(null)}>
-          <div className="bg-white rounded-[32px] p-8 md:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA] relative animate-in fade-in zoom-in-95 duration-200"
+          <div className="bg-white rounded-[32px] p-6 sm:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA] relative my-auto animate-in fade-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}>
             
             {/* Close Button */}

@@ -149,7 +149,7 @@ export default function Login() {
 
         {/* ── RIGHT: Form card ── */}
         <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8" style={{ background: "#f7f5f2" }}>
-          <div className="bg-white w-[460px] px-8 py-5 rounded-[28px] shadow-xl">
+          <div className="bg-white w-full max-w-[460px] px-6 sm:px-8 py-5 rounded-[28px] shadow-xl">
 
             {/* Scissors icon */}
             <div className="flex justify-center mb-3">

@@ -239,6 +239,29 @@ export default function HomePage() {
   : 90;
 
 
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+    if (distance > minSwipeDistance) {
+      handleNext();
+    } else if (distance < -minSwipeDistance) {
+      handlePrev();
+    }
+  };
+
 const [currentSlide, setCurrentSlide] = useState(0);
 
 useEffect(() => {
@@ -759,7 +782,12 @@ useEffect(() => {
             </svg>
           </button>
 
-          <div className="overflow-hidden py-6 w-full">
+          <div 
+            className="overflow-hidden py-6 w-full cursor-grab active:cursor-grabbing select-none"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
             <div
               className="flex items-stretch gap-5 lg:gap-7 transition-transform duration-700 ease-out"
               style={{
@@ -963,7 +991,7 @@ useEffect(() => {
             <span className="relative z-10 text-[12px] font-black uppercase tracking-[0.35em] text-[#C5A059]">Luxury Experience</span>
             <h2 className="relative z-10 mt-5 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-tight text-[#3E362E]">
               Ready For Your{" "}
-              <span className="italic font-serif bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] bg-clip-text text-transparent">
+              <span className="italic font-serif bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] bg-clip-text text-transparent pr-4 inline-block">
                 Transformation?
               </span>
             </h2>
@@ -995,12 +1023,12 @@ useEffect(() => {
       {/* ── REVIEW MODAL ── */}
       {selectedReview && (
         <div
-          className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/80 z-[100] overflow-y-auto flex items-start sm:items-center justify-center p-4 backdrop-blur-sm"
           style={{ animation: "fadeUp 0.3s ease forwards" }}
           onClick={() => setSelectedReview(null)}
         >
           <div
-            className="bg-white rounded-3xl p-8 md:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA]"
+            className="bg-white rounded-3xl p-6 sm:p-10 max-w-md w-full shadow-2xl border border-[#EADDCA] my-auto relative"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-6">

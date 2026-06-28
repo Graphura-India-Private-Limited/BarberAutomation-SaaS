@@ -47,6 +47,7 @@ const Badge = ({ label, color }) => (
     padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 700,
     textTransform: "uppercase", letterSpacing: 0.8,
     background: `${color}15`, color, border: `1px solid ${color}30`,
+    whiteSpace: "nowrap", display: "inline-block"
   }}>
     {label}
   </span>
@@ -2978,7 +2979,7 @@ export default function AdminOnboarding() {
                   </div>
 
                   {/* Analytics Stats Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <StatCard 
                       label="Total Income" 
                       value={`₹${totalIncome.toLocaleString("en-IN")}`} 
@@ -2989,22 +2990,13 @@ export default function AdminOnboarding() {
                       iconColor={C.green}
                     />
                     <StatCard 
-                      label="Total Refunded" 
-                      value={`₹${totalLoss.toLocaleString("en-IN")}`} 
-                      sub="Refunded to customers" 
-                      color={C.red} 
+                      label="Total Transactions" 
+                      value={`${capturedList.length}`} 
+                      sub="Completed payments count" 
+                      color={C.purple} 
                       icon={CreditCard} 
-                      iconBg={C.redLight} 
-                      iconColor={C.red}
-                    />
-                    <StatCard 
-                      label="Net Profit" 
-                      value={`₹${netProfit.toLocaleString("en-IN")}`} 
-                      sub="Income minus refunds" 
-                      color={netProfit >= 0 ? C.green : C.red} 
-                      icon={CreditCard} 
-                      iconBg={netProfit >= 0 ? C.greenLight : C.redLight} 
-                      iconColor={netProfit >= 0 ? C.green : C.red}
+                      iconBg={C.purpleLight} 
+                      iconColor={C.purple}
                     />
                   </div>
 
@@ -3013,7 +3005,7 @@ export default function AdminOnboarding() {
                     {/* Left: AreaChart showing Income vs Refund Trend */}
                     <div className="lg:col-span-2" style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, padding: 20, boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
                       <span style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block", marginBottom: 16 }}>
-                        Income vs Refund Trend (₹)
+                        Income Trend (₹)
                       </span>
                       <div style={{ width: "100%", height: 260 }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -3022,10 +3014,6 @@ export default function AdminOnboarding() {
                               <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor={C.green} stopOpacity={0.25}/>
                                 <stop offset="95%" stopColor={C.green} stopOpacity={0.01}/>
-                              </linearGradient>
-                              <linearGradient id="colorLoss" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor={C.red} stopOpacity={0.25}/>
-                                <stop offset="95%" stopColor={C.red} stopOpacity={0.01}/>
                               </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
@@ -3037,7 +3025,6 @@ export default function AdminOnboarding() {
                             />
                             <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
                             <Area type="monotone" dataKey="Income" stroke={C.green} strokeWidth={2.5} fillOpacity={1} fill="url(#colorIncome)" name="Income" />
-                            <Area type="monotone" dataKey="Loss" stroke={C.red} strokeWidth={2.5} fillOpacity={1} fill="url(#colorLoss)" name="Refunded / Cancelled" />
                           </AreaChart>
                         </ResponsiveContainer>
                       </div>
@@ -3264,15 +3251,6 @@ export default function AdminOnboarding() {
                       iconBg={C.purpleLight} 
                       iconColor={C.purple} 
                     />
-                    <StatCard 
-                      label="Financial Warning" 
-                      value={`${lossSalonsCount} Studios`} 
-                      sub="Negative net profit or high refunds" 
-                      color={C.red} 
-                      icon={Activity} 
-                      iconBg={C.redLight} 
-                      iconColor={C.red} 
-                    />
                   </div>
 
                   {/* Main comparison list */}
@@ -3289,8 +3267,8 @@ export default function AdminOnboarding() {
                         <thead>
                           <tr>
                             <TH>Salon / Studio</TH>
-                            <TH>Financial Status</TH>
-                            <TH>Income / Refunds</TH>
+                            <TH>Financial Summary</TH>
+                            <TH>Total Income</TH>
                             <TH>Booking Success</TH>
                             <TH>Avg Rating</TH>
                             <TH>Action</TH>
@@ -3306,9 +3284,9 @@ export default function AdminOnboarding() {
                               const completionRate = p.bookingsCount > 0 
                                 ? Math.round((p.completedCount / p.bookingsCount) * 100)
                                 : 0;
-                              const profitLabel = p.netProfit >= 0 ? "Profit" : "Deficit";
-                              const profitColor = p.netProfit >= 0 ? C.green : C.red;
-                              const profitBg = p.netProfit >= 0 ? C.greenLight : C.redLight;
+                              const profitLabel = "Income";
+                              const profitColor = C.green;
+                              const profitBg = C.greenLight;
 
                               return (
                                 <tr key={p.salon._id} className="tr" style={{ transition: "background 0.2s" }}>
@@ -3324,14 +3302,13 @@ export default function AdminOnboarding() {
                                   <TD>
                                     <span style={{
                                       padding: "4px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700,
-                                      background: profitBg, color: profitColor, border: `1px solid ${profitColor}30`
+                                      background: profitBg, color: profitColor, border: `1px solid ${profitColor}30`, whiteSpace: "nowrap"
                                     }}>
-                                      {profitLabel}: ₹{p.netProfit.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                                      {profitLabel}: ₹{p.income.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                                     </span>
                                   </TD>
                                   <TD style={{ fontSize: 12 }}>
-                                    <div style={{ color: C.green, fontWeight: 600 }}>Inc: ₹{p.income.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
-                                    <div style={{ color: C.red, fontWeight: 600, marginTop: 2 }}>Refunds: ₹{p.loss.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
+                                    <div style={{ color: C.green, fontWeight: 600 }}>₹{p.income.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</div>
                                   </TD>
                                   <TD>
                                     <div style={{ display: "flex", flexDirection: "column", gap: 4, width: 120 }}>
@@ -4489,19 +4466,9 @@ export default function AdminOnboarding() {
                     Financial Summary
                   </h4>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 12, fontWeight: 650 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: C.muted }}>Total Income:</span>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700 }}>
+                      <span style={{ color: C.ink }}>Total Income:</span>
                       <span style={{ color: C.green }}>₹{selectedPerformanceSalon.income.toLocaleString("en-IN")}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: C.muted }}>Total Refunds:</span>
-                      <span style={{ color: C.red }}>₹{selectedPerformanceSalon.loss.toLocaleString("en-IN")}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px dashed ${C.border}`, paddingTop: 8, fontSize: 13, fontWeight: 700 }}>
-                      <span style={{ color: C.ink }}>Net Financial Status:</span>
-                      <span style={{ color: selectedPerformanceSalon.netProfit >= 0 ? C.green : C.red }}>
-                        ₹{selectedPerformanceSalon.netProfit.toLocaleString("en-IN")} ({selectedPerformanceSalon.netProfit >= 0 ? "Profit" : "Deficit"})
-                      </span>
                     </div>
                   </div>
                 </div>
