@@ -243,7 +243,7 @@ export default function BarberSelection() {
     const fetchBarbers = async () => {
       setLoading(true);
       if (!salonId) {
-        console.warn("No selected salon ID found in localStorage.");
+        // No selected salon ID found yet (user will select one via the UI)
         setHasSalon(false);
         setBarbersList([]);
         setLoading(false);

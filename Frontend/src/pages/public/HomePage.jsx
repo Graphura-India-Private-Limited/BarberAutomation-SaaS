@@ -150,7 +150,7 @@ export default function HomePage() {
         setIsDetectingLocation(false);
       },
       (error) => {
-        console.error(error);
+        console.warn("Geolocation request failed or blocked:", error.message);
         setLocationError("Location permission denied. Please allow location access to see salons.");
         setIsDetectingLocation(false);
       },
