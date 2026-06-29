@@ -164,7 +164,7 @@ export function AddCustomerModal({ onClose, onAdd }) {
         }
       `}</style>
 
-      <div className="w-full max-w-lg bg-[#FAF6F0] rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-[#EADBCE] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300" onClick={e => e.stopPropagation()}>
+      <div className="w-full max-w-lg bg-[#FAF6F0] rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-[#EADBCE] shadow-2xl max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-8 duration-300" onClick={e => e.stopPropagation()}>
 
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-5 border-b border-[#EADBCE]/50 bg-white">

@@ -72,6 +72,7 @@ export default function BarberSettings() {
                   <input 
                     type={showPassword ? "text" : "password"}
                     required
+                    autoComplete="new-password"
                     value={passwords.current}
                     onChange={e => setPasswords({...passwords, current: e.target.value})}
                     className={formInputStyle}
@@ -84,11 +85,11 @@ export default function BarberSettings() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1.5 relative">
                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">New Secure Token <span className="text-red-500 font-bold">*</span></label>
-                    <input type={showPassword ? "text" : "password"} required value={passwords.new} onChange={e => setPasswords({...passwords, new: e.target.value})} className={formInputStyle} />
+                    <input type={showPassword ? "text" : "password"} required autoComplete="new-password" value={passwords.new} onChange={e => setPasswords({...passwords, new: e.target.value})} className={formInputStyle} />
                   </div>
                   <div className="flex flex-col gap-1.5 relative">
                     <label className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-400 pl-0.5">Confirm New Token <span className="text-red-500 font-bold">*</span></label>
-                    <input type={showPassword ? "text" : "password"} required value={passwords.confirm} onChange={e => setPasswords({...passwords, confirm: e.target.value})} className={formInputStyle} />
+                    <input type={showPassword ? "text" : "password"} required autoComplete="new-password" value={passwords.confirm} onChange={e => setPasswords({...passwords, confirm: e.target.value})} className={formInputStyle} />
                   </div>
                 </div>
 

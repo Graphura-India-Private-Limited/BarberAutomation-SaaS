@@ -350,31 +350,31 @@ export default function ServiceConsole() {
 
   const handleMarkDelayed = async () => {
     if (!cur) return;
+    setModal(null);
     await handleAPIStatusUpdate(cur.id, "delayed", "Late by 5+ mins");
     startGraceTimer(2 * 60);
-    setModal(null);
     toast_(`${cur.customer_name} marked Delayed. 2-min grace started.`, "warn");
   };
 
   const handleMarkNoShow = async (reason = "") => {
     if (!cur) return;
+    setModal(null);
     await handleAPIStatusUpdate(cur.id, "noshow", reason || "Did not arrive");
     clearInterval(graceTimerRef.current);
     setGraceSeconds(0);
-    setModal(null);
     toast_(`${cur.customer_name} marked No-Show. Slot reassigned.`, "error");
   };
 
   const handleSendNotif = async () => {
     if (!cur) return;
-    await handleAPINotify(cur.id, cur.customer_name);
     setModal(null);
+    await handleAPINotify(cur.id, cur.customer_name);
   };
 
   const handleRejoin = async () => {
     if (!cur) return;
-    await handleAPIRejoin(cur.id);
     setModal(null);
+    await handleAPIRejoin(cur.id);
     toast_(`${cur.customer_name} rejoined waitlist!`);
   };
 
@@ -393,10 +393,10 @@ export default function ServiceConsole() {
 
   const handleRemove = async () => {
     if (!cur) return;
+    setModal(null);
     await handleAPIStatusUpdate(cur.id, "noshow", "Manually removed");
     clearInterval(graceTimerRef.current);
     setGraceSeconds(0);
-    setModal(null);
     toast_(`${cur.customer_name} removed from queue.`, "error");
   };
 

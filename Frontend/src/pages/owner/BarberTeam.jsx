@@ -176,8 +176,8 @@ export default function BarberTeam() {
       return;
     }
 
-    if (editingBarber.aadhaar && editingBarber.aadhaar.length !== 12) {
-      setEditError("Aadhaar Number must be exactly 12 digits.");
+    if (!editingBarber.aadhaar || editingBarber.aadhaar.length !== 12) {
+      setEditError("Aadhaar Number is required and must be exactly 12 digits.");
       setBusyId(null);
       return;
     }
@@ -886,8 +886,9 @@ export default function BarberTeam() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Aadhaar Number (Optional)</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Aadhaar Number *</label>
                   <input 
+                    required
                     maxLength={12}
                     placeholder="12 digit Aadhaar" 
                     value={editingBarber.aadhaar} 

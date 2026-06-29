@@ -69,8 +69,8 @@ export default function AddBarber() {
       return;
     }
 
-    if (newBarber.aadhaar && newBarber.aadhaar.length !== 12) {
-      setAddError("Aadhaar Number must be exactly 12 digits.");
+    if (!newBarber.aadhaar || newBarber.aadhaar.length !== 12) {
+      setAddError("Aadhaar Number is required and must be exactly 12 digits.");
       setBusy(false);
       return;
     }
@@ -314,8 +314,9 @@ export default function AddBarber() {
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Aadhaar Number (Optional)</label>
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Aadhaar Number *</label>
                 <input 
+                  required
                   maxLength={12}
                   placeholder="12 digit Aadhaar" 
                   value={newBarber.aadhaar} 

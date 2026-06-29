@@ -335,6 +335,13 @@ export default function SalonRegistration() {
     reader.readAsDataURL(file);
   };
 
+  const triggerFileInput = (id) => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.click();
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!form.latitude || !form.longitude) {
@@ -400,7 +407,7 @@ export default function SalonRegistration() {
       localStorage.setItem("salonName", data.salon?.salon_name || "");
       
       setMessage("Submitted successfully. Your status is now Pending Admin Approval.");
-      setTimeout(() => navigate("/owner/dashboard"), 1200);
+      setTimeout(() => navigate("/owner/dashboard"), 120000);
     } catch (err) {
       setError(err.message || "Server linkage failed. Please try again.");
     } finally {
@@ -646,14 +653,18 @@ export default function SalonRegistration() {
                       id="shop-establishment-upload" 
                       accept="image/*,application/pdf" 
                       onChange={e => handleDocumentUpload(e, "shop_establishment_certificate")} 
-                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                      className="hidden" 
                     />
-                    <label htmlFor="shop-establishment-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => triggerFileInput("shop-establishment-upload")}
+                      className="w-full h-full bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs hover:border-[#C5A059] transition-colors cursor-pointer"
+                    >
                       <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
                         {form.shop_establishment_certificate ? "Document uploaded ✓" : "Upload Certificate..."}
                       </span>
                       <Upload size={14} color={GOLD} />
-                    </label>
+                    </button>
                   </div>
                 </Field>
 
@@ -665,14 +676,18 @@ export default function SalonRegistration() {
                       id="trade-license-upload" 
                       accept="image/*,application/pdf" 
                       onChange={e => handleDocumentUpload(e, "trade_license")} 
-                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                      className="hidden" 
                     />
-                    <label htmlFor="trade-license-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => triggerFileInput("trade-license-upload")}
+                      className="w-full h-full bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs hover:border-[#C5A059] transition-colors cursor-pointer"
+                    >
                       <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
                         {form.trade_license ? "Document uploaded ✓" : "Upload License..."}
                       </span>
                       <Upload size={14} color={GOLD} />
-                    </label>
+                    </button>
                   </div>
                 </Field>
 
@@ -684,14 +699,18 @@ export default function SalonRegistration() {
                       id="gst-certificate-upload" 
                       accept="image/*,application/pdf" 
                       onChange={e => handleDocumentUpload(e, "gst_certificate")} 
-                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                      className="hidden" 
                     />
-                    <label htmlFor="gst-certificate-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => triggerFileInput("gst-certificate-upload")}
+                      className="w-full h-full bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs hover:border-[#C5A059] transition-colors cursor-pointer"
+                    >
                       <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
                         {form.gst_certificate ? "Document uploaded ✓" : "Upload GST Certificate..."}
                       </span>
                       <Upload size={14} color={GOLD} />
-                    </label>
+                    </button>
                   </div>
                 </Field>
 
@@ -703,14 +722,18 @@ export default function SalonRegistration() {
                       id="aadhaar-card-upload" 
                       accept="image/*,application/pdf" 
                       onChange={e => handleDocumentUpload(e, "aadhaar_card")} 
-                      className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" 
+                      className="hidden" 
                     />
-                    <label htmlFor="aadhaar-card-upload" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => triggerFileInput("aadhaar-card-upload")}
+                      className="w-full h-full bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs hover:border-[#C5A059] transition-colors cursor-pointer"
+                    >
                       <span className="text-stone-500 text-xs font-normal truncate max-w-[80%]">
                         {form.aadhaar_card ? "Document uploaded ✓" : "Upload Aadhaar Card..."}
                       </span>
                       <Upload size={14} color={GOLD} />
-                    </label>
+                    </button>
                   </div>
                 </Field>
               </div>
@@ -722,11 +745,15 @@ export default function SalonRegistration() {
             
             <Field label="Shop Gallery Images (Max 5)">
               <div className="relative w-full h-[50px]">
-                <input type="file" id="gallery-uploads" accept="image/*" multiple onChange={handleImages} className="absolute inset-0 opacity-0 z-20 cursor-pointer w-full h-full" />
-                <label htmlFor="gallery-uploads" className="absolute inset-0 bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs z-10 hover:border-[#C5A059] transition-colors">
+                <input type="file" id="gallery-uploads" accept="image/*" multiple onChange={handleImages} className="hidden" />
+                <button
+                  type="button"
+                  onClick={() => triggerFileInput("gallery-uploads")}
+                  className="w-full h-full bg-white border border-[#EADBCE] rounded-2xl px-4 flex items-center justify-between text-stone-400 text-sm font-medium font-sans shadow-3xs hover:border-[#C5A059] transition-colors cursor-pointer"
+                >
                   <span className="text-stone-500 text-xs font-normal">{form.images.length > 0 ? `${form.images.length} files selected` : "Upload storefront photos..."}</span>
                   <Upload size={14} color={GOLD} />
-                </label>
+                </button>
               </div>
             </Field>
           </div>
@@ -841,9 +868,20 @@ export default function SalonRegistration() {
           )}
           
           {message && (
-            <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2 text-emerald-800 text-xs font-medium font-sans animate-in fade-in duration-200">
-              <ShieldCheck size={14} className="shrink-0" />
-              <span>{message}</span>
+            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-emerald-800 text-xs font-semibold font-sans animate-in fade-in duration-200 shadow-3xs">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={16} className="shrink-0 text-emerald-600" />
+                <span>{message}</span>
+              </div>
+              {message.includes("Submitted successfully") && (
+                <button
+                  type="button"
+                  onClick={() => navigate("/owner/dashboard")}
+                  className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[9px] font-black uppercase tracking-widest cursor-pointer transition-all border-none"
+                >
+                  Proceed to Dashboard ➔
+                </button>
+              )}
             </div>
           )}
 

@@ -378,7 +378,7 @@ export default function SettingsPage() {
         <p className="text-amber-700 font-sans font-bold tracking-[2px] text-xs sm:text-sm uppercase mb-1">
           SALON PREFERENCES
         </p>
-        <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-1">
+        <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap mb-1">
           <span className="font-bold uppercase">SALON</span>
           <span className="italic text-[#C5A059] normal-case font-medium">Settings</span>
         </h2>
@@ -649,14 +649,14 @@ export default function SettingsPage() {
                 { key: "emailEscalation", label: "Email on critical escalations" },
                 { key: "dailyDigest", label: "Receive daily ticket summaries digest" }
               ].map(pref => (
-                <label key={pref.key} className="flex items-center justify-between cursor-pointer group">
+                <label key={pref.key} className="flex items-center justify-between gap-3 cursor-pointer group">
                   <span className="text-sm font-semibold text-stone-600 group-hover:text-stone-900 transition-colors">{pref.label}</span>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={notifPrefs[pref.key]}
                     onClick={() => toggleNotif(pref.key)}
-                    className={`relative w-11 h-6 rounded-full transition-colors outline-none cursor-pointer ${notifPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
+                    className={`relative w-11 h-6 shrink-0 rounded-full transition-colors outline-none cursor-pointer ${notifPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
                   >
                     <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${notifPrefs[pref.key] ? "translate-x-5" : ""}`} />
                   </button>
@@ -671,14 +671,14 @@ export default function SettingsPage() {
                 { key: "twoFactor", label: "Enforce multi-factor verification on resolutions" },
                 { key: "sessionTimeout", label: "Support terminal session timeout (30 min)" }
               ].map(pref => (
-                <label key={pref.key} className="flex items-center justify-between cursor-pointer group">
+                <label key={pref.key} className="flex items-center justify-between gap-3 cursor-pointer group">
                   <span className="text-sm font-semibold text-stone-600 group-hover:text-stone-900 transition-colors">{pref.label}</span>
                   <button
                     type="button"
                     role="switch"
                     aria-checked={securityPrefs[pref.key]}
                     onClick={() => toggleSecurity(pref.key)}
-                    className={`relative w-11 h-6 rounded-full transition-colors outline-none cursor-pointer ${securityPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
+                    className={`relative w-11 h-6 shrink-0 rounded-full transition-colors outline-none cursor-pointer ${securityPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
                   >
                     <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${securityPrefs[pref.key] ? "translate-x-5" : ""}`} />
                   </button>
@@ -732,7 +732,7 @@ function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, bu
   const inputClass = "w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-medium outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400 font-sans shadow-3xs";
   return (
     <div className="card p-6 shadow-xs border border-[#EADBCE] bg-white text-left animate-in fade-in duration-200">
-      <h2 className="font-serif text-lg tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5 border-b pb-3 border-stone-100">
+      <h2 className="font-serif text-lg tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap mb-5 border-b pb-3 border-stone-100">
         <span className="font-bold uppercase">Edit Workspace</span>
         <span className="italic text-[#C5A059] normal-case font-medium">Profile Details</span>
       </h2>

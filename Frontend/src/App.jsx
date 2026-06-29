@@ -45,6 +45,7 @@ import BarberTeam from "./pages/owner/BarberTeam";
 import OwnerLiveMonitoring from "./pages/owner/OwnerLiveMonitoring";
 import AddBarber from "./pages/owner/AddBarber";
 import OwnerSupportPage from "./pages/owner/OwnerSupportPage";
+import SalonSettlements from "./pages/owner/SalonSettlements";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOnboarding from "./pages/admin/AdminOnboarding";
 import { DashboardPage } from "./pages/admin/DashboardPage";
@@ -219,6 +220,7 @@ function App() {
           <Route path="add-barber" element={<AddBarber />} />
           <Route path="customers" element={<CustomerManagement />} />
           <Route path="support" element={<OwnerSupportPage ticketState={ticketState} />} />
+          <Route path="settlements" element={<SalonSettlements />} />
         </Route>
 
         {/* --- SUPER ADMIN CENTRAL PANEL (RESTRICTED BY RBAC) --- */}
