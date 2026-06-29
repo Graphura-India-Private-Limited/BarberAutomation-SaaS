@@ -55,7 +55,7 @@ export function TicketsPage({
         background: C.card, borderRadius: 16,
         border: `1px solid ${C.border}`,
         boxShadow: "0 1px 4px rgba(0,0,0,.04)",
-        overflow: "hidden",
+        overflow: "visible",
       }}>
         <TicketFilters
           filterStatus={filterStatus}     setFilterStatus={setFilterStatus}
