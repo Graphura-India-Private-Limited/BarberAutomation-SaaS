@@ -3629,18 +3629,13 @@ export default function AdminOnboarding() {
             )}
 
             {/* ══ SUPPORT TICKETS ══ */}
+
             {tab==="tickets" && (() => {
-              const typeFilter = window.location.pathname.includes("customer-issues") 
-                ? "Customer" 
-                : window.location.pathname.includes("salon-issues") 
-                ? "Salon" 
-                : undefined;
-              return (
-                <div className="fade-in">
-                  <TicketsPage {...ticketState} typeFilter={typeFilter} />
-                </div>
-              );
-            })()}
+               const typeFilter = window.location.pathname.includes("customer-issues") ? "Customer" : window.location.pathname.includes("salon-issues")? "Salon" : undefined;
+             return (
+                 <div className="fade-in" style={{ marginTop: '-69px' }}>  {/* adjust value as needed */}
+                  <TicketsPage {...ticketState} typeFilter={typeFilter} /></div>);
+                  })()}
 
             {/* ══ OWNER REQUESTS ══ */}
             {tab==="ownerRequests" && (() => {
