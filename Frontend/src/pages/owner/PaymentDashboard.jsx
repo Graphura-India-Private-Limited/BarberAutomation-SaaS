@@ -146,19 +146,15 @@ export default function PaymentDashboard() {
           <div className="relative rounded-3xl p-6 md:p-8 mb-8 overflow-hidden card text-left bg-white">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                {/* Rule 2 Kicker description tag */}
                 <p className="font-extrabold uppercase tracking-widest text-[11px] text-[#C5A059] mb-1.5 font-sans">
                   Finances & Razorpay Integration
                 </p>
-                {/* Rule 1 Single-Line Header Title */}
-                <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
                   <span className="font-bold uppercase">Payment</span>
                   <span className="italic text-[#C5A059] normal-case font-medium">Management</span>
                 </h2>
-                {/* Rule 3 Core body paragraph description text */}
                 <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-2">Track token installments, fully captured orders, and pending deposits processed through Razorpay.</p>
               </div>
-              {/* Rule 4 Ledger Refresher Action Button */}
               <button 
                 onClick={() => setPage(1)} 
                 className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 self-start md:self-center cursor-pointer hover:opacity-90 font-sans"
@@ -177,14 +173,15 @@ export default function PaymentDashboard() {
             <FilterSelect label="Type" value={filters.paymentType} onChange={value => updateFilter("paymentType", value)} options={["ALL", "TOKEN", "FULL"]} />
             <FilterSelect label="Status" value={filters.status} onChange={value => updateFilter("status", value)} options={["ALL", "PENDING", "SUCCESS", "FAILED", "REFUNDED"]} />
             
-            {/* Rule 2 Layout Labels and Input details tracking system configs */}
-            <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
-              Target Date
-              <div className="mt-2 flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50/50 px-3 py-2.5 hover:bg-white focus-within:border-[#C5A059] focus-within:bg-white transition-all">
-                <Calendar size={15} className="text-stone-400" />
-                <input type="date" value={filters.date} onChange={e => updateFilter("date", e.target.value)} className="w-full bg-transparent text-xs outline-none text-stone-800 font-bold font-sans" />
+            <div className="flex flex-col gap-1.5 text-left">
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans pl-0.5">
+                Target Date
+              </span>
+              <div className="flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50/50 px-3 h-10 hover:bg-white focus-within:border-[#C5A059] focus-within:bg-white transition-all">
+                <Calendar size={14} className="text-[#C5A059] shrink-0" />
+                <input type="date" value={filters.date} onChange={e => updateFilter("date", e.target.value)} className="w-full bg-transparent text-xs outline-none text-stone-850 font-bold font-sans" />
               </div>
-            </label>
+            </div>
 
             <FilterSelect
               label="Barber Assignee"
@@ -194,18 +191,19 @@ export default function PaymentDashboard() {
               objectOptions
             />
 
-            <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">
-              ID Search Query
-              <div className="mt-2 flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50/50 px-3 py-2.5 hover:bg-white focus-within:border-[#C5A059] focus-within:bg-white transition-all">
-                <Search size={15} className="text-stone-400" />
-                <input value={filters.q} onChange={e => updateFilter("q", e.target.value)} placeholder="Order or payment ID" className="w-full bg-transparent text-xs outline-none text-stone-800 font-bold placeholder-stone-400 font-sans" />
+            <div className="flex flex-col gap-1.5 text-left">
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans pl-0.5">
+                ID Search Query
+              </span>
+              <div className="flex items-center gap-2 rounded-xl border border-[#EADBCE] bg-stone-50/50 px-3 h-10 hover:bg-white focus-within:border-[#C5A059] focus-within:bg-white transition-all">
+                <Search size={14} className="text-[#C5A059] shrink-0" />
+                <input type="text" placeholder="e.g. pay_..." value={filters.q} onChange={e => updateFilter("q", e.target.value)} className="w-full bg-transparent text-xs outline-none text-stone-850 font-bold font-sans" />
               </div>
-            </label>
+            </div>
           </section>
 
           {/* Ledger Row Spreadsheet Ledger Container */}
           <section className="card overflow-hidden bg-white shadow-sm text-left font-sans">
-            {/* Rule 2 Table Grid Header Categories */}
             <div className="hidden grid-cols-[1.4fr_1fr_1fr_1fr_1fr_0.8fr] border-b border-stone-100 bg-stone-50/50 px-6 py-4 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] md:grid">
               <span>Transaction Reference</span><span>Customer</span><span>Barber</span><span>Amount</span><span>Status</span><span className="text-right">Action</span>
             </div>
@@ -308,8 +306,14 @@ function TransactionModal({ payment, onClose }) {
     || "—";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-stone-900/40 backdrop-blur-sm p-0 md:items-center md:justify-center md:p-6 animate-in fade-in duration-200">
-      <div className="w-full max-w-xl rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-2xl border border-stone-200 flex flex-col justify-start text-left">
+    <div 
+      className="fixed inset-0 z-50 flex items-end bg-stone-900/40 backdrop-blur-sm p-0 md:items-center md:justify-center md:p-6 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div 
+        className="w-full max-w-xl rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-2xl border border-stone-200 flex flex-col justify-start text-left max-h-[90vh] overflow-y-auto"
+        onClick={e => e.stopPropagation()}
+      >
         <div className="mb-6 flex items-center justify-between pb-4 border-b border-stone-100">
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-stone-50 border border-stone-200 p-3" style={{ color: GOLD }}><CreditCard size={20} /></div>

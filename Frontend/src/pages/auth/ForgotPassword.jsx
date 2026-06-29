@@ -141,7 +141,7 @@ export default function ForgotPassword() {
         <Navbar />
 
         {/* ── BACK ACTION SAFETY NAVIGATION CAPSULE CHIP ── */}
-        <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
+        <div className="w-full max-w-7xl mx-auto px-6 pt-24 relative z-50 flex justify-start">
           <button 
             type="button"
             onClick={() => navigate(-1)} 

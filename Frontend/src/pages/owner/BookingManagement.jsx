@@ -18,9 +18,9 @@ import {
   ArrowLeft
 } from "lucide-react";
 
-// ── ✅ SYSTEM THEME STRUCTURED GLOBAL CONSUMER WRAPPERS ──
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const CHARCOAL = "#3E362E";
 const GOLD = "#C5A059";
@@ -37,6 +37,7 @@ export default function BookingManagement() {
   const [editingBooking, setEditingBooking] = useState(null);
   const [time, setTime] = useState(new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }));
   const [currentPage, setCurrentPage] = useState(1);
+  const [paymentMode, setPaymentMode] = useState("offline");
 
   // Form State for Add/Edit
   const [formData, setFormData] = useState({
@@ -521,44 +522,47 @@ export default function BookingManagement() {
 
               <div>
                 <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2">Target Workflow Pipeline</label>
-                <select
+                <CustomSelect
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-4 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
-                >
-                  <option value="Queue">Queue Booking (Walk-in / Immediate)</option>
-                  <option value="Slot">Slot Booking (Scheduled Appointment)</option>
-                </select>
+                  onChange={(val) => setFormData({ ...formData, type: val })}
+                  options={[
+                    { value: "Queue", label: "Queue Booking (Walk-in / Immediate)" },
+                    { value: "Slot", label: "Slot Booking (Scheduled Appointment)" }
+                  ]}
+                  size="lg"
+                  className="!bg-stone-50 !border-stone-200 !text-[#3E362E] font-bold rounded-xl"
+                />
               </div>
 
               <div>
                 <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2">Assigned Barber / Artist</label>
-                <select
+                <CustomSelect
                   value={formData.barberId}
-                  onChange={(e) => setFormData({ ...formData, barberId: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-4 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
-                >
-                  <option value="">Auto-Assign / Any Barber</option>
-                  {barbers.map((b) => (
-                    <option key={b._id} value={b._id}>{b.name} ({b.status || "available"})</option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormData({ ...formData, barberId: val })}
+                  options={[
+                    { value: "", label: "Auto-Assign / Any Barber" },
+                    ...barbers.map((b) => ({ value: b._id, label: `${b.name} (${b.status || "available"})` }))
+                  ]}
+                  placeholder="Auto-Assign / Any Barber"
+                  size="lg"
+                  className="!bg-stone-50 !border-stone-200 !text-[#3E362E] font-bold rounded-xl"
+                />
               </div>
 
               <div>
                 <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2">Requested Service</label>
-                <select
+                <CustomSelect
                   value={formData.serviceId}
-                  onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-4 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
-                >
-                  {services.map((s) => (
-                    <option key={s._id} value={s._id}>{s.name} (₹{s.price})</option>
-                  ))}
-                  {services.length === 0 && (
-                    <option value="">No services available</option>
-                  )}
-                </select>
+                  onChange={(val) => setFormData({ ...formData, serviceId: val })}
+                  options={
+                    services.length > 0
+                      ? services.map((s) => ({ value: s._id, label: `${s.name} (₹${s.price})` }))
+                      : [{ value: "", label: "No services available" }]
+                  }
+                  placeholder="Select Service"
+                  size="lg"
+                  className="!bg-stone-50 !border-stone-200 !text-[#3E362E] font-bold rounded-xl"
+                />
               </div>
             </div>
           )}
@@ -655,24 +659,29 @@ export default function BookingManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2">Payment Type</label>
-                  <select
+                  <CustomSelect
                     value={formData.paymentType}
-                    onChange={(e) => setFormData({ ...formData, paymentType: e.target.value })}
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-4 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
-                  >
-                    <option value="TOKEN">Token payment (₹50/person)</option>
-                    <option value="FULL">Full payment</option>
-                  </select>
+                    onChange={(val) => setFormData({ ...formData, paymentType: val })}
+                    options={[
+                      { value: "TOKEN", label: "Token payment (₹50/person)" },
+                      { value: "FULL", label: "Full payment" }
+                    ]}
+                    size="lg"
+                    className="!bg-stone-50 !border-stone-200 !text-[#3E362E] font-bold rounded-xl"
+                  />
                 </div>
                 <div>
                   <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2">Payment Mode</label>
-                  <select
-                    className="w-full bg-stone-50 border border-stone-200 rounded-xl p-4 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
-                    defaultValue="offline"
-                  >
-                    <option value="offline">Cash / Offline</option>
-                    <option value="online">Online Simulation</option>
-                  </select>
+                  <CustomSelect
+                    value={paymentMode}
+                    onChange={(val) => setPaymentMode(val)}
+                    options={[
+                      { value: "offline", label: "Cash / Offline" },
+                      { value: "online", label: "Online Simulation" }
+                    ]}
+                    size="lg"
+                    className="!bg-stone-50 !border-stone-200 !text-[#3E362E] font-bold rounded-xl"
+                  />
                 </div>
               </div>
 

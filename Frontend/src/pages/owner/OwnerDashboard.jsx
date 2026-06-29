@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Scissors, BarChart2, CreditCard, DollarSign, UserCheck, 
   MapPin, Clock, ShieldAlert, Edit, LogOut, LayoutDashboard,
-  TrendingUp, Users, Activity, Sparkles, Image as ImageIcon, RefreshCw 
+  TrendingUp, Users, Activity, Sparkles, Image as ImageIcon, RefreshCw, Coffee 
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -17,6 +17,7 @@ export default function OwnerDashboard() {
   const [error, setError] = useState("");
   const [selectedDay, setSelectedDay] = useState(null);
   const [pendingBreaks, setPendingBreaks] = useState([]);
+  const [showBreaks, setShowBreaks] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -155,6 +156,68 @@ export default function OwnerDashboard() {
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             </button>
+
+            {/* Toggle Button for Break Requests */}
+            <div className="relative">
+              <button 
+                type="button"
+                onClick={() => setShowBreaks(!showBreaks)}
+                className="flex items-center justify-center p-2.5 rounded-xl bg-white border border-[#EADBCE] hover:bg-stone-50 cursor-pointer transition shadow-2xs relative"
+                title="Break Requests"
+              >
+                <Coffee className="w-3.5 h-3.5 text-[#3E362E]" />
+                {pendingBreaks.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                )}
+              </button>
+
+              {showBreaks && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setShowBreaks(false)} />
+                  <div className="fixed top-24 left-4 right-4 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-2.5 sm:w-80 bg-white border border-[#EADBCE] rounded-2xl p-4 shadow-xl z-40 text-left text-sm text-[#3E362E] animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="border-b border-[#EADBCE]/50 pb-2 mb-2 flex justify-between items-center">
+                      <span className="font-serif font-black text-[#8B5A2B] uppercase tracking-wider text-xs">Break Requests</span>
+                      <span className="text-[9px] font-bold bg-[#8B5A2B]/10 text-[#8B5A2B] px-2 py-0.5 rounded-full">{pendingBreaks.length} Pending</span>
+                    </div>
+                    
+                    {pendingBreaks.length === 0 ? (
+                      <p className="text-xs text-stone-400 font-medium py-4 text-center">No pending break requests.</p>
+                    ) : (
+                      <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                        {pendingBreaks.map((req) => (
+                          <div key={req._id} className="border-b border-stone-100 pb-3 last:border-0 last:pb-0">
+                            <div className="flex justify-between items-start gap-1">
+                              <div>
+                                <p className="text-xs font-black text-[#8B5A2B]">{req.barber_id?.name || "A Barber"}</p>
+                                <p className="text-[10px] text-stone-500 mt-0.5">
+                                  Type: <span className="capitalize">{req.break_type}</span> ({req.duration_mins || 15}m)
+                                </p>
+                                {req.reason && <p className="text-[10px] italic text-stone-400 mt-1">"{req.reason}"</p>}
+                              </div>
+                              <div className="flex flex-col gap-1.5 shrink-0">
+                                <button 
+                                  onClick={() => { handleBreakAction(req._id, "approve"); setShowBreaks(false); }}
+                                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[8px] uppercase tracking-wider rounded-md transition cursor-pointer border-none"
+                                >
+                                  Approve
+                                </button>
+                                <button 
+                                  onClick={() => { handleBreakAction(req._id, "reject"); setShowBreaks(false); }}
+                                  className="px-2.5 py-1 bg-white border border-red-200 hover:border-red-400 text-red-600 font-extrabold text-[8px] uppercase tracking-wider rounded-md transition cursor-pointer"
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
             <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#EADBCE] shadow-2xs">
               <span className={`h-2 w-2 rounded-full ${statusMeta.dot}`} />
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">{statusMeta.label}</span>
@@ -360,50 +423,7 @@ export default function OwnerDashboard() {
         </div>
       )}
 
-      {/* 🚨 FLOATING BREAK REQUEST NOTIFICATIONS (RIGHT SIDE) */}
-      {pendingBreaks.length > 0 && (
-        <div className="fixed top-24 right-6 z-40 w-full max-w-xs space-y-3 pointer-events-none">
-          {pendingBreaks.map((req) => (
-            <div 
-              key={req._id}
-              className="pointer-events-auto bg-white border border-[#EADBCE] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 animate-in slide-in-from-right-10 text-left font-sans"
-            >
-              <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
-                  <ShieldAlert className="text-amber-600 w-4 h-4 animate-pulse" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-[10px] font-black uppercase tracking-wider text-[#3E362E]">
-                    Break Request
-                  </h4>
-                  <p className="text-sm font-black text-[#8B5A2B] mt-0.5 leading-tight">
-                    {req.barber_id?.name || "A Barber"}
-                  </p>
-                  <p className="text-[11px] text-stone-500 mt-1 leading-normal">
-                    Type: <span className="font-semibold capitalize text-stone-700">{req.break_type}</span> ({req.duration_mins || 15}m)
-                    {req.reason && <span className="block italic mt-1 bg-stone-50 p-1.5 rounded border border-stone-100 text-stone-600">"{req.reason}"</span>}
-                  </p>
-                  
-                  <div className="flex gap-2 mt-3">
-                    <button 
-                      onClick={() => handleBreakAction(req._id, "approve")}
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[9px] uppercase tracking-wider py-1.5 rounded-lg transition cursor-pointer font-sans shadow-3xs border-none"
-                    >
-                      Approve
-                    </button>
-                    <button 
-                      onClick={() => handleBreakAction(req._id, "reject")}
-                      className="flex-1 bg-white border border-red-200 hover:border-red-400 text-red-600 font-extrabold text-[9px] uppercase tracking-wider py-1.5 rounded-lg transition cursor-pointer font-sans"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+
     </div>
   );
 }

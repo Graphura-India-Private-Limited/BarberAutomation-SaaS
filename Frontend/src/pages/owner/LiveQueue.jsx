@@ -413,7 +413,7 @@ export default function LiveQueue() {
             No barbers added yet. Ask admin to add barbers to this salon.
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {barbers.map(b => {
               const sc = b.status === "available" ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
                        : b.status === "busy"      ? "text-zinc-600 bg-zinc-100 border border-zinc-200"
@@ -425,8 +425,8 @@ export default function LiveQueue() {
                     {b.name?.[0]?.toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-zinc-900 truncate">{b.name}</p>
-                    <p className="text-xs text-zinc-500 truncate">{b.specialization || "Barber"}</p>
+                    <p className="font-bold text-sm text-zinc-900 leading-snug">{b.name}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">{b.specialization || "Barber"}</p>
                     <span className={`inline-block text-[9px] font-bold uppercase tracking-wider mt-1.5 px-2.5 py-0.5 rounded-full border ${sc}`}>
                       ● {b.status}
                     </span>

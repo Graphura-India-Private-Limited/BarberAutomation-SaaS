@@ -9,6 +9,7 @@ import { TicketFilters } from "../../components/admin/TicketFilters.jsx";
 import { TicketTable } from "../../components/admin/TicketTable.jsx";
 import { TicketDetailModal } from "../../components/admin/TicketDetailModal.jsx";
 import { getStats, TICKET_STATUS, TICKET_PRIORITY, TICKET_TYPE } from "../../utils/tickets.jsx";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
@@ -142,7 +143,7 @@ export default function OwnerSupportPage({ ticketState }) {
         </header>
 
         {/* Tab Menu Header */}
-        <div className="flex gap-6 border-b border-stone-200 mb-8 overflow-x-auto select-none">
+        <div className="hidden sm:flex gap-6 border-b border-stone-200 mb-8 overflow-x-auto select-none">
           {[
             { id: "overview", label: "Dashboard" },
             { id: "tickets", label: "All Tickets" },
@@ -157,6 +158,21 @@ export default function OwnerSupportPage({ ticketState }) {
               {t.label}
             </button>
           ))}
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        <div className="sm:hidden mb-6 text-left">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5 font-sans">View Section</label>
+          <CustomSelect
+            value={activeTab}
+            onChange={setActiveTab}
+            options={[
+              { value: "overview", label: "Dashboard" },
+              { value: "tickets", label: "All Tickets" },
+              { value: "reports", label: "Reports" },
+              { value: "settings", label: "Escalation Settings" }
+            ]}
+          />
         </div>
 
         {/* Tab Viewports */}
@@ -388,13 +404,13 @@ export default function OwnerSupportPage({ ticketState }) {
                         { key: "emailEscalation", label: "Email on critical escalations" },
                         { key: "dailyDigest", label: "Receive daily ticket summaries digest" }
                       ].map(pref => (
-                        <label key={pref.key} className="flex items-center justify-between cursor-pointer group">
+                        <label key={pref.key} className="flex items-center justify-between gap-3 cursor-pointer group">
                           <span className="text-sm font-semibold text-stone-600 group-hover:text-stone-900 transition-colors">{pref.label}</span>
                           <button
                             role="switch"
                             aria-checked={notifPrefs[pref.key]}
                             onClick={() => toggleNotif(pref.key)}
-                            className={`relative w-11 h-6 rounded-full transition-colors outline-none cursor-pointer ${notifPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
+                            className={`relative w-11 h-6 shrink-0 rounded-full transition-colors outline-none cursor-pointer ${notifPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
                           >
                             <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${notifPrefs[pref.key] ? "translate-x-5" : ""}`} />
                           </button>
@@ -421,13 +437,13 @@ export default function OwnerSupportPage({ ticketState }) {
                         { key: "twoFactor", label: "Enforce multi-factor verification on resolutions" },
                         { key: "sessionTimeout", label: "Support terminal session timeout (30 min)" }
                       ].map(pref => (
-                        <label key={pref.key} className="flex items-center justify-between cursor-pointer group">
+                        <label key={pref.key} className="flex items-center justify-between gap-3 cursor-pointer group">
                           <span className="text-sm font-semibold text-stone-600 group-hover:text-stone-900 transition-colors">{pref.label}</span>
                           <button
                             role="switch"
                             aria-checked={securityPrefs[pref.key]}
                             onClick={() => toggleSecurity(pref.key)}
-                            className={`relative w-11 h-6 rounded-full transition-colors outline-none cursor-pointer ${securityPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
+                            className={`relative w-11 h-6 shrink-0 rounded-full transition-colors outline-none cursor-pointer ${securityPrefs[pref.key] ? "bg-[#C5A059]" : "bg-stone-200"}`}
                           >
                             <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${securityPrefs[pref.key] ? "translate-x-5" : ""}`} />
                           </button>

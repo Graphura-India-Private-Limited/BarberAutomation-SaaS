@@ -7,24 +7,66 @@ import {
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
-const MOCK_REVIEW_STATS = {
-  averageRating: 5.0,
-  totalReviews: 0,
-  fiveStars: 0,
-  fourStars: 0,
-  threeStars: 0,
-};
-
-const MOCK_REVIEWS_LIST = [];
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function BarberReviews() {
-  // ✅ FIX: Reviews must sit in local state to mutate helpful numbers dynamically
-  const [reviews, setReviews] = useState(MOCK_REVIEWS_LIST);
+  const barberId = localStorage.getItem("barberId");
+  const [reviews, setReviews] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [stats, setStats] = useState({
+    averageRating: 5.0,
+    totalReviews: 0,
+    fiveStars: 0,
+    fourStars: 0,
+    threeStars: 0,
+  });
   
   // Track liked review elements locally to prevent double voting spam
   const [clickedHelpful, setClickedHelpful] = useState({});
   const profile = { salonName: "Master Barber Lounge", initials: "MB" };
+
+  React.useEffect(() => {
+    if (!barberId) return;
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch(`${API}/review/barber/${barberId}`);
+        const data = await res.json();
+        if (data.success && data.reviews) {
+          const revs = data.reviews.map(r => ({
+            id: r._id,
+            client: r.customer_id?.name || "Anonymous Client",
+            verified: true,
+            service: r.service || "Premium Styling",
+            rating: r.barber_rating || r.salon_rating || 5,
+            text: r.review_text || "",
+            date: r.created_at ? new Date(r.created_at).toLocaleDateString("en-IN", { dateStyle: "medium" }) : "Recently",
+            helpfulCount: 0
+          }));
+          setReviews(revs);
+
+          // Calculate stats dynamically
+          const total = revs.length;
+          const avg = total > 0 ? Number((revs.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1)) : 5.0;
+          const five = revs.filter(r => r.rating === 5).length;
+          const four = revs.filter(r => r.rating === 4).length;
+          const three = revs.filter(r => r.rating <= 3).length;
+
+          setStats({
+            averageRating: avg,
+            totalReviews: total,
+            fiveStars: five,
+            fourStars: four,
+            threeStars: three,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching barber reviews:", err);
+      }
+    };
+    fetchReviews();
+  }, [barberId]);
+
+  const getPercent = (val) => stats.totalReviews > 0 ? `${Math.round((val / stats.totalReviews) * 100)}%` : "0%";
 
   // ── ✅ NEW INTERACTIVE FUNCTIONALITY ENGINE ──
   const handleHelpfulClick = (id) => {
@@ -73,7 +115,7 @@ export default function BarberReviews() {
             <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
               <MessageSquare size={13} className="text-[#C5A059]" />
               <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
-                {MOCK_REVIEW_STATS.totalReviews} Global Client Reviews Checked
+                {stats.totalReviews} Global Client Reviews Checked
               </span>
             </div>
           </div>
@@ -85,11 +127,11 @@ export default function BarberReviews() {
             <div className="col-span-12 md:col-span-4 card p-6 bg-white flex flex-col items-center justify-center text-center rounded-2xl border border-stone-200/60 shadow-3xs">
               <h3 className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-1">Quality Index</h3>
               <div className="text-5xl font-black font-serif text-stone-900 tracking-tight flex items-baseline gap-1">
-                {MOCK_REVIEW_STATS.averageRating} <span className="text-xl text-stone-400 font-sans font-medium">/ 5</span>
+                {stats.averageRating} <span className="text-xl text-stone-400 font-sans font-medium">/ 5</span>
               </div>
               <div className="flex gap-1 my-2.5">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={15} fill={GOLD} stroke="none" />
+                  <Star key={i} size={15} fill={i < Math.round(stats.averageRating) ? GOLD : "#EFEBE4"} stroke="none" />
                 ))}
               </div>
               <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mt-1">98% Satisfaction Share</p>
@@ -100,9 +142,9 @@ export default function BarberReviews() {
               <h4 className="text-[10px] font-black uppercase tracking-widest text-stone-400 border-b pb-2 border-stone-50">Density Distribution</h4>
               
               {[
-                { label: "5 Stars", val: MOCK_REVIEW_STATS.fiveStars, w: "90%", color: "bg-[#C5A059]" },
-                { label: "4 Stars", val: MOCK_REVIEW_STATS.fourStars, w: "8%", color: "bg-[#3E362E]" },
-                { label: "3 Stars", val: MOCK_REVIEW_STATS.threeStars, w: "2%", color: "bg-stone-300" }
+                { label: "5 Stars", val: stats.fiveStars, w: getPercent(stats.fiveStars), color: "bg-[#C5A059]" },
+                { label: "4 Stars", val: stats.fourStars, w: getPercent(stats.fourStars), color: "bg-[#3E362E]" },
+                { label: "3 Stars", val: stats.threeStars, w: getPercent(stats.threeStars), color: "bg-stone-300" }
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-4 text-xs font-bold">
                   <span className="w-14 text-stone-500 shrink-0">{row.label}</span>

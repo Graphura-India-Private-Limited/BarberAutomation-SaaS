@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, ShieldCheck, Briefcase, Phone, Award, Save } from "lucide-react";
+import { User, ShieldCheck, Briefcase, Phone, Award, Save, X } from "lucide-react";
 import CustomSelect from "../../components/common/CustomSelect";
 
 const API      = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -35,6 +35,12 @@ function BarberProfile() {
 
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
+  const [toast,    setToast]    = useState(null);
+
+  const triggerToast = (msg, type = "success") => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const salonInfo = { salonName: "Master Barber Lounge", initials: "AS" };
 
@@ -85,13 +91,13 @@ function BarberProfile() {
       });
       const data = await res.json();
       if (data.success) {
-        alert("Profile saved successfully!");
+        triggerToast("Profile saved successfully!", "success");
       } else {
-        alert(data.message || "Failed to save profile.");
+        triggerToast(data.message || "Failed to save profile.", "error");
       }
     } catch (err) {
       console.error("Save error:", err);
-      alert("Network error. Make sure the backend is running.");
+      triggerToast("Network error. Make sure the backend is running.", "error");
     } finally {
       setSaving(false);
     }
@@ -242,6 +248,26 @@ function BarberProfile() {
 
         </div>
       </main>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-5 py-4 rounded-2xl border shadow-xl text-xs font-black uppercase tracking-wider transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 ${
+            toast.type === "error"
+              ? "bg-[#FFF5F5] text-[#C53030] border-[#FEB2B2]"
+              : "bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]"
+          }`}
+        >
+          <span>{toast.msg}</span>
+          <button 
+            type="button" 
+            onClick={() => setToast(null)}
+            className="w-5 h-5 rounded-lg flex items-center justify-center border-none bg-transparent hover:bg-black/5 cursor-pointer text-current"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
