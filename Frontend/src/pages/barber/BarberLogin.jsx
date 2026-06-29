@@ -70,8 +70,8 @@ export default function BarberLogin() {
   const fillDemo = () => { setMobile(DEMO.mobile); setPassword(DEMO.password); setError(""); };
 
   return (
-    <div className="min-h-screen bg-[#111] flex">
-      <div className="w-full h-screen bg-white flex">
+    <div className="min-h-screen bg-[#111] flex overflow-y-auto">
+      <div className="w-full min-h-screen bg-white flex flex-col md:flex-row overflow-y-auto">
 
         {/* ── LEFT: Barber Hero ── */}
         <div className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden">

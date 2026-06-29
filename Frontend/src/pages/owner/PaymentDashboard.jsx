@@ -49,6 +49,24 @@ export default function PaymentDashboard() {
     return () => clearInterval(timer);
   }, []);
 
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [allBarbers, setAllBarbers] = useState([]);
+
+  useEffect(() => {
+    const salonId = localStorage.getItem("salonId");
+    if (!salonId) return;
+    fetch(`${API}/barber/salon/${salonId}`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success && res.barbers) {
+          setAllBarbers(res.barbers.map(b => ({ id: b._id, name: b.name })));
+        }
+      })
+      .catch(err => console.error("Error loading barbers:", err));
+  }, []);
+
   const params = useMemo(() => {
     const query = new URLSearchParams({ page, limit: 10 });
     Object.entries(filters).forEach(([key, value]) => {
@@ -66,15 +84,16 @@ export default function PaymentDashboard() {
       .catch(err => active && setError(err.message))
       .finally(() => active && setLoading(false));
     return () => { active = false; };
-  }, [params]);
+  }, [params, refreshTrigger]);
 
   const barbers = useMemo(() => {
+    if (allBarbers.length > 0) return allBarbers;
     const map = new Map();
     data.payments.forEach(payment => {
       if (payment.barber_id?._id) map.set(payment.barber_id._id, payment.barber_id.name);
     });
     return Array.from(map, ([id, name]) => ({ id, name }));
-  }, [data.payments]);
+  }, [data.payments, allBarbers]);
 
   const updateFilter = (name, value) => {
     setFilters(prev => ({ ...prev, [name]: value }));
@@ -156,7 +175,7 @@ export default function PaymentDashboard() {
                 <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-2">Track token installments, fully captured orders, and pending deposits processed through Razorpay.</p>
               </div>
               <button 
-                onClick={() => setPage(1)} 
+                onClick={() => { setPage(1); setRefreshTrigger(prev => prev + 1); }} 
                 className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 self-start md:self-center cursor-pointer hover:opacity-90 font-sans"
                 style={{ background: CHARCOAL }}
               >
@@ -311,24 +330,24 @@ function TransactionModal({ payment, onClose }) {
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-xl rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-2xl border border-stone-200 flex flex-col justify-start text-left max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-2xl border border-stone-200 flex flex-col justify-start text-left max-h-[85vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        <div className="mb-6 flex items-center justify-between pb-4 border-b border-stone-100">
+        <div className="mb-4 flex items-center justify-between pb-3 border-b border-stone-100">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-stone-50 border border-stone-200 p-3" style={{ color: GOLD }}><CreditCard size={20} /></div>
+            <div className="rounded-xl bg-stone-50 border border-stone-200 p-2.5" style={{ color: GOLD }}><CreditCard size={18} /></div>
             <div>
               {/* Rule 1 Nested Side Drawer Header Title */}
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+              <h2 className="font-serif text-lg tracking-normal text-stone-900 flex items-center justify-start gap-1">
                 <span className="font-bold uppercase">Transaction</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Details</span>
               </h2>
-              <p className="text-[10px] text-stone-400 font-mono font-bold mt-0.5">{payment.razorpay_payment_id || "Payment mapping pending capture"}</p>
+              <p className="text-[9px] text-stone-400 font-mono font-bold mt-0.5">{payment.razorpay_payment_id || "Payment mapping pending capture"}</p>
             </div>
           </div>
-          <button onClick={onClose} className="rounded-xl border border-stone-200 bg-stone-50 text-stone-400 p-2 hover:text-stone-600 hover:bg-stone-100 transition-all cursor-pointer"><X size={16} /></button>
+          <button onClick={onClose} className="rounded-xl border border-stone-200 bg-stone-50 text-stone-400 p-2 hover:text-stone-600 hover:bg-stone-100 transition-all cursor-pointer"><X size={14} /></button>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="divide-y divide-stone-100/60 pr-1">
           <Detail label="Amount Captured" value={money(payment.amount)} highlight />
           <Detail label="Gateway Status" value={payment.status} />
           <Detail label="Payment Type" value={payment.payment_type} />
@@ -346,10 +365,9 @@ function TransactionModal({ payment, onClose }) {
 
 function Detail({ label, value, highlight = false }) {
   return (
-    <div className="bg-[#FAF6F0]/60 rounded-xl p-4 border border-[#EADBCE]/60 transition-all text-left">
-      {/* Rule 2 Meta item info cards titles */}
-      <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">{label}</p>
-      <p className={`mt-1.5 break-words text-sm font-bold font-sans ${highlight ? 'font-mono text-stone-900 text-base' : 'text-stone-900'}`}>{value}</p>
+    <div className="flex justify-between items-center py-3 border-b border-stone-100 last:border-0 text-left font-sans text-xs gap-4">
+      <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C5A059] shrink-0">{label}</span>
+      <span className={`font-bold text-stone-900 text-right ${highlight ? 'font-mono text-sm text-amber-800' : 'break-all'}`}>{value}</span>
     </div>
   );
 }

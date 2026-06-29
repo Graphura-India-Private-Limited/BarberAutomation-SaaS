@@ -333,6 +333,31 @@ export default function FinancialAnalytics() {
     return reports;
   }, [timeFilter, reportType, salonReports]);
 
+  const handleExportCSV = () => {
+    if (!displayData.length) return;
+    const headers = ["Active Salon Node", "Bookings", "Customers Served", "Avg Operational Delay", "Revenue Yield"];
+    const rows = displayData.map(salon => [
+      `"${salon.name.replace(/"/g, '""')}"`,
+      salon.bookings,
+      salon.customers,
+      `"${salon.delayAvg}"`,
+      salon.revenue
+    ]);
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(r => r.join(","))
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Salon_Telemetry_Report_${timeFilter}_${reportType}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // ─── FINANCE TAB STATES & CONFIGS ───
   const isOwner = currentUser?.role === "owner" || true; // Fallback for testing
   const hasContextData = contextFinanceData && (contextFinanceData.todayRevenue > 0 || contextFinanceData.barberBreakdown?.length > 0);
@@ -892,7 +917,9 @@ export default function FinancialAnalytics() {
                           </h2>
                           <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Detailed structural matrix audit metrics across active franchise coordinates logs ({timeFilter})</p>
                         </div>
-                        <button className="rounded-xl border h-10 px-4 text-xs font-extrabold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer font-sans border-none"
+                        <button 
+                          onClick={handleExportCSV}
+                          className="rounded-xl border h-10 px-4 text-xs font-extrabold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer font-sans border-none"
                           style={{ backgroundColor: `${GOLD}10`, color: GOLD, borderColor: `${GOLD}40` }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = GOLD;

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { 
   Users, Scissors, Phone, Award, ShieldCheck, 
   Trash2, Coffee, Sparkles, Check, Star, RefreshCw, Plus,
-  Minimize2, Maximize2, Eye, FileText, X, Edit
+  Minimize2, Maximize2, Eye, FileText, X, Edit, Upload
 } from "lucide-react";
 
 
@@ -18,6 +18,7 @@ export default function BarberTeam() {
   const [toast, setToast] = useState(null);
   const [busyId, setBusyId] = useState(null);
   const [selectedBarber, setSelectedBarber] = useState(null);
+  const [deactivatingId, setDeactivatingId] = useState(null);
   const [isMaximized, setIsMaximized] = useState(false);
   const [viewingDocument, setViewingDocument] = useState(false);
 
@@ -110,8 +111,7 @@ export default function BarberTeam() {
     }
   };
 
-  const deactivateBarber = async (barberId) => {
-    if (!window.confirm("Are you sure you want to deactivate this barber? They will be removed from your active team catalog.")) return;
+  const executeDeactivation = async (barberId) => {
     setBusyId(barberId);
     try {
       const res = await fetch(`${API}/barber/${barberId}`, {
@@ -390,8 +390,8 @@ export default function BarberTeam() {
                           >
                             <Edit size={16} />
                           </button>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); deactivateBarber(barber._id); }}
+                           <button 
+                            onClick={(e) => { e.stopPropagation(); setDeactivatingId(barber._id); }}
                             disabled={busyId === barber._id}
                             className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition cursor-pointer disabled:opacity-40"
                             title="Deactivate Barber"
@@ -777,7 +777,7 @@ export default function BarberTeam() {
                       </div>
                     ) : (
                       <div className="py-6 flex flex-col items-center justify-center border-2 border-dashed border-[#EADBCE] rounded-2xl bg-[#FAFAF8] cursor-pointer hover:border-[#C5A059] hover:bg-[#FEF9F0] transition h-32">
-                        <div className="text-3xl mb-2">📷</div>
+                        <Upload className="w-8 h-8 text-[#C5A059] mb-2 stroke-[2.5px]" />
                         <p className="text-xs font-semibold text-stone-600 font-sans">Click to upload photo</p>
                         <p className="text-[10px] text-stone-400 font-sans mt-0.5">JPG, PNG up to 5MB</p>
                       </div>
@@ -791,7 +791,7 @@ export default function BarberTeam() {
                   <div className="upload-box" onClick={() => editDocRef.current?.click()}>
                     {editingBarber.documentName ? (
                       <div className="w-full p-4 bg-emerald-50/50 border border-emerald-200/50 rounded-xl text-center flex flex-col items-center justify-center h-32">
-                        <div className="text-3xl mb-1">📄</div>
+                        <Upload className="w-8 h-8 text-emerald-600 mb-2 stroke-[2.5px]" />
                         <p className="text-xs font-bold text-emerald-800 truncate w-full px-2">{editingBarber.documentName}</p>
                         <button 
                           type="button"
@@ -803,7 +803,7 @@ export default function BarberTeam() {
                       </div>
                     ) : (
                       <div className="py-6 flex flex-col items-center justify-center border-2 border-dashed border-[#EADBCE] rounded-2xl bg-[#FAFAF8] cursor-pointer hover:border-[#C5A059] hover:bg-[#FEF9F0] transition h-32">
-                        <div className="text-3xl mb-2">📄</div>
+                        <Upload className="w-8 h-8 text-[#C5A059] mb-2 stroke-[2.5px]" />
                         <p className="text-xs font-semibold text-stone-600 font-sans">Upload ID/Aadhar</p>
                         <p className="text-[10px] text-stone-400 font-sans mt-0.5">PDF, JPG, PNG</p>
                       </div>
@@ -928,6 +928,38 @@ export default function BarberTeam() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deactivatingId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="w-full max-w-sm bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-2xl text-left">
+            <div className="flex items-center gap-2 pb-3 border-b border-stone-100 mb-4">
+              <span className="text-xl">⚠️</span>
+              <h3 className="font-serif text-lg font-bold text-stone-950">Deactivate Stylist</h3>
+            </div>
+            <p className="text-stone-600 text-sm leading-relaxed mb-6 font-sans">
+              Are you sure you want to deactivate this barber? They will be removed from your active team catalog.
+            </p>
+            <div className="flex justify-end gap-3 pt-3 border-t border-stone-100 font-sans">
+              <button 
+                onClick={() => setDeactivatingId(null)}
+                className="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-500 hover:text-stone-800 hover:bg-stone-50 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  const targetId = deactivatingId;
+                  setDeactivatingId(null);
+                  await executeDeactivation(targetId);
+                }}
+                className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Deactivate
+              </button>
+            </div>
           </div>
         </div>
       )}

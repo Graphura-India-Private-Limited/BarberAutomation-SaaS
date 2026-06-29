@@ -223,7 +223,7 @@ exports.startService = async (req, res) => {
       return res.status(400).json({ success: false, message: "Barber is already attending another customer" });
     }
 
-    await Queue.findByIdAndUpdate(req.params.queue_id, { status: "in-progress" });
+    await Queue.findByIdAndUpdate(req.params.queue_id, { status: "in-progress", served_at: new Date() });
     if (q.booking_id) {
       await Booking.findByIdAndUpdate(q.booking_id, { status: "in-progress" });
     }

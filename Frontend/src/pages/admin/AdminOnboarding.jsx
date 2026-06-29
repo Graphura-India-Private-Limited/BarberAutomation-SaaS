@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Store, Users, UserSquare2, UserPlus2, 
   CalendarCheck, Scissors, CreditCard, Star, Activity, Settings, LogOut,
-  Bell, RefreshCw, ChevronDown, X, Eye, Minimize2, Maximize2, Award, Phone, ShieldCheck, FileText, Inbox, Menu
+  Bell, RefreshCw, ChevronDown, X, Eye, Minimize2, Maximize2, Award, Phone, ShieldCheck, FileText, Inbox, Menu, Download
 } from "lucide-react";  
 import { useTickets } from "../../utils/useTickets";
 import { TicketsPage } from "./TicketsPage";
@@ -234,39 +234,93 @@ const formatDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 };
 
-const PaginationSelect = ({ value, onChange, options }) => (
-  <div style={{ position: "relative", display: "inline-block" }}>
-    <select
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
-      style={{
-        padding: "5px 28px 5px 12px",
-        borderRadius: 10,
-        border: `1px solid ${C.border}`,
-        background: "#FAF9F6",
-        fontSize: 11,
-        color: C.ink,
-        cursor: "pointer",
-        outline: "none",
-        fontWeight: 700,
-        textTransform: "uppercase",
-        letterSpacing: "0.05em",
-        appearance: "none",
-        WebkitAppearance: "none",
-        MozAppearance: "none"
-      }}
-    >
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-    <div style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", display: "flex", alignItems: "center", color: C.gold }}>
-      <ChevronDown size={12} style={{ strokeWidth: "2.5px" }} />
+const PaginationSelect = ({ value, onChange, options }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={containerRef} style={{ position: "relative", display: "inline-block", textAlign: "left" }}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          padding: "5px 24px 5px 12px",
+          borderRadius: 10,
+          border: `1px solid ${C.border}`,
+          background: "#FAF9F6",
+          fontSize: 11,
+          color: C.ink,
+          cursor: "pointer",
+          outline: "none",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          minWidth: 52,
+          justifyContent: "space-between"
+        }}
+      >
+        <span>{value}</span>
+        <ChevronDown size={11} style={{ strokeWidth: "2.5px", transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: C.gold }} />
+      </button>
+
+      {isOpen && (
+        <div style={{
+          position: "absolute",
+          bottom: "calc(100% + 4px)",
+          left: 0,
+          minWidth: "100%",
+          background: "#FFFFFF",
+          border: `1px solid ${C.border}`,
+          borderRadius: 8,
+          boxShadow: "0 -4px 15px rgba(0,0,0,0.08)",
+          zIndex: 999,
+          padding: "2px 0",
+        }}>
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => {
+                onChange(Number(opt));
+                setIsOpen(false);
+              }}
+              style={{
+                width: "100%",
+                padding: "6px 12px",
+                background: value === opt ? `${C.gold}15` : "transparent",
+                border: "none",
+                textAlign: "center",
+                fontSize: 11,
+                color: C.ink,
+                fontWeight: value === opt ? 700 : 500,
+                cursor: "pointer",
+                outline: "none",
+                display: "block",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = `${C.gold}25`; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = value === opt ? `${C.gold}15` : "transparent"; }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 const SectionCard = ({ title, actionLabel, onAction, children, minHeight }) => (
   <div style={{ background: C.card, borderRadius: 16, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,.04)" }}>
@@ -394,7 +448,14 @@ export default function AdminOnboarding() {
   const photoRef  = useRef();
   const docRef    = useRef();
   const adminMenuRef = useRef(null);
+  const sidebarRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (sidebarRef.current) {
+      sidebarRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [showMobileStatsDropdown, setShowMobileStatsDropdown] = useState(false);
@@ -904,7 +965,7 @@ export default function AdminOnboarding() {
   const currentNavLabel = NAV.find(n => n.k === tab)?.label || "Dashboard";
 
   return (
-    <div style={{ display:"flex", minHeight:"100vh", background: C.bg, color: C.ink, fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+    <div style={{ display:"flex", minHeight:"100vh", background: C.bg, color: C.ink, fontFamily: "'Segoe UI', system-ui, sans-serif", overflowX: "hidden", maxWidth: "100vw" }}>
       <style>{`
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:3px}
@@ -934,12 +995,12 @@ export default function AdminOnboarding() {
         />
       )}
 
-      {/* ════ SIDEBAR ════ */}
       <aside 
-        className={`bg-white border-r border-stone-200 h-screen md:sticky md:top-0 overflow-y-auto z-50 transition-all duration-300 flex flex-col shrink-0
+        ref={sidebarRef}
+        className={`bg-white border-r border-stone-200 h-screen fixed inset-y-0 left-0 w-64 z-50 transition-all duration-300 flex flex-col shrink-0 overflow-hidden
           ${isSidebarOpen 
-            ? "fixed inset-y-0 left-0 w-64 translate-x-0 shadow-2xl md:translate-x-0 md:relative md:w-64" 
-            : "fixed inset-y-0 left-0 w-64 -translate-x-full md:translate-x-0 md:relative md:w-64"
+            ? "translate-x-0 shadow-2xl" 
+            : "-translate-x-full md:translate-x-0"
           }
         `}
       >
@@ -974,15 +1035,12 @@ export default function AdminOnboarding() {
         </div>
 
         {/* Nav */}
-        <nav style={{ padding: "0 16px 8px", flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+        <nav style={{ padding: "0 16px 8px", flex: 1, display: "flex", flexDirection: "column", gap: 2, overflowY: "auto" }}>
           {NAV.map((n, i) => {
             const isActive = tab === n.k;
             const Icon = NAV_ICONS[n.k] || LayoutDashboard;
             return (
               <React.Fragment key={n.k}>
-                {(i === 2 || i === 5 || i === 6) && (
-                  <div style={{ height: 1, background: C.border, margin: "10px 0" }} />
-                )}
                 <button
                   className={isActive ? "" : "nav-btn"}
                   onClick={() => handleTabChange(n.k)}
@@ -1034,22 +1092,22 @@ export default function AdminOnboarding() {
       </aside>
 
       {/* ════ MAIN ════ */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="px-4 md:px-8">
+      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden md:pl-64" style={{ width: "100%" }}>
+        <div className="px-4 md:px-8 w-full min-w-0">
 
           {/* ── HEADER ── */}
           <header 
             className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-12 pb-6"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
               <button 
                 onClick={() => setIsSidebarOpen(true)}
                 className="md:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
               >
                 <Menu size={18} className="text-[#C5A059]" />
               </button>
-              <div>
-                <h1 style={{ fontSize: 42, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1, marginBottom: 8 }}>
+              <div className="min-w-0 flex-1">
+                <h1 style={{ fontSize: "clamp(24px, 5.5vw, 40px)", fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1.1, marginBottom: 8, whiteSpace: "normal", wordBreak: "break-word" }}>
                   {currentNavLabel}
                 </h1>
               {tab === "dashboard" ? (
@@ -1241,56 +1299,58 @@ export default function AdminOnboarding() {
               </span>
             </div>
             
-            <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: C.muted }}>Filter Studio:</span>
-              <button
-                type="button"
-                onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                style={{
-                  padding: "6px 14px",
-                  borderRadius: 10,
-                  border: `1px solid ${C.gold}50`,
-                  background: "#FAF9F6",
-                  fontSize: 12,
-                  color: C.ink,
-                  fontWeight: 705,
-                  outline: "none",
-                  cursor: "pointer",
-                  minWidth: 200,
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 8,
-                }}
-              >
-                <span>
-                  {selectedSalonId ? `💈 ${salons.find(s => s._id === selectedSalonId)?.salon_name}` : "✨ All Studios / Salons"}
-                </span>
-                <ChevronDown size={12} style={{ transform: showFilterDropdown ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: C.muted }} />
-              </button>
-
-              {showFilterDropdown && (
-                <>
-                  <div 
-                    onClick={() => setShowFilterDropdown(false)} 
-                    style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
-                  />
-                  <div style={{
-                    position: "absolute",
-                    top: "calc(100% + 4px)",
-                    right: 0,
-                    minWidth: "100%",
-                    maxHeight: 250,
-                    overflowY: "auto",
-                    background: "#FAF9F6",
-                    border: `1px solid ${C.gold}50`,
+              <div style={{ position: "relative", minWidth: 200 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                  style={{
+                    padding: "6px 14px",
                     borderRadius: 10,
-                    boxShadow: "0 8px 30px rgba(197,160,89,0.15)",
-                    zIndex: 999,
-                    padding: "4px 0",
-                    textAlign: "left",
-                  }}>
+                    border: `1px solid ${C.gold}50`,
+                    background: "#FAF9F6",
+                    fontSize: 12,
+                    color: C.ink,
+                    fontWeight: 705,
+                    outline: "none",
+                    cursor: "pointer",
+                    width: "100%",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 8,
+                  }}
+                >
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {selectedSalonId ? `💈 ${salons.find(s => s._id === selectedSalonId)?.salon_name}` : "✨ All Studios / Salons"}
+                  </span>
+                  <ChevronDown size={12} style={{ transform: showFilterDropdown ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", color: C.muted, flexShrink: 0 }} />
+                </button>
+
+                {showFilterDropdown && (
+                  <>
+                    <div 
+                      onClick={() => setShowFilterDropdown(false)} 
+                      style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
+                    />
+                    <div style={{
+                      position: "absolute",
+                      top: "calc(100% + 4px)",
+                      right: 0,
+                      left: 0,
+                      minWidth: 220,
+                      maxHeight: 250,
+                      overflowY: "auto",
+                      background: "#FAF9F6",
+                      border: `1px solid ${C.gold}50`,
+                      borderRadius: 10,
+                      boxShadow: "0 8px 30px rgba(197,160,89,0.15)",
+                      zIndex: 999,
+                      padding: "4px 0",
+                      textAlign: "left",
+                    }}>
                     <button
                       type="button"
                       onClick={() => {
@@ -1358,9 +1418,10 @@ export default function AdminOnboarding() {
               )}
             </div>
           </div>
+        </div>
 
           {/* ════ MAIN CONTENT ════ */}
-          <main style={{ paddingBottom: 60 }}>
+          <main style={{ paddingBottom: 60, width: "100%", minWidth: 0 }}>
 
             {/* Mobile Stats Dropdown */}
             <div className="block sm:hidden mb-6" style={{ position: "relative" }}>
@@ -1392,26 +1453,17 @@ export default function AdminOnboarding() {
               </button>
 
               {showMobileStatsDropdown && (
-                <>
-                  <div 
-                    onClick={() => setShowMobileStatsDropdown(false)} 
-                    style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 998 }} 
-                  />
-                  <div style={{
-                    position: "absolute",
-                    top: "calc(100% + 6px)",
-                    left: 0,
-                    right: 0,
-                    background: "#FFFFFF",
-                    border: `1px solid ${C.border}`,
-                    borderRadius: 12,
-                    boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
-                    zIndex: 999,
-                    padding: "6px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                  }}>
+                <div style={{
+                  marginTop: 6,
+                  background: "#FFFFFF",
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 12,
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                  padding: "6px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                }}>
                     {/* Customers option */}
                     <button
                       type="button"
@@ -1565,7 +1617,6 @@ export default function AdminOnboarding() {
                       </div>
                     </button>
                   </div>
-                </>
               )}
             </div>
 
@@ -1842,7 +1893,7 @@ export default function AdminOnboarding() {
                         <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>
                           {filtered.length} Customers for {currentSalonName}
                         </span>
-                        <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setCustPage(1); }} placeholder="Search by name or mobile..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                        <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setCustPage(1); }} placeholder="Search by name or mobile..." style={{ ...inputStyle, width: "100%", maxWidth: 220, padding:"7px 12px", fontSize:12 }}/>
                       </div>
                       {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
                       : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No customers found</div>
@@ -1907,7 +1958,7 @@ export default function AdminOnboarding() {
                               Showing {filtered.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + custPerPage, filtered.length)} of {filtered.length} customers
                             </div>
                             
-                            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                               {/* Page size dropdown */}
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
@@ -2198,11 +2249,53 @@ export default function AdminOnboarding() {
                     </div>
 
                     <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                      <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                      <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap: "wrap", gap: 10 }}>
                         <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>
                           {filtered.length} Appointments for {currentSalonName}
                         </span>
-                        <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setApptPage(1); }} placeholder="Search by customer, service or stylist..." style={{ ...inputStyle, width:280, padding:"7px 12px", fontSize:12 }}/>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <button 
+                            onClick={() => {
+                              const headers = ["Customer Name", "Service", "Barber Name", "Date", "Amount", "Status"];
+                              const rows = filtered.map(b => [
+                                b.customer_id?.name || "—",
+                                b.services?.[0]?.service_name || "—",
+                                b.barber_id?.name || "—",
+                                b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—",
+                                b.total_amount || 0,
+                                b.status || "—"
+                              ]);
+                              const csvContent = "data:text/csv;charset=utf-8," 
+                                + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
+                              const encodedUri = encodeURI(csvContent);
+                              const link = document.createElement("a");
+                              link.setAttribute("href", encodedUri);
+                              link.setAttribute("download", `appointments_export_${currentSalonName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`);
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                            }}
+                            style={{
+                              padding: "6px 14px",
+                              borderRadius: 10,
+                              border: `1px solid ${C.gold}50`,
+                              background: "#FAF9F6",
+                              fontSize: 12,
+                              color: C.ink,
+                              fontWeight: 705,
+                              outline: "none",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              whiteSpace: "nowrap",
+                              flexShrink: 0
+                            }}
+                          >
+                            <Download size={14} style={{ color: C.goldD }} /> Export CSV
+                          </button>
+                          <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); setApptPage(1); }} placeholder="Search by customer, service or stylist..." style={{ ...inputStyle, width:280, padding:"7px 12px", fontSize:12 }}/>
+                        </div>
                       </div>
                       {loading ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>Loading...</div>
                       : filtered.length===0 ? <div style={{ padding:40, textAlign:"center", color:C.muted }}>No appointments found</div>
@@ -2249,7 +2342,7 @@ export default function AdminOnboarding() {
                               Showing {filtered.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + apptPerPage, filtered.length)} of {filtered.length} appointments
                             </div>
                             
-                            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                               {/* Page size dropdown */}
                               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
@@ -2327,9 +2420,58 @@ export default function AdminOnboarding() {
 
               return (
                 <div className="fade-in" style={{ display:"flex", flexDirection:"column", gap:20 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)", flexWrap: "wrap", gap: 10 }}>
                     <span style={{ fontSize:15, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>Select a Studio to View Appointments</span>
-                    <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <button 
+                        onClick={() => {
+                          const headers = ["Salon Name", "Customer Name", "Service", "Barber Name", "Date", "Amount", "Status"];
+                          const rows = [];
+                          approvedSalons.forEach(salon => {
+                            const salonBookings = bookings.filter(b => (b.salon_id?._id || b.salon_id) === salon._id);
+                            salonBookings.forEach(b => {
+                              rows.push([
+                                salon.salon_name,
+                                b.customer_id?.name || "—",
+                                b.services?.[0]?.service_name || "—",
+                                b.barber_id?.name || "—",
+                                b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—",
+                                b.total_amount || 0,
+                                b.status || "—"
+                              ]);
+                            });
+                          });
+                          const csvContent = "data:text/csv;charset=utf-8," 
+                            + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
+                          const encodedUri = encodeURI(csvContent);
+                          const link = document.createElement("a");
+                          link.setAttribute("href", encodedUri);
+                          link.setAttribute("download", `all_salons_appointments_${new Date().toISOString().slice(0,10)}.csv`);
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        }}
+                        style={{
+                          padding: "6px 14px",
+                          borderRadius: 10,
+                          border: `1px solid ${C.gold}50`,
+                          background: "#FAF9F6",
+                          fontSize: 12,
+                          color: C.ink,
+                          fontWeight: 705,
+                          outline: "none",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
+                          whiteSpace: "nowrap",
+                          flexShrink: 0
+                        }}
+                      >
+                        <Download size={14} style={{ color: C.goldD }} /> Export All CSV
+                      </button>
+                      <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                    </div>
                   </div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
@@ -2471,7 +2613,7 @@ export default function AdminOnboarding() {
                                 Showing {filteredServices.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + servPerPage, filteredServices.length)} of {filteredServices.length} services
                               </div>
                               
-                              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                                 {/* Page size dropdown */}
                                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                                   <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>
@@ -2629,9 +2771,59 @@ export default function AdminOnboarding() {
                 
                 return (
                   <div className="fade-in" style={{ display:"flex", flexDirection:"column", gap:20 }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:C.card, padding:"12px 20px", borderRadius:12, border:`1px solid ${C.border}`, boxShadow:"0 1px 3px rgba(0,0,0,0.02)", flexWrap: "wrap", gap: 10 }}>
                       <span style={{ fontSize:15, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>Select a Studio to View Payments</span>
-                      <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <button 
+                          onClick={() => {
+                            const headers = ["Salon Name", "Customer Name", "Mobile", "Payment ID/Reference", "Amount", "Payment Type", "Status", "Date"];
+                            const rows = [];
+                            approvedSalons.forEach(salon => {
+                              const salonPayments = payments.filter(p => (p.salon_id?._id || p.salon_id) === salon._id);
+                              salonPayments.forEach(p => {
+                                rows.push([
+                                  salon.salon_name,
+                                  p.customer_id?.name || "—",
+                                  p.customer_id?.mobile || "—",
+                                  p.razorpay_payment_id || p.razorpay_order_id || "Manual/Offline",
+                                  p.amount || 0,
+                                  p.payment_type || "TOKEN",
+                                  p.status || "PENDING",
+                                  p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : "—"
+                                ]);
+                              });
+                            });
+                            const csvContent = "data:text/csv;charset=utf-8," 
+                              + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
+                            const encodedUri = encodeURI(csvContent);
+                            const link = document.createElement("a");
+                            link.setAttribute("href", encodedUri);
+                            link.setAttribute("download", `all_salons_transactions_${new Date().toISOString().slice(0,10)}.csv`);
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          }}
+                          style={{
+                            padding: "6px 14px",
+                            borderRadius: 10,
+                            border: `1px solid ${C.gold}50`,
+                            background: "#FAF9F6",
+                            fontSize: 12,
+                            color: C.ink,
+                            fontWeight: 705,
+                            outline: "none",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            whiteSpace: "nowrap",
+                            flexShrink: 0
+                          }}
+                        >
+                          <Download size={14} style={{ color: C.goldD }} /> Export All CSV
+                        </button>
+                        <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width: "100%", maxWidth: 220, padding:"7px 12px", fontSize:12 }}/>
+                      </div>
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
@@ -3007,7 +3199,7 @@ export default function AdminOnboarding() {
                       <span style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block", marginBottom: 16 }}>
                         Income Trend (₹)
                       </span>
-                      <div style={{ width: "100%", height: 260 }}>
+                      <div style={{ width: "100%", height: 260, position: "relative", minWidth: 0, minHeight: 0 }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <defs>
@@ -3035,7 +3227,7 @@ export default function AdminOnboarding() {
                       <span style={{ fontSize: 14, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", display: "block", marginBottom: 16 }}>
                         Payment Type Revenue (₹)
                       </span>
-                      <div style={{ width: "100%", height: 260 }}>
+                      <div style={{ width: "100%", height: 260, position: "relative", minWidth: 0, minHeight: 0 }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={breakdownData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
@@ -3054,17 +3246,60 @@ export default function AdminOnboarding() {
 
                   {/* Transactions Table & Search */}
                   <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
-                    <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                    <div style={{ padding:"14px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap: "wrap", gap: 10 }}>
                       <span style={{ fontSize:16, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>
                         {searchFilteredPayments.length} Transactions Found
                       </span>
-                      <input 
-                        className="inp" 
-                        value={search} 
-                        onChange={e=>{ setSearch(e.target.value); setPayPage(1); }} 
-                        placeholder="Search by customer, payment ID, type..." 
-                        style={{ ...inputStyle, width:260, padding:"7px 12px", fontSize:12 }}
-                      />
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <button 
+                          onClick={() => {
+                            const headers = ["Customer Name", "Mobile", "Payment ID/Reference", "Amount", "Payment Type", "Status", "Date"];
+                            const rows = searchFilteredPayments.map(p => [
+                              p.customer_id?.name || "—",
+                              p.customer_id?.mobile || "—",
+                              p.razorpay_payment_id || p.razorpay_order_id || "Manual/Offline",
+                              p.amount || 0,
+                              p.payment_type || "TOKEN",
+                              p.status || "PENDING",
+                              p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : "—"
+                            ]);
+                            const csvContent = "data:text/csv;charset=utf-8," 
+                              + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
+                            const encodedUri = encodeURI(csvContent);
+                            const link = document.createElement("a");
+                            link.setAttribute("href", encodedUri);
+                            link.setAttribute("download", `transactions_export_${currentSalonName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`);
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          }}
+                          style={{
+                            padding: "6px 14px",
+                            borderRadius: 10,
+                            border: `1px solid ${C.gold}50`,
+                            background: "#FAF9F6",
+                            fontSize: 12,
+                            color: C.ink,
+                            fontWeight: 705,
+                            outline: "none",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                            whiteSpace: "nowrap",
+                            flexShrink: 0
+                          }}
+                        >
+                          <Download size={14} style={{ color: C.goldD }} /> Export CSV
+                        </button>
+                        <input 
+                          className="inp" 
+                          value={search} 
+                          onChange={e=>{ setSearch(e.target.value); setPayPage(1); }} 
+                          placeholder="Search by customer, payment ID, type..." 
+                          style={{ ...inputStyle, width: "100%", maxWidth: 260, padding:"7px 12px", fontSize:12 }}
+                        />
+                      </div>
                     </div>
 
                     {searchFilteredPayments.length === 0 ? (
@@ -3128,7 +3363,7 @@ export default function AdminOnboarding() {
                             Showing {searchFilteredPayments.length === 0 ? 0 : startIndex + 1} - {Math.min(startIndex + payPerPage, searchFilteredPayments.length)} of {searchFilteredPayments.length} items
                           </div>
                           
-                          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                             {/* Show per page dropdown */}
                             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                               <span style={{ fontSize: 12, color: C.muted, fontWeight: 505 }}>Show:</span>

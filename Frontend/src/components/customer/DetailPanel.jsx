@@ -103,9 +103,18 @@ export default function DetailPanel({ customer, onUpdate }) {
         <div className="grid grid-cols-3 gap-2.5">
           <StatBox label="Loyalty Points" value={`${customer.loyaltyPts} pts`} accent />
           <StatBox label="Total Visits"   value={customer.visits} />
-          <div className="bg-card-warm border border-border/60 rounded-xl px-3.5 py-3 shadow-inner">
+          <div className="bg-card-warm border border-border/60 rounded-xl px-3 py-3 shadow-inner min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted mb-1">Barber</div>
-            <div className="font-body font-bold text-[13px] text-primary leading-snug">{customer.barber}</div>
+            <div 
+              className={`font-body font-bold truncate ${
+                customer.barber === "Unassigned"
+                  ? "text-[11px] uppercase tracking-wider text-[#C5A059]"
+                  : "text-[13px] text-primary leading-snug"
+              }`}
+              title={customer.barber}
+            >
+              {customer.barber}
+            </div>
           </div>
         </div>
       </div>

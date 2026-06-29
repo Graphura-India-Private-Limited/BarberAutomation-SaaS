@@ -4,6 +4,7 @@ import {
   Clock, CreditCard, ChevronRight, User, Sparkles, X, PlusCircle, 
   HelpCircle, Download
 } from "lucide-react";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
@@ -249,28 +250,32 @@ export default function SalonSettlements() {
 
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-0.5">Payment Method</span>
-            <select 
+            <CustomSelect 
               value={methodFilter} 
-              onChange={e => setMethodFilter(e.target.value)}
-              className="w-full rounded-xl border border-[#EADBCE] bg-stone-50/50 px-3 h-10 text-xs font-bold text-stone-700 outline-none focus:border-[#C5A059] focus:bg-white transition-all"
-            >
-              <option value="ALL">All Methods</option>
-              <option value="CASH">Cash Only</option>
-              <option value="ONLINE">Online (UPI / Card)</option>
-            </select>
+              onChange={setMethodFilter}
+              options={[
+                { value: "ALL", label: "All Methods" },
+                { value: "CASH", label: "Cash Only" },
+                { value: "ONLINE", label: "Online (UPI / Card)" }
+              ]}
+              size="sm"
+              className="h-10 rounded-xl"
+            />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-0.5">Settlement Status</span>
-            <select 
+            <CustomSelect 
               value={statusFilter} 
-              onChange={e => setStatusFilter(e.target.value)}
-              className="w-full rounded-xl border border-[#EADBCE] bg-stone-50/50 px-3 h-10 text-xs font-bold text-stone-700 outline-none focus:border-[#C5A059] focus:bg-white transition-all"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="SETTLED">Settled Full</option>
-              <option value="PENDING_BALANCE">Pending Balance</option>
-            </select>
+              onChange={setStatusFilter}
+              options={[
+                { value: "ALL", label: "All Statuses" },
+                { value: "SETTLED", label: "Settled Full" },
+                { value: "PENDING_BALANCE", label: "Pending Balance" }
+              ]}
+              size="sm"
+              className="h-10 rounded-xl"
+            />
           </div>
 
           <div className="flex items-end">

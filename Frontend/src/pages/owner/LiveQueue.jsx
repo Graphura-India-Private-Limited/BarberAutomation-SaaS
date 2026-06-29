@@ -20,7 +20,7 @@ export default function LiveQueue() {
   const intervalRef = useRef(null);
 
   const salonId = localStorage.getItem("salonId");
-  const token   = localStorage.getItem("token");
+  const token   = localStorage.getItem("token") || localStorage.getItem("ownerToken");
 
   const headers = () => ({
     Authorization: `Bearer ${token}`,
@@ -286,7 +286,11 @@ export default function LiveQueue() {
             }`}>
             Auto {autoRefresh ? "ON" : "OFF"}
           </button>
-          <button onClick={fetchData}
+          <button 
+            onClick={async () => {
+              setLoading(true);
+              await fetchData();
+            }}
             className="px-4 py-2.5 bg-[#8B6B3E] hover:bg-[#735A32] text-white rounded-xl text-xs font-bold tracking-wider uppercase flex items-center gap-2 transition-all shadow-sm">
             <RefreshCw className="w-4 h-4"/> Refresh
           </button>

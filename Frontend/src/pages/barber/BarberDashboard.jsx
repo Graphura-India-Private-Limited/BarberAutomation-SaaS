@@ -575,7 +575,7 @@ export default function BarberDashboard() {
   </div>
 
   {/* Chart Section */}
-  <div className="h-48 w-full">
+  <div className="h-48 w-full relative min-w-0" style={{ minHeight: 0 }}>
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={weekChartData} barGap={8}>
         <XAxis 

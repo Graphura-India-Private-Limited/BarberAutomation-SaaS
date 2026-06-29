@@ -254,8 +254,8 @@ export function DetailModal({ entry, isQueue, onClose, onServe, onRemove }) {
     : [['Service', svc?.label], ['Barber', `${barber?.emoji || '💈'} ${barber?.name}`], ['Target Slot', entry.slot], ['Date Log', entry.date], ['System Status', entry.status], ['Phone Signature', entry.phone]];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-4 bg-stone-900/40 backdrop-blur-sm transition-all duration-300 animate-in fade-in" onClick={onClose}>
-      <div className="w-full max-w-lg bg-[#FAF6F0] rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-[#EADBCE] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-0 sm:p-4 bg-stone-900/40 backdrop-blur-sm transition-all duration-300 animate-in fade-in" onClick={onClose}>
+      <div className="w-full sm:max-w-lg bg-[#FAF6F0] rounded-t-[2.5rem] sm:rounded-[2.5rem] border-t sm:border border-[#EADBCE] shadow-2xl overflow-hidden animate-in slide-in-from-bottom-8 duration-300" onClick={e => e.stopPropagation()}>
 
         {/* Modal Header */}
         <div className="flex justify-between items-center px-6 py-5 border-b border-[#EADBCE]/50 bg-white">

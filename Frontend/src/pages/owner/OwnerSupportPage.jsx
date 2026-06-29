@@ -42,6 +42,32 @@ export default function OwnerSupportPage({ ticketState }) {
     });
   }, [ticketState.tickets, salonId, salonName]);
 
+  // Apply active filters to owner tickets
+  const filteredTickets = useMemo(() => {
+    return ownerTickets.filter(t => {
+      if (ticketState.filterStatus && ticketState.filterStatus !== "All" && t.status !== ticketState.filterStatus) {
+        return false;
+      }
+      if (ticketState.filterType && ticketState.filterType !== "All" && t.type !== ticketState.filterType) {
+        return false;
+      }
+      if (ticketState.filterPriority && ticketState.filterPriority !== "All" && t.priority !== ticketState.filterPriority) {
+        return false;
+      }
+      if (ticketState.searchQuery) {
+        const q = ticketState.searchQuery.toLowerCase();
+        const matchesId = t.id?.toLowerCase().includes(q);
+        const matchesTitle = t.title?.toLowerCase().includes(q);
+        const matchesCustomer = t.customer?.toLowerCase().includes(q);
+        const matchesDescription = t.description?.toLowerCase().includes(q);
+        if (!matchesId && !matchesTitle && !matchesCustomer && !matchesDescription) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [ownerTickets, ticketState.filterStatus, ticketState.filterType, ticketState.filterPriority, ticketState.searchQuery]);
+
   // Retrieve stats for owner-specific tickets
   const stats = useMemo(() => getStats(ownerTickets), [ownerTickets]);
 
@@ -296,6 +322,7 @@ export default function OwnerSupportPage({ ticketState }) {
           {activeTab === "tickets" && (
             <div className="space-y-6 animate-in fade-in duration-200 text-left">
               <TicketFilters
+                hideType={true}
                 filterStatus={ticketState.filterStatus}
                 setFilterStatus={ticketState.setFilterStatus}
                 filterType={ticketState.filterType}
@@ -304,7 +331,7 @@ export default function OwnerSupportPage({ ticketState }) {
                 setFilterPriority={ticketState.setFilterPriority}
                 searchQuery={ticketState.searchQuery}
                 setSearchQuery={ticketState.setSearchQuery}
-                total={ownerTickets.length}
+                total={filteredTickets.length}
               />
               <div className="card overflow-hidden">
                 <div style={{ padding: "12px 20px", borderBottom: "1px solid #EADBCE", background: "#FAF6F0", display: "flex", alignItems: "center", gap: 8 }}>
@@ -313,7 +340,7 @@ export default function OwnerSupportPage({ ticketState }) {
                     Active Workspace Stream Ledger
                   </span>
                 </div>
-                <TicketTable tickets={ownerTickets} onSelect={(t) => ticketState.setSelectedTicket(t)} />
+                <TicketTable tickets={filteredTickets} onSelect={(t) => ticketState.setSelectedTicket(t)} />
               </div>
             </div>
           )}

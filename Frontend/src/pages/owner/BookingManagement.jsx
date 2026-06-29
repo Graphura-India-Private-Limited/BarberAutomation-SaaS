@@ -15,7 +15,9 @@ import {
   Scissors,
   LogOut,
   SlidersHorizontal,
-  ArrowLeft
+  ArrowLeft,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 
 import Navbar from "../../components/layout/Navbar";
@@ -37,7 +39,12 @@ export default function BookingManagement() {
   const [editingBooking, setEditingBooking] = useState(null);
   const [time, setTime] = useState(new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }));
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState(null); // { type: 'success' | 'error', message: string }
   const [paymentMode, setPaymentMode] = useState("offline");
+  const showToast = (message, type = "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   // Form State for Add/Edit
   const [formData, setFormData] = useState({
@@ -173,11 +180,11 @@ export default function BookingManagement() {
       if (data.success) {
         setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "Approved" } : b));
       } else {
-        alert(data.message || "Failed to approve booking");
+        showToast(data.message || "Failed to approve booking");
       }
     } catch (err) {
       console.error(err);
-      alert("Error updating booking status");
+      showToast("Error updating booking status");
     }
   };
 
@@ -195,11 +202,11 @@ export default function BookingManagement() {
       if (data.success) {
         setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "Rejected" } : b));
       } else {
-        alert(data.message || "Failed to reject booking");
+        showToast(data.message || "Failed to reject booking");
       }
     } catch (err) {
       console.error(err);
-      alert("Error updating booking status");
+      showToast("Error updating booking status");
     }
   };
 
@@ -278,7 +285,7 @@ export default function BookingManagement() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.mobile.trim()) {
-      alert("Name and Mobile Number are required.");
+      showToast("Name and Mobile Number are required.");
       return;
     }
 
@@ -286,7 +293,7 @@ export default function BookingManagement() {
       let formattedSlot = null;
       if (formData.type === "Slot") {
         if (!formData.date || !formData.slot) {
-          alert("Booking Date and Preferred Time Slot are required for Slot bookings.");
+          showToast("Booking Date and Preferred Time Slot are required for Slot bookings.");
           return;
         }
         let dateStr = formData.date;
@@ -333,11 +340,11 @@ export default function BookingManagement() {
         setView("list");
         await fetchBookings();
       } else {
-        alert(data.message || "Failed to create booking.");
+        showToast(data.message || "Failed to create booking.");
       }
     } catch (err) {
       console.error(err);
-      alert("Error submitting booking.");
+      showToast("Error submitting booking.");
     }
   };
 
@@ -471,7 +478,7 @@ export default function BookingManagement() {
           e.preventDefault();
           if (createStep === 1) {
             if (!formData.name.trim() || !formData.mobile.trim()) {
-              alert("Name and Mobile Number are required.");
+              showToast("Name and Mobile Number are required.");
               return;
             }
             if (formData.type === "Slot") {
@@ -588,15 +595,13 @@ export default function BookingManagement() {
 
               <div>
                 <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-2">Preferred Slot Time</label>
-                <select
+                <CustomSelect
                   value={formData.slot}
-                  onChange={(e) => setFormData({ ...formData, slot: e.target.value })}
-                  className="w-full bg-stone-50 border border-stone-200 rounded-xl p-4 outline-none text-stone-800 focus:border-amber-500 focus:bg-white transition text-sm font-bold cursor-pointer"
-                >
-                  {['10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM', '06:00 PM', '06:30 PM', '07:00 PM'].map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormData({ ...formData, slot: val })}
+                  options={['10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM', '06:00 PM', '06:30 PM', '07:00 PM'].map(s => ({ value: s, label: s }))}
+                  size="lg"
+                  className="!bg-stone-50 !border-stone-200 !text-[#3E362E] font-bold rounded-xl"
+                />
               </div>
             </div>
           )}
@@ -895,7 +900,7 @@ export default function BookingManagement() {
           <div className="card p-6 bg-white overflow-hidden mb-8 text-left">
             <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
               {/* Rule 1: Master Section Sub-Header Title Layout */}
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex flex-wrap items-center justify-start gap-2">
                 <span className="font-bold uppercase">Live Operations</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Queue</span>
                 {selectedTypeFilter !== "ALL" && <span className="text-xs font-sans font-bold text-[#C5A059] lowercase">({selectedTypeFilter} only)</span>}
@@ -996,6 +1001,16 @@ export default function BookingManagement() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-[min(420px,90vw)] animate-in fade-in slide-in-from-bottom duration-300">
+          <div className="relative flex items-center gap-3.5 px-5 py-4 rounded-2xl overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl text-left">
+            <div className="absolute -top-10 -left-10 w-32 h-32 blur-[60px] rounded-full pointer-events-none" style={{ background: toast.type === "success" ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)" }} />
+            {toast.type === "success" ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 relative z-10" /> : <XCircle className="w-5 h-5 text-rose-500 shrink-0 relative z-10" />}
+            <p className="text-stone-200 text-xs font-semibold leading-relaxed relative z-10 font-sans">{toast.message}</p>
+            <button onClick={() => setToast(null)} className="ml-auto text-stone-500 hover:text-white transition-colors relative z-10"><X size={14} /></button>
           </div>
         </div>
       )}
