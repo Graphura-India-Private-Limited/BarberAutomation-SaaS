@@ -130,7 +130,7 @@ export default function OwnerSupportPage({ ticketState }) {
               <span className="font-bold uppercase">Support</span>
               <span className="italic text-[#C5A059] normal-case font-medium">& Escalation</span>
             </h2>
-            <p className="text-stone-400 text-[11px] font-mono mt-1 font-sans">
+            <p className="text-stone-400 text-[11px] font-mono mt-1 ">
               {salonName} Support Console · Real-time ticket management and resolution SLA logs
             </p>
           </div>
