@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueue } from "../../contexts/AppContext";
+import CheckoutPage from "../../components/booking/CheckoutPage";
 
 
 import {
@@ -284,6 +285,7 @@ export default function SmartQueue() {
   const [detail,      setDetail]      = useState(null);
   const [notif,       setNotif]       = useState(null);
   const [liveActive,  setLiveActive]  = useState(true);
+  const [checkoutBookingData, setCheckoutBookingData] = useState(null);
   const notifRef = useRef();
 
   const barberId = localStorage.getItem("barberId");
@@ -456,13 +458,12 @@ export default function SmartQueue() {
       toast("Direct customer injection is disabled in live database mode.", "warn");
       return;
     }
-    if (type === 'queue') {
-      setQueue(prev => [...prev, { ...entry, position: prev.length + 1 }]);
-      toast(`${entry.name} added to queue `, 'success');
-    } else {
-      setBookings(prev => [...prev, entry]);
-      toast(`Booking confirmed for ${entry.name} at ${entry.slot} `, 'success');
-    }
+    const svcObj = SERVICES.find(s => s.id === entry.service);
+    setCheckoutBookingData({
+      ...entry,
+      type,
+      price: (svcObj?.price || 15) * 80
+    });
   };
 
   const handleServe = async idOrEntry => {
@@ -713,6 +714,31 @@ export default function SmartQueue() {
 
       {/* ── PORTAL MODAL DRIVERS ── */}
       {showAdd && <AddCustomerModal onClose={() => setShowAdd(false)} onAdd={handleAdd} />}
+      {checkoutBookingData && (
+        <div className="fixed inset-0 z-[150] bg-white overflow-y-auto">
+          <CheckoutPage
+            bookingData={checkoutBookingData}
+            onBack={() => setCheckoutBookingData(null)}
+            onComplete={async (payType, amountPaid) => {
+              const finalEntry = {
+                ...checkoutBookingData,
+                paymentType: payType,
+                amountPaid: amountPaid,
+                paymentStatus: 'paid'
+              };
+              
+              if (checkoutBookingData.type === 'queue') {
+                setQueue(prev => [...prev, { ...finalEntry, position: prev.length + 1 }]);
+                toast(`${finalEntry.name} added to queue (Paid: ₹${amountPaid})`, 'success');
+              } else {
+                setBookings(prev => [...prev, finalEntry]);
+                toast(`Booking confirmed for ${finalEntry.name} at ${finalEntry.slot} (Paid: ₹${amountPaid})`, 'success');
+              }
+              setCheckoutBookingData(null);
+            }}
+          />
+        </div>
+      )}
       {detail?.type === 'queue' && (
         <DetailModal entry={detail.entry} isQueue onClose={() => setDetail(null)} onServe={handleServe} onRemove={handleRemoveQueue} />
       )}
