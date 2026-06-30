@@ -112,7 +112,7 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
       {/* 📱 Mobile Backdrop Overlay */}
       {sideOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/20 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"
           onClick={() => setSideOpen(false)}
         />
       )}
@@ -120,7 +120,7 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
       {/* ── ═══ LUXURY SIDEBAR ═══ ── */}
       <aside 
         className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 bg-[#FDFBF7]/95 border-r border-[#E6D5C3] backdrop-blur-md 
-          ${sideOpen ? "w-64 translate-x-0" : "-translate-x-full w-64 md:translate-x-0 md:w-64"}`}
+          ${sideOpen ? "w-64 translate-x-0" : "-translate-x-full w-64 lg:translate-x-0 lg:w-64"}`}
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-[#E6D5C3]">
@@ -209,12 +209,12 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
       </aside>
 
       {/* ── ═══ MAIN CONTENT AREA ═══ ── */}
-      <div className="flex-1 min-w-0 md:ml-64 flex flex-col">
+      <div className="flex-1 min-w-0 lg:ml-64 flex flex-col">
         
         {/* Unified Top Navbar Header */}
-        <header className="sticky top-0 z-50 w-full px-4 md:px-8 py-4 bg-[#1A1A1A] border-b border-[#D4AF37]/20 flex items-center justify-between">
+        <header className="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-[#E6D5C3] sticky top-0 z-30">
           <div className="flex items-center gap-4">
-            <button onClick={() => setSideOpen(!sideOpen)} className="md:hidden p-2 text-zinc-400 hover:text-white transition-colors cursor-pointer">
+            <button onClick={() => setSideOpen(!sideOpen)} className="lg:hidden p-2 text-zinc-400 hover:text-black transition-colors cursor-pointer">
               {sideOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <div className="text-left">
