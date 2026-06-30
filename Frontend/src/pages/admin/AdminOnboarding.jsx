@@ -334,6 +334,28 @@ const SectionCard = ({ title, actionLabel, onAction, children, minHeight }) => (
   </div>
 );
 
+const TabHeader = ({ title, subtitle, icon: Icon }) => (
+  <div style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+    marginBottom: 24,
+    paddingBottom: 16,
+    borderBottom: `1px solid ${C.border}`,
+    textAlign: "left"
+  }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      {Icon && <Icon size={22} color={C.gold} style={{ strokeWidth: 2.2 }} />}
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", margin: 0 }}>
+        {title}
+      </h1>
+    </div>
+    <p style={{ fontSize: 12, color: C.muted, margin: 0, fontWeight: 500, lineHeight: 1.5 }}>
+      {subtitle}
+    </p>
+  </div>
+);
+
 const NAV = [
   { k: "dashboard", label: "Dashboard" },
   { k: "salons", label: "Salon Management" },
@@ -1121,10 +1143,13 @@ export default function AdminOnboarding() {
               )}
               </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, paddingBottom: 4, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: C.muted }}>
-                {new Date().toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}
-              </span>
+            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-start sm:justify-end mt-2 sm:mt-0 pb-1">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: `1px solid ${C.border}`, borderRadius: 99, padding: "6px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
+                <CalendarCheck size={13} color={C.gold} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: C.ink }}>
+                  {new Date().toLocaleDateString("en-US", { weekday:"short", day:"numeric", month:"short", year:"numeric" })}
+                </span>
+              </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: `1px solid ${C.border}`, borderRadius: 99, padding: "2px 8px 2px 14px", marginRight: 4, position: "relative" }}>
                 <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5, color: C.muted }}>Branch:</span>
                 <button
@@ -1422,6 +1447,32 @@ export default function AdminOnboarding() {
 
           {/* ════ MAIN CONTENT ════ */}
           <main style={{ paddingBottom: 60, width: "100%", minWidth: 0 }}>
+
+            {/* Dynamic Tab Header */}
+            {(() => {
+              const headerMap = {
+                dashboard: { title: "Dashboard Overview", subtitle: "Real-time statistics, recent activities, and pending actions across all salons.", icon: LayoutDashboard },
+                salons: { title: "Studio Management", subtitle: "Review and manage studio approval requests, active salons, and status logs.", icon: Store },
+                customers: { title: "Guest Relations Registry", subtitle: "Detailed registry of all customers, booking frequencies, and guest profiles.", icon: Users },
+                appointments: { title: "Bespoke Appointments Ledger", subtitle: "Track, schedule, filter, and monitor all salon booking records and statuses.", icon: CalendarCheck },
+                services: { title: "Service Master Catalogue", subtitle: "Manage master salon service categories, pricing structures, and offerings.", icon: Scissors },
+                payments: { title: "Financial Transaction Ledger", subtitle: "Comprehensive transaction history, revenue statistics, and payment receipts.", icon: CreditCard },
+                reviews: { title: "Bespoke Feedback & Performance", subtitle: "Guest reviews, service ratings, and booking experience metrics comparisons.", icon: Star },
+                live: { title: "Live Studio Monitor", subtitle: "Real-time barber chair occupancies, wait times, and queue engine statistics.", icon: Activity },
+                tickets: { title: "Support Workspace Console", subtitle: "Monitor, assign, resolve, and handle guest and studio support tickets.", icon: Inbox },
+                ownerRequests: { title: "Onboarding Credentials Requests", subtitle: "Process new salon studio applications, credentials, and verification requests.", icon: Award },
+                settings: { title: "System Configurations", subtitle: "Configure global SaaS rules, platform variables, and administrative preferences.", icon: Settings },
+              };
+              const currentHeader = headerMap[tab];
+              if (!currentHeader) return null;
+              return (
+                <TabHeader
+                  title={currentHeader.title}
+                  subtitle={currentHeader.subtitle}
+                  icon={currentHeader.icon}
+                />
+              );
+            })()}
 
             {/* Mobile Stats Dropdown */}
             <div className="block sm:hidden mb-6" style={{ position: "relative" }}>
