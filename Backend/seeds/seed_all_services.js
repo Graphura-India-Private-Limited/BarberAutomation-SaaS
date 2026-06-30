@@ -923,22 +923,36 @@ const seedAllServices = async () => {
     await Service.deleteMany({});
     console.log("Cleared existing Services collection.");
 
-    const serviceOffers = servicesToSeed.map(s => s.name);
-    const servicePrices = {};
-    servicesToSeed.forEach(s => {
-      servicePrices[s.name] = s.price;
-    });
-
+    let salonIdx = 0;
     for (const salon of salons) {
       console.log(`Processing salon: ${salon.salon_name} (${salon._id})`);
       
+      const menSvcs = servicesToSeed.filter(s => s.category === "men");
+      const womenSvcs = servicesToSeed.filter(s => s.category === "women");
+      const addonSvcs = servicesToSeed.filter(s => s.category === "addon");
+
+      // Select 20 men's, 20 women's, 10 addons based on salonIdx
+      const selectedMen = menSvcs.filter((_, idx) => (idx + salonIdx) % 2 === 0); // 20 services
+      const selectedWomen = womenSvcs.filter((_, idx) => (idx + salonIdx) % 2 === 0); // 20 services
+      const selectedAddon = addonSvcs.filter((_, idx) => (idx + salonIdx) % 3 === 0); // 10 services
+
+      const salonServices = [...selectedMen, ...selectedWomen, ...selectedAddon]; // exactly 50 services!
+
+      console.log(`Selected ${salonServices.length} services (Men: ${selectedMen.length}, Women: ${selectedWomen.length}, Addons: ${selectedAddon.length}) for ${salon.salon_name}`);
+
       // Update the salon's offered services and prices in the Salon schema
+      const serviceOffers = salonServices.map(s => s.name);
+      const servicePrices = {};
+      salonServices.forEach(s => {
+        servicePrices[s.name] = s.price;
+      });
+
       salon.services_offered = serviceOffers;
       salon.service_prices = servicePrices;
       await salon.save();
 
       // Create service catalog entries in the Service collection
-      for (const svc of servicesToSeed) {
+      for (const svc of salonServices) {
         await Service.create({
           salon_id: salon._id,
           name: svc.name,
@@ -950,9 +964,11 @@ const seedAllServices = async () => {
           is_active: true
         });
       }
+
+      salonIdx++;
     }
 
-    console.log("Successfully seeded 110 premium services for all salons!");
+    console.log("Successfully seeded 50 diverse premium services for all salons!");
     process.exit(0);
   } catch (err) {
     console.error("Error seeding services:", err);
