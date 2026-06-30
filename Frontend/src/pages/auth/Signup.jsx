@@ -80,41 +80,41 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111] flex">
-      <div className="w-full h-screen bg-white flex">
+    <div className="min-h-screen bg-[#111] flex flex-col md:flex-row w-full">
+      <div className="w-full min-h-screen bg-white flex flex-col md:flex-row">
 
         {/* ── LEFT: Hero Panel ── */}
-        <div className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden">
+        <div className="w-full md:w-1/2 h-[220px] sm:h-[260px] md:h-screen relative flex flex-col justify-between overflow-hidden">
           <img src={signupImage} alt="Barber" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/55" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
 
           {/* Logo */}
-          <div className="relative z-10 p-10 pt-12">
+          <div className="relative z-10 p-6 md:p-10 pt-6 md:pt-12">
             <div className="flex items-center gap-3">
-              <Scissors size={26} color={GOLD} strokeWidth={2} />
+              <Scissors size={20} className="md:w-[26px] md:h-[26px]" color={GOLD} strokeWidth={2} />
               <div>
-                <div className="text-white font-bold tracking-[0.25em] text-sm uppercase">Barber Pro</div>
-                <div className="text-white/60 text-[10px] tracking-[0.35em] uppercase mt-0.5">— Est. 2026 —</div>
+                <div className="text-white font-bold tracking-[0.25em] text-xs md:text-sm uppercase">Barber Pro</div>
+                <div className="text-white/60 text-[8px] md:text-[10px] tracking-[0.35em] uppercase mt-0.5">— Est. 2026 —</div>
               </div>
             </div>
           </div>
 
           {/* Headline */}
-          <div className="relative z-10 px-10 pb-8 flex-1 flex flex-col justify-center">
-            <h1 className="text-7xl font-serif font-bold leading-none">
+          <div className="relative z-10 px-6 md:px-10 pb-5 md:pb-8 flex-1 flex flex-col justify-end md:justify-center">
+            <h1 className="text-3xl sm:text-4xl md:text-7xl font-serif font-bold leading-none">
               <span style={{ color: GOLD }}>JOIN</span>
-              <br />
-              <span className="text-white">US TODAY</span>
+              {" "}
+              <span className="text-white md:block">US TODAY</span>
             </h1>
-            <div className="w-16 h-1 mt-5" style={{ background: GOLD }} />
-            <p className="text-white/80 text-base mt-5 leading-relaxed max-w-xs italic">
+            <div className="w-12 md:w-16 h-0.5 md:h-1 mt-2 md:mt-5" style={{ background: GOLD }} />
+            <p className="text-white/80 text-[10px] md:text-base mt-2 md:mt-5 leading-relaxed max-w-xs italic hidden sm:block">
               Create your free account and start booking premium grooming sessions in seconds.
             </p>
           </div>
 
           {/* Feature icons */}
-          <div className="relative z-10 px-10 pb-10 grid grid-cols-4 gap-3">
+          <div className="relative z-10 px-10 pb-10 hidden md:grid grid-cols-4 gap-3">
             {FEATURES.map(({ icon: Icon, title, sub }) => (
               <div key={title} className="flex flex-col items-center text-center gap-2">
                 <div
@@ -131,7 +131,7 @@ export default function Signup() {
         </div>
 
         {/* ── RIGHT: Form Card ── */}
-        <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8" style={{ background: "#f7f5f2" }}>
+        <div className="w-full md:w-1/2 flex items-center justify-center px-4 sm:px-6 py-8 md:py-8" style={{ background: "#f7f5f2" }}>
           <div className="bg-white w-full max-w-[460px] px-6 sm:px-8 py-5 rounded-[28px] shadow-xl">
 
             {/* Icon */}
