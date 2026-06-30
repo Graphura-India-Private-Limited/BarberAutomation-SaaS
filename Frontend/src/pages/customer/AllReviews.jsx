@@ -130,7 +130,7 @@ export default function AllReviews() {
         </div>
 
         {/* Main Content Layout */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-24 relative z-10 flex-grow w-full">
           
           {/* ═══ STATS STRIP ═══ */}
           <div className="grid grid-cols-3 gap-4 sm:gap-6 mb-10">

@@ -343,7 +343,7 @@ export default function SmartQueue() {
     <>
       <Navbar />
 
-      <div className="min-h-screen pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col">
+      <div className="min-h-screen pb-12 sm:pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col">
         <Toast notif={notif} />
 <header className="bg-[#FAF6F0] border-b border-[#EADBCE]/60 px-8 py-4 flex items-center justify-between z-30 shadow-xs">
   <div className="flex items-center gap-3.5">

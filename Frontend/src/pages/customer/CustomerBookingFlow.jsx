@@ -392,7 +392,7 @@ export default function Wrapper() {
             </div>
           </div>
 
-          <div className="max-w-2xl mx-auto px-4 pb-24 relative z-10 w-full">
+          <div className="max-w-2xl mx-auto px-4 pb-12 sm:pb-24 relative z-10 w-full">
             <div className="bg-white/90 backdrop-blur-md rounded-[32px] p-6 sm:p-10 border border-[#EADDCA] shadow-[0_10px_30px_rgba(0,0,0,0.01)] transition-all duration-500">
               {currentStep === 3 && <SlotSelection bookingData={bookingData} onNext={handleSlotSelected} />}
               {currentStep === 4 && <BookingForm bookingData={bookingData} onBack={() => setCurrentStep(3)} onConfirm={handleBookingFormSubmitted} />}
