@@ -47,7 +47,7 @@ export function TicketFilters({
     }`;
 
   return (
-    <div className="bg-white rounded-3xl border border-[#EADBCE] p-6 space-y-6 shadow-3xs text-left font-sans">
+    <div className="bg-white rounded-xl md:rounded-3xl border border-[#EADBCE] p-3 md:p-6 space-y-4 md:space-y-6 shadow-3xs text-left font-sans">
       
       {/* Search Input bar */}
       <div className="relative">
