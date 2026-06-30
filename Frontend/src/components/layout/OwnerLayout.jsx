@@ -13,6 +13,7 @@ export default function OwnerLayout() {
   const location = useLocation();
   const [sideOpen, setSideOpen] = useState(false);
   const [pendingBreakCount, setPendingBreakCount] = useState(0);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const salonName = localStorage.getItem("salonName") || "Barber Salon";
   const ownerName = localStorage.getItem("name") || "Owner";
@@ -147,14 +148,138 @@ export default function OwnerLayout() {
       {/* ── ═══ MAIN CONTENT AREA ═══ ── */}
       <div className="flex-1 min-w-0 xl:ml-64 flex flex-col">
         
+        {/* Desktop Top Navbar Header */}
+        <header className="hidden xl:flex items-center justify-between px-8 py-4 bg-gradient-to-r from-[#FDFBF7] to-[#F5F1ED] border-b border-[#E6D5C3] sticky top-0 z-30">
+          <div className="flex-1">
+            <p className="font-serif font-black text-lg text-[#3E362E]">{salonName}</p>
+          </div>
+          
+          {/* Desktop Profile Avatar with Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              className="w-10 h-10 rounded-full bg-gradient-to-br from-[#8B5A2B] to-[#4A3E3D] text-white flex items-center justify-center font-bold text-sm shrink-0 hover:shadow-md transition-all cursor-pointer"
+            >
+              {initials}
+            </button>
+            
+            {/* Profile Dropdown Menu */}
+            {showProfileDropdown && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowProfileDropdown(false)}
+                />
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                  <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-[#FDFBF7] to-[#F5F1ED]">
+                    <p className="font-serif font-black text-sm text-[#3E362E]">{ownerName}</p>
+                    <p className="text-xs text-stone-500 mt-1.5 font-bold uppercase tracking-wider">{salonName}</p>
+                  </div>
+                  
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        navigate("/owner/settings");
+                        setShowProfileDropdown(false);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >
+                      MY PROFILE
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        navigate("/owner/approvals");
+                        setShowProfileDropdown(false);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >
+                      BREAK APPROVALS
+                    </button>
+                  </div>
+                  
+                  <div className="border-t border-gray-100 py-2">
+                    <button
+                      onClick={() => {
+                        localStorage.clear();
+                        navigate("/owner/login");
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
+                    >
+                      LOGOUT
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </header>
+        
         {/* Mobile Top Navbar Header */}
         <header className="xl:hidden flex items-center justify-between px-4 py-4 bg-[#3E362E] border-b border-[#4A3E3D] sticky top-0 z-30">
           <button onClick={() => setSideOpen(!sideOpen)} className="p-1 text-[#C5A059] hover:text-white cursor-pointer">
             {sideOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
           <p className="font-serif font-black text-sm text-white truncate max-w-[180px]">{salonName}</p>
-          <div className="w-8 h-8 rounded-full bg-[#C5A059] text-[#2A241F] flex items-center justify-center font-bold text-xs shrink-0">
-            {initials}
+          
+          {/* Profile Avatar with Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              className="w-8 h-8 rounded-full bg-[#C5A059] text-[#2A241F] flex items-center justify-center font-bold text-xs shrink-0 hover:bg-[#D4B896] transition-colors cursor-pointer"
+            >
+              {initials}
+            </button>
+            
+            {/* Profile Dropdown Menu */}
+            {showProfileDropdown && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowProfileDropdown(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+                  <div className="p-4 border-b border-gray-100">
+                    <p className="font-bold text-sm text-gray-900">{ownerName}</p>
+                    <p className="text-xs text-stone-500 mt-1 font-bold uppercase tracking-wider">{salonName}</p>
+                  </div>
+                  
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        navigate("/owner/settings");
+                        setShowProfileDropdown(false);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >
+                      MY PROFILE
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        navigate("/owner/approvals");
+                        setShowProfileDropdown(false);
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >
+                      BREAK APPROVALS
+                    </button>
+                  </div>
+                  
+                  <div className="border-t border-gray-100 py-2">
+                    <button
+                      onClick={() => {
+                        localStorage.clear();
+                        navigate("/owner/login");
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
+                    >
+                      LOGOUT
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
