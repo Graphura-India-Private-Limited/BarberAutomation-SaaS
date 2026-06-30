@@ -61,11 +61,11 @@ export default function StaffLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111] flex w-full overflow-hidden font-sans">
-      <div className="w-full h-screen bg-white flex">
+    <div className="min-h-screen bg-[#111] flex flex-col md:flex-row w-full font-sans overflow-x-hidden">
+      <div className="w-full min-h-screen bg-white flex flex-col md:flex-row">
         
         {/* ── LEFT PANEL: LUXURY CONTEXT BRAND HERO ── */}
-        <div className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden h-full">
+        <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden">
           <img 
             src={salonImage} 
             alt="Salon Workspace" 
@@ -75,40 +75,40 @@ export default function StaffLogin() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
 
           {/* Core Platform Logo Badge */}
-          <div className="relative z-10 p-10 pt-12">
+          <div className="relative z-10 p-6 xl:p-10 pt-6 xl:pt-12 text-left">
             <div className="flex items-center gap-3">
-              <Scissors size={24} color={GOLD} strokeWidth={2.5} />
+              <Scissors size={20} className="xl:w-[26px] xl:h-[26px]" color={GOLD} strokeWidth={2} />
               <div>
-                <div className="text-white font-extrabold tracking-[0.25em] text-xs uppercase">Barber Pro</div>
-                <div className="text-white/50 text-[9px] tracking-[0.35em] uppercase mt-0.5">— Platform Core —</div>
+                <div className="text-white font-extrabold tracking-[0.25em] text-xs xl:text-sm uppercase">Barber Pro</div>
+                <div className="text-white/50 text-[8px] xl:text-[10px] tracking-[0.35em] uppercase mt-0.5">— Platform Core —</div>
               </div>
             </div>
           </div>
 
           {/* Context Dynamic Headline */}
-          <div className="relative z-10 px-10 pb-12 flex-1 flex flex-col justify-center">
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase mb-3" style={{ color: GOLD }}>
+          <div className="relative z-10 px-6 md:px-10 pb-5 md:pb-8 flex-1 flex flex-col justify-end md:justify-center text-left">
+            <span className="text-[9px] font-black tracking-[0.3em] uppercase mb-1.5" style={{ color: GOLD }}>
               Internal Workspace Gateway
             </span>
-            <h1 className="text-5xl lg:text-6xl font-serif font-black leading-tight text-white uppercase tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-serif font-bold leading-none text-white uppercase tracking-tight">
               Staff <br />
-              <span style={{ color: GOLD }}>Portal</span>
+              <span style={{ color: GOLD }} className="md:block">Portal</span>
             </h1>
-            <div className="w-14 h-[3px] mt-6 rounded-full" style={{ background: GOLD }} />
-            <p className="text-white/70 text-sm mt-6 leading-relaxed max-w-sm font-medium">
+            <div className="w-12 md:w-16 h-0.5 md:h-1 mt-2 md:mt-5" style={{ background: GOLD }} />
+            <p className="text-white/70 text-[10px] md:text-sm mt-2 md:mt-5 leading-relaxed max-w-sm font-medium hidden sm:block">
               Access scheduled client rosters, track real-time queue states, and manage personal shift parameters cleanly.
             </p>
           </div>
 
           {/* Secure Compliance Stamp Footer */}
-          <div className="relative z-10 px-10 pb-10 flex items-center gap-2 text-white/40 text-[10px] font-bold tracking-wider uppercase border-t border-white/10 pt-4 bg-black/20">
+          <div className="relative z-10 px-10 pb-10 hidden md:flex items-center gap-2 text-white/40 text-[10px] font-bold tracking-wider uppercase border-t border-white/10 pt-4 bg-black/20">
             <KeyRound size={12} style={{ color: GOLD }} />
             <span>Encrypted End-To-End Access Nodes</span>
           </div>
         </div>
 
         {/* ── RIGHT PANEL: FORM REGISTRATION ACCESS CARD ── */}
-        <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-10" style={{ background: "#F7F5F2" }}>
+        <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8 md:py-8" style={{ background: "#F7F5F2" }}>
           <div className="bg-white w-[460px] px-8 py-7 rounded-[2.5rem] shadow-xl border border-[#EADBCE]/40">
             
             {/* Identity Icon Frame */}

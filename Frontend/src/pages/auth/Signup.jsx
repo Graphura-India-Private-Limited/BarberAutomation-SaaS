@@ -84,7 +84,7 @@ export default function Signup() {
       <div className="w-full min-h-screen bg-white flex flex-col md:flex-row">
 
         {/* ── LEFT: Hero Panel ── */}
-        <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen relative flex flex-col justify-between overflow-hidden">
+        <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden">
           <img src={signupImage} alt="Barber" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/55" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />

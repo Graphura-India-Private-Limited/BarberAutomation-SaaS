@@ -16,6 +16,19 @@ import {
 
 export default function AboutPage() {
   const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const slides = [
+    "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1600&q=80",
+    "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=80",
+    "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1600&q=80"
+  ];
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const STATS = [
     { label: "Master Stylists", value: "15+" },
@@ -49,11 +62,16 @@ export default function AboutPage() {
       {/* ── HERO BANNER ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] pt-32 pb-24 text-center select-none">
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=1600&q=80"
-            alt="Luxury Barbershop Interior"
-            className="w-full h-full object-cover opacity-20 object-center"
-          />
+          {slides.map((img, index) => (
+            <img
+              key={index}
+              src={img}
+              alt={`Luxury Barbershop Interior ${index + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
+                index === currentSlide ? "opacity-40" : "opacity-0"
+              }`}
+            />
+          ))}
           <div className="absolute inset-0 bg-gradient-to-t from-[#2A241F]/40 to-black/20" />
         </div>
 
@@ -96,7 +114,7 @@ export default function AboutPage() {
           <div className="relative group">
             <div className="absolute inset-0 bg-[#C5A059]/10 rounded-[2.5rem] transform rotate-3 scale-[1.01] z-0" />
             <img 
-              src="https://images.unsplash.com/photo-1672642150048-fbfa1634804f?q=80&w=600&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&auto=format&fit=crop"
               alt="Grooming Consultation"
               className="w-full aspect-[4/3] object-cover rounded-[2.5rem] border border-[#E8DCCB] relative z-10 shadow-lg group-hover:scale-[1.01] transition-transform duration-500"
             />
