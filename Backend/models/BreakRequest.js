@@ -12,7 +12,7 @@ const breakSchema = new mongoose.Schema({
   break_type: { 
     type: String, 
     default: "short", 
-    enum: ["short", "long", "lunch"] 
+    enum: ["short", "long", "lunch", "leave"] 
   },
 
   // Timing fields for the approval system

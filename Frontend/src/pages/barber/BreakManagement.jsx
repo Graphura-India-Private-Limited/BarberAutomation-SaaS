@@ -65,6 +65,11 @@ export default function BreakManagement() {
   const [duration, setDuration] = useState('15');
   const [reason, setReason] = useState('');
 
+  // Leave Form states
+  const [leaveStartDate, setLeaveStartDate] = useState('');
+  const [leaveEndDate, setLeaveEndDate] = useState('');
+  const [leaveReason, setLeaveReason] = useState('');
+
   const [requests, setRequests] = useState([]);
   const [breakRequests, setBreakRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,8 +91,10 @@ export default function BreakManagement() {
         if (data.success) {
           const mapped = (data.requests || []).map(r => ({
             id: r._id,
-            type: r.break_type,
-            details: `${r.duration_mins} mins (${new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})` + (r.reason ? ` - Reason: ${r.reason}` : ''),
+            type: r.break_type === "leave" ? "Multi-Day Leave" : r.break_type,
+            details: r.break_type === "leave"
+              ? `${Math.round(r.duration_mins / 1440)} Days (from ${new Date(r.start_time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} to ${new Date(r.end_time || r.start_time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })})` + (r.reason ? ` - Reason: ${r.reason}` : '')
+              : `${r.duration_mins} mins (${new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})` + (r.reason ? ` - Reason: ${r.reason}` : ''),
             status: r.status.charAt(0).toUpperCase() + r.status.slice(1)
           }));
           setRequests(mapped);
@@ -100,9 +107,13 @@ export default function BreakManagement() {
           const mapped = (data.requests || []).map(r => ({
             id: r._id,
             name: r.barber_id?.name || "Barber",
-            type: r.break_type,
-            time: new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            duration: `${r.duration_mins}m`,
+            type: r.break_type === "leave" ? "Multi-Day Leave" : r.break_type,
+            time: r.break_type === "leave"
+              ? `${new Date(r.start_time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}`
+              : new Date(r.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            duration: r.break_type === "leave"
+              ? `${Math.round(r.duration_mins / 1440)}d`
+              : `${r.duration_mins}m`,
             status: r.status
           }));
           setBreakRequests(mapped);
@@ -192,6 +203,55 @@ export default function BreakManagement() {
     }
   };
 
+  const handleLeaveSubmit = async (e) => {
+    e.preventDefault();
+    if (!leaveStartDate || !leaveEndDate || !leaveReason.trim()) {
+      alert("Please fill in all leave fields including reason.");
+      return;
+    }
+
+    const start = new Date(leaveStartDate);
+    const end = new Date(leaveEndDate);
+
+    // Set times to standard shift coverage (e.g. 9:00 AM start, 9:00 PM end)
+    start.setHours(9, 0, 0, 0);
+    end.setHours(21, 0, 0, 0);
+
+    if (end < start) {
+      alert("End date must be on or after start date.");
+      return;
+    }
+
+    // Calculate duration in minutes
+    const diffMs = end - start;
+    const durationVal = Math.round(diffMs / 60000);
+
+    try {
+      const res = await fetch(`${API}/barber/${barberId}/break-request`, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({
+          break_type: "leave",
+          start_time: start.toISOString(),
+          end_time: end.toISOString(),
+          duration_mins: durationVal,
+          reason: leaveReason
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setLeaveStartDate('');
+        setLeaveEndDate('');
+        setLeaveReason('');
+        fetchBreaks();
+      } else {
+        alert(data.message || "Failed to submit leave request");
+      }
+    } catch (err) {
+      alert("Network error submitting leave request");
+    }
+  };
+
   const handleApprove = async (id) => {
     try {
       const res = await fetch(`${API}/owner/break-request/${id}`, {
@@ -277,8 +337,7 @@ export default function BreakManagement() {
         {/* 3-GRID LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-          {/* LUNCH & SHORT BREAK FORMS */}
-          <div className={`${isBarber ? 'lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-6 space-y-0' : 'lg:col-span-2 space-y-8'}`}>
+          <div className={`${isBarber ? 'lg:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 space-y-0' : 'lg:col-span-2 space-y-8'}`}>
             
             {/* LUNCH FORM */}
             <div className="bg-white/70 p-6 rounded-[22px] border border-[#EADDCA] text-left">
@@ -306,16 +365,16 @@ export default function BreakManagement() {
                 <form onSubmit={handleBreakSubmit} className="space-y-4">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <CustomDropdown
-                      label="Break Type"
-                      value={breakType}
-                      onChange={setBreakType}
-                      options={breakTypes}
+                       label="Break Type"
+                       value={breakType}
+                       onChange={setBreakType}
+                       options={breakTypes}
                     />
                     <CustomDropdown
-                      label="Duration"
-                      value={duration}
-                      onChange={setDuration}
-                      options={durations}
+                       label="Duration"
+                       value={duration}
+                       onChange={setDuration}
+                       options={durations}
                     />
                   </div>
 
@@ -346,6 +405,60 @@ export default function BreakManagement() {
                 </form>
               </div>
             </div>
+
+            {/* MULTI-DAY LEAVE FORM */}
+            {isBarber && (
+              <div className="bg-white/70 p-6 rounded-[22px] border border-[#EADDCA] text-left flex flex-col justify-between">
+                <div>
+                  <h2 className="text-sm font-black uppercase mb-2 tracking-wider text-[#3E362E] font-serif">Request Multi-Day Leave</h2>
+                  <p className="text-[10px] text-stone-500 font-bold mb-4 font-sans leading-relaxed">
+                    Planning a trip or needing a longer break (2-3 days)? Request owner-approved leaves here.
+                  </p>
+                  <form onSubmit={handleLeaveSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 pl-0.5">Start Date</label>
+                      <input 
+                        type="date" 
+                        required 
+                        min={new Date().toISOString().split("T")[0]}
+                        value={leaveStartDate} 
+                        onChange={(e) => setLeaveStartDate(e.target.value)} 
+                        className={formInputStyle} 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 pl-0.5">End Date</label>
+                      <input 
+                        type="date" 
+                        required 
+                        min={leaveStartDate || new Date().toISOString().split("T")[0]}
+                        value={leaveEndDate} 
+                        onChange={(e) => setLeaveEndDate(e.target.value)} 
+                        className={formInputStyle} 
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <label className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-0.5">
+                        Reason for Leave <span className="text-red-500 font-bold">*</span>
+                      </label>
+                      <textarea
+                        required
+                        value={leaveReason}
+                        onChange={(e) => setLeaveReason(e.target.value)}
+                        placeholder="Please describe the reason for your multi-day leave..."
+                        className="w-full p-3.5 border border-[#EADDCA] rounded-xl focus:outline-none focus:border-[#C5A059] bg-white font-medium text-xs text-[#3E362E] transition-all min-h-[70px] resize-none"
+                      />
+                    </div>
+                    <button 
+                      type="submit" 
+                      className="w-full bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] hover:text-[#FAF6F0] py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-colors cursor-pointer border-none shadow-sm"
+                    >
+                      Send Leave Request
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
 
           </div>
 
@@ -406,12 +519,14 @@ export default function BreakManagement() {
           <h2 className="text-sm font-black uppercase mb-6 text-left font-serif">Request Status History</h2>
           <div className="space-y-3">
             {requests.map((req) => (
-              <div key={req.id} className="flex justify-between p-4 border border-[#EADDCA]/40 rounded-xl bg-white/40">
-                <div className="text-left">
-                  <p className="font-black text-[#3E362E]">{req.type}</p>
-                  <p className="text-[10px] font-bold text-stone-400 uppercase mt-0.5">{req.details}</p>
+              <div key={req.id} className="flex justify-between items-center gap-4 p-4 border border-[#EADDCA]/40 rounded-xl bg-white/40">
+                <div className="text-left flex-1 min-w-0 pr-2">
+                  <p className="font-black text-[#3E362E] text-xs truncate sm:whitespace-normal">{req.type}</p>
+                  <p className="text-[10px] font-bold text-stone-400 uppercase mt-0.5 break-words whitespace-normal leading-relaxed">{req.details}</p>
                 </div>
-                {getStatusBadge(req.status)}
+                <div className="shrink-0 font-sans">
+                  {getStatusBadge(req.status)}
+                </div>
               </div>
             ))}
           </div>

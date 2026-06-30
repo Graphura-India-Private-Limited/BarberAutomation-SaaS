@@ -622,37 +622,6 @@ export default function BarberSelection() {
                 </div>
               )}
 
-              {/* FLOATING FILTERS BUTTON FOR MOBILE/TABLET */}
-              {!selectedBarber && (
-                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 lg:hidden">
-                  <button
-                    onClick={() => setShowFilters(true)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      background: "#2C241E",
-                      color: "#F5EFE0",
-                      border: "1px solid #C5A059",
-                      borderRadius: 30,
-                      padding: "10px 20px",
-                      fontFamily: "'Montserrat',sans-serif",
-                      fontWeight: 700,
-                      fontSize: 11,
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      cursor: "pointer",
-                      boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-                      transition: "all 0.3s"
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
-                  >
-                    <SlidersHorizontal size={14} className="text-[#C5A059]" />
-                    <span>Filters</span>
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>

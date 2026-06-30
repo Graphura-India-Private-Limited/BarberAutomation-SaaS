@@ -483,21 +483,7 @@ function QueueCard({ q, children, displayPosition }) {
         <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 mb-0.5">Service</p>
         <p className="text-sm font-bold text-zinc-900">
           {q.booking_id?.services?.[0]?.service_name || "—"}
-          {q.booking_id?.services?.[0]?.member_name && q.booking_id.services[0].member_name !== "Self" && (
-            <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-[#8B6B3E]">
-              for {q.booking_id.services[0].member_name}
-            </span>
-          )}
         </p>
-        {q.booking_id?.services && q.booking_id.services.length > 1 && (
-          <div className="mt-2 pt-2 border-t border-dashed border-[#EADBCE]/60 space-y-1">
-            {q.booking_id.services.slice(1).map((s, sIdx) => (
-              <p key={sIdx} className="text-xs text-zinc-600 font-medium">
-                👥 <span className="font-bold text-zinc-800">{s.member_name}</span>: <span className="italic">{s.service_name}</span>
-              </p>
-            ))}
-          </div>
-        )}
         {q.booking_id?.total_amount > 0 && (
           <p className="text-[10px] text-[#8B6B3E] font-bold mt-1">Total: ₹{q.booking_id.total_amount}</p>
         )}

@@ -70,15 +70,6 @@ function QueueRow({ entry, idx, onClick, onServe }) {
         <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
           {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
-        {entry.services && entry.services.length > 1 && (
-          <div className="mt-2 pl-2 border-l border-[#C5A059] space-y-1">
-            {entry.services.slice(1).map((s, sIdx) => (
-              <p key={sIdx} className="text-xs text-stone-600 font-medium">
-                👥 <span className="font-bold text-stone-800">{s.member_name}</span>: <span className="italic">{s.service_name}</span>
-              </p>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Wait time text metric */}
@@ -138,15 +129,6 @@ function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
         <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
           {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
-        {entry.services && entry.services.length > 1 && (
-          <div className="mt-2 pl-2 border-l border-[#C5A059] space-y-1">
-            {entry.services.slice(1).map((s, sIdx) => (
-              <p key={sIdx} className="text-xs text-stone-600 font-medium">
-                👥 <span className="font-bold text-stone-800">{s.member_name}</span>: <span className="italic">{s.service_name}</span>
-              </p>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Trigger Handler */}

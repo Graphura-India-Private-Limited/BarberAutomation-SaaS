@@ -97,8 +97,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111] flex flex-col md:flex-row w-full">
-      <div className="w-full min-h-screen bg-[#f7f5f2] flex flex-col md:flex-row">
+    <div className="w-full min-h-screen bg-[#f7f5f2] flex flex-col md:flex-row relative">
 
         {/* ── LEFT: Customer Hero ── */}
         <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden">
@@ -361,8 +360,6 @@ export default function Login() {
             </div>
           </div>
         </div>
-
       </div>
-    </div>
   );
 }

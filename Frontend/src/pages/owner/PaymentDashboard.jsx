@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Calendar, ChevronLeft, ChevronRight, CreditCard, RefreshCw, 
-  Search, X, Scissors, LogOut, LayoutDashboard, BarChart2, DollarSign 
+  Search, X, Scissors, LogOut, LayoutDashboard, BarChart2, DollarSign,
+  Download
 } from "lucide-react";
 import CustomSelect from "../../components/common/CustomSelect";
 
@@ -119,6 +120,100 @@ export default function PaymentDashboard() {
     }
   };
 
+  const exportToCSV = async () => {
+    try {
+      setLoading(true);
+      // Build query string matching current filters but without page/limit pagination
+      const allParams = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value && value !== "ALL") allParams.set(key, value);
+      });
+      allParams.set("limit", 100);
+      
+      let allPayments = [];
+      let currentPage = 1;
+      let hasMore = true;
+      
+      while (hasMore) {
+        allParams.set("page", currentPage);
+        const res = await fetch(`${API}/payment?${allParams.toString()}`, {
+          headers: {
+            Authorization: `Bearer ${getToken()}`
+          }
+        });
+        const data = await res.json();
+        if (data.success && data.payments) {
+          allPayments = [...allPayments, ...data.payments];
+          if (currentPage >= data.pagination.pages) {
+            hasMore = false;
+          } else {
+            currentPage++;
+          }
+        } else {
+          hasMore = false;
+        }
+      }
+      
+      if (allPayments.length === 0) {
+        setToast("No payments to export.");
+        return;
+      }
+      
+      // Headers
+      const headersList = [
+        "Transaction ID", 
+        "Customer Name", 
+        "Customer Email", 
+        "Customer Mobile", 
+        "Barber Name", 
+        "Amount (INR)", 
+        "Payment Type", 
+        "Status", 
+        "Date & Time"
+      ];
+      
+      // Rows - escaped commas and quoted fields for Excel
+      const rows = allPayments.map(p => {
+        const dateStr = p.created_at
+          ? new Date(p.created_at).toLocaleString('en-IN', { timeZone: 'UTC' })
+          : new Date().toLocaleString('en-IN');
+        return [
+          `"${p.razorpay_payment_id || p.razorpay_order_id || p._id}"`,
+          `"${p.customer_id?.name || "N/A"}"`,
+          `"${p.customer_id?.email || "N/A"}"`,
+          `"${p.customer_id?.mobile || "N/A"}"`,
+          `"${p.barber_id?.name || "Unassigned"}"`,
+          p.amount || 0,
+          `"${p.payment_type || "N/A"}"`,
+          `"${p.status || "N/A"}"`,
+          `"${dateStr}"`
+        ];
+      });
+      
+      // Excel-friendly UTF-8 BOM
+      const BOM = "\uFEFF";
+      const csvContent = BOM + "sep=,\n" + [
+        headersList.join(","),
+        ...rows.map(e => e.join(","))
+      ].join("\n");
+      
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `payments_ledger_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setToast("Ledger exported successfully!");
+    } catch (err) {
+      console.error("Export error:", err);
+      setToast("Failed to export ledger.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen" style={{ background: "#FAF6F0" }}>
       <style>{`
@@ -174,13 +269,21 @@ export default function PaymentDashboard() {
                 </h2>
                 <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-2">Track token installments, fully captured orders, and pending deposits processed through Razorpay.</p>
               </div>
-              <button 
-                onClick={() => { setPage(1); setRefreshTrigger(prev => prev + 1); }} 
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 self-start md:self-center cursor-pointer hover:opacity-90 font-sans"
-                style={{ background: CHARCOAL }}
-              >
-                <RefreshCw size={14} color={GOLD} /> Refresh Ledger
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2.5 self-start md:self-center">
+                <button 
+                  onClick={exportToCSV}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-[#3E362E] bg-white border border-[#EADBCE] shadow-sm hover:bg-stone-50 transition-all duration-200 cursor-pointer font-sans"
+                >
+                  <Download size={14} className="text-[#C5A059]" /> Export CSV
+                </button>
+                <button 
+                  onClick={() => { setPage(1); setRefreshTrigger(prev => prev + 1); }} 
+                  className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer hover:opacity-90 font-sans"
+                  style={{ background: CHARCOAL }}
+                >
+                  <RefreshCw size={14} color={GOLD} /> Refresh Ledger
+                </button>
+              </div>
             </div>
             <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-5 transform rotate-12 pointer-events-none">
               <CreditCard className="w-32 h-32 text-stone-900" />

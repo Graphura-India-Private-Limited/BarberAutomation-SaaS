@@ -628,17 +628,17 @@ useEffect(() => {
                 <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent rotate-12 group-hover:left-[120%] transition-all duration-1000 z-20 pointer-events-none" />
                 <div className="absolute inset-0 z-0">
                   <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-75 scale-100 group-hover:scale-110 group-hover:opacity-90 transition-all duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6F0] via-[#FAF6F0]/20 to-transparent group-hover:from-[#FAF6F0]/95 group-hover:via-[#FAF6F0]/90 transition-all duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6F0] via-[#FAF6F0]/90 to-[#FAF6F0]/10 lg:from-[#FAF6F0] lg:via-[#FAF6F0]/20 lg:to-transparent lg:group-hover:from-[#FAF6F0]/95 lg:group-hover:via-[#FAF6F0]/90 transition-all duration-500" />
                 </div>
                 <div className="relative z-10 p-6 md:p-7 flex flex-col justify-end h-full">
                   <div className="mb-5 inline-flex w-fit rounded-2xl bg-white/70 backdrop-blur-xl p-4 text-[#C5A059] border border-white/40 group-hover:bg-[#C5A059] group-hover:text-white transition-all duration-300">
                     <f.Icon size={24} />
                   </div>
                   <h3 className="mb-3 text-sm md:text-base font-black uppercase tracking-[0.18em] text-[#3E362E]">{f.title}</h3>
-                  <p className="text-[11px] md:text-xs leading-relaxed text-stone-700 italic font-serif mb-0 opacity-0 max-h-0 translate-y-4 overflow-hidden transition-all duration-500 ease-out group-hover:opacity-100 group-hover:max-h-[100px] group-hover:translate-y-0 group-hover:mb-5">
+                  <p className="text-[11px] md:text-xs leading-relaxed text-stone-700 italic font-serif opacity-100 max-h-[120px] translate-y-0 mb-5 lg:mb-0 lg:opacity-0 lg:max-h-0 lg:translate-y-4 overflow-hidden transition-all duration-500 ease-out lg:group-hover:opacity-100 lg:group-hover:max-h-[100px] lg:group-hover:translate-y-0 lg:group-hover:mb-5">
                     {f.description}
                   </p>
-                  <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#C5A059] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                  <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#C5A059] opacity-100 translate-y-0 lg:opacity-0 lg:translate-y-2 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-300">
                     Book Now <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 </div>

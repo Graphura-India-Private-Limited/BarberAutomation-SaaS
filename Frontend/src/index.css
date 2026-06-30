@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  background-color: #f7f5f2;
+}
+
 /* GRID - स्पेसिफिक क्लास वापरा जेणेकरून इतर ग्रिड्स खराब होणार नाहीत */
 .category-grid {
   display: grid;

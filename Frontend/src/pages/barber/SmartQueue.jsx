@@ -64,11 +64,6 @@ function QueueRow({ entry, idx, onClick, onServe }) {
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
           <SourceTag src={entry.source} />
-          {entry.memberName && entry.memberName !== 'Self' && (
-            <span className="text-[9px] font-black px-2 py-0.5 rounded-md border bg-amber-50 border-amber-200 text-amber-700">
-              for {entry.memberName}
-            </span>
-          )}
           {isFirst && (
             <Chip color={entry.status === 'in-progress' ? '#2E8B57' : '#A37B58'}>
               {entry.status === 'in-progress' ? '● SERVING' : '● NEXT UP'}
@@ -78,15 +73,6 @@ function QueueRow({ entry, idx, onClick, onServe }) {
         <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
           {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
-        {entry.services && entry.services.length > 1 && (
-          <div className="mt-2 pl-2 border-l border-[#C5A059] space-y-1">
-            {entry.services.slice(1).map((s, sIdx) => (
-              <p key={sIdx} className="text-xs text-stone-600 font-medium">
-                👥 <span className="font-bold text-stone-800">{s.member_name}</span>: <span className="italic">{s.service_name}</span>
-              </p>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Wait time text metric */}
@@ -139,11 +125,6 @@ function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
       <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
-          {entry.memberName && entry.memberName !== 'Self' && (
-            <span className="text-[9px] font-black px-2 py-0.5 rounded-md border bg-amber-50 border-amber-200 text-amber-700">
-              for {entry.memberName}
-            </span>
-          )}
           <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border ${ss.bg} ${ss.border} ${ss.text}`}>
             {entry.status}
           </span>
@@ -151,15 +132,6 @@ function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
         <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
           {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
-        {entry.services && entry.services.length > 1 && (
-          <div className="mt-2 pl-2 border-l border-[#C5A059] space-y-1">
-            {entry.services.slice(1).map((s, sIdx) => (
-              <p key={sIdx} className="text-xs text-stone-600 font-medium">
-                👥 <span className="font-bold text-stone-800">{s.member_name}</span>: <span className="italic">{s.service_name}</span>
-              </p>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Trigger Handler */}

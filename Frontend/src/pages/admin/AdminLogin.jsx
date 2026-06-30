@@ -86,8 +86,7 @@ export default function AdminLogin() {
   const fillDemo = () => { setMobile(DEMO.mobile); setPassword(DEMO.password); setError(""); };
 
   return (
-    <div className="min-h-screen bg-[#111] flex flex-col md:flex-row w-full font-sans overflow-x-hidden">
-      <div className="w-full min-h-screen bg-white flex flex-col md:flex-row">
+    <div className="w-full min-h-screen bg-white flex flex-col md:flex-row relative">
 
         {/* ── LEFT: Admin Hero ── */}
         <div
@@ -348,8 +347,6 @@ export default function AdminLogin() {
             </div>
           </div>
         </div>
-
       </div>
-    </div>
   );
 }
