@@ -181,17 +181,17 @@ export default function HomeOverview() {
           </div>
 
           {/* Salon Workspace Info — live from API */}
-          <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-2xs">
-            <h3 className="text-sm font-black uppercase tracking-wider text-stone-900 mb-4 border-b pb-2 border-stone-100 flex items-center gap-2">
+          <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-2xs max-w-4xl w-full mx-auto">
+            <h3 className="text-sm font-black uppercase tracking-wider text-stone-800 mb-4 border-b pb-2 border-stone-100 flex items-center gap-2">
               <span className="w-1 h-3 bg-[#C5A059] rounded-full" />
               Salon Workspace Info
             </h3>
             <div className="space-y-3.5 text-sm text-stone-700 font-medium">
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salon Node</span> <span className="font-bold text-stone-900">{useDbData ? (localStorage.getItem("salonName") || "Our Salon") : salon.name}</span></div>
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Address</span> <span className="font-bold text-stone-900">{useDbData ? (localStorage.getItem("salonAddress") || "") : salon.address}</span></div>
-              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Support Phone</span> <span className="font-bold text-stone-900 font-mono text-xs">{useDbData ? "" : salon.phone}</span></div>
+              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salon Node</span> <span className="min-w-0 font-bold text-stone-900 break-words">{useDbData ? (localStorage.getItem("salonName") || "Our Salon") : salon.name}</span></div>
+              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Address</span> <span className="min-w-0 font-bold text-stone-900 break-words">{useDbData ? (localStorage.getItem("salonAddress") || "") : salon.address}</span></div>
+              <div className="flex border-b pb-2.5 border-stone-100"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Support Phone</span> <span className="min-w-0 font-bold text-stone-900 font-mono text-xs break-words">{useDbData ? "" : salon.phone}</span></div>
               {currentUser?.role === "barber" && (
-                <div className="flex"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salary Model</span> <span className="font-bold text-[#A37B58] uppercase tracking-wider text-xs">{currentUser.salaryModel || "Standard Split"}</span></div>
+                <div className="flex"><span className="text-[10px] font-black uppercase tracking-wider text-stone-400 w-28 shrink-0">Salary Model</span> <span className="min-w-0 font-bold text-[#A37B58] uppercase tracking-wider text-xs">{currentUser.salaryModel || "Standard Split"}</span></div>
               )}
             </div>
           </div>
