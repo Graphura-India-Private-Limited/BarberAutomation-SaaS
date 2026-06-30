@@ -119,8 +119,27 @@ function BarberProfile() {
   return (
     <div className="w-full text-stone-800 font-sans antialiased flex flex-col">
 
-      {/* ── Main ── */}
-      <main className="max-w-5xl mx-auto w-full px-6 py-10 flex-1">
+      <main className="max-w-5xl mx-auto w-full px-6 py-10 flex-1 text-left">
+        
+        {/* Section Dynamic Header Info */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+              My <span className="text-[#C5A059]">Profile</span>
+            </h1>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+              View your credential status, assigned studio, and experience metrics
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+            <User size={13} className="text-[#C5A059]" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
+              Identity Status: <span className="text-emerald-700 font-extrabold">Verified</span>
+            </span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
           {/* LEFT — Barber identity card */}

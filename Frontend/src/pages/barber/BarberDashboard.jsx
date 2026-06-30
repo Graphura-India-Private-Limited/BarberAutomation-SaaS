@@ -461,11 +461,29 @@ export default function BarberDashboard() {
       {/* ═══ MAIN CONTENT ═══ */}
       <div className="flex-1 flex flex-col">
 
-        {/* Page Content */}
         <main className="flex-1 px-4 md:px-6 pt-6 pb-6 space-y-5 bg-[#FDFBF7] text-[#4A3E3D]">
 
-  {/* ── STAT CARDS ── */}
-  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mx-auto w-full">
+          {/* Section Dynamic Header Info */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-stone-200/60 w-full gap-4 text-left">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+                Barber <span className="text-[#C5A059]">Dashboard</span>
+              </h1>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+                Real-time performance metrics, client volumes & revenue auditing
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
+                Console status: <span className="text-emerald-700 font-extrabold">Online</span>
+              </span>
+            </div>
+          </div>
+
+          {/* ── STAT CARDS ── */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mx-auto w-full">
     {[
       { 
         label: "Today's Revenue",  
