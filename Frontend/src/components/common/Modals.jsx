@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, Phone, Scissors, Calendar, Clock, Info, ShieldCheck, CheckCircle2, Trash2 } from 'lucide-react';
+import { X, User, Phone, Scissors, Calendar, Clock, Info, ShieldCheck, CheckCircle2, Trash2, CreditCard } from 'lucide-react';
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
