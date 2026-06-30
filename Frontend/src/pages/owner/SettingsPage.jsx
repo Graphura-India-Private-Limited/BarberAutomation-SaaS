@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AppContext";
-import { Scissors, Edit, MapPin, Image as ImageIcon, Bell, Shield } from "lucide-react";
+import { Scissors, Edit, MapPin, Image as ImageIcon, Bell, Shield, Plus } from "lucide-react";
 import CustomSelect from "../../components/common/CustomSelect";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -116,17 +116,23 @@ export default function SettingsPage() {
         syncSalon(profile.salon);
       }
       
+      // Hide the initial full-screen loading spinner so the page opens immediately
+      setLoading(false);
+
+      // Fetch secondary lists (barbers and approval requests) in the background
       if (salonId) {
-        const [bs, reqs] = await Promise.all([
+        Promise.all([
           fetch(`${API}/barber/salon/${salonId}`, { headers: headers() }).then(r => r.json()),
           fetch(`${API}/owner/salon/${salonId}/approval-requests`, { headers: headers() }).then(r => r.json())
-        ]);
-        if (bs.success) setBarbers(bs.barbers || []);
-        if (reqs.success) setApprovalRequests(reqs.requests || []);
+        ]).then(([bs, reqs]) => {
+          if (bs && bs.success) setBarbers(bs.barbers || []);
+          if (reqs && reqs.success) setApprovalRequests(reqs.requests || []);
+        }).catch(err => {
+          console.error("Background data fetch failed:", err);
+        });
       }
     } catch (err) {
       setError("Failed to load settings data");
-    } finally {
       setLoading(false);
     }
   };
@@ -501,7 +507,7 @@ export default function SettingsPage() {
                       ))}
                     </div>
 
-                    <div className="mt-3 flex justify-between items-center text-[10px] text-stone-400 font-sans border-t pt-2 border-stone-100/50">
+                    <div className="mt-3 flex flex-col sm:flex-row gap-1.5 sm:justify-between sm:items-center text-[10px] text-stone-400 font-sans border-t pt-2 border-stone-100/50">
                       <span>Submitted: {new Date(req.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
                       {req.resolved_at && (
                         <span>Resolved: {new Date(req.resolved_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
@@ -607,17 +613,17 @@ export default function SettingsPage() {
               }
 
               return (
-                <div key={barber._id} className="bg-[#FAF6F0]/60 border border-[#EADBCE]/35 rounded-2xl p-4 flex items-center justify-between transition hover:bg-[#FAF6F0]/80">
+                <div key={barber._id} className="bg-[#FAF6F0]/60 border border-[#EADBCE]/35 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition hover:bg-[#FAF6F0]/80">
                   <div className="text-left">
                     <p className="font-bold text-zinc-900 text-sm tracking-tight">{barber.name}</p>
                     <p className="text-xs text-zinc-500 font-sans mt-0.5">{barber.specialization || "Hair Stylist & Grooming Expert"}</p>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                     <span className={`text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full ${badgeClass}`}>
                       {statusLabel}
                     </span>
-                    <span className="text-xs text-zinc-500 font-sans font-bold">
+                    <span className="text-xs text-zinc-500 font-sans font-bold whitespace-nowrap">
                       Exp: {barber.experience || 0} Yrs
                     </span>
                   </div>
@@ -803,6 +809,34 @@ function ProfileEditor({ form, setField, addImages, tagLocation, saveProfile, bu
       <div className="mt-4">
         <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Physical Address</label>
         <textarea className={`${inputClass} min-h-16 resize-none`} value={form.address} onChange={e => setField("address", e.target.value)} onBlur={handleAddressBlur} placeholder="Physical Destination Address" />
+      </div>
+
+      <div className="mt-4">
+        <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">Storefront Gallery (Max 5 Images)</label>
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5 items-center mt-1">
+          {(form.images || []).map((img, i) => (
+            <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-[#EADBCE] group">
+              <img src={img} alt={`Staged ${i}`} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => {
+                  const filtered = form.images.filter((_, idx) => idx !== i);
+                  setField("images", filtered);
+                }}
+                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity text-xs font-bold border-none cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          {(form.images || []).length < 5 && (
+            <label className="aspect-square rounded-xl border-2 border-dashed border-[#EADBCE] hover:border-[#C5A059] flex flex-col items-center justify-center cursor-pointer transition-colors text-stone-400 hover:text-[#C5A059] bg-[#FAF6F0]/20">
+              <Plus size={18} />
+              <span className="text-[9px] font-bold uppercase tracking-widest mt-1">Upload</span>
+              <input type="file" accept="image/*" multiple onChange={addImages} className="hidden" />
+            </label>
+          )}
+        </div>
       </div>
       
       <div className="mt-5 flex flex-wrap gap-3 pt-4 border-t border-stone-50">

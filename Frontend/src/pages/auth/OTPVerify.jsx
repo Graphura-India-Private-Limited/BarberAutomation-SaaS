@@ -118,37 +118,50 @@ export default function OTPVerify({ phone, onBack }) {
   const displayPhone = phone || '98765 43210';
 
   return (
-    <div style={S.page}>
+    <div className="min-h-screen bg-[#FAF6F0] flex flex-col md:flex-row w-full font-sans overflow-x-hidden">
       <style>{CSS}</style>
 
-      <div style={S.left} className={mounted ? 'slide-in-left' : ''}>
-        <img src={SALON_IMAGE} alt="Barber salon view layout background" style={S.bgImg} />
-        <div style={S.overlay} />
+      {/* ── LEFT: Hero Panel ── */}
+      <div className={`w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden ${mounted ? 'slide-in-left' : ''}`}>
+        <img src={SALON_IMAGE} alt="Barber salon view layout background" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
 
-        <div style={S.logoWrap}>
-          <div style={S.logoBox}><ScissorIcon size={18} color="#D4A843" /></div>
-          <div>
-            <div style={S.logoText}>BARBER <span style={S.logoPro}>PRO</span></div>
-            <div style={S.logoTagline}>PREMIUM GROOMING SYSTEMS</div>
+        {/* Logo */}
+        <div className="relative z-10 p-6 xl:p-10 pt-6 xl:pt-12 text-left">
+          <div className="flex items-center gap-3">
+            <ScissorIcon size={20} className="xl:w-[26px] xl:h-[26px]" color="#D4A843" strokeWidth={2} />
+            <div>
+              <div className="text-white font-bold tracking-[0.25em] text-xs xl:text-sm uppercase">Barber Pro</div>
+              <div className="text-white/60 text-[8px] xl:text-[10px] tracking-[0.35em] uppercase mt-0.5">— Est. 2026 —</div>
+            </div>
           </div>
         </div>
 
-        <div style={S.leftBottom}>
-          <p style={S.leftItalic}>Verify your identity.<br />Your session awaits.</p>
-          <div style={S.goldLine} />
-          <p style={S.leftSmall}>
+        {/* Headline */}
+        <div className="relative z-10 px-6 md:px-10 pb-5 md:pb-8 flex-1 flex flex-col justify-end md:justify-center text-left">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-serif font-bold leading-none text-white">
+            <span style={{ color: '#D4A843' }}>VERIFY</span>
+            {" "}
+            <span className="text-white md:block">IDENTITY</span>
+          </h1>
+          <div className="w-12 md:w-16 h-0.5 md:h-1 mt-2 md:mt-5 bg-[#D4A843]" />
+          <p className="text-white/80 text-[10px] md:text-base mt-2 md:mt-5 leading-relaxed max-w-xs italic hidden sm:block">
             We sent a one-time password to your registered mobile number to ensure secure access to your personal dashboard.
           </p>
-          <div style={S.tagRow}>
-            {['Secure Access', 'OTP Login', 'Instant Verify'].map(t => (
-              <span key={t} style={S.tag}>{t}</span>
-            ))}
-          </div>
-          <div style={S.bottomBrand}>GRAPHURA INDIA PRIVATE LIMITED</div>
+        </div>
+
+        {/* Tags */}
+        <div className="relative z-10 px-10 pb-10 hidden md:grid grid-cols-3 gap-3">
+          {['Secure Access', 'OTP Login', 'Instant Verify'].map(t => (
+            <div key={t} className="border border-[#D4A843]/50 rounded-full py-1.5 text-[10px] text-center text-[#D4A843] uppercase tracking-widest font-medium bg-black/25">
+              {t}
+            </div>
+          ))}
         </div>
       </div>
 
-      <div style={S.right}>
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 py-8 md:py-8 bg-[#FAF6F0]">
         <div style={{ ...S.card, ...(mounted ? {} : { opacity: 0 }) }} className={mounted ? 'slide-in-right' : ''}>
 
           <div style={S.cardBrand}>

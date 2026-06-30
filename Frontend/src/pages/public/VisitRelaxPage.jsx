@@ -30,6 +30,19 @@ export default function VisitRelaxPage() {
   const [bookingDetails, setBookingDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slides = [
+    "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1600&q=80",
+    "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1600&q=80",
+    "https://images.unsplash.com/photo-1605497746444-052d5b6bc34c?w=1600&q=80"
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchActiveBooking = async (isBackground = false) => {
     if (!isBackground) setLoading(true);
@@ -190,11 +203,16 @@ Always keep your neckline clean—trimming two fingers above your Adam's apple i
       {/* ── HERO BANNER ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#1A1613] via-[#2A241F] to-[#3E362E] pt-32 pb-24 text-center select-none">
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1600&q=80"
-            alt="Customer Relax Lounge Background"
-            className="w-full h-full object-cover opacity-20 object-center"
-          />
+          {slides.map((img, index) => (
+            <img
+              key={index}
+              src={img}
+              alt={`Customer Relax Lounge Background ${index + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${
+                index === currentSlide ? "opacity-40" : "opacity-0"
+              }`}
+            />
+          ))}
           <div className="absolute inset-0 bg-gradient-to-t from-[#2A241F]/40 to-black/20" />
         </div>
 
@@ -478,7 +496,7 @@ Always keep your neckline clean—trimming two fingers above your Adam's apple i
       {/* ── ARTICLE MODAL ── */}
       {selectedArticle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-white border border-[#E8DCCB] rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+          <div className="relative w-full max-w-2xl bg-white border border-[#E8DCCB] rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
             
             {/* Header Image */}
             <div className="relative h-60 bg-stone-100 overflow-hidden shrink-0">
@@ -487,7 +505,7 @@ Always keep your neckline clean—trimming two fingers above your Adam's apple i
                 alt={selectedArticle.title} 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/25" />
               <button 
                 onClick={() => setSelectedArticle(null)}
                 className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-white/90 hover:bg-white text-[#3E362E] rounded-full border border-stone-200 shadow-md transition cursor-pointer select-none border-none font-bold"

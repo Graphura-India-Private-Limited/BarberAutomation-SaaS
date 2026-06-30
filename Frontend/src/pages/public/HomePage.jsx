@@ -353,7 +353,7 @@ useEffect(() => {
   ))}
 
   {/* Overlays */}
-  <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2] via-[#FAF7F2]/80 to-transparent w-full pointer-events-none" />
+  <div className="absolute inset-0 w-full pointer-events-none" style={{ background: "linear-gradient(to right, #FAF7F2 0%, rgba(250, 247, 242, 0.8) 10%, rgba(250, 247, 242, 0) 25%)" }} />
   <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/30 via-transparent to-transparent pointer-events-none" />
 </div>
 
@@ -397,10 +397,10 @@ useEffect(() => {
 
             <div className="flex items-center gap-4 bg-white/40 backdrop-blur-sm border border-stone-200/50 p-3 px-5 rounded-2xl w-fit shadow-xs my-2">
               <div className="flex -space-x-3 overflow-hidden">
-                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80" alt="Client" />
-                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Client" />
-                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=100&q=80" alt="Client" />
-                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&q=80" alt="Client" />
+                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover bg-stone-200" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80" alt="" />
+                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover bg-stone-200" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="" />
+                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover bg-stone-200" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80" alt="" />
+                <img className="inline-block h-9 w-9 rounded-full ring-2 ring-[#FAF7F2] object-cover bg-stone-200" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&q=80" alt="" />
               </div>
               <div>
                 <h5 className="text-xs font-black text-stone-900 tracking-tight leading-tight">10K+ Happy Clients</h5>

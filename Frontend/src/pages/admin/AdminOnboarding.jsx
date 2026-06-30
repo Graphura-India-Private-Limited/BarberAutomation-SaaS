@@ -1985,7 +1985,12 @@ export default function AdminOnboarding() {
                                           return salons.find(s => s._id === sId)?.salon_name;
                                         }).filter(Boolean)
                                       );
-                                      return uniqueSalons.size > 0 ? Array.from(uniqueSalons).join(", ") : "—";
+                                      const salonsArr = Array.from(uniqueSalons);
+                                      if (salonsArr.length === 0) return "—";
+                                      if (salonsArr.length > 2) {
+                                        return `${salonsArr.slice(0, 2).join(", ")} + ${salonsArr.length - 2} more`;
+                                      }
+                                      return salonsArr.join(", ");
                                     })()}
                                   </TD>
                                 </tr>
@@ -2309,12 +2314,12 @@ export default function AdminOnboarding() {
                             onClick={() => {
                               const headers = ["Customer Name", "Service", "Barber Name", "Date", "Amount", "Status"];
                               const rows = filtered.map(b => [
-                                b.customer_id?.name || "—",
-                                b.services?.[0]?.service_name || "—",
-                                b.barber_id?.name || "—",
-                                b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—",
+                                b.customer_id?.name || "-",
+                                b.services?.[0]?.service_name || "-",
+                                b.barber_id?.name || "-",
+                                b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "-",
                                 b.total_amount || 0,
-                                b.status || "—"
+                                b.status || "-"
                               ]);
                               const csvContent = "data:text/csv;charset=utf-8," 
                                 + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
@@ -2483,12 +2488,12 @@ export default function AdminOnboarding() {
                             salonBookings.forEach(b => {
                               rows.push([
                                 salon.salon_name,
-                                b.customer_id?.name || "—",
-                                b.services?.[0]?.service_name || "—",
-                                b.barber_id?.name || "—",
-                                b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "—",
+                                b.customer_id?.name || "-",
+                                b.services?.[0]?.service_name || "-",
+                                b.barber_id?.name || "-",
+                                b.created_at ? new Date(b.created_at).toLocaleDateString("en-IN") : "-",
                                 b.total_amount || 0,
-                                b.status || "—"
+                                b.status || "-"
                               ]);
                             });
                           });
@@ -2628,7 +2633,7 @@ export default function AdminOnboarding() {
                           <>
                             <div className="w-full overflow-x-auto">
                               <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                              <thead><tr>{["Service","Category","Price","Duration","Status","Actions"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
+                              <thead><tr>{["Service","Category","Price","Duration","Status"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
                               <tbody>
                                 {paginated.map(s=>(
                                   <tr key={s._id} className="tr">
@@ -2637,12 +2642,6 @@ export default function AdminOnboarding() {
                                     <TD style={{ fontSize:13, fontWeight:700, color:C.gold }}>₹{s.price}</TD>
                                     <TD style={{ fontSize:12, color:C.muted }}>{s.duration} min</TD>
                                     <TD><Badge label={s.is_active?"Active":"Inactive"} color={s.is_active?C.green:C.red}/></TD>
-                                    <TD>
-                                      <div style={{ display:"flex", gap:6 }}>
-                                        <button className="action-btn" onClick={()=>toggleService(s._id,!s.is_active)} style={btnStyle(`${C.gold}15`, C.gold, `1px solid ${C.gold}30`)}>{s.is_active?"Disable":"Enable"}</button>
-                                        <button className="action-btn" onClick={()=>deleteService(s._id)} style={btnStyle(`${C.red}10`, C.red, `1px solid ${C.red}30`)}>Delete</button>
-                                      </div>
-                                    </TD>
                                   </tr>
                                 ))}
                               </tbody>
@@ -2834,13 +2833,13 @@ export default function AdminOnboarding() {
                               salonPayments.forEach(p => {
                                 rows.push([
                                   salon.salon_name,
-                                  p.customer_id?.name || "—",
-                                  p.customer_id?.mobile || "—",
+                                  p.customer_id?.name || "-",
+                                  p.customer_id?.mobile || "-",
                                   p.razorpay_payment_id || p.razorpay_order_id || "Manual/Offline",
                                   p.amount || 0,
                                   p.payment_type || "TOKEN",
                                   p.status || "PENDING",
-                                  p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : "—"
+                                  p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : "-"
                                 ]);
                               });
                             });
@@ -3306,13 +3305,13 @@ export default function AdminOnboarding() {
                           onClick={() => {
                             const headers = ["Customer Name", "Mobile", "Payment ID/Reference", "Amount", "Payment Type", "Status", "Date"];
                             const rows = searchFilteredPayments.map(p => [
-                              p.customer_id?.name || "—",
-                              p.customer_id?.mobile || "—",
+                              p.customer_id?.name || "-",
+                              p.customer_id?.mobile || "-",
                               p.razorpay_payment_id || p.razorpay_order_id || "Manual/Offline",
                               p.amount || 0,
                               p.payment_type || "TOKEN",
                               p.status || "PENDING",
-                              p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : "—"
+                              p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : "-"
                             ]);
                             const csvContent = "data:text/csv;charset=utf-8," 
                               + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");

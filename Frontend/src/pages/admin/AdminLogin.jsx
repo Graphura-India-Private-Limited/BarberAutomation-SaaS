@@ -86,12 +86,12 @@ export default function AdminLogin() {
   const fillDemo = () => { setMobile(DEMO.mobile); setPassword(DEMO.password); setError(""); };
 
   return (
-    <div className="min-h-screen bg-[#111] flex">
-      <div className="w-full h-screen bg-white flex">
+    <div className="min-h-screen bg-[#111] flex flex-col md:flex-row w-full font-sans overflow-x-hidden">
+      <div className="w-full min-h-screen bg-white flex flex-col md:flex-row">
 
         {/* ── LEFT: Admin Hero ── */}
         <div
-          className="w-1/2 relative hidden md:flex flex-col justify-between overflow-hidden"
+          className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden"
           style={{
             backgroundImage:
               "url('https://t4.ftcdn.net/jpg/03/74/32/65/360_F_374326500_IZuSyagnKizUonpTAxmG9xoJA7LLLavU.jpg')",
@@ -109,31 +109,31 @@ export default function AdminLogin() {
           />
 
           {/* Logo */}
-          <div className="relative z-10 p-10 pt-12">
+          <div className="relative z-10 p-6 xl:p-10 pt-6 xl:pt-12 text-left">
             <div className="flex items-center gap-3">
-              <Shield size={26} color={GOLD} strokeWidth={2} />
+              <Shield size={20} className="xl:w-[26px] xl:h-[26px]" color={GOLD} strokeWidth={2} />
               <div>
-                <div className="font-sans font-black uppercase tracking-widest text-sm text-white">Admin Station</div>
-                <div className="font-sans text-[10px] font-extrabold uppercase tracking-widest text-white/60 mt-0.5">— Secure Access —</div>
+                <div className="font-sans font-black uppercase tracking-widest text-xs xl:text-sm text-white">Admin Station</div>
+                <div className="font-sans text-[8px] xl:text-[10px] font-extrabold uppercase tracking-widest text-white/60 mt-0.5">— Secure Access —</div>
               </div>
             </div>
           </div>
 
           {/* Headline */}
-          <div className="relative z-10 px-10 pb-8 flex-1 flex flex-col justify-center">
+          <div className="relative z-10 px-6 md:px-10 pb-5 md:pb-8 flex-1 flex flex-col justify-end md:justify-center text-left">
             <h1 className="leading-none">
-              <span className="font-sans font-black uppercase text-5xl tracking-tight" style={{ color: GOLD }}>ADMIN</span>
-              <br />
-              <span className="font-serif italic text-4xl text-white normal-case mt-1 block"style={{ color: "white" }}>Portal</span>
+              <span className="font-sans font-black uppercase text-3xl sm:text-4xl md:text-5xl tracking-tight" style={{ color: GOLD }}>ADMIN</span>
+              {" "}
+              <span className="font-serif italic text-2xl sm:text-3xl text-white normal-case mt-1 block" style={{ color: "white" }}>Portal</span>
             </h1>
-            <div className="w-16 h-1 mt-5" style={{ background: GOLD }} />
-            <p className="font-sans text-sm font-normal leading-relaxed text-white/80 mt-5 max-w-xs">
+            <div className="w-12 md:w-16 h-0.5 md:h-1 mt-2 md:mt-5 bg-amber-500" style={{ background: GOLD }} />
+            <p className="font-sans text-[10px] md:text-sm font-normal leading-relaxed text-white/80 mt-2 md:mt-5 max-w-xs hidden sm:block">
               Manage requests, users, and analytics through a secure control center.
             </p>
           </div>
 
           {/* Feature icons */}
-          <div className="relative z-10 px-10 pb-10 grid grid-cols-4 gap-3">
+          <div className="relative z-10 px-10 pb-10 hidden md:grid grid-cols-4 gap-3">
             {FEATURES.map(({ icon: Icon, title, sub }) => (
               <div key={title} className="flex flex-col items-center text-center gap-2">
                 <div
@@ -150,7 +150,7 @@ export default function AdminLogin() {
         </div>
 
         {/* ── RIGHT: Form card ── */}
-        <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8" style={{ background: "#f7f5f2" }}>
+        <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8 md:py-8" style={{ background: "#f7f5f2" }}>
           <div className="bg-white w-[460px] px-8 py-5 rounded-[28px] shadow-xl">
 
             {/* Shield icon */}

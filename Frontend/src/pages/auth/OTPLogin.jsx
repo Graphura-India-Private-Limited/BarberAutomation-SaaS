@@ -119,47 +119,49 @@ export default function OTPLogin() {
         }
       `}</style>
 
-      <div className="w-full h-screen bg-[#FAF6F0] flex">
+      <div className="w-full min-h-screen bg-[#FAF6F0] flex flex-col md:flex-row">
 
         {/* ── LEFT CONTAINER SECTION ── */}
-        <div className="w-1/2 relative hidden md:block">
-          <img src={barberImage} alt="Barber" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/45" />
+        <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden">
+          <img src={barberImage} alt="Barber" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/55" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
 
           {/* Logo labels */}
-          <div className="absolute top-10 left-10 text-white">
-            <h1 className="text-4xl font-bold tracking-wider font-sans">
-              BARBER <span className="text-amber-500">PRO</span>
-            </h1>
-            <p className="text-sm tracking-[4px] mt-2">EST. 2026</p>
+          <div className="relative z-10 p-6 xl:p-10 pt-6 xl:pt-12 text-left">
+            <div className="flex items-center gap-3">
+              <Scissors size={20} className="xl:w-[26px] xl:h-[26px]" color="#C5A059" strokeWidth={2} />
+              <div>
+                <div className="text-white font-bold tracking-[0.25em] text-xs xl:text-sm uppercase">Barber Pro</div>
+                <div className="text-white/60 text-[8px] xl:text-[10px] tracking-[0.35em] uppercase mt-0.5">— Est. 2026 —</div>
+              </div>
+            </div>
           </div>
 
           {/* Banner typography block */}
-          <div className="absolute left-10 top-[45%] -translate-y-1/2 max-w-md">
-            <h2 className="text-6xl font-serif leading-tight text-white">
+          <div className="relative z-10 px-6 md:px-10 pb-5 md:pb-8 flex-1 flex flex-col justify-end md:justify-center text-left">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-serif font-bold leading-none text-white">
               <span className="text-amber-500">YOUR STYLE,</span>
               <br />
-              OUR EXPERTISE
-            </h2>
-            <div className="w-20 h-1 bg-amber-500 mt-4" />
-            <p className="text-white text-xl mt-6 leading-9 font-sans">
+              <span className="text-white md:block">OUR EXPERTISE</span>
+            </h1>
+            <div className="w-12 md:w-16 h-0.5 md:h-1 mt-2 md:mt-5 bg-amber-500" />
+            <p className="text-white/80 text-[10px] md:text-base mt-2 md:mt-5 leading-relaxed max-w-xs italic hidden sm:block">
               Log in to your account to manage bookings, track appointments, and more.
             </p>
           </div>
 
           {/* Horizontal streaming metrics badges */}
-          <div className="absolute bottom-10 left-0 right-0 px-8">
-            <div className="grid grid-cols-4 gap-4">
-              <FeatureCard icon={<Calendar size={28} />} title="BOOK"          subtitle="APPOINTMENTS" />
-              <FeatureCard icon={<Clock3 size={28} />}   title="MANAGE"        subtitle="SCHEDULES" />
-              <FeatureCard icon={<User size={28} />}     title="PERSONALIZED"  subtitle="EXPERIENCE" />
-              <FeatureCard icon={<Award size={28} />}    title="EXCLUSIVE"     subtitle="OFFERS" />
-            </div>
+          <div className="relative z-10 px-10 pb-10 hidden md:grid grid-cols-4 gap-3">
+            <FeatureCard icon={<Calendar size={22} />} title="BOOK"          subtitle="APPOINTMENTS" />
+            <FeatureCard icon={<Clock3 size={22} />}   title="MANAGE"        subtitle="SCHEDULES" />
+            <FeatureCard icon={<User size={22} />}     title="PERSONALIZED"  subtitle="EXPERIENCE" />
+            <FeatureCard icon={<Award size={22} />}    title="EXCLUSIVE"     subtitle="OFFERS" />
           </div>
         </div>
 
         {/* ── RIGHT ACCENTS VIEWPORT CONTAINER ── */}
-        <div className="w-full md:w-1/2 bg-[#FAF6F0] flex items-center justify-center p-6">
+        <div className="w-full md:w-1/2 bg-[#FAF6F0] flex items-center justify-center p-6 py-8 md:py-8">
           <div className="card-minimalist w-full max-w-[450px] p-8 sm:p-10 flex flex-col">
 
             {/* Header Identity Badge Group */}
