@@ -804,7 +804,7 @@ export default function BookingManagement() {
                   Elite Grooming Management
                 </p>
                 {/* Rule 1: Single-Line Master Header Layout Setup */}
-                <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
                   <span className="font-bold uppercase">Booking</span>
                   <span className="italic text-[#C5A059] normal-case font-medium">Dashboard</span>
                 </h2>
@@ -814,7 +814,7 @@ export default function BookingManagement() {
               {/* Rule 4: Primary UI Action Link Button */}
               <button
                 onClick={handleNewBookingClick}
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer self-start sm:self-center font-sans border-none outline-none"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md active:scale-[0.98] transition-all duration-200 cursor-pointer self-start sm:self-center font-sans border-none outline-none shrink-0"
                 style={{ background: CHARCOAL }}
               >
                 <Plus size={16} color={GOLD} /> New Booking

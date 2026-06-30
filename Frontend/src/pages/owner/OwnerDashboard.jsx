@@ -138,7 +138,7 @@ export default function OwnerDashboard() {
         {/* Main Dashboard Header */}
         <header className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200">
           <div>
-            <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+            <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
               <span className="font-bold uppercase">Dashboard</span>
               <span className="italic text-[#C5A059] normal-case font-medium">Overview</span>
             </h2>
@@ -273,7 +273,7 @@ export default function OwnerDashboard() {
           {/* Left Side Info Panel Stack */}
           <section className="space-y-6 lg:col-span-5">
             <div className="card p-6">
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-4">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap mb-4">
                 <span className="font-bold uppercase">Registered</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Salon Info</span>
               </h2>
@@ -286,7 +286,7 @@ export default function OwnerDashboard() {
             </div>
 
             <div className="card p-6">
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-4">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap mb-4">
                 <span className="font-bold uppercase">Media</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Gallery Vault</span>
               </h2>
@@ -310,7 +310,7 @@ export default function OwnerDashboard() {
             <div className="card p-6 flex flex-col justify-between" style={{ minHeight: "260px" }}>
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+                  <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
                     <span className="font-bold uppercase">Weekly</span>
                     <span className="italic text-[#C5A059] normal-case font-medium">Revenue</span>
                   </h2>
@@ -356,7 +356,7 @@ export default function OwnerDashboard() {
 
             {/* Onboarding Checklist Status Matrix */}
             <div className="card p-6">
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap mb-5">
                 <span className="font-bold uppercase">Activation</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Metrics Check</span>
               </h2>

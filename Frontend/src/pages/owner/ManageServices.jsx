@@ -119,7 +119,7 @@ export default function ManageServices() {
         <div className="mx-auto max-w-xl text-center card p-10">
           <span className="text-5xl block mb-4">⌛</span>
           {/* Rule 1 Fallback Title */}
-          <h2 className="font-serif text-2xl sm:text-3xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+          <h2 className="font-serif text-2xl sm:text-3xl tracking-normal text-stone-900 flex items-center justify-center gap-2 flex-wrap sm:whitespace-nowrap">
             <span className="font-bold uppercase">Approval</span>
             <span className="italic text-[#C5A059] normal-case font-medium">Required</span>
           </h2>
@@ -172,7 +172,7 @@ export default function ManageServices() {
           <header className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200 text-left">
             <div>
               {/* Rule 1 Master Header Composition standard */}
-              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
                 <span className="font-bold uppercase">Manage</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Services</span>
               </h2>
@@ -186,7 +186,7 @@ export default function ManageServices() {
               /* Rule 4 Action trigger button link components mapping standard strings */
               <button 
                 onClick={() => setIsAdding(true)} 
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-extrabold text-xs tracking-wider text-white uppercase shadow-md transition-all active:scale-95 hover:opacity-90 cursor-pointer font-sans"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-extrabold text-xs tracking-wider text-white uppercase shadow-md transition-all active:scale-95 hover:opacity-90 cursor-pointer font-sans shrink-0"
                 style={{ background: CHARCOAL }}
               >
                 <Plus size={14} style={{ color: GOLD }} />
@@ -201,12 +201,12 @@ export default function ManageServices() {
           {isAdding && (
             <div className="mb-8 card p-6 shadow-lg text-left">
               {/* Rule 1 Nested module subtitle layout rules standard */}
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap mb-5">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap mb-5">
                 <span className="font-bold uppercase">New Service</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Specification</span>
               </h2>
-              <form onSubmit={handleAddService} className="grid gap-4 md:grid-cols-5 font-sans">
-                <div className="md:col-span-2">
+              <form onSubmit={handleAddService} className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 font-sans">
+                <div className="col-span-1 sm:col-span-2 lg:col-span-2">
                   {/* Rule 2 Input Field descriptors metadata tags labels */}
                   <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Name</label>
                   <input required placeholder="e.g., Luxury Beard Trim" value={newService.name} onChange={e => setNewService(prev => ({ ...prev, name: e.target.value }))} className="w-full rounded-xl border border-stone-200 bg-white p-3.5 text-sm font-medium outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059]/20 transition-all text-stone-800 placeholder-stone-400 font-sans" />
@@ -266,7 +266,7 @@ export default function ManageServices() {
                     </>
                   )}
                 </div>
-                <div className="md:col-span-2">
+                <div className="col-span-1 sm:col-span-2 lg:col-span-2">
                   <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-1.5 block font-sans">Service Image URL</label>
                   <div className="flex gap-2">
                     <input 
@@ -312,7 +312,7 @@ export default function ManageServices() {
                     </div>
                   )}
                 </div>
-                <div className="md:col-span-3">
+                <div className="col-span-1 sm:col-span-2 lg:col-span-3">
                   <div className="flex justify-between items-center mb-1.5">
                     <label className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] block font-sans">Service Description</label>
                     <span className="text-[10px] text-stone-400 font-semibold">{newService.description.length}/500</span>
@@ -326,7 +326,7 @@ export default function ManageServices() {
                     rows={1}
                   />
                 </div>
-                <div className="flex gap-3 md:col-span-5 pt-2 border-t border-stone-100 mt-2 font-sans">
+                <div className="flex gap-3 col-span-1 sm:col-span-2 lg:col-span-5 pt-2 border-t border-stone-100 mt-2 font-sans">
                   {/* Rule 4 Inside form data trigger action submission keys */}
                   <button type="submit" className="rounded-xl px-5 py-3 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer font-sans" style={{ background: CHARCOAL }}>
                     Save Catalog Item

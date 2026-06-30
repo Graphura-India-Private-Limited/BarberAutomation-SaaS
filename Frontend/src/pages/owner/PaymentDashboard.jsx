@@ -188,7 +188,7 @@ export default function PaymentDashboard() {
           </div>
 
           {/* Filter Selection Panel Utility row */}
-          <section className="mb-6 grid gap-4 p-5 card md:grid-cols-5 bg-white shadow-sm text-left">
+          <section className="mb-6 grid gap-4 p-5 card grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 bg-white shadow-sm text-left">
             <FilterSelect label="Type" value={filters.paymentType} onChange={value => updateFilter("paymentType", value)} options={["ALL", "TOKEN", "FULL"]} />
             <FilterSelect label="Status" value={filters.status} onChange={value => updateFilter("status", value)} options={["ALL", "PENDING", "SUCCESS", "FAILED", "REFUNDED"]} />
             
@@ -380,7 +380,7 @@ function EmptyState({ title, subtitle }) {
   return (
     <div className="p-14 text-center">
       {/* Rule 1 Fallback variant mapping empty space frames */}
-      <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+      <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-center gap-2 flex-wrap sm:whitespace-nowrap">
         <span className="font-bold uppercase">{title}</span>
       </h2>
       {/* Rule 3 Core placeholder descriptions texts layout views */}

@@ -298,7 +298,7 @@ export default function LiveQueue() {
       </div>
 
       {/* ════ STATS STRIP ════ */}
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { label: "Unassigned",     value: unassigned.length,   color: "text-[#3E362E]",    bgColor: "bg-stone-50 border-stone-200/60",     icon: AlertCircle },
           { label: "Waiting",        value: waiting.length,      color: "text-[#8B6B3E]",  bgColor: "bg-[#FAF6F0] border-[#EADBCE]/60",  icon: Clock },
@@ -417,7 +417,7 @@ export default function LiveQueue() {
             No barbers added yet. Ask admin to add barbers to this salon.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {barbers.map(b => {
               const sc = b.status === "available" ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
                        : b.status === "busy"      ? "text-zinc-600 bg-zinc-100 border border-zinc-200"

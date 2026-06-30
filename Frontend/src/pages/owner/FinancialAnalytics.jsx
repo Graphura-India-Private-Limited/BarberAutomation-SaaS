@@ -445,12 +445,12 @@ export default function FinancialAnalytics() {
 
         {/* Premium Brand Header Banner */}
         <div className="rounded-3xl p-6 md:p-8 mb-8 overflow-hidden card relative bg-white text-left">
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div>
               <p className="font-extrabold uppercase tracking-widest text-[11px] text-[#C5A059] mb-1.5 font-sans">
                 Unified Business Intelligence
               </p>
-              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+              <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
                 <span className="font-bold uppercase">Financial</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Analytics</span>
               </h2>
@@ -459,7 +459,7 @@ export default function FinancialAnalytics() {
             
             {/* Range picker only visible on revenue tab */}
             {activeTab === "revenue" && (
-              <div className="flex flex-col sm:flex-row gap-4 bg-stone-50 border border-[#EADBCE] p-4 rounded-3xl w-full md:max-w-md shrink-0 sm:items-center shadow-inner font-sans">
+              <div className="flex flex-col sm:flex-row gap-4 bg-stone-50 border border-[#EADBCE] p-4 rounded-3xl w-full lg:max-w-md shrink-0 sm:items-center shadow-inner font-sans">
                 <div className="flex-1 w-full">
                   <DateInput label="From" value={range.from} onChange={value => setRange(prev => ({ ...prev, from: value }))} />
                 </div>
@@ -513,7 +513,7 @@ export default function FinancialAnalytics() {
               <div className="animate-in fade-in duration-300 space-y-8">
                 {/* Metric Summary counters */}
                 <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-left">
-                  <MetricCard title="Daily Revenue" value={money(daily?.totalRevenue || daily)} icon={CalendarDays} accent="bg-orange-50 border border-orange-200/50 text-orange-700" />
+                  <MetricCard title="Daily Revenue" value={money(daily?.totalRevenue ?? daily)} icon={CalendarDays} accent="bg-orange-50 border border-orange-200/50 text-orange-700" />
                   <MetricCard title="Total Revenue" value={money(summary.totalRevenue)} icon={BadgeIndianRupee} accent="bg-amber-50 border border-amber-200/55 text-amber-700" />
                   <MetricCard title="Token Payments" value={money(summary.tokenRevenue)} icon={ReceiptText} accent="bg-sky-50 border border-sky-200/50 text-sky-700" />
                   <MetricCard title="Full Payments" value={money(summary.fullRevenue)} icon={CircleDollarSign} accent="bg-emerald-50 border border-emerald-200/50 text-emerald-700" />
@@ -831,9 +831,9 @@ export default function FinancialAnalytics() {
                 ) : (
                   /* TELEMETRY REPORTS VIEW */
                   <div className="space-y-6 text-left">
-                    <div className="card p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm bg-white font-sans">
+                    <div className="card p-4 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm bg-white font-sans">
                       
-                      <div className="flex bg-stone-100 p-1 rounded-xl border border-stone-200/60 w-full md:w-auto shadow-inner">
+                      <div className="flex flex-wrap justify-center sm:justify-start bg-stone-100 p-1 rounded-xl border border-stone-200/60 w-full lg:w-auto shadow-inner">
                         {['daily', 'weekly', 'monthly'].map(t => (
                           <button
                             key={t}
@@ -850,7 +850,7 @@ export default function FinancialAnalytics() {
                         ))}
                       </div>
 
-                      <div className="flex bg-stone-100 p-1 rounded-xl border border-stone-200/60 w-full md:w-auto shadow-inner">
+                      <div className="flex flex-wrap justify-center sm:justify-start bg-stone-100 p-1 rounded-xl border border-stone-200/60 w-full lg:w-auto shadow-inner">
                         {['salon-wise', 'revenue-wise', 'booking-wise'].map(type => (
                           <button
                             key={type}
@@ -1100,7 +1100,7 @@ function ChartPanel({ title, subtitle, children, className = "" }) {
   return (
     <div className={`card p-6 bg-white shadow-sm ${className} text-left`}>
       <div className="mb-6">
-        <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+        <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
           <span className="font-bold uppercase">{title.split(" ")[0]}</span>
           <span className="italic text-[#C5A059] normal-case font-medium">{title.split(" ").slice(1).join(" ")}</span>
         </h2>

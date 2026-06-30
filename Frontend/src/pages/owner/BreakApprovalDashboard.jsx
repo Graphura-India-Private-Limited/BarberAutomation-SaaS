@@ -121,7 +121,7 @@ export default function BreakApprovalDashboard() {
               Grooming Team Administration
             </p>
             {/* Rule 1 Master Title Header Standard Single-Line Layout */}
-            <h2 className="font-serif text-2xl sm:text-3xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+            <h2 className="font-serif text-2xl sm:text-3xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
               <span className="font-bold uppercase">Register Your</span>
               <span className="italic text-[#C5A059] normal-case font-medium">Shifts</span>
             </h2>
@@ -134,7 +134,7 @@ export default function BreakApprovalDashboard() {
         </header>
 
         {/* ── COUNTER METRICS DISPLAY SHARDS ── */}
-        <section className="grid grid-cols-3 gap-4 mb-8 text-left">
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
           <div className="bg-white border border-[#EADBCE] rounded-2xl p-4 text-center shadow-sm card hover:transform-none">
             <div className="mx-auto w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center mb-2 text-amber-700">
               <Users size={16} />
@@ -173,7 +173,7 @@ export default function BreakApprovalDashboard() {
                   ✨
                 </div>
                 {/* Rule 1 Fallback target empty content alignment text style */}
-                <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-center gap-2 whitespace-nowrap">
+                <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex items-center justify-center gap-2 flex-wrap sm:whitespace-nowrap">
                   <span className="font-bold uppercase">Inbox</span>
                   <span className="italic text-[#C5A059] normal-case font-medium">Cleared</span>
                 </h2>

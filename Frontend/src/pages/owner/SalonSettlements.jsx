@@ -198,7 +198,7 @@ export default function SalonSettlements() {
                   showToast("No pending balances left to settle!");
                 }
               }} 
-              className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-xs font-bold tracking-wider uppercase text-white shadow-md transition-all duration-200 self-start md:self-center bg-[#3E362E] hover:opacity-90 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-xs font-bold tracking-wider uppercase text-white shadow-md transition-all duration-200 self-start md:self-center bg-[#3E362E] hover:opacity-90 cursor-pointer shrink-0"
             >
               <PlusCircle size={14} color={GOLD} /> Settle Counter Dues
             </button>
@@ -233,7 +233,7 @@ export default function SalonSettlements() {
         </section>
 
         {/* Filters and Search Utility bar */}
-        <section className="mb-6 grid gap-4 p-5 rounded-2xl border border-[#EADBCE] bg-white text-left md:grid-cols-4">
+        <section className="mb-6 grid gap-4 p-5 rounded-2xl border border-[#EADBCE] bg-white text-left grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] pl-0.5">Search Counter Payments</span>
             <div className="flex items-center gap-2 rounded-xl border border-[#EADBCE] bg-stone-50/50 px-3 h-10 hover:bg-white focus-within:border-[#C5A059] focus-within:bg-white transition-all">

@@ -153,7 +153,7 @@ export default function OwnerSupportPage({ ticketState }) {
         {/* Header Block */}
         <header className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200">
           <div>
-            <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+            <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
               <span className="font-bold uppercase">Support</span>
               <span className="italic text-[#C5A059] normal-case font-medium">& Escalation</span>
             </h2>

@@ -305,7 +305,7 @@ export default function BarberTeam() {
       {/* Header */}
       <header className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 border-b pb-6 border-stone-200">
         <div>
-          <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 whitespace-nowrap">
+          <h2 className="font-serif text-3xl sm:text-4xl tracking-normal text-stone-900 flex items-center justify-start gap-2 flex-wrap sm:whitespace-nowrap">
             <span className="font-bold uppercase">Barber</span>
             <span className="italic text-[#C5A059] normal-case font-medium">Team</span>
           </h2>
@@ -527,7 +527,7 @@ export default function BarberTeam() {
                   </div>
 
                   {/* Highlights Bar */}
-                  <div className="grid grid-cols-3 gap-3 mt-6 border-t border-b border-stone-100 py-3.5 text-stone-600 text-xs font-bold bg-[#FAFAF8]/50 px-4 rounded-xl border border-[#EADBCE]/30">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 border-t border-b border-stone-100 py-3.5 text-stone-600 text-xs font-bold bg-[#FAFAF8]/50 px-4 rounded-xl border border-[#EADBCE]/30">
                     <div className="text-center">
                       <span className="text-[9px] text-stone-400 block uppercase tracking-wider mb-0.5">Rating</span>
                       <span className="text-stone-900 flex items-center justify-center gap-1 mt-0.5">
