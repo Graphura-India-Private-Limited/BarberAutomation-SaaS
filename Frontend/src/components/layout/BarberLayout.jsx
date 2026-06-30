@@ -247,7 +247,7 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
               {showNotifications && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
-                  <div className="absolute right-0 mt-2.5 w-80 bg-white border border-[#E6D5C3] rounded-2xl p-4 shadow-xl z-[200] text-left text-sm text-[#4A3E3D] animate-in fade-in slide-in-from-top-1 duration-200">
+                  <div className="absolute right-0 mt-2.5 w-64  bg-white border border-[#E6D5C3] rounded-2xl p-4 shadow-xl z-[200] text-left text-sm text-[#4A3E3D] animate-in fade-in slide-in-from-top-1 duration-200">
                     <div className="border-b border-[#E6D5C3]/40 pb-2 mb-2 flex justify-between items-center">
                       <span className="font-serif font-black text-[#8B5A2B] uppercase tracking-wider text-xs">Notifications</span>
                       <span className="text-[9px] font-bold bg-[#8B5A2B]/10 text-[#8B5A2B] px-2 py-0.5 rounded-full">3 New</span>
