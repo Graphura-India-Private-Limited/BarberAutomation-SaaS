@@ -134,8 +134,65 @@ const INITIAL_SERVICES = [
   { id: "SVC-210", name: "Balayage glow booster", category: "Addon", price: 899, duration: "30 min", active: true, popular: true }
 ];
 
+const fitsAnyPredefinedSpec = (name) => {
+  const n = name.toLowerCase();
+  const isBeard = n.includes("beard") || n.includes("shave") || n.includes("mustache");
+  
+  const matchHaircut = !isBeard && (n.includes("cut") || n.includes("fade") || n.includes("style") || n.includes("blow") || n.includes("wash"));
+  if (matchHaircut) return true;
+  if (isBeard) return true;
+  
+  const matchSpa = !isBeard && (n.includes("spa") || n.includes("treatment") || n.includes("oil") || n.includes("mask"));
+  if (matchSpa) return true;
+  
+  const matchColor = !isBeard && (n.includes("color") || n.includes("highlight") || n.includes("glaze"));
+  if (matchColor) return true;
+  
+  const matchFacial = n.includes("facial") || n.includes("massage") || n.includes("detox");
+  if (matchFacial) return true;
+  
+  return false;
+};
+
+const fitsStandardCategory = (name, spec) => {
+  const n = name.toLowerCase();
+  const isBeard = n.includes("beard") || n.includes("shave") || n.includes("mustache");
+  if (spec === "haircut & styling") return !isBeard && (n.includes("cut") || n.includes("fade") || n.includes("style") || n.includes("blow") || n.includes("wash"));
+  if (spec === "beard sculpting & shave") return isBeard;
+  if (spec === "hair spa & treatment") return !isBeard && (n.includes("spa") || n.includes("treatment") || n.includes("oil") || n.includes("mask"));
+  if (spec === "hair coloring & highlights") return !isBeard && (n.includes("color") || n.includes("highlight") || n.includes("glaze"));
+  if (spec === "facial & grooming massage") return n.includes("facial") || n.includes("massage") || n.includes("detox");
+  return false;
+};
+
+const PREDEFINED_SPECS = [
+  "haircut & styling",
+  "beard sculpting & shave",
+  "hair spa & treatment",
+  "hair coloring & highlights",
+  "facial & grooming massage",
+  "ayurvedic head massage",
+  "all-rounder master stylist"
+];
+
+const doesServiceMatchSpecs = (serviceName, specs) => {
+  if (specs.length === 0) return true;
+  if (specs.some(s => s.includes("all-rounder") || s.includes("master stylist"))) return true;
+  
+  const hasCustomSpec = specs.some(s => !PREDEFINED_SPECS.includes(s));
+  const fitsPredefined = fitsAnyPredefinedSpec(serviceName);
+  
+  // If the service is a miscellaneous service and we have a custom spec (like 'skills'), display it
+  if (!fitsPredefined && hasCustomSpec) {
+    return true;
+  }
+  
+  return specs.some(spec => fitsStandardCategory(serviceName, spec) || serviceName.toLowerCase().includes(spec));
+};
+
 export default function BarberServices() {
   const [services, setServices] = useState(INITIAL_SERVICES);
+  const [barberSpecialization, setBarberSpecialization] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedService, setSelectedService] = useState(null);
@@ -176,8 +233,24 @@ export default function BarberServices() {
     }
   };
 
+  const fetchBarberProfile = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API}/auth/barber/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success && data.barber) {
+        setBarberSpecialization(data.barber.specialization || "");
+      }
+    } catch (err) {
+      console.error("Error fetching barber profile in services tab:", err);
+    }
+  };
+
   React.useEffect(() => {
     fetchServices();
+    fetchBarberProfile();
   }, [useDbData]);
 
   // Header States
@@ -273,9 +346,17 @@ export default function BarberServices() {
   };
 
   const filteredServices = services.filter(svc => {
-    const matchesSearch = svc.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const specs = barberSpecialization 
+      ? barberSpecialization.split(",").map(s => s.trim().toLowerCase()).filter(Boolean) 
+      : [];
+      
+    const matchesSearch = svc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      specs.some(spec => spec.includes(searchQuery.toLowerCase()) && doesServiceMatchSpecs(svc.name, [spec]));
+      
     const matchesCategory = activeCategory === "all" || svc.category === activeCategory;
-    return matchesSearch && matchesCategory;
+    const matchesSpecs = doesServiceMatchSpecs(svc.name, specs);
+    
+    return matchesSearch && matchesCategory && matchesSpecs;
   });
 
   return (
@@ -297,7 +378,7 @@ export default function BarberServices() {
             <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
               <Layers size={13} className="text-[#C5A059]" />
               <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
-                {services.filter(s => s.active).length} Active Subsets Operational
+                {filteredServices.filter(s => s.active).length} Active Subsets Operational
               </span>
             </div>
           </div>
