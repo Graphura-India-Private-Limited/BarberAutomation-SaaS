@@ -346,7 +346,8 @@ export function AddCustomerModal({ onClose, onAdd }) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {!isPrimary && (
                         <input
-                          className="input-field-custom text-xs py-2 px-3"
+                          className="input-field-custom text-xs"
+                          style={{ padding: "8px 12px" }}
                           type="text"
                           placeholder="Guest name"
                           value={att.name}
@@ -354,7 +355,8 @@ export function AddCustomerModal({ onClose, onAdd }) {
                         />
                       )}
                       <select
-                        className={`input-field-custom text-xs py-2 px-3 h-[38px] cursor-pointer ${isPrimary ? 'col-span-2' : ''}`}
+                        className={`input-field-custom text-xs cursor-pointer ${isPrimary ? 'col-span-2' : ''}`}
+                        style={{ padding: "8px 12px", height: "38px" }}
                         value={att.service}
                         onChange={e => handleAttendeeChange(att.id, 'service', e.target.value)}
                       >
