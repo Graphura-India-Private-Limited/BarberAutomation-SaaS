@@ -88,10 +88,12 @@ export default function CustomerDetails() {
           </div>
 
           {/* Form Layout Grid */}
-          <div className={`grid gap-8 items-start ${service ? "grid-cols-1 md:grid-cols-3" : "max-w-xl mx-auto grid-cols-1"}`}>
+          {/* <div className={`grid gap-8 items-start ${service ? "grid-cols-1 md:grid-cols-3" : "max-w-xl mx-auto grid-cols-1"}`}> */}
+          <div className={`grid gap-8 items-start ${service ? "grid-cols-1 lg:grid-cols-3" : "max-w-xl mx-auto grid-cols-1"}`}>
             
             {/* Form Card */}
-            <div className={`bg-white/80 backdrop-blur-xl rounded-[24px] p-6 sm:p-10 border border-white/60 shadow-[0_20px_50px_rgba(197,160,89,0.05)] transition-all duration-300 hover:shadow-[0_25px_60px_rgba(197,160,89,0.1)] ${service ? "md:col-span-2" : ""}`}>
+
+            <div className={`bg-white/80 backdrop-blur-xl rounded-[24px] p-6 sm:p-10 border border-white/60 shadow-[0_20px_50px_rgba(197,160,89,0.05)] transition-all duration-300 hover:shadow-[0_25px_60px_rgba(197,160,89,0.1)] md:order-2 lg:order-1 ${service ? "lg:col-span-2" : ""}`}>
               
               {/* Logged-in notice banner */}
               {isLoggedIn && (
@@ -174,7 +176,7 @@ export default function CustomerDetails() {
 
             {/* Service Summary */}
             {service && (
-              <div className="md:sticky md:top-24">
+              <div className="md:order-1 lg:order-2 lg:sticky lg:top-24 md:mx-auto md:max-w-md lg:mx-0 lg:max-w-none">
                 <ServiceSummary service={service} barber={barber} />
               </div>
             )}

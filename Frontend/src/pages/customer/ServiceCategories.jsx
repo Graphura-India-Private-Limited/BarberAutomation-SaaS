@@ -150,15 +150,15 @@ function CategoryCard({ cat, index, navigate }) {
         <button
           style={{
             width: "100%",
-            padding: "13px 0",
+            padding: "13px 14px",
             borderRadius: 10,
             border: "none",
             background: hovered ? cat.accent : "#2C241E",
             color: hovered ? "#2C241E" : "#F5EFE0",
             fontFamily: "'Montserrat',sans-serif",
             fontWeight: 700,
-            fontSize: 11,
-            letterSpacing: "0.18em",
+            fontSize: "clamp(9px, 2vw, 11px)",
+            letterSpacing: "0.12em",
             textTransform: "uppercase",
             cursor: "pointer",
             transition: "background 0.3s ease, color 0.3s ease",
@@ -166,10 +166,12 @@ function CategoryCard({ cat, index, navigate }) {
             alignItems: "center",
             justifyContent: "center",
             gap: 8,
+            whiteSpace: "nowrap",
+            flexWrap: "nowrap",
           }}
         >
           Explore Services
-          <span style={{ fontSize: 14, fontWeight: 300 }}>→</span>
+          <span style={{ fontSize: 14, fontWeight: 300, flexShrink: 0 }}>→</span>
         </button>
       </div>
     </div>
