@@ -1012,7 +1012,7 @@ export default function AdminOnboarding() {
       {/* Mobile Sidebar Backdrop */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-stone-900/60 z-50 md:hidden animate-in fade-in duration-200" 
+          className="fixed inset-0 bg-stone-900/60 z-50 lg:hidden animate-in fade-in duration-200" 
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -1022,7 +1022,7 @@ export default function AdminOnboarding() {
         className={`bg-white border-r border-stone-200 h-screen fixed inset-y-0 left-0 w-64 z-50 transition-all duration-300 flex flex-col shrink-0 overflow-hidden
           ${isSidebarOpen 
             ? "translate-x-0 shadow-2xl" 
-            : "-translate-x-full md:translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
           }
         `}
       >
@@ -1044,7 +1044,7 @@ export default function AdminOnboarding() {
             </div>
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className="md:hidden p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg cursor-pointer"
+              className="lg:hidden p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -1114,22 +1114,22 @@ export default function AdminOnboarding() {
       </aside>
 
       {/* ════ MAIN ════ */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden md:pl-64" style={{ width: "100%" }}>
+      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden lg:pl-64" style={{ width: "100%" }}>
         <div className="px-4 md:px-8 w-full min-w-0">
 
           {/* ── HEADER ── */}
           <header 
-            className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-12 pb-6"
+            className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pt-12 pb-6"
           >
-            <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
+            <div className="flex items-center gap-3 w-full lg:w-auto min-w-0">
               <button 
                 onClick={() => setIsSidebarOpen(true)}
-                className="md:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
+                className="lg:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
               >
                 <Menu size={18} className="text-[#C5A059]" />
               </button>
               <div className="min-w-0 flex-1">
-                <h1 style={{ fontSize: "clamp(24px, 5.5vw, 40px)", fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1.1, marginBottom: 8, whiteSpace: "normal", wordBreak: "break-word" }}>
+                <h1 style={{ fontSize: "clamp(24px, 5.5vw, 40px)", fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", lineHeight: 1.1, marginBottom: 8, whiteSpace: "normal" }}>
                   {currentNavLabel}
                 </h1>
               {tab === "dashboard" ? (
@@ -3251,7 +3251,7 @@ export default function AdminOnboarding() {
                         Income Trend (₹)
                       </span>
                       <div style={{ width: "100%", height: 260, position: "relative", minWidth: 0, minHeight: 0 }}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={260} debounce={1}>
                           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <defs>
                               <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
@@ -3279,7 +3279,7 @@ export default function AdminOnboarding() {
                         Payment Type Revenue (₹)
                       </span>
                       <div style={{ width: "100%", height: 260, position: "relative", minWidth: 0, minHeight: 0 }}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={260} debounce={1}>
                           <BarChart data={breakdownData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={C.border} />
                             <XAxis dataKey="name" stroke={C.muted} fontSize={11} tickLine={false} />

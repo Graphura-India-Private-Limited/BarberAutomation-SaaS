@@ -97,11 +97,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111] flex flex-col xl:flex-row w-full">
-      <div className="w-full min-h-screen bg-white flex flex-col xl:flex-row">
+    <div className="min-h-screen bg-[#111] flex flex-col md:flex-row w-full">
+      <div className="w-full min-h-screen bg-white flex flex-col md:flex-row">
 
         {/* ── LEFT: Customer Hero ── */}
-        <div className="w-full xl:w-1/2 h-[220px] sm:h-[280px] md:h-[360px] lg:h-[400px] xl:h-screen relative flex flex-col justify-between overflow-hidden">
+        <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen relative flex flex-col justify-between overflow-hidden">
           <img src={barberImage} alt="Barber" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/55" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
@@ -118,20 +118,20 @@ export default function Login() {
           </div>
 
           {/* Headline */}
-          <div className="relative z-10 px-6 xl:px-10 pb-5 xl:pb-8 flex-1 flex flex-col justify-end xl:justify-center">
+          <div className="relative z-10 px-6 md:px-10 pb-5 md:pb-8 flex-1 flex flex-col justify-end md:justify-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-serif font-bold leading-none">
               <span style={{ color: GOLD }}>CUSTOMER</span>
               {" "}
-              <span className="text-white xl:block">PORTAL</span>
+              <span className="text-white md:block">PORTAL</span>
             </h1>
-            <div className="w-12 xl:w-16 h-0.5 xl:h-1 mt-2 xl:mt-5" style={{ background: GOLD }} />
-            <p className="text-white/80 text-[10px] xl:text-base mt-2 xl:mt-5 leading-relaxed max-w-xs italic hidden sm:block">
+            <div className="w-12 md:w-16 h-0.5 md:h-1 mt-2 md:mt-5" style={{ background: GOLD }} />
+            <p className="text-white/80 text-[10px] md:text-base mt-2 md:mt-5 leading-relaxed max-w-xs italic hidden sm:block">
               Book your grooming session, track your queue and manage your appointments with ease.
             </p>
           </div>
 
           {/* Feature icons */}
-          <div className="relative z-10 px-10 pb-10 hidden xl:grid grid-cols-4 gap-3">
+          <div className="relative z-10 px-10 pb-10 hidden md:grid grid-cols-4 gap-3">
             {FEATURES.map(({ icon: Icon, title, sub }) => (
               <div key={title} className="flex flex-col items-center text-center gap-2">
                 <div
@@ -148,8 +148,8 @@ export default function Login() {
         </div>
 
         {/* ── RIGHT: Form card ── */}
-        <div className="w-full xl:w-1/2 flex items-center justify-center px-4 sm:px-6 py-8 xl:py-8" style={{ background: "#f7f5f2" }}>
-          <div className="bg-white w-full max-w-[460px] md:max-w-[640px] xl:max-w-[460px] px-6 sm:px-8 py-5 rounded-[28px] shadow-xl">
+        <div className="w-full md:w-1/2 flex items-center justify-center px-4 sm:px-6 py-8 md:py-8" style={{ background: "#f7f5f2" }}>
+          <div className="bg-white w-full max-w-[460px] px-6 sm:px-8 py-5 rounded-[28px] shadow-xl">
 
             {/* Scissors icon */}
             <div className="flex justify-center mb-3">

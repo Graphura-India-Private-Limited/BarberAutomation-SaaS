@@ -336,7 +336,7 @@ useEffect(() => {
 
     {/* ── HERO ── */}
       <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[550px] md:min-h-[650px] flex items-center">
-     <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none">
+     <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none border-l border-[#FAF7F2]">
   <div className="absolute inset-0 bg-black/10 md:bg-transparent pointer-events-none" />
 
   {/* Slides */}
@@ -353,7 +353,7 @@ useEffect(() => {
   ))}
 
   {/* Overlays */}
-  <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2] via-[#FAF7F2]/70 to-transparent w-full md:w-[20%] pointer-events-none" />
+  <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2] via-[#FAF7F2]/80 to-transparent w-full pointer-events-none" />
   <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/30 via-transparent to-transparent pointer-events-none" />
 </div>
 

@@ -18,10 +18,10 @@ export function TicketTable({ tickets, onSelect }) {
       {/* Table header - desktop */}
       <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-3 border-b border-[#E8DDD0] bg-[#FAF6F0] text-xs font-semibold text-[#8A7A6A] uppercase tracking-wider">
         <div className="col-span-1">ID</div>
-        <div className="col-span-3">Title</div>
+        <div className="col-span-2">Title</div>
         <div className="col-span-2">Type</div>
         <div className="col-span-2">Status</div>
-        <div className="col-span-1">Priority</div>
+        <div className="col-span-2">Priority</div>
         <div className="col-span-2">Assignee</div>
         <div className="col-span-1">Updated</div>
       </div>
@@ -38,7 +38,7 @@ export function TicketTable({ tickets, onSelect }) {
               <div className="col-span-1">
                 <span className="text-xs font-mono text-[#B58B67] font-medium">{ticket.id}</span>
               </div>
-              <div className="col-span-3">
+              <div className="col-span-2">
                 <p className="text-sm font-medium text-[#3D3126] truncate">{ticket.title}</p>
                 <p className="text-xs text-[#8A7A6A] truncate">
                   {ticket.customer} {ticket.salonName && ` · Salon: ${ticket.salonName}`}
@@ -46,7 +46,7 @@ export function TicketTable({ tickets, onSelect }) {
               </div>
               <div className="col-span-2"><TypeBadge type={ticket.type} /></div>
               <div className="col-span-2"><StatusBadge status={ticket.status} /></div>
-              <div className="col-span-1"><PriorityBadge priority={ticket.priority} /></div>
+              <div className="col-span-2"><PriorityBadge priority={ticket.priority} /></div>
               <div className="col-span-2">
                 <span className="text-sm text-[#3D3126] flex items-center gap-1">
                   <User size={12} className="text-[#8A7A6A]" />

@@ -387,9 +387,9 @@ Always keep your neckline clean—trimming two fingers above your Adam's apple i
                   key={i} 
                   className="p-4 rounded-xl bg-[#FAF6F0]/60 border border-[#E8DCCB]/60 space-y-1.5"
                 >
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-extrabold text-[#3E362E] text-xs sm:text-sm">{upg.name}</h4>
-                    <span className="font-mono font-black text-stone-900 text-xs sm:text-sm">{upg.price}</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-extrabold text-[#3E362E] text-xs sm:text-sm flex-1">{upg.name}</h4>
+                    <span className="font-mono font-black text-stone-900 text-xs sm:text-sm shrink-0 ml-2">{upg.price}</span>
                   </div>
                   <p className="text-stone-500 text-[11px] leading-relaxed">{upg.desc}</p>
                 </div>
