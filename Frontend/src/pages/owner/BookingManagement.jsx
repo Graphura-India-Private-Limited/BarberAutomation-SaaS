@@ -423,13 +423,32 @@ export default function BookingManagement() {
 
   // ── RENDER BOOKING WIZARD FLOW ──
   const renderWizard = () => {
-    const totalSteps = formData.type === "Slot" ? 4 : 3;
+    const totalSteps = formData.type === "Slot" ? 3 : 2;
     
     const getStepTitle = () => {
       if (createStep === 1) return "Customer & Service Details";
-      if (createStep === 2 && formData.type === "Slot") return "Date & Time Slot";
-      if (createStep === 3 || (createStep === 2 && formData.type === "Queue")) return "Attendees & Family";
+      if (createStep === 2) return "Date & Time Slot";
       return "Payment Gateway & Review";
+    };
+
+    const getDisplayStep = () => {
+      if (createStep === 1) return 1;
+      if (createStep === 2) return 2;
+      return formData.type === "Slot" ? 3 : 2;
+    };
+    
+    const handleStepBack = () => {
+      if (createStep === 4) {
+        if (formData.type === "Queue") {
+          setCreateStep(1);
+        } else {
+          setCreateStep(2);
+        }
+      } else if (createStep === 2) {
+        setCreateStep(1);
+      } else {
+        setView("list");
+      }
     };
 
     return (
@@ -438,17 +457,7 @@ export default function BookingManagement() {
         <div className="flex items-center justify-between pb-6 border-b border-stone-100 mb-8">
           <button 
             type="button"
-            onClick={() => {
-              if (createStep > 1) {
-                if (createStep === 3 && formData.type === "Queue") {
-                  setCreateStep(1);
-                } else {
-                  setCreateStep(createStep - 1);
-                }
-              } else {
-                setView("list");
-              }
-            }}
+            onClick={handleStepBack}
             className="flex items-center gap-2 text-stone-500 hover:text-stone-850 transition cursor-pointer border-none bg-transparent outline-none font-bold text-xs uppercase tracking-wider font-sans"
           >
             <ArrowLeft size={14} strokeWidth={3} /> Back
@@ -456,7 +465,7 @@ export default function BookingManagement() {
           
           <div className="text-right">
             <span className="text-[10px] font-black uppercase tracking-widest text-[#C5A059] block mb-1">
-              Step {createStep === 3 && formData.type === "Queue" ? 2 : createStep === 4 && formData.type === "Queue" ? 3 : createStep} of {totalSteps}
+              Step {getDisplayStep()} of {totalSteps}
             </span>
             <span className="text-xs font-bold text-stone-400 font-sans">{getStepTitle()}</span>
           </div>
@@ -468,7 +477,7 @@ export default function BookingManagement() {
             className="h-full transition-all duration-300"
             style={{ 
               backgroundColor: GOLD, 
-              width: `${((createStep === 3 && formData.type === "Queue" ? 2 : createStep === 4 && formData.type === "Queue" ? 3 : createStep) / totalSteps) * 100}%` 
+              width: `${(getDisplayStep() / totalSteps) * 100}%` 
             }}
           />
         </div>
@@ -484,12 +493,10 @@ export default function BookingManagement() {
             if (formData.type === "Slot") {
               setCreateStep(2);
             } else {
-              setCreateStep(3); // skip step 2 for Queue
+              setCreateStep(4); // skip step 2 and step 3 for Queue
             }
           } else if (createStep === 2) {
-            setCreateStep(3);
-          } else if (createStep === 3) {
-            setCreateStep(4);
+            setCreateStep(4); // skip step 3
           } else if (createStep === 4) {
             handleFormSubmit(e);
           }
@@ -606,53 +613,7 @@ export default function BookingManagement() {
             </div>
           )}
 
-          {/* STEP 3: Attendees Selection */}
-          {createStep === 3 && (
-            <div className="space-y-5">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-serif text-2xl text-stone-900 font-bold">
-                  Add <span className="italic text-[#C5A059] font-medium">Attendees</span>
-                </h3>
-                <button
-                  type="button"
-                  onClick={handleAddAttendee}
-                  className="text-xs text-[#A06D3B] hover:text-[#8B5A2B] font-extrabold uppercase tracking-wider transition-colors cursor-pointer border-none bg-transparent outline-none"
-                >
-                  + Add Attendee
-                </button>
-              </div>
 
-              <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-                {formData.attendees.map((member, index) => (
-                  <div key={member.id} className="flex gap-3 items-center bg-stone-50/50 p-3 rounded-2xl border border-stone-200/50">
-                    <div className="flex-grow">
-                      <label className="block text-[9px] font-extrabold uppercase tracking-widest text-stone-400 mb-1.5">
-                        {index === 0 ? "Primary Person Name" : `Family Member / Person #${index + 1}`}
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={member.name}
-                        onChange={(e) => handleAttendeeNameChange(member.id, e.target.value)}
-                        placeholder={index === 0 ? "Customer name (syncs from details)" : "Enter person's name"}
-                        className="w-full bg-white border border-stone-200 rounded-xl p-3 outline-none text-stone-800 focus:border-[#C5A059] transition text-sm font-semibold"
-                      />
-                    </div>
-                    {index > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveAttendee(member.id)}
-                        className="p-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors border-none bg-transparent cursor-pointer outline-none self-end"
-                        title="Remove Attendee"
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* STEP 4: Review & Payment Settings */}
           {createStep === 4 && (
@@ -727,17 +688,7 @@ export default function BookingManagement() {
           <div className="flex gap-4 pt-6 border-t border-stone-100">
             <button
               type="button"
-              onClick={() => {
-                if (createStep > 1) {
-                  if (createStep === 3 && formData.type === "Queue") {
-                    setCreateStep(1);
-                  } else {
-                    setCreateStep(createStep - 1);
-                  }
-                } else {
-                  setView("list");
-                }
-              }}
+              onClick={handleStepBack}
               className="w-full bg-stone-100 hover:bg-stone-200 text-stone-600 transition py-4 rounded-xl font-extrabold text-xs uppercase tracking-wider cursor-pointer border-none outline-none"
             >
               {createStep === 1 ? "Cancel" : "Back"}
