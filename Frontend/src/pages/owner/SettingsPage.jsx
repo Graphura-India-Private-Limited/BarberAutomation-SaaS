@@ -184,9 +184,9 @@ export default function SettingsPage() {
     setMessage("Acquiring GPS fix... please check browser prompt.");
     
     const geoOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
+      enableHighAccuracy: false,
+      timeout: 15000,
+      maximumAge: 60000
     };
 
     navigator.geolocation.getCurrentPosition(

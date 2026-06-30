@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Scissors, BarChart2, CreditCard, DollarSign, LayoutDashboard,
-  LogOut, Plus, Trash2, ArrowLeft, Clock, Tags 
+  LogOut, Plus, Trash2, ArrowLeft, Clock, Tags, Edit2, X
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -19,6 +19,8 @@ export default function ManageServices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
+  const [selectedService, setSelectedService] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", price: "", duration: "30", category: "men", description: "", image: "" });
 
   const fallbacks = {
     men: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=150&q=80",
@@ -83,6 +85,48 @@ export default function ManageServices() {
     } catch (err) {
       setError(err.message || "Unable to delete service");
     }
+  };
+
+  const saveServiceChanges = async () => {
+    if (!selectedService) return;
+    setError("");
+    try {
+      const res = await fetch(`${API}/services/${selectedService._id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: editForm.name,
+          price: Number(editForm.price),
+          duration: Number(editForm.duration) || 30,
+          category: editForm.category.toLowerCase(),
+          description: editForm.description,
+          image: editForm.image || fallbacks[editForm.category.toLowerCase()] || fallbacks.men
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.service) {
+        setServices(prev => prev.map(s => s._id === selectedService._id ? data.service : s));
+        setSelectedService(null);
+      } else {
+        throw new Error(data.message || "Failed to update service changes");
+      }
+    } catch (err) {
+      console.error("Failed to save service changes:", err);
+      setError(err.message || "Error updating service");
+    }
+  };
+
+  const handleEditImageUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setEditForm(prev => ({ ...prev, image: reader.result || "" }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleLogout = () => {
@@ -364,12 +408,30 @@ export default function ManageServices() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto pt-3 md:pt-0 border-t md:border-0 border-stone-100 font-sans shrink-0">
-                  <div className="text-left md:text-right">
+                <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto pt-3 md:pt-0 border-t md:border-0 border-stone-100 font-sans shrink-0">
+                  <div className="text-left md:text-right mr-3">
                     <p className="text-2xl font-black font-mono text-stone-900">₹{service.price}</p>
                     {/* Rule 2 Fee metadata tracker label kicker tag */}
                     <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-0.5">Base Price</p>
                   </div>
+                  
+                  <button 
+                    onClick={() => {
+                      setSelectedService(service);
+                      setEditForm({
+                        name: service.name,
+                        price: service.price,
+                        duration: service.duration,
+                        category: service.category,
+                        description: service.description || "",
+                        image: service.image || ""
+                      });
+                    }} 
+                    className="rounded-xl border border-[#C5A059] bg-[#FAF6F0]/50 text-[#C5A059] hover:bg-[#C5A059] hover:text-white px-4 py-2.5 text-xs font-extrabold tracking-wider uppercase transition-all shadow-sm flex items-center gap-1 cursor-pointer"
+                  >
+                    <Edit2 size={12} /> Modify
+                  </button>
+
                   {/* Rule 4 Core Action item Delete configuration system elements button link links */}
                   <button 
                     onClick={() => deleteService(service._id)} 
@@ -389,6 +451,123 @@ export default function ManageServices() {
             </div>
           )}
         </div>
+
+        {selectedService && (
+        <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#FAF6F0] border border-[#EADBCE] p-6 rounded-[2rem] w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-in fade-in duration-250">
+            <div className="flex justify-between items-center pb-4 border-b border-[#EADBCE]/50 mb-4">
+              <h2 className="text-xl font-serif font-black text-stone-900 uppercase">
+                Modify Service
+              </h2>
+              <button onClick={() => setSelectedService(null)} className="w-8 h-8 rounded-xl flex items-center justify-center border border-stone-200 bg-white text-stone-400 hover:text-stone-800 transition-all cursor-pointer">
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">Service Name</label>
+                <input
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm font-bold text-stone-800 outline-none focus:border-[#C5A059]"
+                  placeholder="Service Name"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">Price (₹)</label>
+                <input
+                  type="number"
+                  value={editForm.price}
+                  onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm font-bold text-stone-800 outline-none focus:border-[#C5A059]"
+                  placeholder="Price"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">Duration (mins)</label>
+                <input
+                  type="number"
+                  value={editForm.duration}
+                  onChange={(e) => setEditForm({ ...editForm, duration: e.target.value })}
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm font-bold text-stone-800 outline-none focus:border-[#C5A059]"
+                  placeholder="Duration"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">Category</label>
+                <select
+                  value={editForm.category}
+                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm font-bold text-stone-800 outline-none focus:border-[#C5A059] h-[48px] cursor-pointer"
+                >
+                  <option value="men">Men</option>
+                  <option value="women">Women</option>
+                  <option value="addon">Addon</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">Description</label>
+                <textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm font-bold text-stone-800 outline-none focus:border-[#C5A059] min-h-[60px]"
+                  placeholder="Description"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">Upload Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEditImageUpload}
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl p-2.5 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:bg-[#FAF6F0] file:text-stone-700 file:font-black file:uppercase file:cursor-pointer"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-stone-400">Image URL</label>
+                <input
+                  value={editForm.image}
+                  onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                  className="w-full bg-white border border-[#EADBCE] rounded-xl p-3 text-sm font-bold text-stone-800 outline-none focus:border-[#C5A059]"
+                  placeholder="Image URL"
+                />
+              </div>
+
+              {editForm.image && (
+                <div className="mt-2">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-1">Preview</p>
+                  <div className="w-full h-32 rounded-xl overflow-hidden border border-stone-200 bg-stone-50">
+                    <img src={editForm.image} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-[#EADBCE]/50 mt-5 font-sans">
+              <button 
+                onClick={saveServiceChanges}
+                className="rounded-xl px-5 py-3 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer font-sans" 
+                style={{ background: CHARCOAL }}
+              >
+                Save Changes
+              </button>
+              <button 
+                onClick={() => setSelectedService(null)} 
+                className="rounded-xl bg-stone-100 border border-stone-200 text-stone-500 hover:bg-stone-200 font-extrabold text-xs uppercase tracking-wider px-5 py-3 transition-all cursor-pointer font-sans"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     );
   }

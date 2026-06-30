@@ -278,10 +278,10 @@ export default function SalonDetailPage() {
       <Navbar />
 
       {/* 📸 EDITORIAL SHOWCASE HERO DISPLAY */}
-      <section className="relative bg-[#FAF6F0] pt-28 pb-8 px-6 sm:px-8 lg:px-10">
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <section className="relative bg-[#FAF6F0] pt-28 pb-8 px-6 sm:px-8 xl:px-10">
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-12 items-center">
           {/* Left Side: Salon Info */}
-          <div className="lg:col-span-7 text-left space-y-6">
+          <div className="xl:col-span-7 text-left space-y-6">
             <button
               onClick={() => navigate(-1)}
               className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#8A7B6A] hover:text-[#C5A059] transition cursor-pointer border-none bg-transparent"
@@ -319,7 +319,7 @@ export default function SalonDetailPage() {
             </div>
 
             {/* Heading */}
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-[#3E362E]">
+            <h1 className="font-serif text-4xl sm:text-5xl xl:text-6xl font-black leading-[1.05] tracking-tight text-[#3E362E]">
               {salon.name}
             </h1>
 
@@ -352,8 +352,8 @@ export default function SalonDetailPage() {
           </div>
 
           {/* Right Side: Showcase Image Frame */}
-          <div className="lg:col-span-5">
-            <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] rounded-[2rem] overflow-hidden border border-[#E8DCCB] bg-stone-100 shadow-xl group">
+          <div className="xl:col-span-5">
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] xl:aspect-[4/3] rounded-[2rem] overflow-hidden border border-[#E8DCCB] bg-stone-100 shadow-xl group">
               <img
                 src={activeImage || salon.image}
                 alt={salon.name}
@@ -369,7 +369,7 @@ export default function SalonDetailPage() {
       </section>
 
       {/* 📊 QUICK CONTEXT INFO TILES ROW — spans full width below hero banner */}
-      <section className="mx-auto max-w-7xl w-full px-6 sm:px-8 lg:px-10 pt-8">
+      <section className="mx-auto max-w-7xl w-full px-6 sm:px-8 xl:px-10 pt-8">
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
           <InfoTile icon={MapPin} label="Address" value={salon.address} />
           <InfoTile icon={Clock} label="Hours" value={salon.hours} />
@@ -378,7 +378,7 @@ export default function SalonDetailPage() {
       </section>
 
       {/* 🧱 DATA PROFILE DETAILS LAYOUT COLUMNS GRID */}
-      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:px-10 flex-1">
+      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-8 sm:px-8 xl:grid-cols-[1.25fr_0.75fr] xl:px-10 flex-1">
         <div className="space-y-8">
           {/* 📸 Gallery Section */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left text-[#3E362E]">
@@ -438,15 +438,15 @@ export default function SalonDetailPage() {
                 {/* Dropdown Selector for Category Filtering */}
                 <div className="w-full sm:w-auto min-w-[200px]">
                   <CustomSelect
-                    value={selectedCategory}
-                    onChange={setSelectedCategory}
-                    options={[
-                      { value: "all", label: "All Services" },
-                      { value: "men", label: "Men Services" },
-                      { value: "women", label: "Women Services" },
-                      { value: "addon", label: "Addon Services" }
-                    ]}
-                    className="!text-[10px] !font-black !uppercase !tracking-widest !bg-[#FAF6F0] !text-[#3E362E] !border-[#E8DCCB] !rounded-xl !h-10"
+                     value={selectedCategory}
+                     onChange={setSelectedCategory}
+                     options={[
+                       { value: "all", label: "All Services" },
+                       { value: "men", label: "Men Services" },
+                       { value: "women", label: "Women Services" },
+                       { value: "addon", label: "Addon Services" }
+                     ]}
+                     className="!text-[10px] !font-black !uppercase !tracking-widest !bg-[#FAF6F0] !text-[#3E362E] !border-[#E8DCCB] !rounded-xl !h-10"
                   />
                 </div>
               </div>
@@ -456,11 +456,11 @@ export default function SalonDetailPage() {
               {filteredServices.length === 0 ? (
                 <div className="py-12 text-center bg-[#FAF6F0]/50 rounded-2xl border border-dashed border-[#E8DCCB]">
                   <Scissors className="text-stone-300 mx-auto mb-2 animate-pulse" size={32} />
-                  <p className="text-sm font-bold text-stone-505">No services listed for this category.</p>
+                  <p className="text-sm font-bold text-stone-555">No services listed for this category.</p>
                 </div>
               ) : (
                 <>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {paginatedServices.map((service) => (
                       <div
                         key={service._id}
@@ -642,7 +642,7 @@ export default function SalonDetailPage() {
         </div>
 
         {/* 📑 FIXED FLOATING RIGHT SIDEBAR ANCHOR */}
-        <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+        <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
           {/* Booking Card */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-6 shadow-sm text-left transition-all hover:border-[#C5A059]/40">
             <div className="mb-4 flex items-center justify-between border-b border-stone-100 pb-3">

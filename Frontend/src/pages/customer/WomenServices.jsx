@@ -319,7 +319,7 @@ export default function WomenServices() {
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button
               onClick={() => setShowFilters(true)}
-              className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 border border-[#DDD4C4] rounded-lg bg-white text-[11px] font-bold text-[#2C241E] cursor-pointer hover:bg-stone-50 transition-colors h-9"
+              className="lg:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 border border-[#DDD4C4] rounded-lg bg-white text-[11px] font-bold text-[#2C241E] cursor-pointer hover:bg-stone-50 transition-colors h-9"
               style={{ fontFamily: "'Montserrat',sans-serif" }}
             >
               <SlidersHorizontal size={12} className="text-[#C5A059]" />
@@ -339,26 +339,26 @@ export default function WomenServices() {
         </div>
 
         {/* MAIN */}
-        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-col md:flex-row gap-6 md:gap-9 items-start">
+        <div className="max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start">
 
           {/* Mobile Backdrop */}
           {showFilters && (
             <div 
-              className="fixed inset-0 bg-stone-900/60 z-50 md:hidden animate-in fade-in duration-200" 
+              className="fixed inset-0 bg-stone-900/60 z-[10000] lg:hidden animate-in fade-in duration-200" 
               onClick={() => setShowFilters(false)}
             />
           )}
 
           {/* SIDEBAR */}
           <aside className={`
-            shrink-0 md:w-[248px] md:sticky md:top-[100px] md:mb-0 md:block md:max-h-[calc(100vh-120px)] md:overflow-y-auto thin-scrollbar
+            shrink-0 lg:w-[248px] lg:sticky lg:top-[100px] lg:mb-0 lg:block lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto thin-scrollbar
             ${showFilters 
-              ? "fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
-              : "hidden md:block"
+              ? "fixed top-0 left-0 bottom-0 z-[10001] w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
+              : "hidden lg:block"
             }
           `}>
             {showFilters && (
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-stone-100 md:hidden">
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-stone-100 lg:hidden">
                 <span className="text-xs font-bold text-[#2C241E] uppercase tracking-wider">Filters</span>
                 <button onClick={() => setShowFilters(false)} className="text-stone-500 hover:text-stone-900">
                   <X size={18} />
@@ -508,6 +508,37 @@ export default function WomenServices() {
               </div>
             )}
           </div>
+
+          {/* FLOATING FILTERS BUTTON FOR MOBILE/TABLET */}
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 lg:hidden">
+            <button
+              onClick={() => setShowFilters(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "#2C241E",
+                color: "#F5EFE0",
+                border: "1px solid #C5A059",
+                borderRadius: 30,
+                padding: "10px 20px",
+                fontFamily: "'Montserrat',sans-serif",
+                fontWeight: 700,
+                fontSize: 11,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                cursor: "pointer",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+                transition: "all 0.3s"
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
+            >
+              <SlidersHorizontal size={14} className="text-[#C5A059]" />
+              <span>Filters</span>
+            </button>
+          </div>
+
         </div>
       </div>
       <Footer />

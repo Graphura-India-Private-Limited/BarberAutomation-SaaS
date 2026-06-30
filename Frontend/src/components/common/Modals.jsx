@@ -237,16 +237,6 @@ export function AddCustomerModal({ onClose, onAdd }) {
           </button>
         </div>
 
-        {/* Mode Toggle */}
-        <div className="mx-6 mt-5 p-1 rounded-2xl flex gap-1 bg-[#EFEBE4] border border-[#EADBCE]/60">
-          {[['queue','Walk-in'],['booking','Booking']].map(([m,l]) => (
-            <button key={m} onClick={() => setMode(m)}
-              className={`flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider border-none cursor-pointer transition-all ${mode===m ? 'tab-btn-active shadow-3xs' : 'tab-btn-inactive'}`}>
-              {l}
-            </button>
-          ))}
-        </div>
-
         {/* Form Fields Stack */}
         <div className="p-6 space-y-4 text-left">
           {[

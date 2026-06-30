@@ -27,11 +27,34 @@ const NAV_ITEMS = [
 ];
 
 const FEATURES = [
-   
- { title: "Signature Cuts",  Icon: Scissors, image: "https://i.pinimg.com/736x/82/c5/3d/82c53d8a1ea142d096daec6430eca0db.jpg", description: "Precision tailoring for the modern gentleman.",          path: "/customer/look" },
-  { title: "Luxury Styling",  Icon: Sparkles, image: "https://i.pinimg.com/736x/ab/00/ea/ab00ead61169995482cc7703115efda2.jpg", description: "Couture hair transformations for feminine silhouette.",  path: "/customer/services/women" },
-  { title: "Beard Sculpture", Icon: User,     image: "https://i.pinimg.com/736x/70/66/7f/70667fddecd13bde2bac687c3a7fa5cd.jpg", description: "Architectural grooming for the masculine profile.",      path: "/customer/services/men" },
-  { title: "Color Artistry",  Icon: Palette,  image: "https://i.pinimg.com/736x/96/36/06/9636062d461545f11d4e7c5c510b2481.jpg", description: "Bespoke color palettes for every hair texture.",         path: "/customer/services/women" },
+  { 
+    title: "Signature Cuts",  
+    Icon: Scissors, 
+    image: "https://i.pinimg.com/736x/82/c5/3d/82c53d8a1ea142d096daec6430eca0db.jpg", 
+    description: "Precision tailoring, advanced texturizing, and custom shape design crafted to enhance the modern gentleman's profile.",          
+    path: "/customer/services/men" 
+  },
+  { 
+    title: "Luxury Styling",  
+    Icon: Sparkles, 
+    image: "https://i.pinimg.com/736x/ab/00/ea/ab00ead61169995482cc7703115efda2.jpg", 
+    description: "Couture hair transformations, volume blowout waves, and expert luxury styling customized for a stunning feminine silhouette.",  
+    path: "/customer/services/women" 
+  },
+  { 
+    title: "Beard Sculpture", 
+    Icon: User,     
+    image: "https://i.pinimg.com/736x/70/66/7f/70667fddecd13bde2bac687c3a7fa5cd.jpg", 
+    description: "Architectural grooming, hot towel clean outlines, beard conditioning oils, and structural trimming for a refined profile.",      
+    path: "/customer/services/men" 
+  },
+  { 
+    title: "Color Artistry",  
+    Icon: Palette,  
+    image: "https://i.pinimg.com/736x/96/36/06/9636062d461545f11d4e7c5c510b2481.jpg", 
+    description: "Bespoke color palettes, hand-painted balayage techniques, and advanced color protection curated for every hair texture.",         
+    path: "/customer/services/women" 
+  },
 ];
 
 const HOW_IT_WORKS = [
@@ -199,7 +222,7 @@ export default function HomePage() {
         setLocationError("Location permission denied. Please allow location access to see salons.");
         setIsDetectingLocation(false);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
     );
   };
 
@@ -336,31 +359,36 @@ useEffect(() => {
 
     {/* ── HERO ── */}
       <section className="relative w-full bg-[#FAF7F2] overflow-hidden min-h-[550px] md:min-h-[650px] flex items-center">
-     <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none border-l border-[#FAF7F2]">
-  <div className="absolute inset-0 bg-black/10 md:bg-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-full md:w-[55%] h-full z-0 overflow-hidden select-none border-l border-[#FAF7F2]">
+          {/* Slides */}
+          {heroImages.map((img, index) => (
+            <img
+              key={index}
+              src={img}
+              alt={`Hero ${index + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover object-[85%_center] md:object-[80%_center]
+              transition-opacity duration-1000 ${
+                index === currentSlide ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          ))}
 
-  {/* Slides */}
-  {heroImages.map((img, index) => (
-    <img
-      key={index}
-      src={img}
-      alt={`Hero ${index + 1}`}
-      className={`absolute inset-0 w-full h-full object-cover object-center md:object-[80%_center]
-      transition-opacity duration-1000 ${
-        index === currentSlide ? "opacity-100" : "opacity-0"
-      }`}
-    />
-  ))}
+          {/* Cream wash overlay rendered AFTER slides so it actually works on mobile/tablet */}
+          <div className="absolute inset-0 bg-[#FAF7F2]/50 md:bg-transparent pointer-events-none backdrop-blur-[0.5px] md:backdrop-blur-none" />
 
-  {/* Overlays */}
-  <div className="absolute inset-0 w-full pointer-events-none" style={{ background: "linear-gradient(to right, #FAF7F2 0%, rgba(250, 247, 242, 0.8) 10%, rgba(250, 247, 242, 0) 25%)" }} />
-  <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/30 via-transparent to-transparent pointer-events-none" />
-</div>
+          {/* Gradient overlays rendered AFTER slides to fade from cream (left) to slide (right) */}
+          {/* Mobile/Tablet Gradient Overlay (below md): Stronger overlay to keep text readable */}
+          <div className="absolute inset-0 w-full pointer-events-none md:hidden" style={{ background: "linear-gradient(to right, #FAF7F2 0%, rgba(250, 247, 242, 0.95) 45%, rgba(250, 247, 242, 0.4) 75%, transparent 100%)" }} />
+          {/* Desktop Gradient Overlay (md and up): Lighter overlay so the image is sharp and clear like before */}
+          <div className="absolute inset-0 w-full pointer-events-none hidden md:block" style={{ background: "linear-gradient(to right, #FAF7F2 0%, rgba(250, 247, 242, 0.8) 10%, rgba(250, 247, 242, 0) 25%)" }} />
+          
+          <div className="absolute inset-0 bg-gradient-to-t from-[#FAF7F2]/40 via-transparent to-transparent pointer-events-none" />
+        </div>
 
         {/* ── ✅ FIXED: ADJUSTED TOP PADDING TO MOVE THE PACKET GRID LOGIC DOWN CLEANLY ── */}
         <div className="mx-auto max-w-7xl w-full px-6 pt-28 pb-16 md:pt-40 md:pb-24 grid md:grid-cols-2 gap-12 items-center relative z-10">
           <div className="space-y-6 max-w-xl fade-up">
-            <h1 className="text-4xl sm:text-5xl md:text-5xl font-black text-stone-900 tracking-wide uppercase leading-[1.15] font-serif">
+            <h1 className="text-3xl sm:text-5xl font-black text-stone-900 tracking-wide uppercase leading-[1.15] font-serif">
               Premium Services <br />
               <span className="text-[#C5A059] font-light italic normal-case font-serif tracking-normal">at affordable prices</span>
             </h1>
@@ -587,30 +615,29 @@ useEffect(() => {
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                
-              onClick={() => {
-    if (f.title === "Signature Cuts") {
-      navigate("/customer/look", {
-      state: { gender: "women", service: { name: "Haircut & Styling", category: "women" }, barber: null }});
-      } else if (f.title === "Color Artistry") {
-         navigate("/customer/look", {state: { gender: "women", service: { name: "Color Artistry", category: "color" }, barber: null }});
-     } else {
-         navigate(f.path);
-         }
-        }}
+                onClick={() => {
+                  const token = localStorage.getItem("token");
+                  if (!token) {
+                    navigate("/nearby");
+                  } else {
+                    navigate(f.path);
+                  }
+                }}
                 className="group relative h-[360px] rounded-[30px] overflow-hidden border border-[#EADDCA] bg-white/80 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_rgba(197,160,89,0.18)] hover:border-[#C5A059]/50 cursor-pointer"
               >
                 <div className="absolute top-0 left-[-120%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent rotate-12 group-hover:left-[120%] transition-all duration-1000 z-20 pointer-events-none" />
                 <div className="absolute inset-0 z-0">
-                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-400 scale-100 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#F9F5EF] via-[#F9F5EF]/20 to-transparent" />
+                  <img src={f.image} alt={f.title} className="h-full w-full object-cover opacity-75 scale-100 group-hover:scale-110 group-hover:opacity-90 transition-all duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#FAF6F0] via-[#FAF6F0]/20 to-transparent group-hover:from-[#FAF6F0]/95 group-hover:via-[#FAF6F0]/90 transition-all duration-500" />
                 </div>
                 <div className="relative z-10 p-6 md:p-7 flex flex-col justify-end h-full">
                   <div className="mb-5 inline-flex w-fit rounded-2xl bg-white/70 backdrop-blur-xl p-4 text-[#C5A059] border border-white/40 group-hover:bg-[#C5A059] group-hover:text-white transition-all duration-300">
                     <f.Icon size={24} />
                   </div>
                   <h3 className="mb-3 text-sm md:text-base font-black uppercase tracking-[0.18em] text-[#3E362E]">{f.title}</h3>
-                  <p className="text-[11px] md:text-xs leading-relaxed text-stone-700 italic font-serif mb-5">{f.description}</p>
+                  <p className="text-[11px] md:text-xs leading-relaxed text-stone-700 italic font-serif mb-0 opacity-0 max-h-0 translate-y-4 overflow-hidden transition-all duration-500 ease-out group-hover:opacity-100 group-hover:max-h-[100px] group-hover:translate-y-0 group-hover:mb-5">
+                    {f.description}
+                  </p>
                   <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#C5A059] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                     Book Now <ArrowRight className="w-3.5 h-3.5" />
                   </span>
@@ -712,12 +739,17 @@ useEffect(() => {
                         </div>
                         <span className="bg-[#ECFDF5] text-[#065F46] text-[10px] font-black px-2 py-1 rounded-full uppercase">Open</span>
                       </div>
-                      <div className="flex items-center justify-between text-[11px] text-[#8D7B68] mb-4">
-                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-[#C5A059] text-[#C5A059]" />{s.rating || "4.9"}</span>
-                        {userCoords && s.latitude && s.longitude && (
-                          <span className="text-[#C5A059] font-black">{getSalonDistanceStr(s)}</span>
-                        )}
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.opening_time} - {s.closing_time}</span>
+                      <div className="flex items-center justify-between text-[11px] text-[#8D7B68] mb-4 gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-[#C5A059] text-[#C5A059]" />{s.rating || "4.9"}</span>
+                          {userCoords && s.latitude && s.longitude && (
+                            <>
+                              <span className="text-[#8D7B68]/30">•</span>
+                              <span className="text-[#C5A059] font-black">{getSalonDistanceStr(s)}</span>
+                            </>
+                          )}
+                        </div>
+                        <span className="flex items-center gap-1 shrink-0"><Clock className="w-3 h-3" />{s.opening_time} - {s.closing_time}</span>
                       </div>
                       <div className="flex gap-2">
                         <button type="button" onClick={(e) => {
@@ -1037,9 +1069,9 @@ useEffect(() => {
         <div className="relative z-10 max-w-5xl mx-auto">
           <div className="relative overflow-hidden rounded-[40px] border border-[#E6D7BC] bg-white/60 backdrop-blur-2xl shadow-[0_20px_60px_rgba(62,54,46,0.08)] px-6 sm:px-10 lg:px-16 py-14 lg:py-16 text-center">
             <span className="relative z-10 text-[12px] font-black uppercase tracking-[0.35em] text-[#C5A059]">Luxury Experience</span>
-            <h2 className="relative z-10 mt-5 text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-tight text-[#3E362E]">
+            <h2 className="relative z-10 mt-5 text-2xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-tight text-[#3E362E]">
               Ready For Your{" "}
-              <span className="italic font-serif bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] bg-clip-text text-transparent pr-4 inline-block">
+              <span className="italic font-serif bg-gradient-to-r from-[#C5A059] via-[#E8C878] to-[#C5A059] bg-clip-text text-transparent pr-6 inline-block">
                 Transformation?
               </span>
             </h2>

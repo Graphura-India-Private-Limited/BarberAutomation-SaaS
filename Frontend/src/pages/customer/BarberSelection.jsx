@@ -357,14 +357,16 @@ export default function BarberSelection() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
 
         {/* ── BACK BUTTON ── */}
-        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
-          <button
-            onClick={() => navigate(-1)}
-            style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
-          >←</button>
-        </div>
+        {!showFilters && (
+          <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
+            <button
+              onClick={() => navigate(-1)}
+              style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
+            >←</button>
+          </div>
+        )}
 
         {/* ── HERO ── */}
         <div className="relative h-[200px] sm:h-[260px] md:h-[320px] lg:h-[420px] overflow-hidden">
@@ -418,26 +420,26 @@ export default function BarberSelection() {
           )}
 
           {/* ── LAYOUT ── */}
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
             {/* Mobile Backdrop */}
             {showFilters && (
               <div 
-                className="fixed inset-0 bg-stone-900/60 z-50 md:hidden animate-in fade-in duration-200" 
+                className="fixed inset-0 bg-stone-900/60 z-[10000] lg:hidden animate-in fade-in duration-200" 
                 onClick={() => setShowFilters(false)}
               />
             )}
 
             {/* ── SIDEBAR ── */}
             <aside className={`
-              shrink-0 md:w-[240px] md:sticky md:top-[90px] md:mb-0 md:block
+              shrink-0 lg:w-[240px] lg:sticky lg:top-[90px] lg:mb-0 lg:block
               ${showFilters 
-                ? "fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
-                : "hidden md:block"
+                ? "fixed top-0 left-0 bottom-0 z-[10001] w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
+                : "hidden lg:block"
               }
             `}>
               {showFilters && (
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-stone-100 md:hidden">
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-stone-100 lg:hidden">
                   <span className="text-xs font-bold text-[#2C241E] uppercase tracking-wider">Filters</span>
                   <button onClick={() => setShowFilters(false)} className="text-stone-500 hover:text-stone-900">
                     <X size={18} />
@@ -519,7 +521,7 @@ export default function BarberSelection() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <button
                     onClick={() => setShowFilters(true)}
-                    className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 border border-[#DDD4C4] rounded-lg bg-white text-[11px] font-bold text-[#2C241E] cursor-pointer hover:bg-stone-50 transition-colors h-9"
+                    className="lg:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 border border-[#DDD4C4] rounded-lg bg-white text-[11px] font-bold text-[#2C241E] cursor-pointer hover:bg-stone-50 transition-colors h-9"
                     style={{ fontFamily: "'Montserrat',sans-serif" }}
                   >
                     <SlidersHorizontal size={12} className="text-[#C5A059]" />
@@ -582,14 +584,14 @@ export default function BarberSelection() {
 
               {/* CONTINUE CTA */}
               {selectedBarber && (
-                <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-[#EAE0D0] flex flex-row items-center justify-between gap-3 shadow-[0_-10px_30px_rgba(44,36,30,0.12)] sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:z-0 sm:mt-10 sm:p-5 md:p-7 sm:bg-white sm:border sm:rounded-2xl sm:flex-row sm:gap-4 sm:shadow-none">
+                <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-[#EAE0D0] flex flex-row items-center justify-between gap-3 shadow-[0_-10px_30px_rgba(44,36,30,0.12)] xl:relative xl:bottom-auto xl:left-auto xl:right-auto xl:z-0 xl:mt-10 xl:p-6 xl:bg-white xl:border xl:rounded-2xl xl:flex-row xl:gap-4 xl:shadow-none">
                   <div className="w-auto text-left">
-                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#AAA", margin: "0 0 4px" }} className="hidden sm:block">Selected Artist</p>
+                    <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#AAA", margin: "0 0 4px" }} className="hidden xl:block">Selected Artist</p>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <img src={selectedBarber.img} alt={selectedBarber.name} style={{ borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A059" }} className="w-9 h-9 sm:w-10 sm:h-10" />
+                      <img src={selectedBarber.img} alt={selectedBarber.name} style={{ borderRadius: "50%", objectFit: "cover", border: "2px solid #C5A059" }} className="w-9 h-9 xl:w-10 xl:h-10" />
                       <div>
-                        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, color: "#2C241E", margin: 0 }} className="text-[16px] sm:text-[20px] leading-tight">{selectedBarber.name}</p>
-                        <p style={{ fontFamily: "'Montserrat',sans-serif", color: "#AAA", margin: 0 }} className="text-[10px] sm:text-[11px]">{selectedBarber.role}</p>
+                        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, color: "#2C241E", margin: 0 }} className="text-[16px] xl:text-[20px] leading-tight">{selectedBarber.name}</p>
+                        <p style={{ fontFamily: "'Montserrat',sans-serif", color: "#AAA", margin: 0 }} className="text-[10px] xl:text-[11px]">{selectedBarber.role}</p>
                       </div>
                     </div>
                   </div>
@@ -610,12 +612,44 @@ export default function BarberSelection() {
                         navigate("/customer/look", { state: { service: selectedService, barber: selectedBarber, gender } });
                       }
                     }}
-                    className="w-auto justify-center py-2.5 px-4 sm:py-3.5 sm:px-8 text-[10px] sm:text-[11px]"
+                    className="w-auto justify-center py-2.5 px-4 xl:py-3.5 xl:px-8 text-[10px] xl:text-[11px]"
                     style={{ background: "#C5A059", color: "#fff", border: "none", borderRadius: 10, fontFamily: "'Montserrat',sans-serif", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", cursor: "pointer", transition: "background 0.25s", display: "flex", alignItems: "center", gap: 8 }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "#2C241E"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "#C5A059"; }}
                   >
                     Choose Your Look →
+                  </button>
+                </div>
+              )}
+
+              {/* FLOATING FILTERS BUTTON FOR MOBILE/TABLET */}
+              {!selectedBarber && (
+                <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 lg:hidden">
+                  <button
+                    onClick={() => setShowFilters(true)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      background: "#2C241E",
+                      color: "#F5EFE0",
+                      border: "1px solid #C5A059",
+                      borderRadius: 30,
+                      padding: "10px 20px",
+                      fontFamily: "'Montserrat',sans-serif",
+                      fontWeight: 700,
+                      fontSize: 11,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      cursor: "pointer",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+                      transition: "all 0.3s"
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
+                  >
+                    <SlidersHorizontal size={14} className="text-[#C5A059]" />
+                    <span>Filters</span>
                   </button>
                 </div>
               )}

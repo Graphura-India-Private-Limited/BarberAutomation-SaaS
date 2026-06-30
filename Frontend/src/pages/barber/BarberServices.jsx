@@ -380,28 +380,7 @@ export default function BarberServices() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-5 mt-5 border-t border-stone-50">
-                    {/* <button type="button" className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1">
-                      <Edit2 size={11} /> Modify
-                    </button> */}
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedService(svc);
-
-                        setEditForm({
-                          name: svc.name,
-                          price: svc.price,
-                          duration: svc.duration,
-                          category: svc.category,
-                          image: svc.image || ""
-                        });
-                      }}
-                      className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1"
-                    >
-                      <Edit2 size={11} /> Modify
-                    </button>
+                  <div className="flex items-center justify-end pt-5 mt-5 border-t border-stone-50">
 
                     <div className="flex items-center gap-2">
                       <span className={`text-[9px] font-black uppercase tracking-wider ${svc.active ? "text-emerald-600" : "text-stone-400"}`}>

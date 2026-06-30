@@ -65,7 +65,7 @@ export default function OwnerLayout() {
       {/* 📱 Mobile Backdrop Overlay */}
       {sideOpen && (
         <div 
-          className="fixed inset-0 bg-black/20 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/20 backdrop-blur-xs z-40 xl:hidden transition-opacity duration-300"
           onClick={() => setSideOpen(false)}
         />
       )}
@@ -73,7 +73,7 @@ export default function OwnerLayout() {
       {/* ── ═══ LUXURY SIDEBAR ═══ ── */}
       <aside 
         className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 bg-[#FDFBF7]/95 border-r border-[#E6D5C3] backdrop-blur-md 
-          ${sideOpen ? "w-64 translate-x-0" : "-translate-x-full w-64 lg:translate-x-0 lg:w-64"}`}
+          ${sideOpen ? "w-64 translate-x-0" : "-translate-x-full w-64 xl:translate-x-0 xl:w-64"}`}
       >
         {/* Logo Brand Header */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-[#E6D5C3]">
@@ -145,15 +145,15 @@ export default function OwnerLayout() {
       </aside>
 
       {/* ── ═══ MAIN CONTENT AREA ═══ ── */}
-      <div className="flex-1 min-w-0 lg:ml-64 flex flex-col">
+      <div className="flex-1 min-w-0 xl:ml-64 flex flex-col">
         
         {/* Mobile Top Navbar Header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-[#E6D5C3] sticky top-0 z-30">
-          <button onClick={() => setSideOpen(!sideOpen)} className="p-1 text-[#4A3E3D] cursor-pointer">
+        <header className="xl:hidden flex items-center justify-between px-4 py-4 bg-[#3E362E] border-b border-[#4A3E3D] sticky top-0 z-30">
+          <button onClick={() => setSideOpen(!sideOpen)} className="p-1 text-[#C5A059] hover:text-white cursor-pointer">
             {sideOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          <p className="font-serif font-black text-sm truncate max-w-[180px]">{salonName}</p>
-          <div className="w-8 h-8 rounded-full bg-[#8B5A2B] text-white flex items-center justify-center font-bold text-xs shrink-0">
+          <p className="font-serif font-black text-sm text-white truncate max-w-[180px]">{salonName}</p>
+          <div className="w-8 h-8 rounded-full bg-[#C5A059] text-[#2A241F] flex items-center justify-center font-bold text-xs shrink-0">
             {initials}
           </div>
         </header>

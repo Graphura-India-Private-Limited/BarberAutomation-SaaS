@@ -665,12 +665,7 @@ export default function SmartQueue() {
                 ))}
               </div>
             )}
-            <button 
-              className="bg-[#A37B58] hover:bg-[#8F6947] text-white font-black text-xs uppercase tracking-widest w-full mt-4 py-4 rounded-xl shadow-xs transition-colors cursor-pointer"
-              onClick={() => setShowAdd(true)}
-            >
-              + Add Customer to Queue
-            </button>
+
           </div>
         )}
 

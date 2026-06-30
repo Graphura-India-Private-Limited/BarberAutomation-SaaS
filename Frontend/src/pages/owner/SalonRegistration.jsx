@@ -263,9 +263,9 @@ export default function SalonRegistration() {
     setMessage("Acquiring GPS fix... please check browser prompt.");
 
     const geoOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000, // 10 seconds maximum wait time
-      maximumAge: 0
+      enableHighAccuracy: false,
+      timeout: 15000,
+      maximumAge: 60000
     };
 
     navigator.geolocation.getCurrentPosition(

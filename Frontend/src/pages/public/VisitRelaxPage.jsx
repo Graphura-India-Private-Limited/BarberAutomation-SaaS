@@ -403,13 +403,13 @@ Always keep your neckline clean—trimming two fingers above your Adam's apple i
               {UPGRADES.map((upg, i) => (
                 <div 
                   key={i} 
-                  className="p-4 rounded-xl bg-[#FAF6F0]/60 border border-[#E8DCCB]/60 space-y-1.5"
+                  className="p-4 rounded-xl bg-[#FAF6F0]/60 border border-[#E8DCCB]/60 flex flex-col justify-between gap-3 hover:border-[#C5A059]/40 hover:bg-white transition-all duration-300"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-extrabold text-[#3E362E] text-xs sm:text-sm flex-1">{upg.name}</h4>
-                    <span className="font-mono font-black text-stone-900 text-xs sm:text-sm shrink-0 ml-2">{upg.price}</span>
+                  <div className="space-y-1.5">
+                    <h4 className="font-extrabold text-[#3E362E] text-xs sm:text-sm leading-snug">{upg.name}</h4>
+                    <p className="text-stone-500 text-[11px] leading-relaxed">{upg.desc}</p>
                   </div>
-                  <p className="text-stone-500 text-[11px] leading-relaxed">{upg.desc}</p>
+                  <span className="font-mono font-black text-[#C5A059] text-[11px] sm:text-xs shrink-0 bg-[#C5A059]/10 px-2 py-0.5 rounded w-fit">{upg.price}</span>
                 </div>
               ))}
             </div>

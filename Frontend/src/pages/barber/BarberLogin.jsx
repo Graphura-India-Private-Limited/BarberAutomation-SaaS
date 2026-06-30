@@ -71,7 +71,7 @@ export default function BarberLogin() {
 
   return (
     <div className="min-h-screen bg-[#111] flex flex-col md:flex-row w-full font-sans overflow-x-hidden">
-      <div className="w-full min-h-screen bg-white flex flex-col md:flex-row overflow-y-auto">
+      <div className="w-full min-h-screen bg-[#f7f5f2] flex flex-col md:flex-row overflow-y-auto">
  
         {/* ── LEFT: Barber Hero ── */}
         <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden">
