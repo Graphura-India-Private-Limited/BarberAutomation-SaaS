@@ -36,13 +36,22 @@ export default function BarberSettings() {
 
       <main className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-10 flex-1 text-left relative z-10">
  
-        <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
-          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
-            Control <span className="text-[#C5A059]">Panel</span>
-          </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-[#C5A059] mt-1">
-            Configure workspace preferences & security
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+              Control <span className="text-[#C5A059]">Panel</span>
+            </h1>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+              Configure workspace preferences, notifications & security
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+            <Settings size={13} className="text-[#C5A059]" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
+              Version: <span className="text-stone-700 font-extrabold">2.0.0</span>
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

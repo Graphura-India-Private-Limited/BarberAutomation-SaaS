@@ -436,7 +436,28 @@ export default function ServiceConsole() {
 
   return (
     <div className="w-full text-stone-800 font-sans antialiased flex flex-col overflow-x-hidden min-h-screen bg-[#FAF6F0]">
-      <main className="max-w-[1450px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col lg:flex-row gap-6 items-start">
+      <main className="max-w-[1450px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col items-stretch gap-6 text-left">
+        
+        {/* Section Dynamic Header Info */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-stone-200/60 w-full gap-4">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+              Service <span className="text-[#C5A059]">Console</span>
+            </h1>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+              Live Client Grooming Tracker & Active Session Workbench
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+            <Layers size={13} className="text-[#C5A059]" />
+            <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
+              Console status: <span className="text-emerald-700 font-extrabold">Ready</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
         
         {/* COLUMN 1: LIVE MONITOR PIPELINE GRID VIEW */}
         <div className="w-full lg:w-3/12 flex flex-col gap-4">
@@ -756,6 +777,7 @@ export default function ServiceConsole() {
           </div>
         </div>
 
+        </div>
       </main>
 
       {/* ═══ INTERACTIVE SYSTEM OVERLAY MODALS ═══ */}

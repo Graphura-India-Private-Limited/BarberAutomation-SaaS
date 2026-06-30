@@ -598,6 +598,25 @@ export default function SmartQueue() {
     <div className="pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col pt-6 min-h-screen">
       <Toast notif={notif} />
 
+      {/* Section Dynamic Header Info */}
+      <div className="max-w-lg mx-auto w-full px-1 pb-6 border-b border-stone-200/60 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-left">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+            Live <span className="text-[#C5A059]">Queue</span>
+          </h1>
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+            Real-Time Walk-In Timeline & Booking Orchestration
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[10px] font-black uppercase tracking-wider text-stone-500">
+            Queue Engine: <span className="text-[#C5A059] font-extrabold">Active</span>
+          </span>
+        </div>
+      </div>
+
       {/* 📊 CORE GRID SUMMARY COUNTERS ROW */}
       <div className="bg-white border-b border-stone-200/40 shadow-2xs py-4 px-4">
         <div className="max-w-lg mx-auto grid grid-cols-4 gap-3">
