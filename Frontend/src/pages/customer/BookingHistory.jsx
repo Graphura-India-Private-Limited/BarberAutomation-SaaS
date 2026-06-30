@@ -287,7 +287,7 @@ export default function BookingHistory() {
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-24 relative z-10 flex-grow w-full">
 
           {/* ── BOOKING ID LOOKUP PANEL ── */}
           <div className="mb-8 bg-white/90 backdrop-blur-md border border-[#EADDCA] rounded-2xl p-5 shadow-[0_8px_25px_rgba(0,0,0,0.02)]">

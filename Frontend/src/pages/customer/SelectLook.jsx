@@ -238,7 +238,7 @@ export default function SelectLook() {
         ::-webkit-scrollbar-thumb { background: #C5A059; border-radius: 3px; }
       `}</style>
 
-      <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E", paddingBottom: 120 }}>
+      <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }} className="pb-10 sm:pb-24">
 
         {/* ── BACK BUTTON ── */}
         <div className="absolute top-[72px] left-5 md:top-[88px] md:left-5 z-[9999]">
@@ -251,7 +251,7 @@ export default function SelectLook() {
         </div>
 
         {/* ── HERO ── */}
-        <div className="relative h-[400px] overflow-hidden mt-[56px] md:mt-[72px]">
+        <div className="relative h-[200px] sm:h-[260px] md:h-[320px] lg:h-[400px] overflow-hidden mt-[56px] md:mt-[72px]">
           <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.3)" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.8))" }} />
 

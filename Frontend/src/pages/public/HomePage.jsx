@@ -136,6 +136,51 @@ export default function HomePage() {
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationError, setLocationError] = useState(null);
 
+  const getDistanceInKm = (lat1, lon1, lat2, lon2) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+    const R = 6371; // Radius of earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const getSalonDistanceStr = (s) => {
+    if (userCoords && s.latitude && s.longitude) {
+      const dist = getDistanceInKm(
+        userCoords.latitude,
+        userCoords.longitude,
+        s.latitude,
+        s.longitude
+      );
+      if (dist !== null) {
+        return `${dist.toFixed(1)} km away`;
+      }
+    }
+    return "Nearby";
+  };
+
+  const displaySalons = React.useMemo(() => {
+    const list = [...salons];
+    if (userCoords) {
+      list.sort((a, b) => {
+        const distA = getDistanceInKm(userCoords.latitude, userCoords.longitude, a.latitude, a.longitude);
+        const distB = getDistanceInKm(userCoords.latitude, userCoords.longitude, b.latitude, b.longitude);
+        if (distA !== null && distB !== null) return distA - distB;
+        if (distA !== null) return -1;
+        if (distB !== null) return 1;
+        return 0;
+      });
+    }
+    return list.slice(0, 3);
+  }, [salons, userCoords]);
+
   const detectLocation = () => {
     if (!navigator.geolocation) {
       setLocationError("Geolocation is not supported by this browser.");
@@ -150,7 +195,7 @@ export default function HomePage() {
         setIsDetectingLocation(false);
       },
       (error) => {
-        console.error(error);
+        console.warn("Geolocation request failed or blocked:", error.message);
         setLocationError("Location permission denied. Please allow location access to see salons.");
         setIsDetectingLocation(false);
       },
@@ -187,7 +232,7 @@ export default function HomePage() {
     }
     fetch(`${API}/salon/nearby`)
       .then((r) => { if (!r.ok) throw new Error(`Network response error: ${r.status}`); return r.json(); })
-      .then((d) => { if (d.success) setSalons(d.salons?.slice(0, 3) || []); })
+      .then((d) => { if (d.success) setSalons(d.salons || []); })
       .catch((err) => console.error("Failed fetching nearby salons:", err));
 
     fetch(`${API}/review`)
@@ -644,7 +689,7 @@ useEffect(() => {
           </div>
 
           {userCoords ? (
-            salons.length === 0 ? (
+            displaySalons.length === 0 ? (
               <div className="py-12 text-center bg-white border border-[#EADDCA] rounded-[32px]">
                 <MapPin className="w-12 h-12 mx-auto text-[#C5A059]/40 mb-3" />
                 <p className="text-base font-extrabold text-[#3E362E]">No Salons Available</p>
@@ -653,7 +698,7 @@ useEffect(() => {
             ) : (
               <>
                 <div className="grid gap-6 md:grid-cols-3">
-                  {salons.map((s) => (
+                  {displaySalons.map((s) => (
                     <div key={s._id} onClick={() => {
                       localStorage.setItem("selectedSalonId", s._id);
                       localStorage.setItem("selectedSalonName", s.salon_name);
@@ -669,6 +714,9 @@ useEffect(() => {
                       </div>
                       <div className="flex items-center justify-between text-[11px] text-[#8D7B68] mb-4">
                         <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-[#C5A059] text-[#C5A059]" />{s.rating || "4.9"}</span>
+                        {userCoords && s.latitude && s.longitude && (
+                          <span className="text-[#C5A059] font-black">{getSalonDistanceStr(s)}</span>
+                        )}
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.opening_time} - {s.closing_time}</span>
                       </div>
                       <div className="flex gap-2">

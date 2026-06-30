@@ -110,7 +110,7 @@ export default function Booking() {
         </div>
 
         {/* ── Main content ── */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 relative z-10 flex-grow w-full">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-24 relative z-10 flex-grow w-full">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
             {/* ── Left column: Payment card ── */}

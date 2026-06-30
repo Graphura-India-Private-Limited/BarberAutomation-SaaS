@@ -32,7 +32,7 @@ export function TicketsPage({
     : filteredTickets;
 
   return (
-    <div style={{ padding: "32px 32px 60px", display: "flex", flexDirection: "column", gap: 24 }}>
+    <div className="px-0 md:px-8 pt-6 pb-16 flex flex-col gap-6 w-full">
 
       {/* ── ✅ FIXED: CLEANED HERO TOP BAR (REMOVED INNER DUPED HEADERS) ── */}
       <div style={{
@@ -55,7 +55,7 @@ export function TicketsPage({
         background: C.card, borderRadius: 16,
         border: `1px solid ${C.border}`,
         boxShadow: "0 1px 4px rgba(0,0,0,.04)",
-        overflow: "hidden",
+        overflow: "visible",
       }}>
         <TicketFilters
           filterStatus={filterStatus}     setFilterStatus={setFilterStatus}

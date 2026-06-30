@@ -243,7 +243,7 @@ export default function BarberSelection() {
     const fetchBarbers = async () => {
       setLoading(true);
       if (!salonId) {
-        console.warn("No selected salon ID found in localStorage.");
+        // No selected salon ID found yet (user will select one via the UI)
         setHasSalon(false);
         setBarbersList([]);
         setLoading(false);
@@ -367,7 +367,7 @@ export default function BarberSelection() {
         </div>
 
         {/* ── HERO ── */}
-        <div style={{ position: "relative", height: 420, overflow: "hidden" }}>
+        <div className="relative h-[200px] sm:h-[260px] md:h-[320px] lg:h-[420px] overflow-hidden">
           <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.32)" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.78))" }} />
 
@@ -396,7 +396,7 @@ export default function BarberSelection() {
         </div>
 
         {/* ── MAIN ── */}
-        <div className={`max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 ${selectedBarber ? "pb-28 sm:pb-10" : ""}`}>
+        <div className={`max-w-[1280px] mx-auto px-4 md:px-8 py-6 md:py-10 ${selectedBarber ? "pb-10 sm:pb-10" : ""}`}>
 
           {/* ── SERVICE CONTEXT STRIP ── */}
           {selectedService && (

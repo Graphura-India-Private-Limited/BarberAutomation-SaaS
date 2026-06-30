@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, User, Phone, Scissors, Calendar, Clock, Info, ShieldCheck, CheckCircle2, Trash2 } from 'lucide-react';
+import { X, User, Phone, Scissors, Calendar, Clock, Info, ShieldCheck, CheckCircle2, Trash2, CreditCard } from 'lucide-react';
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
@@ -111,22 +111,116 @@ export function AddCustomerModal({ onClose, onAdd }) {
     ? currentBarberId
     : BARBERS[0].id;
 
-  const [mode,    setMode]    = React.useState('queue');
-  const [name,    setName]    = React.useState('');
-  const [phone,   setPhone]   = React.useState('');
-  const [service, setService] = React.useState(SERVICES[0].id);
-  const [barber,  setBarber]  = React.useState(initialBarberId);
-  const [slot,    setSlot]    = React.useState(SLOTS[0]);
+  const [mode,        setMode]        = React.useState('queue');
+  const [name,        setName]        = React.useState('');
+  const [phone,       setPhone]       = React.useState('');
+  const [barber,      setBarber]      = React.useState(initialBarberId);
+  const [slot,        setSlot]        = React.useState(SLOTS[0]);
+
+  const now = new Date(), pad = n => String(n).padStart(2,'0');
+  const today = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const [date,        setDate]        = React.useState(today);
+  const [paymentType, setPaymentType] = React.useState('TOKEN');
+
+  const [attendees,   setAttendees]   = React.useState([
+    { id: 1, name: '', service: SERVICES[0].id }
+  ]);
+
+  const handleAddAttendee = () => {
+    setAttendees([
+      ...attendees,
+      { id: Date.now(), name: '', service: SERVICES[0].id }
+    ]);
+  };
+
+  const handleRemoveAttendee = (id) => {
+    if (attendees.length === 1) return;
+    setAttendees(attendees.filter(a => a.id !== id));
+  };
+
+  const handleAttendeeChange = (id, field, value) => {
+    setAttendees(attendees.map(a => {
+      if (a.id === id) {
+        return { ...a, [field]: value };
+      }
+      return a;
+    }));
+  };
+
+  // Synchronize first attendee name with the main name input
+  React.useEffect(() => {
+    setAttendees(prev => prev.map((a, i) => i === 0 ? { ...a, name: name } : a));
+  }, [name]);
+
+  const getBreakdown = () => {
+    const totalAmount = attendees.reduce((sum, att) => {
+      const svcObj = SERVICES.find(s => s.id === att.service);
+      return sum + (svcObj ? svcObj.price * 80 : 0);
+    }, 0);
+    const tokenTotal = attendees.length * 50;
+    const payableNow = paymentType === 'FULL' ? totalAmount : tokenTotal;
+    const balance = paymentType === 'FULL' ? 0 : Math.max(0, totalAmount - tokenTotal);
+    return { totalAmount, tokenTotal, payableNow, balance };
+  };
+
+  const { totalAmount, payableNow, balance } = getBreakdown();
 
   const handleSubmit = () => {
     if (!name.trim()) return;
-    const base = { id: Date.now(), name: name.trim(), phone, service, barber };
+    const base = { id: Date.now(), name: name.trim(), phone, service: attendees[0].service, barber };
+
+    const finalAttendees = attendees.map((att, i) => {
+      const svcObj = SERVICES.find(s => s.id === att.service);
+      return {
+        id: att.id,
+        name: att.name.trim() || (i === 0 ? name.trim() : `Guest ${i + 1}`),
+        service: att.service,
+        serviceLabel: svcObj?.label || 'Service',
+        servicePrice: svcObj?.price || 0,
+        type: i === 0 ? "Primary" : "Family Member"
+      };
+    });
+
     if (mode === 'queue') {
-      onAdd({ type:'queue', entry: { ...base, joinedAt:Date.now(), source:'walk-in', status:'waiting' } });
+      onAdd({
+        type: 'queue',
+        entry: {
+          ...base,
+          joinedAt: Date.now(),
+          source: 'walk-in',
+          status: 'waiting',
+          attendees: finalAttendees,
+          services: finalAttendees.map(att => {
+            const svcObj = SERVICES.find(s => s.id === att.service);
+            return {
+              service_id: att.service,
+              service_name: svcObj?.label || att.service,
+              member_name: att.name
+            };
+          }),
+          paymentType
+        }
+      });
     } else {
-      const now = new Date(), pad = n => String(n).padStart(2,'0');
-      const date = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-      onAdd({ type:'booking', entry: { ...base, slot, date, status:'confirmed' } });
+      onAdd({
+        type: 'booking',
+        entry: {
+          ...base,
+          slot,
+          date,
+          status: 'confirmed',
+          attendees: finalAttendees,
+          services: finalAttendees.map(att => {
+            const svcObj = SERVICES.find(s => s.id === att.service);
+            return {
+              service_id: att.service,
+              service_name: svcObj?.label || att.service,
+              member_name: att.name
+            };
+          }),
+          paymentType
+        }
+      });
     }
     onClose();
   };
@@ -199,24 +293,15 @@ export function AddCustomerModal({ onClose, onAdd }) {
             </div>
           ))}
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Scissors size={11} color="#C5A059" /> Service</label>
-            <select className="input-field-custom h-[48px] cursor-pointer" value={service} onChange={e=>setService(e.target.value)}>
-              {SERVICES.map(s => <option key={s.id} value={s.id}>{s.label} — {s.mins}min · ₹{s.price*80}</option>)}
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Calendar size={11} color="#C5A059" /> Barber</label>
-            <select className="input-field-custom h-[48px] cursor-pointer" value={barber} onChange={e=>setBarber(e.target.value)}>
-              {(isBarber && currentBarberId && BARBERS.some(b => b.id === currentBarberId)
-                ? BARBERS.filter(b => b.id === currentBarberId)
-                : BARBERS).map(b => <option key={b.id} value={b.id}>{b.emoji} {b.name}</option>)}
-            </select>
-          </div>
+          {mode === 'booking' && (
+            <div className="space-y-1.5 animate-in fade-in duration-200">
+              <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Calendar size={11} color="#C5A059" /> Booking Date</label>
+              <input className="input-field-custom" type="date" value={date} onChange={e=>setDate(e.target.value)} />
+            </div>
+          )}
 
           {mode === 'booking' && (
-            <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="space-y-1.5 animate-in fade-in duration-200">
               <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><Clock size={11} color="#C5A059" /> Time Slot</label>
               <select className="input-field-custom h-[48px] cursor-pointer" value={slot} onChange={e=>setSlot(e.target.value)}>
                 {SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -224,12 +309,114 @@ export function AddCustomerModal({ onClose, onAdd }) {
             </div>
           )}
 
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><User size={11} color="#C5A059" /> Barber</label>
+            <select className="input-field-custom h-[48px] cursor-pointer" value={barber} onChange={e=>setBarber(e.target.value)}>
+              {(isBarber && currentBarberId && BARBERS.some(b => b.id === currentBarberId)
+                ? BARBERS.filter(b => b.id === currentBarberId)
+                : BARBERS).map(b => <option key={b.id} value={b.id}>{b.emoji} {b.name}</option>)}
+            </select>
+          </div>
+
+          {/* Attendees & Services Section */}
+          <div className="space-y-3 pt-2">
+            <div className="flex justify-between items-center border-b border-[#EADBCE]/50 pb-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] flex items-center gap-1"><Scissors size={11} color="#A37B58" /> Attendees & Services</p>
+              <button type="button" onClick={handleAddAttendee} className="text-[10px] font-black uppercase tracking-wider text-[#C5A059] bg-transparent border-none cursor-pointer flex items-center gap-1 hover:text-stone-900 transition-colors">
+                + Add Attendee
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {attendees.map((att, index) => {
+                const isPrimary = index === 0;
+                return (
+                  <div key={att.id} className="p-3.5 bg-white rounded-xl border border-[#EADBCE]/70 space-y-2 relative shadow-3xs animate-in fade-in duration-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-bold text-stone-500 uppercase tracking-wide">
+                        {isPrimary ? "👤 Primary Customer (Self)" : `👤 Guest #${index + 1}`}
+                      </span>
+                      {!isPrimary && (
+                        <button type="button" onClick={() => handleRemoveAttendee(att.id)} className="text-stone-400 hover:text-red-500 cursor-pointer bg-transparent border-none">
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {!isPrimary && (
+                        <input
+                          className="input-field-custom text-xs"
+                          style={{ padding: "8px 12px" }}
+                          type="text"
+                          placeholder="Guest name"
+                          value={att.name}
+                          onChange={e => handleAttendeeChange(att.id, 'name', e.target.value)}
+                        />
+                      )}
+                      <select
+                        className={`input-field-custom text-xs cursor-pointer ${isPrimary ? 'col-span-2' : ''}`}
+                        style={{ padding: "8px 12px", height: "38px" }}
+                        value={att.service}
+                        onChange={e => handleAttendeeChange(att.id, 'service', e.target.value)}
+                      >
+                        {SERVICES.map(s => (
+                          <option key={s.id} value={s.id}>
+                            {s.label} ({s.mins}m) · ₹{s.price * 80}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Payment Terms & Pricing Breakdown */}
+          <div className="space-y-2.5 pt-2">
+            <label className="text-[10px] font-black uppercase tracking-wider text-stone-400 ml-0.5 flex items-center gap-1"><CreditCard size={11} color="#C5A059" /> Payment Term</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[['TOKEN', 'Token (₹50/p)'], ['FULL', 'Full Amount']].map(([pt, label]) => (
+                <button
+                  key={pt}
+                  type="button"
+                  onClick={() => setPaymentType(pt)}
+                  className={`py-2.5 rounded-xl text-xs font-black uppercase border-none cursor-pointer transition-all ${
+                    paymentType === pt
+                      ? 'bg-[#3E362E] text-white shadow-sm'
+                      : 'bg-white text-stone-600 border border-[#EADBCE] hover:border-[#C5A059]'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="p-3.5 bg-white border border-[#EADBCE] rounded-xl text-xs space-y-1.5 shadow-3xs">
+              <div className="flex justify-between font-bold text-stone-600">
+                <span>Total Amount:</span>
+                <span>₹{totalAmount}</span>
+              </div>
+              <div className="flex justify-between font-bold text-stone-900 border-t border-[#EADBCE]/50 pt-1.5">
+                <span className="text-[#C5A059]">Payable Now:</span>
+                <span className="text-[#C5A059]">₹{payableNow}</span>
+              </div>
+              {balance > 0 && (
+                <div className="flex justify-between text-stone-500 font-semibold italic text-[11px] pt-0.5">
+                  <span>Balance at Salon:</span>
+                  <span>₹{balance}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Action Footer Trigger */}
           <div className="pt-2">
-            <button 
+            <button
               disabled={!name.trim()}
               onClick={handleSubmit}
-              className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest text-white shadow-md transition-all ${
+              className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest text-white border-none shadow-md transition-all ${
                 name.trim() ? 'opacity-100 cursor-pointer active:scale-98 hover:opacity-95' : 'opacity-45 cursor-not-allowed'
               }`}
               style={{ backgroundColor: CHARCOAL }}
