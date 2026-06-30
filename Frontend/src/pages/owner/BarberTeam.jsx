@@ -5,7 +5,19 @@ import {
   Trash2, Coffee, Sparkles, Check, Star, RefreshCw, Plus,
   Minimize2, Maximize2, Eye, FileText, X, Edit, Upload
 } from "lucide-react";
+import CustomSelect from "../../components/common/CustomSelect";
 
+
+const SPECIALIZATION_OPTIONS = [
+  "Haircut & Styling",
+  "Beard Sculpting & Shave",
+  "Hair Spa & Treatment",
+  "Hair Coloring & Highlights",
+  "Facial & Grooming Massage",
+  "Ayurvedic Head Massage",
+  "All-Rounder Master Stylist",
+  "Other"
+];
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
@@ -26,6 +38,7 @@ export default function BarberTeam() {
   const [editError, setEditError] = useState("");
   const editPhotoRef = useRef();
   const editDocRef = useRef();
+  const [isOtherSpec, setIsOtherSpec] = useState(false);
 
   const closeDetails = () => {
     setSelectedBarber(null);
@@ -134,6 +147,8 @@ export default function BarberTeam() {
 
   const handleEditClick = (barber) => {
     setEditError("");
+    const isKnown = SPECIALIZATION_OPTIONS.filter(o => o !== "Other").includes(barber.specialization);
+    setIsOtherSpec(barber.specialization ? !isKnown : false);
     setEditingBarber({
       _id: barber._id,
       name: barber.name,
@@ -851,14 +866,31 @@ export default function BarberTeam() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Specialization</label>
-                  <input 
-                    required 
-                    placeholder="Haircut & Fade" 
-                    value={editingBarber.specialization} 
-                    onChange={e => setEditingBarber(prev => ({ ...prev, specialization: e.target.value }))} 
-                    className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Specialization *</label>
+                  <CustomSelect
+                    options={SPECIALIZATION_OPTIONS}
+                    value={isOtherSpec ? "Other" : (editingBarber.specialization || "")}
+                    placeholder="Select Specialization"
+                    onChange={val => {
+                      if (val === "Other") {
+                        setIsOtherSpec(true);
+                        setEditingBarber(prev => ({ ...prev, specialization: "" }));
+                      } else {
+                        setIsOtherSpec(false);
+                        setEditingBarber(prev => ({ ...prev, specialization: val }));
+                      }
+                    }}
                   />
+                  
+                  {isOtherSpec && (
+                    <input 
+                      required 
+                      placeholder="Type custom specialization..." 
+                      value={editingBarber.specialization} 
+                      onChange={e => setEditingBarber(prev => ({ ...prev, specialization: e.target.value }))} 
+                      className="w-full mt-2 rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
+                    />
+                  )}
                 </div>
 
                 <div>

@@ -1,13 +1,26 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload } from "lucide-react";
+import CustomSelect from "../../components/common/CustomSelect";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
+const SPECIALIZATION_OPTIONS = [
+  "Haircut & Styling",
+  "Beard Sculpting & Shave",
+  "Hair Spa & Treatment",
+  "Hair Coloring & Highlights",
+  "Facial & Grooming Massage",
+  "Ayurvedic Head Massage",
+  "All-Rounder Master Stylist",
+  "Other"
+];
+
 export default function AddBarber() {
   const navigate = useNavigate();
+  const [isOtherSpec, setIsOtherSpec] = useState(false);
   
   const [newBarber, setNewBarber] = useState({
     name: "",
@@ -279,14 +292,31 @@ export default function AddBarber() {
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Specialization</label>
-                <input 
-                  required 
-                  placeholder="Haircut & Fade" 
-                  value={newBarber.specialization} 
-                  onChange={e => setNewBarber(prev => ({ ...prev, specialization: e.target.value }))} 
-                  className="w-full rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Specialization *</label>
+                <CustomSelect
+                  options={SPECIALIZATION_OPTIONS}
+                  value={isOtherSpec ? "Other" : (newBarber.specialization || "")}
+                  placeholder="Select Specialization"
+                  onChange={val => {
+                    if (val === "Other") {
+                      setIsOtherSpec(true);
+                      setNewBarber(prev => ({ ...prev, specialization: "" }));
+                    } else {
+                      setIsOtherSpec(false);
+                      setNewBarber(prev => ({ ...prev, specialization: val }));
+                    }
+                  }}
                 />
+                
+                {isOtherSpec && (
+                  <input 
+                    required 
+                    placeholder="Type custom specialization..." 
+                    value={newBarber.specialization} 
+                    onChange={e => setNewBarber(prev => ({ ...prev, specialization: e.target.value }))} 
+                    className="w-full mt-2 rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
+                  />
+                )}
               </div>
 
               <div>
