@@ -152,11 +152,13 @@ export default function RefundPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+                // className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start min-w-0"
               >
                 
                 {/* Left Panel: Booking Details and Payments */}
-                <div className="lg:col-span-7 space-y-6">
+                {/* <div className="lg:col-span-7 space-y-6"> */}
+                <div className="lg:col-span-7 space-y-6 min-w-0">
                   
                   {/* Title & Header */}
                   <div className="text-left">
@@ -179,16 +181,16 @@ export default function RefundPage() {
                   )}
 
                   {/* Booking Details Card */}
-                  <div className="bg-white rounded-3xl border border-[#EADBCE] p-6 shadow-2xs text-left relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#FAF6F0] rounded-bl-full flex items-center justify-center pointer-events-none">
-                      <Calendar className="w-5 h-5 text-[#C5A059]/30" />
+                    <div className="bg-white rounded-3xl border border-[#EADBCE] p-6 shadow-2xs text-left relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-[#FAF6F0] rounded-bl-full flex items-start justify-end pt-2 pr-2 pointer-events-none z-0">
+                      <Calendar className="w-4 h-4 text-[#C5A059]/30" />
                     </div>
 
-                    <h3 className="font-serif text-lg font-bold mb-4">Appointment Overview</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between border-b border-[#FAF6F0] pb-2 text-xs">
-                        <span className="text-stone-400 font-medium">Salon Hub</span>
-                        <span className="font-bold text-[#3E362E]">{booking?.salon_id?.salon_name || "Style Studio"}</span>
+                    <h3 className="font-serif text-lg font-bold mb-4 relative z-10">Appointment Overview</h3>
+                    <div className="space-y-3 relative z-10">
+                      <div className="flex justify-between items-start gap-3 border-b border-[#FAF6F0] pb-2 text-xs">
+                        <span className="text-stone-400 font-medium shrink-0">Salon Hub</span>
+                        <span className="font-bold text-[#3E362E] text-right break-words">{booking?.salon_id?.salon_name || "Style Studio"}</span>
                       </div>
                       <div className="flex justify-between border-b border-[#FAF6F0] pb-2 text-xs">
                         <span className="text-stone-400 font-medium">Services</span>
@@ -227,7 +229,8 @@ export default function RefundPage() {
                 </div>
 
                 {/* Right Panel: Cancellation Confirmation & Warning */}
-                <div className="lg:col-span-5 space-y-6">
+                {/* <div className="lg:col-span-5 space-y-6"> */}
+                <div className="lg:col-span-5 space-y-6 min-w-0">
                   
                   {/* Warning / Cancellation Info Card */}
                   <div className="bg-[#3D3126] text-white rounded-[2.2rem] p-8 shadow-md border border-[#C5A059]/20 text-left relative overflow-hidden">

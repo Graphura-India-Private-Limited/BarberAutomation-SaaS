@@ -193,7 +193,10 @@ export default function MenServices() {
     <>
       <Navbar />
       <SalonSelectorBar />
-      <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond','Georgia',serif", color: "#2C241E" }}>
+     <div
+        className="[scrollbar-width:thin] [scrollbar-color:#C9BFA8_transparent] [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#C9BFA8] [&::-webkit-scrollbar-thumb]:rounded-[10px] hover:[&::-webkit-scrollbar-thumb]:bg-[#B0A488]"
+        style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond','Georgia',serif", color: "#2C241E" }}
+      >
 
         {/* FLOATING BACK BUTTON — fixed, same as WomenServices */}
         <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[90px] md:left-5 z-[9999]">
@@ -324,7 +327,7 @@ export default function MenServices() {
 
           {/* SIDEBAR */}
           <aside className={`
-            shrink-0 md:w-[248px] md:sticky md:top-[90px] md:mb-0 md:block
+            shrink-0 md:w-[248px] md:sticky md:top-[90px] md:mb-0 md:block md:max-h-[calc(100vh-110px)] md:overflow-y-auto thin-scrollbar
             ${showFilters 
               ? "fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-white h-screen overflow-y-auto p-4 shadow-2xl animate-in slide-in-from-left duration-200" 
               : "hidden md:block"
