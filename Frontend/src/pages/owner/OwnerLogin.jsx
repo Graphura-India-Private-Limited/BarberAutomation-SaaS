@@ -72,7 +72,8 @@ export default function OwnerLogin() {
       <div className="w-full min-h-screen bg-[#f7f5f2] flex flex-col md:flex-row">
  
         {/* ── LEFT: Salon Hero ── */}
-        <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden">
+        {/* <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-screen md:sticky md:top-0 relative flex flex-col justify-between overflow-hidden"> */}
+        <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-auto md:min-h-full lg:h-screen lg:sticky lg:top-0 relative flex flex-col justify-between overflow-hidden">
           <img src={salonImage} alt="Salon" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/55" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
