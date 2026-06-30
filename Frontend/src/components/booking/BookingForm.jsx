@@ -106,45 +106,16 @@ export default function BookingForm({ bookingData, onBack, onConfirm }) {
           )}
         </div>
 
-        {/* Attendees */}
-        <div className="space-y-3 mt-6">
-          <div className="flex justify-between items-end mb-2">
-            <label className="block text-sm font-semibold text-gray-700">Attendees</label>
-            <button 
-              type="button" 
-              onClick={handleAddFamilyMember}
-              className="text-sm text-[#C5A059] hover:text-stone-800 font-bold flex items-center gap-1 transition-colors"
-            >
-              <span>+ Add Family Member</span>
-            </button>
-          </div>
-
-          {attendees.map((member, index) => (
-            <div key={member.id} className="flex gap-3 items-center">
-              <div className="flex-grow">
-                <input 
-                  type="text" required
-                  value={member.name}
-                  onChange={(e) => handleNameChange(member.id, e.target.value)}
-                  className={editableInputClass}
-                  placeholder={`Name of ${member.type}`}
-                />
-              </div>
-              
-              {index > 0 && (
-                <button 
-                  type="button"
-                  onClick={() => handleRemoveFamilyMember(member.id)}
-                  className="p-3 text-red-500 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-100"
-                  title="Remove"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          ))}
+        {/* Attendees (Single Primary Guest only) */}
+        <div className="space-y-2 mt-6">
+          <label className="block text-sm font-semibold text-gray-700">Primary Guest Name</label>
+          <input 
+            type="text" required
+            value={attendees[0].name}
+            onChange={(e) => handleNameChange(attendees[0].id, e.target.value)}
+            className={editableInputClass}
+            placeholder="Name of Primary"
+          />
         </div>
 
         <button 

@@ -476,8 +476,8 @@ export default function BarberServices() {
                 placeholder="Category"
               />
 
-              <label className="block text-[11px] uppercase tracking-widest font-black text-stone-500 mb-1">
-                Upload image
+              <label className="block text-[10px] uppercase tracking-widest font-black text-stone-500 mb-1">
+              Upload image 
               </label>
               <input
                 type="file"

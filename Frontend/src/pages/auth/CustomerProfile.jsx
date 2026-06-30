@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
   Scissors, User, Mail, Phone, Plus, Trash2, X, 
-  Calendar, Clock, Award, Image, ChevronRight, ArrowLeft, Save,
+  Calendar, Clock, Award, Image, ChevronRight, ChevronLeft, ArrowLeft, Save,
   Bell, CheckCircle, ShieldAlert, Sparkles, LogOut, CheckSquare, 
   Square, Edit3, Settings, Gift, List, Heart, CalendarPlus, Star,
   RefreshCw, Play, Search, ShoppingBag, Compass, HelpCircle, LifeBuoy,
@@ -836,7 +836,7 @@ export default function CustomerProfile() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                       
                       {/* Main Live Queue Status Cards */}
-                      <div className="lg:col-span-2 space-y-6">
+                      <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
                         
                         {/* Live Header Status */}
                         <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-2xs">
@@ -948,7 +948,7 @@ export default function CustomerProfile() {
                       </div>
 
                       {/* Right Countdown Panel */}
-                      <div className="space-y-6">
+                      <div className="space-y-6 order-1 lg:order-2">
                         
                         {/* Countdown Wait Card */}
                         <div className="bg-[#3D3126] text-white rounded-[2.2rem] p-8 shadow-md border border-[#B58B67]/20 text-center relative overflow-hidden">
@@ -1649,6 +1649,24 @@ export default function CustomerProfile() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Collapsible Right Arrow Tab for Live Queue Status ── */}
+      {activeQueue && activeTab !== "queue" && (
+        <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 animate-in fade-in duration-300">
+          <button
+            onClick={() => setActiveTab("queue")}
+            className="bg-[#3D3126] hover:bg-[#2C2117] text-[#B58B67] border border-[#B58B67]/40 border-r-0 hover:border-[#B58B67] p-3 rounded-l-2xl shadow-lg cursor-pointer transition-all flex flex-col items-center gap-1.5 hover:pr-4"
+            title="View Live Queue Tracker"
+          >
+            <ChevronLeft className="w-5 h-5 animate-pulse text-[#B58B67]" />
+            <span className="text-[9px] font-black tracking-widest writing-mode-vertical uppercase [writing-mode:vertical-lr] rotate-180 font-sans">
+              {activeQueue.status === "in-progress"
+                ? "Styling Chair ⚡"
+                : `Pos #${activeQueue.position} (${activeQueue.estimated_wait}m) ⏳`}
+            </span>
+          </button>
+        </div>
+      )}
     </>
   );
 }
