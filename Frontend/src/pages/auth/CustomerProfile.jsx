@@ -836,7 +836,7 @@ export default function CustomerProfile() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                       
                       {/* Main Live Queue Status Cards */}
-                      <div className="lg:col-span-2 space-y-6">
+                      <div className="lg:col-span-2 space-y-6 order-2 lg:order-1">
                         
                         {/* Live Header Status */}
                         <div className="bg-white border border-[#EADBCE] rounded-3xl p-6 shadow-2xs">
@@ -948,7 +948,7 @@ export default function CustomerProfile() {
                       </div>
 
                       {/* Right Countdown Panel */}
-                      <div className="space-y-6">
+                      <div className="space-y-6 order-1 lg:order-2">
                         
                         {/* Countdown Wait Card */}
                         <div className="bg-[#3D3126] text-white rounded-[2.2rem] p-8 shadow-md border border-[#B58B67]/20 text-center relative overflow-hidden">
