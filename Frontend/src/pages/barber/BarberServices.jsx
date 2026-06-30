@@ -143,7 +143,8 @@ export default function BarberServices() {
     name: "",
     price: "",
     duration: "",
-    category: ""
+    category: "",
+    image: ""
   });
 
   const barberId = localStorage.getItem("barberId");
@@ -166,7 +167,8 @@ export default function BarberServices() {
           price: s.price,
           duration: `${s.duration} min`,
           active: s.is_active,
-          popular: true
+          popular: true,
+          image: s.image || ""
         })));
       }
     } catch (err) {
@@ -206,6 +208,17 @@ export default function BarberServices() {
     }
   };
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setEditForm(prev => ({ ...prev, image: reader.result || "" }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const saveServiceChanges = async () => {
     if (!selectedService) return;
 
@@ -218,7 +231,8 @@ export default function BarberServices() {
               name: editForm.name,
               price: Number(editForm.price),
               duration: editForm.duration,
-              category: editForm.category
+              category: editForm.category,
+              image: editForm.image
             }
             : service
         )
@@ -232,7 +246,8 @@ export default function BarberServices() {
         name: editForm.name,
         price: Number(editForm.price),
         duration: parseInt(editForm.duration) || 30,
-        category: editForm.category.toLowerCase()
+        category: editForm.category.toLowerCase(),
+        image: editForm.image
       };
 
       const res = await fetch(`${API}/services/${selectedService.id}`, {
@@ -372,7 +387,6 @@ export default function BarberServices() {
 
                     <button
                       type="button"
-                      // onClick={() => setSelectedService(svc)}
                       onClick={() => {
                         setSelectedService(svc);
 
@@ -380,7 +394,8 @@ export default function BarberServices() {
                           name: svc.name,
                           price: svc.price,
                           duration: svc.duration,
-                          category: svc.category
+                          category: svc.category,
+                          image: svc.image || ""
                         });
                       }}
                       className="text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors cursor-pointer flex items-center gap-1"
@@ -460,6 +475,38 @@ export default function BarberServices() {
                 className="w-full border p-2 rounded"
                 placeholder="Category"
               />
+
+              <label className="block text-[11px] uppercase tracking-widest font-black text-stone-500 mb-1">
+                Upload image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full border border-stone-200 rounded-md p-2 text-sm file:mr-2 file:py-2 file:px-3 file:rounded file:border-0 file:bg-[#F2E8D6] file:text-stone-800"
+              />
+
+              <input
+                value={editForm.image}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, image: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+                placeholder="Service Image URL "
+              />
+
+              {editForm.image && (
+                <div className="mt-3">
+                  <p className="text-[10px] uppercase tracking-widest font-black text-stone-500 mb-2">Preview</p>
+                  <div className="w-full h-40 rounded-2xl overflow-hidden border border-stone-200 bg-stone-50">
+                    <img
+                      src={editForm.image}
+                      alt="Service preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
 
             </div>
 
