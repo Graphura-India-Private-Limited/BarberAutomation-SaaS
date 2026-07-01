@@ -361,8 +361,8 @@ export default function SalonDetailPage() {
       </section>
 
       {/* 🧱 DATA PROFILE DETAILS LAYOUT COLUMNS GRID */}
-      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-8 sm:px-8 2xl:grid-cols-12 2xl:px-10 flex-1">
-        <div className="space-y-8 2xl:col-span-8 w-full">
+      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-8 sm:px-8 grid-cols-1 2xl:grid-cols-12 2xl:px-10 flex-1">
+        <div className="space-y-8 col-span-1 2xl:col-span-8 w-full">
           {/* 📸 Gallery Section */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left text-[#3E362E]">
             <div className="mb-5 flex items-center justify-between border-b border-stone-100 pb-4">
@@ -443,7 +443,7 @@ export default function SalonDetailPage() {
                 </div>
               ) : (
                 <>
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
                     {paginatedServices.map((service) => (
                       <div
                         key={service._id}
@@ -585,7 +585,7 @@ export default function SalonDetailPage() {
             {barbers.length === 0 ? (
               <p className="text-xs font-semibold text-stone-400">Stylists are currently busy or offline. Walk-ins are welcome!</p>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                 {barbers.map((barber) => (
                   <div key={barber._id} className="flex items-center gap-3 p-4 rounded-xl border border-[#E8DCCB]/60 bg-[#FAF6F0]/65 hover:border-[#C5A059]/40 hover:shadow-xs transition-all duration-300">
                     <div className="w-12 h-12 rounded-full bg-white border border-[#E8DCCB] flex items-center justify-center text-[#C5A059] flex-shrink-0 shadow-2xs">
@@ -625,7 +625,7 @@ export default function SalonDetailPage() {
         </div>
 
         {/* 📑 FIXED FLOATING RIGHT SIDEBAR ANCHOR */}
-        <aside className="space-y-6 2xl:sticky 2xl:top-24 2xl:self-start 2xl:col-span-4 w-full">
+        <aside className="space-y-6 col-span-1 2xl:sticky 2xl:top-24 2xl:self-start 2xl:col-span-4 w-full">
           {/* Booking Card */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-6 shadow-sm text-left transition-all hover:border-[#C5A059]/40">
             <div className="mb-4 flex items-center justify-between border-b border-stone-100 pb-3">

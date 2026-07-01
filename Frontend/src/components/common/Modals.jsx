@@ -60,11 +60,92 @@ export function fmtWait(position, service) {
   return `~${Math.floor(mins/60)}h ${mins%60}m`;
 }
 
+const serviceImageMap = {
+  // Bridal & Wedding Styling (Women)
+  "bridal style & updo": "https://images.unsplash.com/photo-1591551010154-18652a9f3ad7?w=600&q=80",
+  "bridal style": "https://images.unsplash.com/photo-1591551010154-18652a9f3ad7?w=600&q=80",
+  "bridal updo": "https://images.unsplash.com/photo-1591551010154-18652a9f3ad7?w=600&q=80",
+
+  // Women's services matching
+  "precision cut & blow dry": "/images (1).jpg",
+  "couture hair styling (curling/straightening)": "/images (2).jpg",
+  "couture hair styling": "/images (2).jpg",
+  "layered cut & blowout": "/images (3).jpg",
+  "creative hair makeover": "/images (4).jpg",
+  "express hair wash & blow dry": "/images (5).jpg",
+  "kids girls styling & cut": "/images (6).jpg",
+  "bollywood signature blowout": "/images (7).jpg",
+  "anti-frizz hair styling": "/images (8).jpg",
+  "premium hot iron styling": "/images (9).jpg",
+  "global hair coloring": "/images (10).jpg",
+  "signature balayage": "/images (11).jpg",
+  "ammonia-free root touchup": "/images (12).jpg",
+  "ombre hair transformation": "/images (13).jpg",
+  "fashion color streaks (3 foils)": "/images (14).jpg",
+  "blonde highlights accent": "/images (15).jpg",
+  "indian henna pack application": "/images (16).jpg",
+  "shine toner & color glaze": "/images (17).jpg",
+  "full global highlights": "/images (18).jpg",
+  "crown area highlights touch-up": "/images (19).jpg",
+  "organic oil head massage": "/images (20).jpg",
+  "hydrating hair spa": "/images (21).jpg",
+  "therapeutic scalp cleansing": "/images (22).jpg",
+  "relaxing neck & back therapy": "/images (23).jpg",
+  "anti-dandruff scalp treatment": "/images (24).jpg",
+  "intense nourishing cream spa": "/images (25).jpg",
+  "ayurvedic hair vitality ritual": "/images (26).jpg",
+  "detoxifying charcoal spa": "/images (27).jpg",
+  "deep moisture oil therapy": "/images (28).jpg",
+  "aromatic scalp soothing treatment": "/sandra-gabriel-4PQ0aGtzGGI-unsplash.jpg",
+  "cysteine smoothing treatment": "/images (29).jpg",
+  "advanced keratin therapy": "/images (30).jpg",
+  "olaplex damage repair": "/images (31).jpg",
+  "pro-keratin shine therapy": "/images (32).jpg",
+  "anti-hairfall laser therapy": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80",
+  "biotin nourishing infusion": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80",
+  "volume-boost root treatment": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80",
+  "organic frizz-free smoothing": "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80",
+  "silk protein glazing": "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80",
+  "scalp hydradermie treatment": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80",
+
+  // Addon services matching
+  "volumizing root boost": "/images (1).jpg",
+  "scalp cooling serum ampoule": "/images (2).jpg",
+  "split-end prevention treatment": "/images (3).jpg",
+  "premium shine glaze / toner": "/images (10).jpg",
+  "silver / grey glossing": "/images (11).jpg",
+  "gold highlights accents (2 foils)": "/images (12).jpg",
+  "color protect lock sealant": "/images (13).jpg",
+  "hair gloss & luster spa": "/images (21).jpg",
+  "copper / caramel glaze refresher": "/images (14).jpg",
+  "fashion streaks booster": "/images (15).jpg",
+  "root shadow blending": "/images (16).jpg",
+  "ammonia-free color gloss": "/images (17).jpg",
+  "balayage glow booster": "/images (18).jpg",
+  "keratin boost mask": "/images (29).jpg",
+  "charcoal facial scrub": "/images (27).jpg",
+  "rose water face mist": "/images (22).jpg",
+  "organic beard wash": "/ashish-sam-N6gZ_28vL3c-unsplash.jpg",
+  "de-tan pack addon": "/images (25).jpg",
+  "collagen eye mask": "/sandra-gabriel-4PQ0aGtzGGI-unsplash.jpg",
+  "cooling mint face pack": "/images (24).jpg"
+};
+
 export function getPremiumServiceImage(serviceName = "", category = "") {
-  const n = (serviceName || "").toLowerCase();
+  const n = (serviceName || "").toLowerCase().trim().replace(/\s+/g, " ");
   const c = (category || "").toLowerCase();
 
-  // Specific matches for public folder images:
+  // 1. Direct dictionary map lookup first for total accuracy:
+  if (serviceImageMap[n]) {
+    return serviceImageMap[n];
+  }
+
+  // 2. Fallbacks for bridal/wedding
+  if (n.includes("bridal") || n.includes("wedding")) {
+    return "https://images.unsplash.com/photo-1591551010154-18652a9f3ad7?w=600&q=80";
+  }
+
+  // 3. Fallbacks for men's beard/mustache public folder images:
   if (n.includes("mustache") || n.includes("trim")) {
     return "/ashish-sam-N6gZ_28vL3c-unsplash.jpg";
   }
@@ -81,19 +162,18 @@ export function getPremiumServiceImage(serviceName = "", category = "") {
     return "/WhatsApp Image 2026-05-25 at 2.11.24 PM.jpeg";
   }
 
-  // 1. Women's Services
+  // 4. Women's Services general keywords fallback
   if (c === "women" || c === "treatment" || n.includes("bridal") || n.includes("girl") || n.includes("balayage") || n.includes("blowout") || n.includes("cysteine") || n.includes("olaplex") || n.includes("feather") || n.includes("bob") || n.includes("women")) {
     if (n.includes("color") || n.includes("colour") || n.includes("highlight") || n.includes("balayage") || n.includes("ombre") || n.includes("dye")) {
-      return "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=600&q=80"; // Women's color
+      return "https://images.unsplash.com/photo-1605980776566-0486c3ac7617?w=600&q=80"; // Women's color (active ID)
     }
     if (n.includes("spa") || n.includes("massage") || n.includes("scalp") || n.includes("facial") || n.includes("treatment") || n.includes("keratin") || n.includes("smooth")) {
       return "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80"; // Women's spa/treatment
     }
-    // Default women's haircut/styling
-    return "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80";
+    return "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80"; // Default women styling
   }
 
-  // 2. Men's Services
+  // 5. Men's Services general keywords fallback
   if (c === "men" || c === "beard" || n.includes("gentleman") || n.includes("men") || n.includes("boy") || n.includes("fade") || n.includes("shave") || n.includes("mustache")) {
     if (n.includes("beard") || n.includes("shave") || n.includes("mustache") || n.includes("razor")) {
       return "/ashish-sam-N6gZ_28vL3c-unsplash.jpg";
@@ -101,16 +181,15 @@ export function getPremiumServiceImage(serviceName = "", category = "") {
     if (n.includes("spa") || n.includes("massage") || n.includes("facial") || n.includes("scrub") || n.includes("detox") || n.includes("mask") || n.includes("champi")) {
       return "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&q=80"; // Men's facial/spa
     }
-    // Default men's haircut
-    return "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80";
+    return "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80"; // Default men's haircut
   }
 
-  // 3. Addons/General/Fallbacks
+  // 6. Addons/General/Fallbacks
   if (n.includes("massage") || n.includes("spa") || n.includes("facial") || n.includes("wellness")) {
     return "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80";
   }
   if (n.includes("color") || n.includes("colour") || n.includes("highlight")) {
-    return "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80";
+    return "https://images.unsplash.com/photo-1605980776566-0486c3ac7617?w=600&q=80";
   }
   return "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80";
 }

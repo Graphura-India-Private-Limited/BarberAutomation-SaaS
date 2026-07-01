@@ -211,6 +211,10 @@ export default function MenServices() {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     setVisibleCards(new Set());
     const observers = [];
     const t = setTimeout(() => {

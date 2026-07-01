@@ -211,6 +211,10 @@ export default function WomenServices() {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     setVisibleCards(new Set());
     const timers = [];
     const observers = [];
