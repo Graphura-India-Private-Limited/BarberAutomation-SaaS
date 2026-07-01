@@ -7,20 +7,44 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
 
-const SPECIALIZATION_OPTIONS = [
+const PREDEFINED_SPECIALIZATIONS = [
   "Haircut & Styling",
   "Beard Sculpting & Shave",
   "Hair Spa & Treatment",
   "Hair Coloring & Highlights",
   "Facial & Grooming Massage",
   "Ayurvedic Head Massage",
-  "All-Rounder Master Stylist",
-  "Other"
+  "All-Rounder Master Stylist"
 ];
 
 export default function AddBarber() {
   const navigate = useNavigate();
-  const [isOtherSpec, setIsOtherSpec] = useState(false);
+  const [selectedSpecs, setSelectedSpecs] = useState([]);
+  const [customSpecInput, setCustomSpecInput] = useState("");
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
+  const handleToggleSpec = (spec) => {
+    let next;
+    if (selectedSpecs.includes(spec)) {
+      next = selectedSpecs.filter(s => s !== spec);
+    } else {
+      next = [...selectedSpecs, spec];
+    }
+    setSelectedSpecs(next);
+    setNewBarber(prev => ({ ...prev, specialization: next.join(", ") }));
+  };
+
+  const handleAddCustomSpec = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = customSpecInput.trim();
+    if (trimmed && !selectedSpecs.includes(trimmed)) {
+      const next = [...selectedSpecs, trimmed];
+      setSelectedSpecs(next);
+      setNewBarber(prev => ({ ...prev, specialization: next.join(", ") }));
+      setCustomSpecInput("");
+      setShowCustomInput(false);
+    }
+  };
   
   const [newBarber, setNewBarber] = useState({
     name: "",
@@ -291,31 +315,80 @@ export default function AddBarber() {
                 />
               </div>
 
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Specialization *</label>
-                <CustomSelect
-                  options={SPECIALIZATION_OPTIONS}
-                  value={isOtherSpec ? "Other" : (newBarber.specialization || "")}
-                  placeholder="Select Specialization"
-                  onChange={val => {
-                    if (val === "Other") {
-                      setIsOtherSpec(true);
-                      setNewBarber(prev => ({ ...prev, specialization: "" }));
-                    } else {
-                      setIsOtherSpec(false);
-                      setNewBarber(prev => ({ ...prev, specialization: val }));
-                    }
-                  }}
-                />
-                
-                {isOtherSpec && (
-                  <input 
-                    required 
-                    placeholder="Type custom specialization..." 
-                    value={newBarber.specialization} 
-                    onChange={e => setNewBarber(prev => ({ ...prev, specialization: e.target.value }))} 
-                    className="w-full mt-2 rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
-                  />
+              <div className="sm:col-span-2">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-2">Specializations *</label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {PREDEFINED_SPECIALIZATIONS.map(spec => {
+                    const isSelected = selectedSpecs.includes(spec);
+                    return (
+                      <button
+                        key={spec}
+                        type="button"
+                        onClick={() => handleToggleSpec(spec)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                          isSelected 
+                            ? "bg-[#3E362E] text-white border-[#3E362E]" 
+                            : "bg-white text-stone-600 border-[#EADBCE] hover:border-[#C5A059]"
+                        }`}
+                      >
+                        {spec} {isSelected ? "✓" : "+"}
+                      </button>
+                    );
+                  })}
+
+                  {selectedSpecs.filter(s => !PREDEFINED_SPECIALIZATIONS.includes(s)).map(spec => (
+                    <button
+                      key={spec}
+                      type="button"
+                      onClick={() => handleToggleSpec(spec)}
+                      className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#8B5A2B] text-white border border-[#8B5A2B] transition-all cursor-pointer"
+                      title="Click to remove"
+                    >
+                      {spec} ×
+                    </button>
+                  ))}
+
+                  {!showCustomInput && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomInput(true)}
+                      className="px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-[#C5A059] bg-[#FEF9EE] border border-[#EADBCE] hover:bg-[#FEF9EE]/85 transition-all cursor-pointer"
+                    >
+                      + Add Custom
+                    </button>
+                  )}
+                </div>
+
+                {showCustomInput && (
+                  <div className="flex gap-2 items-center animate-in fade-in slide-in-from-top-1 duration-200 max-w-md">
+                    <input
+                      type="text"
+                      placeholder="Type custom specialization..."
+                      value={customSpecInput}
+                      onChange={e => setCustomSpecInput(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddCustomSpec(e);
+                        }
+                      }}
+                      className="flex-1 rounded-xl border border-[#EADBCE] bg-white p-2.5 text-xs font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCustomSpec}
+                      className="px-4 py-2.5 bg-[#3E362E] text-[#C5A059] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border border-[#3E362E] hover:bg-[#2A241F]"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowCustomInput(false); setCustomSpecInput(""); }}
+                      className="px-3 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-500 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 )}
               </div>
 

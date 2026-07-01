@@ -1116,7 +1116,7 @@ export default function AdminOnboarding() {
 
       {/* ════ MAIN ════ */}
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden lg:pl-64" style={{ width: "100%" }}>
-        <div className="px-4 md:px-8 w-full min-w-0">
+        <div className="px-4 md:px-8 w-full min-w-0 mx-auto max-w-[1440px]">
 
           {/* ── HEADER ── */}
           <header 
@@ -1791,7 +1791,7 @@ export default function AdminOnboarding() {
                 ) : SALONS_FILTERED.length===0 ? (
                   <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No {salonTab} salons</div>
                 ) : (
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))", gap:14 }}>
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:14 }}>
                     {SALONS_FILTERED.map((s,i)=>(
                       <div key={s._id} style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
                         <div style={{ height:140, overflow:"hidden", position:"relative" }}>
@@ -2099,7 +2099,7 @@ export default function AdminOnboarding() {
                     <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 20 }}>
                     {approvedSalons
                       .filter(s => !search || s.salon_name?.toLowerCase().includes(search.toLowerCase()) || s.address?.toLowerCase().includes(search.toLowerCase()))
                       .map((salon, idx) => {
@@ -2532,7 +2532,7 @@ export default function AdminOnboarding() {
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 20 }}>
                     {approvedSalons
                       .filter(s => !search || s.salon_name?.toLowerCase().includes(search.toLowerCase()) || s.address?.toLowerCase().includes(search.toLowerCase()))
                       .map((salon, idx) => {
@@ -2744,7 +2744,7 @@ export default function AdminOnboarding() {
                       <input className="inp" value={search} onChange={e=>{ setSearch(e.target.value); }} placeholder="Search salons..." style={{ ...inputStyle, width:220, padding:"7px 12px", fontSize:12 }}/>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 20 }}>
                       {salons.filter(s => s.status === "approved" && (!search || s.salon_name?.toLowerCase().includes(search.toLowerCase()) || s.address?.toLowerCase().includes(search.toLowerCase()))).map((salon) => {
                         const salonServices = services.filter(s => (s.salon_id?._id || s.salon_id) === salon._id);
                         return (
@@ -2878,7 +2878,7 @@ export default function AdminOnboarding() {
                       </div>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 20 }}>
                       {searchedSalons.map((salon, idx) => {
                         const salonPayments = payments.filter(p => (p.salon_id?._id || p.salon_id) === salon._id);
                         const capturedPayments = salonPayments.filter(p => {
@@ -3646,7 +3646,7 @@ export default function AdminOnboarding() {
                 </div>
                 {filteredBarbers.length===0 ? <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, padding:60, textAlign:"center", color:C.muted }}>No barbers to monitor</div>
                 : (
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:14 }}>
                     {filteredBarbers.map((b,i)=>(
                       <div 
                         key={b._id} 
@@ -4021,7 +4021,7 @@ export default function AdminOnboarding() {
 
             {/* ══ SETTINGS ══ */}
             {tab==="settings" && (
-              <div className="fade-in" style={{ maxWidth:560, margin:"0 auto" }}>
+              <div className="fade-in" style={{ maxWidth:800, margin:"0 auto" }}>
                 <div style={{ background:C.card, borderRadius:16, border:`1px solid ${C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)" }}>
                   <div style={{ padding:"16px 20px", borderBottom:`1px solid ${C.border}` }}>
                     <span style={{ fontSize:18, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>System Settings</span>

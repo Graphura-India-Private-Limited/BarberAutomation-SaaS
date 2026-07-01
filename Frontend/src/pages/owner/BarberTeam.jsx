@@ -8,15 +8,14 @@ import {
 import CustomSelect from "../../components/common/CustomSelect";
 
 
-const SPECIALIZATION_OPTIONS = [
+const PREDEFINED_SPECIALIZATIONS = [
   "Haircut & Styling",
   "Beard Sculpting & Shave",
   "Hair Spa & Treatment",
   "Hair Coloring & Highlights",
   "Facial & Grooming Massage",
   "Ayurvedic Head Massage",
-  "All-Rounder Master Stylist",
-  "Other"
+  "All-Rounder Master Stylist"
 ];
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -38,7 +37,32 @@ export default function BarberTeam() {
   const [editError, setEditError] = useState("");
   const editPhotoRef = useRef();
   const editDocRef = useRef();
-  const [isOtherSpec, setIsOtherSpec] = useState(false);
+  const [selectedSpecs, setSelectedSpecs] = useState([]);
+  const [customSpecInput, setCustomSpecInput] = useState("");
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
+  const handleToggleSpec = (spec) => {
+    let next;
+    if (selectedSpecs.includes(spec)) {
+      next = selectedSpecs.filter(s => s !== spec);
+    } else {
+      next = [...selectedSpecs, spec];
+    }
+    setSelectedSpecs(next);
+    setEditingBarber(prev => ({ ...prev, specialization: next.join(", ") }));
+  };
+
+  const handleAddCustomSpec = (e) => {
+    if (e) e.preventDefault();
+    const trimmed = customSpecInput.trim();
+    if (trimmed && !selectedSpecs.includes(trimmed)) {
+      const next = [...selectedSpecs, trimmed];
+      setSelectedSpecs(next);
+      setEditingBarber(prev => ({ ...prev, specialization: next.join(", ") }));
+      setCustomSpecInput("");
+      setShowCustomInput(false);
+    }
+  };
 
   const closeDetails = () => {
     setSelectedBarber(null);
@@ -147,8 +171,10 @@ export default function BarberTeam() {
 
   const handleEditClick = (barber) => {
     setEditError("");
-    const isKnown = SPECIALIZATION_OPTIONS.filter(o => o !== "Other").includes(barber.specialization);
-    setIsOtherSpec(barber.specialization ? !isKnown : false);
+    const specs = barber.specialization 
+      ? barber.specialization.split(",").map(s => s.trim()).filter(Boolean) 
+      : [];
+    setSelectedSpecs(specs);
     setEditingBarber({
       _id: barber._id,
       name: barber.name,
@@ -392,7 +418,23 @@ export default function BarberTeam() {
                           </div>
                           <div>
                             <h3 className="text-base font-black font-serif text-stone-900 leading-tight">{barber.name}</h3>
-                            <span className="text-xs text-[#C5A059] font-bold mt-1.5 inline-block">{barber.specialization || "General Stylist"}</span>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {barber.specialization 
+                                ? barber.specialization.split(",").map(s => s.trim()).filter(Boolean).map(spec => (
+                                    <span 
+                                      key={spec} 
+                                      className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-[#FAF6F0] text-[#8B5A2B] border border-[#C5A059]/20"
+                                    >
+                                      {spec}
+                                    </span>
+                                  ))
+                                : (
+                                    <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-[#FAF6F0] text-[#8B5A2B] border border-[#C5A059]/20">
+                                      General Stylist
+                                    </span>
+                                  )
+                              }
+                            </div>
                           </div>
                         </div>
 
@@ -530,7 +572,24 @@ export default function BarberTeam() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <h3 className="text-3xl sm:text-4xl font-black font-serif text-stone-900 leading-tight">{selectedBarber.name}</h3>
-                        <p className="text-sm text-[#C5A059] font-black mt-1 tracking-wider uppercase">{selectedBarber.specialization || "General Stylist"}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-2 justify-center sm:justify-start">
+                          {selectedBarber.specialization 
+                            ? selectedBarber.specialization.split(",").map(s => s.trim()).filter(Boolean).map(spec => (
+                                <span 
+                                  key={spec} 
+                                  className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#FAF6F0] text-[#8B5A2B] border border-[#C5A059]/25 shadow-3xs"
+                                
+                                >
+                                  {spec}
+                                </span>
+                              ))
+                            : (
+                                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#FAF6F0] text-[#8B5A2B] border border-[#C5A059]/25 shadow-3xs">
+                                  General Stylist
+                                </span>
+                              )
+                          }
+                        </div>
                       </div>
                       <div className="flex flex-col items-center sm:items-end gap-1.5 flex-shrink-0">
                         <span className={`px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider shadow-2xs ${getStatusBadge(selectedBarber.status).style}`}>
@@ -865,31 +924,80 @@ export default function BarberTeam() {
                   />
                 </div>
 
-                <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-1.5">Specialization *</label>
-                  <CustomSelect
-                    options={SPECIALIZATION_OPTIONS}
-                    value={isOtherSpec ? "Other" : (editingBarber.specialization || "")}
-                    placeholder="Select Specialization"
-                    onChange={val => {
-                      if (val === "Other") {
-                        setIsOtherSpec(true);
-                        setEditingBarber(prev => ({ ...prev, specialization: "" }));
-                      } else {
-                        setIsOtherSpec(false);
-                        setEditingBarber(prev => ({ ...prev, specialization: val }));
-                      }
-                    }}
-                  />
-                  
-                  {isOtherSpec && (
-                    <input 
-                      required 
-                      placeholder="Type custom specialization..." 
-                      value={editingBarber.specialization} 
-                      onChange={e => setEditingBarber(prev => ({ ...prev, specialization: e.target.value }))} 
-                      className="w-full mt-2 rounded-xl border border-[#EADBCE] bg-white p-3 text-sm font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400" 
-                    />
+                <div className="sm:col-span-2">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#C5A059] block mb-2">Specializations *</label>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {PREDEFINED_SPECIALIZATIONS.map(spec => {
+                      const isSelected = selectedSpecs.includes(spec);
+                      return (
+                        <button
+                          key={spec}
+                          type="button"
+                          onClick={() => handleToggleSpec(spec)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                            isSelected 
+                              ? "bg-[#3E362E] text-white border-[#3E362E]" 
+                              : "bg-white text-stone-600 border-[#EADBCE] hover:border-[#C5A059]"
+                          }`}
+                        >
+                          {spec} {isSelected ? "✓" : "+"}
+                        </button>
+                      );
+                    })}
+
+                    {selectedSpecs.filter(s => !PREDEFINED_SPECIALIZATIONS.includes(s)).map(spec => (
+                      <button
+                        key={spec}
+                        type="button"
+                        onClick={() => handleToggleSpec(spec)}
+                        className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#8B5A2B] text-white border border-[#8B5A2B] transition-all cursor-pointer"
+                        title="Click to remove"
+                      >
+                        {spec} ×
+                      </button>
+                    ))}
+
+                    {!showCustomInput && (
+                      <button
+                        type="button"
+                        onClick={() => setShowCustomInput(true)}
+                        className="px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-[#C5A059] bg-[#FEF9EE] border border-[#EADBCE] hover:bg-[#FEF9EE]/85 transition-all cursor-pointer"
+                      >
+                        + Add Custom
+                      </button>
+                    )}
+                  </div>
+
+                  {showCustomInput && (
+                    <div className="flex gap-2 items-center animate-in fade-in slide-in-from-top-1 duration-200 max-w-md">
+                      <input
+                        type="text"
+                        placeholder="Type custom specialization..."
+                        value={customSpecInput}
+                        onChange={e => setCustomSpecInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddCustomSpec(e);
+                          }
+                        }}
+                        className="flex-1 rounded-xl border border-[#EADBCE] bg-white p-2.5 text-xs font-semibold outline-none focus:border-[#C5A059] transition-all text-stone-800 placeholder-stone-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCustomSpec}
+                        className="px-4 py-2.5 bg-[#3E362E] text-[#C5A059] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border border-[#3E362E] hover:bg-[#2A241F]"
+                      >
+                        Add
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowCustomInput(false); setCustomSpecInput(""); }}
+                        className="px-3 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-500 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   )}
                 </div>
 

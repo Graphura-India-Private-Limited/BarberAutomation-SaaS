@@ -32,7 +32,7 @@ export function TicketsPage({
     : filteredTickets;
 
   return (
-    <div className="px-0 md:px-8 pt-6 pb-16 flex flex-col gap-6 w-full">
+    <div className="px-0 pt-6 pb-16 flex flex-col gap-6 w-full">
 
       {/* ── ✅ FIXED: CLEANED HERO TOP BAR (REMOVED INNER DUPED HEADERS) ── */}
       <div style={{
