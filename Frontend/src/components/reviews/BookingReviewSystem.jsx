@@ -122,7 +122,7 @@ const BookingReviewSystem = ({ bookingData }) => {
         <Navbar />
 
         {/* ── EXIT BACK BUTTON ── */}
-        <div className="w-full max-w-7xl mx-auto px-6 pt-6 relative z-50 flex justify-start">
+        <div className="w-full max-w-7xl mx-auto px-6 pt-[80px] md:pt-[96px] relative z-50 flex justify-start">
           <button
             onClick={() => navigate("/")}
             className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#EADDCA] shadow-md hover:bg-white transition-all duration-300 group cursor-pointer select-none"

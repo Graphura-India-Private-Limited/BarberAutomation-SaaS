@@ -1013,7 +1013,7 @@ export default function AdminOnboarding() {
       {isSidebarOpen && (
         <div 
            
-          className="fixed inset-0 bg-stone-900/60 z-50 lg:hidden animate-in fade-in duration-200"
+          className="fixed inset-0 bg-stone-900/60 z-50 xl:hidden animate-in fade-in duration-200"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -1023,7 +1023,7 @@ export default function AdminOnboarding() {
         className={`bg-white border-r border-stone-200 h-screen fixed inset-y-0 left-0 w-64 z-50 transition-all duration-300 flex flex-col shrink-0 overflow-hidden
           ${isSidebarOpen 
             ? "translate-x-0 shadow-2xl" 
-            : "-translate-x-full lg:translate-x-0"
+            : "-translate-x-full xl:translate-x-0"
           }
         `}
       >
@@ -1045,7 +1045,7 @@ export default function AdminOnboarding() {
             </div>
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg cursor-pointer"
+              className="xl:hidden p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -1115,18 +1115,18 @@ export default function AdminOnboarding() {
       </aside>
 
       {/* ════ MAIN ════ */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden lg:pl-64" style={{ width: "100%" }}>
+      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden xl:pl-64" style={{ width: "100%" }}>
         <div className="px-4 md:px-8 w-full min-w-0 mx-auto max-w-[1440px]">
 
           {/* ── HEADER ── */}
           <header 
-            className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pt-12 pb-6"
+            className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 pt-12 pb-6"
           >
-            <div className="flex items-center gap-3 w-full lg:w-auto min-w-0">
+            <div className="flex items-center gap-3 w-full xl:w-auto min-w-0">
               <button 
                 onClick={() => setIsSidebarOpen(true)}
                 // className="xl:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
-                className="lg:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
+                className="xl:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
               >
                 <Menu size={18} className="text-[#C5A059]" />
               </button>

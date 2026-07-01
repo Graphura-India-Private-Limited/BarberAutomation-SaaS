@@ -26,7 +26,7 @@ export default function AdminLayout({ page, children }) {
   return (
     <div className="flex min-h-screen bg-orange-50">
       {/* Sidebar Navigation */}
-      <div className="hidden lg:flex shrink-0">
+      <div className="hidden xl:flex shrink-0">
         <Sidebar activePage={page} setActivePage={(p) => navigate(pageMap[p])} />
       </div>
       

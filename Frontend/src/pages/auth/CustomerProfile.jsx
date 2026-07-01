@@ -614,18 +614,18 @@ export default function CustomerProfile() {
   return (
     <>
       <div className="h-screen bg-[#FAF6F0] flex flex-col font-sans text-[#1C1917] transition-colors duration-300 overflow-hidden">
-        <div className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row h-full overflow-hidden">
+        <div className="flex-1 w-full max-w-[1440px] mx-auto flex flex-col xl:flex-row h-full overflow-hidden">
 
           {/* Backdrop Overlay for mobile drawer */}
           {isSidebarOpen && (
             <div 
-              className="fixed inset-0 bg-black/45 backdrop-blur-xs z-[9998] lg:hidden"
+              className="fixed inset-0 bg-black/45 backdrop-blur-xs z-[9998] xl:hidden"
               onClick={() => setIsSidebarOpen(false)}
             />
           )}
 
           {/* ── LEFT SIDEBAR ── */}
-          <aside className={`fixed inset-y-0 left-0 w-64 bg-[#FFFFFF] text-[#1C1917] flex flex-col min-h-screen border-r border-[#E7E5E4] p-5 justify-between shadow-2xl z-[9999] transition-transform duration-300 lg:static lg:translate-x-0 lg:flex lg:shadow-2xs ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+          <aside className={`fixed inset-y-0 left-0 w-64 bg-[#FFFFFF] text-[#1C1917] flex flex-col min-h-screen border-r border-[#E7E5E4] p-5 justify-between shadow-2xl z-[9999] transition-transform duration-300 xl:static xl:translate-x-0 xl:flex xl:shadow-2xs ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
             <div className="space-y-6">
               <div className="px-1 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -640,7 +640,7 @@ export default function CustomerProfile() {
                 {/* Close Button on mobile */}
                 <button
                   onClick={() => setIsSidebarOpen(false)}
-                  className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 lg:hidden cursor-pointer border-none bg-transparent"
+                  className="p-1 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 xl:hidden cursor-pointer border-none bg-transparent"
                   title="Close navigation menu"
                 >
                   <X size={18} />
@@ -718,7 +718,7 @@ export default function CustomerProfile() {
                 {/* Hamburger menu button */}
                 <button
                   onClick={() => setIsSidebarOpen(true)}
-                  className="p-2 -ml-2 rounded-xl text-[#3D3126] hover:bg-[#FAF6F0] lg:hidden cursor-pointer border-none bg-transparent flex items-center justify-center shrink-0"
+                  className="p-2 -ml-2 rounded-xl text-[#3D3126] hover:bg-[#FAF6F0] xl:hidden cursor-pointer border-none bg-transparent flex items-center justify-center shrink-0"
                   title="Open navigation menu"
                 >
                   <svg style={{ width: "24px", height: "24px" }} fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

@@ -277,36 +277,35 @@ export default function SelectLook() {
 
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }} className="pb-10 sm:pb-24">
 
-        {/* ── BACK BUTTON ── */}
-        <div className="absolute top-[72px] left-5 md:top-[88px] md:left-5 z-[9999]">
-          <button
-            onClick={() => navigate(-1)}
-            style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
-          >←</button>
-        </div>
-
         {/* ── HERO ── */}
-        <div className="relative h-[200px] sm:h-[260px] md:h-[320px] lg:h-[400px] overflow-hidden mt-[56px] md:mt-[72px]">
+        <div className="relative h-[260px] sm:h-[280px] md:h-[320px] lg:h-[400px] overflow-hidden mt-[56px] md:mt-[72px]">
+          {/* ── BACK BUTTON ── */}
+          <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+            <button
+              onClick={() => navigate(-1)}
+              style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
+            >←</button>
+          </div>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.3)" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.8))" }} />
 
-          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(197,160,89,0.45)", borderRadius: 40, padding: "5px 18px", marginBottom: 20, background: "rgba(0,0,0,0.25)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }} className="px-[72px] md:px-6">
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(197,160,89,0.45)", borderRadius: 40, padding: "5px 18px", marginBottom: 10, background: "rgba(0,0,0,0.25)" }}>
               <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.28em", textTransform: "uppercase", color: "#C5A059" }}>Step 03 — Lookbook Selection</span>
             </div>
             <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, color: "#fff", fontSize: "clamp(36px,5vw,64px)", lineHeight: 1.05, margin: "0 0 10px" }}>
               Choose Your{" "}
               <em style={{ fontStyle: "italic", color: "#C5A059", fontWeight: 400 }}>Desired Look</em>
             </h1>
-            <div style={{ width: 56, height: 1, background: "linear-gradient(to right, transparent, #C5A059, transparent)", margin: "14px auto 18px" }} />
-            <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,0.55)", maxWidth: 420, lineHeight: 1.8 }}>
+            <div style={{ width: 56, height: 1, background: "linear-gradient(to right, transparent, #C5A059, transparent)", margin: "10px auto" }} />
+            <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,0.85)", maxWidth: 420, lineHeight: 1.8 }}>
               Browse our curated lookbook. Your stylist{selectedBarber ? `, ${selectedBarber.name},` : ""} will craft this exact look for you.
             </p>
           </div>
 
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 80, background: "linear-gradient(to bottom, transparent, #FAF6F0)", zIndex: 6 }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to bottom, transparent, #FAF6F0)", zIndex: 6 }} className="h-10 md:h-20" />
         </div>
 
         {/* ── MAIN CONTENT ── */}

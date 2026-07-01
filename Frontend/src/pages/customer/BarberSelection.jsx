@@ -51,18 +51,32 @@ const PREDEFINED_SPECS = [
 ];
 
 const doesServiceMatchSpecs = (serviceName, specs) => {
-  if (specs.length === 0) return true;
+  if (!serviceName || specs.length === 0) return true;
+  const sName = serviceName.toLowerCase();
   const normalizedSpecs = specs.map(s => s.toLowerCase());
+  
+  // All-rounder matches everything
   if (normalizedSpecs.some(s => s.includes("all-rounder") || s.includes("master stylist"))) return true;
   
-  const hasCustomSpec = normalizedSpecs.some(s => !PREDEFINED_SPECS.includes(s));
-  const fitsPredefined = fitsAnyPredefinedSpec(serviceName);
-  
-  if (!fitsPredefined && hasCustomSpec) {
-    return true;
-  }
-  
-  return normalizedSpecs.some(spec => fitsStandardCategory(serviceName, spec) || serviceName.toLowerCase().includes(spec));
+  // Check for semantic matches between service name and each specialty
+  return normalizedSpecs.some(spec => {
+    // 1. Direct containment
+    if (sName.includes(spec) || spec.includes(sName)) return true;
+    
+    // 2. Keyword overlap
+    const massageMatch = (sName.includes("massage") || sName.includes("facial")) && (spec.includes("massage") || spec.includes("facial"));
+    const shaveMatch = (sName.includes("shave") || sName.includes("beard") || sName.includes("mustache")) && (spec.includes("shave") || spec.includes("beard") || spec.includes("sculpting"));
+    const hairSpaMatch = (sName.includes("spa") || sName.includes("treatment") || sName.includes("oil") || sName.includes("mask")) && (spec.includes("spa") || spec.includes("treatment") || spec.includes("oil") || spec.includes("head massage"));
+    const haircutMatch = (sName.includes("cut") || sName.includes("fade") || sName.includes("style") || sName.includes("hair")) && (spec.includes("cut") || spec.includes("styling") || spec.includes("haircut") || spec.includes("hair"));
+    const colorMatch = (sName.includes("color") || sName.includes("highlight") || sName.includes("dye") || sName.includes("bleach")) && (spec.includes("color") || spec.includes("highlight") || spec.includes("styling"));
+    
+    if (massageMatch || shaveMatch || hairSpaMatch || haircutMatch || colorMatch) return true;
+    
+    // 3. Fallback: split words and look for common meaningful terms
+    const sWords = sName.split(/\s+/).filter(w => w.length > 3 && w !== "with" && w !== "from");
+    const specWords = spec.split(/\s+/).filter(w => w.length > 3 && w !== "with" && w !== "from");
+    return sWords.some(w => specWords.some(sw => sw.includes(w) || w.includes(sw)));
+  });
 };
 function Stars({ rating }) {
   return (
@@ -418,26 +432,25 @@ export default function BarberSelection() {
 
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
 
-        {/* ── BACK BUTTON ── */}
-        {!showFilters && (
-          <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
-            <button
-              onClick={() => navigate(-1)}
-              style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
-            >←</button>
-          </div>
-        )}
-
         {/* ── HERO ── */}
-        <div className="relative h-[200px] sm:h-[260px] md:h-[320px] lg:h-[420px] overflow-hidden">
+        <div className="relative h-[260px] sm:h-[280px] md:h-[320px] lg:h-[420px] overflow-hidden">
+          {/* ── BACK BUTTON ── */}
+          {!showFilters && (
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
+              <button
+                onClick={() => navigate(-1)}
+                style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
+              >←</button>
+            </div>
+          )}
           <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.32)" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.78))" }} />
 
-          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }} className="px-[72px] md:px-6">
             {/* step badge */}
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(197,160,89,0.45)", borderRadius: 40, padding: "5px 18px", marginBottom: 20, background: "rgba(0,0,0,0.25)" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(197,160,89,0.45)", borderRadius: 40, padding: "5px 18px", marginBottom: 10, background: "rgba(0,0,0,0.25)" }}>
               <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.28em", textTransform: "uppercase", color: "#C5A059" }}>Step 02 — Appointment Allocation</span>
             </div>
 
@@ -450,13 +463,13 @@ export default function BarberSelection() {
                 At {salonName}
               </p>
             )}
-            <div style={{ width: 56, height: 1, background: "linear-gradient(to right, transparent, #C5A059, transparent)", margin: "14px auto 18px" }} />
-            <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,0.55)", maxWidth: 400, lineHeight: 1.8 }}>
+            <div style={{ width: 56, height: 1, background: "linear-gradient(to right, transparent, #C5A059, transparent)", margin: "10px auto" }} />
+            <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, fontWeight: 300, color: "rgba(255,255,255,0.85)", maxWidth: 400, lineHeight: 1.8 }}>
               Our curated professionals are ready to craft your perfect experience.
             </p>
           </div>
 
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 80, background: "linear-gradient(to bottom, transparent, #FAF6F0)", zIndex: 6 }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to bottom, transparent, #FAF6F0)", zIndex: 6 }} className="h-10 md:h-20" />
         </div>
 
         {/* ── MAIN ── */}
