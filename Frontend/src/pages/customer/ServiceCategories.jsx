@@ -191,9 +191,28 @@ export default function ServiceCategories() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const t1 = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 50);
+
+    const t2 = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 200);
+
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   return (
@@ -213,7 +232,7 @@ export default function ServiceCategories() {
       <div style={{ background: "#FAF6F0", minHeight: "100vh", fontFamily: "'Cormorant Garamond',serif", color: "#2C241E" }}>
 
         {/* ── BACK BUTTON ── */}
-        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[88px] md:left-5 z-[9999]">
+        <div className="fixed top-20 left-4 md:top-[88px] md:left-5 z-[9999]">
           <button
             onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
             style={{
