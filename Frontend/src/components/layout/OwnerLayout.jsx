@@ -183,9 +183,7 @@ export default function OwnerLayout() {
                         setShowProfileDropdown(false);
                       }}
                       className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      MY PROFILE
-                    </button>
+                    >MY PROFILE</button>
                     
                     <button
                       onClick={() => {
@@ -193,9 +191,7 @@ export default function OwnerLayout() {
                         setShowProfileDropdown(false);
                       }}
                       className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      BREAK APPROVALS
-                    </button>
+                    >BREAK APPROVALS</button>
                   </div>
                   
                   <div className="border-t border-gray-100 py-1.5">
@@ -205,9 +201,7 @@ export default function OwnerLayout() {
                         navigate("/owner/login");
                       }}
                       className="w-full px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      LOGOUT
-                    </button>
+                    >LOGOUT</button>
                   </div>
                 </div>
               </>
@@ -251,9 +245,7 @@ export default function OwnerLayout() {
                         setShowProfileDropdown(false);
                       }}
                       className="w-full px-3 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      MY PROFILE
-                    </button>
+                    >MY PROFILE</button>
                     
                     <button
                       onClick={() => {
@@ -261,9 +253,7 @@ export default function OwnerLayout() {
                         setShowProfileDropdown(false);
                       }}
                       className="w-full px-3 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      BREAK APPROVALS
-                    </button>
+                    >BREAK APPROVALS</button>
                   </div>
                   
                   <div className="border-t border-gray-100 py-1.5">
@@ -273,9 +263,7 @@ export default function OwnerLayout() {
                         navigate("/owner/login");
                       }}
                       className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      LOGOUT
-                    </button>
+                    >LOGOUT</button>
                   </div>
                 </div>
               </>

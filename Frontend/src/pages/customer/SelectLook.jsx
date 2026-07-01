@@ -217,7 +217,7 @@ export default function SelectLook() {
 
   const selectedService = location.state?.service;
   const selectedBarber  = location.state?.barber;
-  const gender          = location.state?.gender || "men";
+  const gender          = location.state?.gender || selectedService?.gender || "men";
 
   const [selectedLook,  setSelectedLook]  = useState(null);
   const [searchQuery,   setSearchQuery]   = useState("");

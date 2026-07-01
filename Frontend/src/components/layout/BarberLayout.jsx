@@ -287,24 +287,18 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
                     <button
                       onClick={() => { navigate("/barber/profile"); setShowProfileDropdown(false); }}
                       className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      MY PROFILE
-                    </button>
+                    >MY PROFILE</button>
                     <button
                       onClick={() => { navigate("/barber/settings"); setShowProfileDropdown(false); }}
                       className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                     SETTINGS
-                    </button>
+                    >SETTINGS</button>
                   </div>
 
                   <div className="border-t border-gray-100 py-1.5">
                     <button
                       onClick={() => { localStorage.clear(); navigate("/barber/login"); }}
                       className="w-full px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      LOGOUT
-                    </button>
+                    >LOGOUT</button>
                   </div>
                 </div>
               </>

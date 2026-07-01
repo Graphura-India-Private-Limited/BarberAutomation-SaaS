@@ -139,9 +139,9 @@ function CategoryCard({ cat, index, navigate }) {
         {/* Stats row */}
         <div style={{ display: "flex", gap: 0, marginBottom: 20, borderTop: "1px solid #F0E8DA", borderBottom: "1px solid #F0E8DA", padding: "14px 0" }}>
           {cat.stats.map((s, i) => (
-            <div key={i} style={{ flex: 1, textAlign: "center", borderRight: i < cat.stats.length - 1 ? "1px solid #F0E8DA" : "none" }}>
+            <div key={i} style={{ flex: 1, textAlign: "center", padding: "0 6px", borderRight: i < cat.stats.length - 1 ? "1px solid #F0E8DA" : "none", wordBreak: "break-word", overflowWrap: "break-word" }}>
               <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, fontWeight: 700, color: "#2C241E", margin: 0 }}>{s.val}</p>
-              <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, color: "#AAA", margin: 0, letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</p>
+              <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: "clamp(8px, 1.1vw, 9.5px)", color: "#AAA", margin: 0, letterSpacing: "0.02em", textTransform: "uppercase", lineHeight: 1.15 }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -299,7 +299,7 @@ export default function ServiceCategories() {
 
         {/* ── CARDS GRID ── */}
         <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-10 md:py-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
             {CATEGORIES.map((cat, i) => (
               <CategoryCard key={cat.id} cat={cat} index={i} navigate={navigate} />
             ))}

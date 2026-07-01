@@ -23,6 +23,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import CustomSelect from "../common/CustomSelect";
+import { getPremiumServiceImage } from "../common/Modals";
 
 const demoSalons = [
   {
@@ -183,25 +184,7 @@ export default function SalonDetailPage() {
   };
 
   const getServiceImage = (service) => {
-    if (service.image && service.image.trim() !== "") return service.image;
-    const name = service.name.toLowerCase();
-    const cat = (service.category || "").toLowerCase();
-    if (name.includes("cut") || name.includes("hair") || name.includes("shamp") || name.includes("trim")) {
-      return "https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600";
-    }
-    if (name.includes("beard") || name.includes("shave") || name.includes("mustache")) {
-      return "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=600";
-    }
-    if (name.includes("facial") || name.includes("massage") || name.includes("spa") || name.includes("clean") || name.includes("scrub") || name.includes("face")) {
-      return "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=600";
-    }
-    if (name.includes("colour") || name.includes("color") || name.includes("dye") || name.includes("highlight")) {
-      return "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=600";
-    }
-    if (cat === "women") {
-      return "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=600";
-    }
-    return "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=600";
+    return getPremiumServiceImage(service.name, service.category);
   };
 
   const filteredServices = servicesList.filter((service) => {
@@ -278,10 +261,10 @@ export default function SalonDetailPage() {
       <Navbar />
 
       {/* 📸 EDITORIAL SHOWCASE HERO DISPLAY */}
-      <section className="relative bg-[#FAF6F0] pt-28 pb-8 px-6 sm:px-8 xl:px-10">
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-12 items-center">
+      <section className="relative bg-[#FAF6F0] pt-28 pb-8 px-6 sm:px-8 2xl:px-10">
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 2xl:grid-cols-12 gap-8 2xl:gap-12 items-center">
           {/* Left Side: Salon Info */}
-          <div className="xl:col-span-7 text-left space-y-6">
+          <div className="2xl:col-span-7 text-left space-y-6">
             <button
               onClick={() => navigate(-1)}
               className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#8A7B6A] hover:text-[#C5A059] transition cursor-pointer border-none bg-transparent"
@@ -352,8 +335,8 @@ export default function SalonDetailPage() {
           </div>
 
           {/* Right Side: Showcase Image Frame */}
-          <div className="xl:col-span-5">
-            <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] xl:aspect-[4/3] rounded-[2rem] overflow-hidden border border-[#E8DCCB] bg-stone-100 shadow-xl group">
+          <div className="2xl:col-span-5">
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] 2xl:aspect-[4/3] rounded-[2rem] overflow-hidden border border-[#E8DCCB] bg-stone-100 shadow-xl group">
               <img
                 src={activeImage || salon.image}
                 alt={salon.name}
@@ -369,7 +352,7 @@ export default function SalonDetailPage() {
       </section>
 
       {/* 📊 QUICK CONTEXT INFO TILES ROW — spans full width below hero banner */}
-      <section className="mx-auto max-w-7xl w-full px-6 sm:px-8 xl:px-10 pt-8">
+      <section className="mx-auto max-w-7xl w-full px-6 sm:px-8 2xl:px-10 pt-8">
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
           <InfoTile icon={MapPin} label="Address" value={salon.address} />
           <InfoTile icon={Clock} label="Hours" value={salon.hours} />
@@ -378,8 +361,8 @@ export default function SalonDetailPage() {
       </section>
 
       {/* 🧱 DATA PROFILE DETAILS LAYOUT COLUMNS GRID */}
-      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-8 sm:px-8 xl:grid-cols-[1.25fr_0.75fr] xl:px-10 flex-1">
-        <div className="space-y-8">
+      <section className="mx-auto grid max-w-7xl w-full gap-8 px-6 py-8 sm:px-8 2xl:grid-cols-12 2xl:px-10 flex-1">
+        <div className="space-y-8 2xl:col-span-8 w-full">
           {/* 📸 Gallery Section */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left text-[#3E362E]">
             <div className="mb-5 flex items-center justify-between border-b border-stone-100 pb-4">
@@ -426,8 +409,8 @@ export default function SalonDetailPage() {
 
           {/* 💈 Services Section with Horizontal Tabs and Dropdown */}
           <div id="popular-services" className="rounded-2xl border border-[#E8DCCB] bg-white p-6 shadow-sm text-left">
-            <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 pb-5">
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-[#3E362E] flex items-center justify-start gap-2 whitespace-nowrap">
+            <div className="mb-6 flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-4 border-b border-stone-100 pb-5">
+              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-[#3E362E] flex flex-wrap items-center justify-start gap-2">
                 <span className="font-bold uppercase text-[17px] sm:text-[19px]">Available</span>
                 <span className="italic text-[#C5A059] normal-case font-medium">Services Menu</span>
               </h2>
@@ -642,7 +625,7 @@ export default function SalonDetailPage() {
         </div>
 
         {/* 📑 FIXED FLOATING RIGHT SIDEBAR ANCHOR */}
-        <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+        <aside className="space-y-6 2xl:sticky 2xl:top-24 2xl:self-start 2xl:col-span-4 w-full">
           {/* Booking Card */}
           <div className="rounded-2xl border border-[#E8DCCB] bg-white text-[#3E362E] p-6 shadow-sm text-left transition-all hover:border-[#C5A059]/40">
             <div className="mb-4 flex items-center justify-between border-b border-stone-100 pb-3">

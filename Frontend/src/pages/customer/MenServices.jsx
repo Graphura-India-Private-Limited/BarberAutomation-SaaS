@@ -5,6 +5,7 @@ import Footer from "../../components/layout/Footer";
 import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 import CustomSelect from "../../components/common/CustomSelect";
 import { SlidersHorizontal, X } from "lucide-react";
+import { getPremiumServiceImage } from "../../components/common/Modals";
 
 const services = [
   // styling (Haircuts & Styling) - 1 to 10
@@ -13,10 +14,10 @@ const services = [
   { id: 3, name: "Premium Keratin Infusion", desc: "Hair softening and frizz-reduction treatment for men.", price: 2200, duration: "90 min", category: "styling", rating: 5, reviews: 62, tag: "Premium", img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=600&auto=format&fit=crop&q=80" },
   { id: 4, name: "Indian Wedding Grooming", desc: "Complete luxury hair styling and setting for grooms and wedding guests.", price: 1500, duration: "60 min", category: "styling", rating: 5, reviews: 198, tag: "Luxury", img: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=600&auto=format&fit=crop&q=80" },
   { id: 5, name: "Kids' Style Cut", desc: "Fun, quick hair styling and cutting for children under 12.", price: 250, duration: "25 min", category: "styling", rating: 4, reviews: 88, tag: null, img: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=600&auto=format&fit=crop&q=80" },
-  { id: 6, name: "Slick Back Classic Pompadour", desc: "Classic slicked back haircut styled with premium high-shine pomade.", price: 500, duration: "45 min", category: "styling", rating: 5, reviews: 75, tag: "Popular", img: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=600&auto=format&fit=crop&q=80" },
-  { id: 7, name: "Buzz Cut & Edge-up", desc: "Clean, ultra-short buzz cut with sharp razor edge detailing.", price: 200, duration: "20 min", category: "styling", rating: 4, reviews: 130, tag: null, img: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&auto=format&fit=crop&q=80" },
-  { id: 8, name: "Textured Crop Fade", desc: "Modern messy textured top with short high-skin fade sides.", price: 400, duration: "40 min", category: "styling", rating: 5, reviews: 92, tag: "Popular", img: "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&auto=format&fit=crop&q=80" },
-  { id: 9, name: "Bollywood Premium Styling", desc: "Premium celebrity-inspired haircut and volume blow dry styling.", price: 800, duration: "45 min", category: "styling", rating: 5, reviews: 147, tag: "Premium", img: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&auto=format&fit=crop&q=80" },
+  { id: 6, name: "Slick Back Classic Pompadour", desc: "Classic slicked back haircut styled with premium high-shine pomade.", price: 500, duration: "45 min", category: "styling", rating: 5, reviews: 75, tag: "Popular", img: "https://images.unsplash.com/photo-1593702295094-aec22597af65?w=600&auto=format&fit=crop&q=80" },
+  { id: 7, name: "Buzz Cut & Edge-up", desc: "Clean, ultra-short buzz cut with sharp razor edge detailing.", price: 200, duration: "20 min", category: "styling", rating: 4, reviews: 130, tag: null, img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=600&auto=format&fit=crop&q=80" },
+  { id: 8, name: "Textured Crop Fade", desc: "Modern messy textured top with short high-skin fade sides.", price: 400, duration: "40 min", category: "styling", rating: 5, reviews: 92, tag: "Popular", img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&auto=format&fit=crop&q=80" },
+  { id: 9, name: "Bollywood Premium Styling", desc: "Premium celebrity-inspired haircut and volume blow dry styling.", price: 800, duration: "45 min", category: "styling", rating: 5, reviews: 147, tag: "Premium", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80" },
   { id: 10, name: "Scalp Detox & Cut Combo", desc: "Detoxifying scalp wash paired with a precise haircut.", price: 900, duration: "50 min", category: "styling", rating: 5, reviews: 54, tag: null, img: "https://images.unsplash.com/photo-1600948836101-f9ffda59d250?w=600&auto=format&fit=crop&q=80" },
 
   // beard (Beard Grooming) - 11 to 20
@@ -135,13 +136,73 @@ export default function MenServices() {
   const [slideIndex, setSlideIndex]         = useState(0);
   const [visibleCards, setVisibleCards]     = useState(new Set());
   const [showFilters, setShowFilters]       = useState(false);
+  const [servicesList, setServicesList] = useState([]);
+  const [loadingState, setLoadingState] = useState(true);
   const cardRefs = useRef({});
 
   useEffect(() => {
-    const salonId = localStorage.getItem("selectedSalonId");
-    if (!salonId) {
-      navigate("/nearby");
-    }
+    const fetchServices = async () => {
+      try {
+        const salonId = localStorage.getItem("selectedSalonId");
+        if (!salonId) {
+          navigate("/nearby");
+          return;
+        }
+        const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        const res = await fetch(`${API}/services/${salonId}`);
+        const data = await res.json();
+        if (data.success) {
+          const mapped = data.services
+            .filter(bs => bs.category === "men" && bs.is_active !== false)
+            .map(bs => {
+              const match = services.find(s => s.name.toLowerCase() === bs.name.toLowerCase());
+              const image = getPremiumServiceImage(bs.name, "men");
+              
+              if (match) {
+                return {
+                  ...match,
+                  id: bs._id,
+                  price: bs.price,
+                  duration: `${bs.duration} min`,
+                  desc: bs.description || match.desc,
+                  img: image,
+                  gender: "men"
+                };
+              }
+              
+              let subcat = "styling";
+              const name = bs.name.toLowerCase();
+              if (name.includes("beard") || name.includes("shave") || name.includes("mustache") || name.includes("trim")) {
+                subcat = "beard";
+              } else if (name.includes("spa") || name.includes("massage") || name.includes("facial") || name.includes("detox") || name.includes("mask") || name.includes("scrub") || name.includes("face")) {
+                subcat = "spa";
+              } else if (name.includes("color") || name.includes("colour") || name.includes("highlight") || name.includes("streaks") || name.includes("henna") || name.includes("dye")) {
+                subcat = "color";
+              }
+              
+              return {
+                id: bs._id,
+                name: bs.name,
+                desc: bs.description || "Premium styling service.",
+                price: bs.price,
+                duration: `${bs.duration || 30} min`,
+                category: subcat,
+                gender: "men",
+                rating: 5,
+                reviews: 80,
+                tag: null,
+                img: image
+              };
+            });
+          setServicesList(mapped);
+        }
+      } catch (err) {
+        console.error("Error fetching salon services:", err);
+      } finally {
+        setLoadingState(false);
+      }
+    };
+    fetchServices();
   }, [navigate]);
 
   useEffect(() => {
@@ -163,9 +224,9 @@ export default function MenServices() {
       });
     }, 60);
     return () => { clearTimeout(t); observers.forEach((o) => o.disconnect()); };
-  }, [activeCategory, selectedPrice, minRating, searchQuery, sortBy]);
+  }, [activeCategory, selectedPrice, minRating, searchQuery, sortBy, servicesList]);
 
-  const filtered = services
+  const filtered = servicesList
     .filter((s) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -403,7 +464,11 @@ export default function MenServices() {
 
           {/* CARDS */}
           <div className="flex-1 w-full min-w-0">
-            {filtered.length === 0 ? (
+            {loadingState ? (
+              <div style={{ textAlign: "center", padding: "100px 20px", background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0" }}>
+                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 14, color: "#888", letterSpacing: "0.05em" }}>Loading Catalog Services...</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
                 <div style={{ fontSize: 36, marginBottom: 14 }}>✦</div>
                 <p style={{ fontSize: 20, fontFamily: "'Cormorant Garamond',serif", color: "#8A7060", margin: "0 0 8px" }}>No services found</p>
@@ -479,35 +544,7 @@ export default function MenServices() {
             )}
           </div>
 
-          {/* FLOATING FILTERS BUTTON FOR MOBILE/TABLET */}
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 lg:hidden">
-            <button
-              onClick={() => setShowFilters(true)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                background: "#2C241E",
-                color: "#F5EFE0",
-                border: "1px solid #C5A059",
-                borderRadius: 30,
-                padding: "10px 20px",
-                fontFamily: "'Montserrat',sans-serif",
-                fontWeight: 700,
-                fontSize: 11,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                cursor: "pointer",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-                transition: "all 0.3s"
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
-            >
-              <SlidersHorizontal size={14} className="text-[#C5A059]" />
-              <span>Filters</span>
-            </button>
-          </div>
+
 
         </div>
       </div>
