@@ -88,22 +88,59 @@ const LOOKS_DB = {
 
 function getCategory(service, gender) {
   if (!service) return "default";
+
+  const name = service.name?.toLowerCase() || "";
+  const cat = service.category?.toLowerCase() || "";
+
+  const isHighlightService =
+    name.includes("balayage") ||
+    name.includes("highlight") ||
+    name.includes("ombre") ||
+    name.includes("streak") ||
+    name.includes("foil");
+
+  const isKeratinService =
+    cat === "treatment" ||
+    name.includes("keratin") ||
+    name.includes("smoothing") ||
+    name.includes("cysteine") ||
+    name.includes("rebond") ||
+    name.includes("brazilian");
+
+  const isSpaService =
+    cat === "spa" ||
+    cat === "massage" ||
+    name.includes("scalp") ||
+    name.includes("facial") ||
+    name.includes("massage") ||
+    name.includes("spa");
+
   if (gender === "men") {
-    const n = service.name?.toLowerCase() || "";
-    if (n.includes("fade")) return "skin_fade";
-    if (n.includes("beard")) return "beard";
-    if (n.includes("shave")) return "hot_towel_shave";
-    if (n.includes("scalp")) return "scalp_revitalize";
+    if (name.includes("shave") || name.includes("razor")) return "hot_towel_shave";
+    if (cat === "beard" || name.includes("beard") || name.includes("mustache")) return "beard";
+    if (name.includes("fade")) return "skin_fade";
+    if (isSpaService) return "scalp_revitalize";
+    if (cat === "color" || name.includes("color") || name.includes("highlight") || name.includes("henna") || name.includes("grey")) return "color";
+    if (isKeratinService) return "keratin_smoothing";
     return "haircut";
   }
+
   if (gender === "women") {
-    const cat  = service.category?.toLowerCase() || "";
-    const name = service.name?.toLowerCase() || "";
+    if (isHighlightService) return "highlights_balayage";
     if (cat === "color") return "color";
-    if (cat === "spa")   return "spa";
-    if (name.includes("keratin")) return "keratin_smoothing";
+    if (isSpaService) return "spa";
+    if (isKeratinService) return "keratin_smoothing";
     return "styling";
   }
+
+  if (isHighlightService) return "highlights_balayage";
+  if (cat === "color") return "color";
+  if (isSpaService) return "spa";
+  if (isKeratinService) return "keratin_smoothing";
+  if (cat === "beard") return "beard";
+  if (name.includes("fade")) return "skin_fade";
+  if (name.includes("shave")) return "hot_towel_shave";
+
   return "default";
 }
 
