@@ -472,6 +472,8 @@ export default function AdminOnboarding() {
   const adminMenuRef = useRef(null);
   const sidebarRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const adminName = localStorage.getItem("name") || "System Admin";
+  const adminEmail = localStorage.getItem("email") || "admin@barberpro.com";
 
   useEffect(() => {
     if (sidebarRef.current) {
@@ -1261,39 +1263,79 @@ export default function AdminOnboarding() {
                   <div
                     style={{
                       position: "absolute",
-                      top: "calc(100% + 8px)",
+                      top: "calc(100% + 12px)",
                       right: 0,
-                      minWidth: 170,
+                      width: 208,
                       background: "#fff",
-                      border: `1px solid ${C.border}`,
-                      borderRadius: 10,
-                      boxShadow: "0 12px 28px rgba(0,0,0,.12)",
+                      border: "1px solid #F3F4F6",
+                      borderRadius: 12,
+                      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                      padding: "0",
                       overflow: "hidden",
-                      zIndex: 30,
+                      zIndex: 999,
+                      display: "flex",
+                      flexDirection: "column",
                     }}
                   >
-                    <button
-                      type="button"
-                      onClick={() => { handleTabChange("dashboard"); setAdminMenuOpen(false); }}
-                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", cursor: "pointer", fontSize: 13, color: C.ink, fontFamily: "inherit" }}
-                    >
-                      Profile
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { handleTabChange("settings"); setAdminMenuOpen(false); }}
-                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", borderTop: `1px solid ${C.border}`, cursor: "pointer", fontSize: 13, color: C.ink, fontFamily: "inherit" }}
-                    >
-                      Settings
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { localStorage.clear(); navigate("/login"); }}
-                      style={{ width: "100%", textAlign: "left", padding: "10px 12px", background: "#fff", border: "none", borderTop: `1px solid ${C.border}`, cursor: "pointer", fontSize: 13, color: C.red, fontFamily: "inherit", fontWeight: 600 }}
-                    >
-                      Logout
-                    </button>
-                </div>
+                    {/* Header */}
+                    <div style={{ padding: "14px 16px", borderBottom: "1px solid #F3F4F6", background: "linear-gradient(to right, #FDFBF7, #F5F1ED)" }}>
+                      <p style={{ fontFamily: "Georgia, serif", fontWeight: 900, fontSize: 12, color: "#3E362E", margin: 0 }}>
+                        {adminName}
+                      </p>
+                      <p style={{ fontSize: 10, color: "#78716C", marginTop: 4, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", margin: "4px 0 0 0" }}>
+                        {adminEmail}
+                      </p>
+                    </div>
+
+                    <div style={{ padding: "6px 0" }}>
+                      {/* MY PROFILE */}
+                      <button
+                        type="button"
+                        onClick={() => { handleTabChange("dashboard"); setAdminMenuOpen(false); }}
+                        style={{
+                          width: "100%", padding: "8px 16px", textAlign: "left", fontSize: 12, color: "#3E362E",
+                          fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", transition: "background 0.15s ease",
+                          border: "none", background: "transparent", cursor: "pointer", fontFamily: "inherit"
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139, 90, 43, 0.05)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        MY PROFILE
+                      </button>
+
+                      {/* SETTINGS */}
+                      <button
+                        type="button"
+                        onClick={() => { handleTabChange("settings"); setAdminMenuOpen(false); }}
+                        style={{
+                          width: "100%", padding: "8px 16px", textAlign: "left", fontSize: 12, color: "#3E362E",
+                          fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", transition: "background 0.15s ease",
+                          border: "none", background: "transparent", cursor: "pointer", fontFamily: "inherit"
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139, 90, 43, 0.05)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        SETTINGS
+                      </button>
+                    </div>
+
+                    <div style={{ borderTop: "1px solid #F3F4F6", padding: "6px 0" }}>
+                      {/* LOG OUT */}
+                      <button
+                        type="button"
+                        onClick={() => { localStorage.clear(); navigate("/login"); }}
+                        style={{
+                          width: "100%", padding: "8px 16px", textAlign: "left", fontSize: 12, color: "#DC2626",
+                          fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", transition: "background 0.15s ease",
+                          border: "none", background: "transparent", cursor: "pointer", fontFamily: "inherit"
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "#FEF2F2"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        LOG OUT
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

@@ -160,76 +160,75 @@ export function Header({ activePage, setActivePage, unreadCount = 0, onBellClick
                   position: "absolute",
                   top: "calc(100% + 12px)",
                   right: 0,
-                  width: 240,
-                  background: C.bg2,
-                  border: `1px solid ${C.border}`,
+                  width: 208,
+                  background: "#fff",
+                  border: "1px solid #F3F4F6",
                   borderRadius: 12,
-                  boxShadow: "0 10px 25px -5px rgba(28, 25, 23, 0.08), 0 8px 10px -6px rgba(28, 25, 23, 0.04)",
-                  padding: "8px 0",
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                  padding: "0",
+                  overflow: "hidden",
                   zIndex: 999,
                   display: "flex",
                   flexDirection: "column",
                 }}>
-                  <div style={{ padding: "8px 16px 4px", fontSize: 9, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em" }}>
-                    Account Details
+                  {/* Header */}
+                  <div style={{ padding: "14px 16px", borderBottom: "1px solid #F3F4F6", background: "linear-gradient(to right, #FDFBF7, #F5F1ED)" }}>
+                    <p style={{ fontFamily: "Georgia, serif", fontWeight: 900, fontSize: 12, color: "#3E362E", margin: 0 }}>
+                      {adminName}
+                    </p>
+                    <p style={{ fontSize: 10, color: "#78716C", marginTop: 4, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", margin: "4px 0 0 0" }}>
+                      {adminEmail}
+                    </p>
                   </div>
 
-                  {/* Profile Option -> switches view to Settings tab */}
-                  <button
-                    type="button"
-                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('settings'); }}
-                    style={dropdownItemStyle}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <User size={15} color={C.gold} />
-                    <span style={{ fontWeight: 500, color: C.ink }}>Admin Settings</span>
-                  </button>
+                  <div style={{ padding: "6px 0" }}>
+                    {/* MY PROFILE */}
+                    <button
+                      type="button"
+                      onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('dashboard'); }}
+                      style={{
+                        width: "100%", padding: "8px 16px", textAlign: "left", fontSize: 12, color: "#3E362E",
+                        fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", transition: "background 0.15s ease",
+                        border: "none", background: "transparent", cursor: "pointer", fontFamily: "inherit"
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139, 90, 43, 0.05)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                    >
+                      MY PROFILE
+                    </button>
 
-                  <div style={{ height: 1, background: C.border, margin: "6px 0" }} />
-
-                  <div style={{ padding: "4px 16px 4px", fontSize: 9, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: "0.12em" }}>
-                    Escalation Quick links
+                    {/* SETTINGS */}
+                    <button
+                      type="button"
+                      onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('settings'); }}
+                      style={{
+                        width: "100%", padding: "8px 16px", textAlign: "left", fontSize: 12, color: "#3E362E",
+                        fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", transition: "background 0.15s ease",
+                        border: "none", background: "transparent", cursor: "pointer", fontFamily: "inherit"
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(139, 90, 43, 0.05)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                    >
+                      SETTINGS
+                    </button>
                   </div>
 
-                  {/* Dashboard Shortcut */}
-                  <button
-                    type="button"
-                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('dashboard'); }}
-                    style={dropdownItemStyle}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <LayoutDashboard size={15} color={C.gold} />
-                    <span style={{ fontWeight: 500, color: C.ink }}>SLA Breach Center</span>
-                  </button>
-
-
-                  {/* Reports Shortcut */}
-                  <button
-                    type="button"
-                    onClick={() => { setDropdownOpen(false); if(setActivePage) setActivePage('reports'); }}
-                    style={dropdownItemStyle}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = C.bg; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <BarChart2 size={15} color={C.gold} />
-                    <span style={{ fontWeight: 500, color: C.ink }}>System Audit Ledger</span>
-                  </button>
-
-                  <div style={{ height: 1, background: C.border, margin: "6px 0" }} />
-
-                  {/* Sign Out Console */}
-                  <button
-                    type="button"
-                    onClick={() => { setDropdownOpen(false); if(onSignOut) onSignOut(); }}
-                    style={dropdownItemStyle}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = C.redLight; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <LogOut size={15} color={C.red} />
-                    <span style={{ fontWeight: 600, color: C.red }}>Sign Out Console</span>
-                  </button>
+                  <div style={{ borderTop: "1px solid #F3F4F6", padding: "6px 0" }}>
+                    {/* LOG OUT */}
+                    <button
+                      type="button"
+                      onClick={() => { setDropdownOpen(false); if(onSignOut) onSignOut(); }}
+                      style={{
+                        width: "100%", padding: "8px 16px", textAlign: "left", fontSize: 12, color: "#DC2626",
+                        fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", transition: "background 0.15s ease",
+                        border: "none", background: "transparent", cursor: "pointer", fontFamily: "inherit"
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#FEF2F2"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                    >
+                      LOG OUT
+                    </button>
+                  </div>
                 </div>
               </>
             )}
