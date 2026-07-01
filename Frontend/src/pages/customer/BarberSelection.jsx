@@ -9,6 +9,61 @@ import { SlidersHorizontal, X } from "lucide-react";
 // (Unused static BARBERS array removed; real barbers are fetched from database in useEffect)
 
 /* ─── HELPERS ───────────────────────────────────────────────── */
+const fitsAnyPredefinedSpec = (name) => {
+  const n = name.toLowerCase();
+  const isBeard = n.includes("beard") || n.includes("shave") || n.includes("mustache");
+  
+  const matchHaircut = !isBeard && (n.includes("cut") || n.includes("fade") || n.includes("style") || n.includes("blow") || n.includes("wash"));
+  if (matchHaircut) return true;
+  if (isBeard) return true;
+  
+  const matchSpa = !isBeard && (n.includes("spa") || n.includes("treatment") || n.includes("oil") || n.includes("mask"));
+  if (matchSpa) return true;
+  
+  const matchColor = !isBeard && (n.includes("color") || n.includes("highlight") || n.includes("glaze"));
+  if (matchColor) return true;
+  
+  const matchFacial = n.includes("facial") || n.includes("massage") || n.includes("detox");
+  if (matchFacial) return true;
+  
+  return false;
+};
+
+const fitsStandardCategory = (name, spec) => {
+  const n = name.toLowerCase();
+  const isBeard = n.includes("beard") || n.includes("shave") || n.includes("mustache");
+  if (spec === "haircut & styling") return !isBeard && (n.includes("cut") || n.includes("fade") || n.includes("style") || n.includes("blow") || n.includes("wash"));
+  if (spec === "beard sculpting & shave") return isBeard;
+  if (spec === "hair spa & treatment") return !isBeard && (n.includes("spa") || n.includes("treatment") || n.includes("oil") || n.includes("mask"));
+  if (spec === "hair coloring & highlights") return !isBeard && (n.includes("color") || n.includes("highlight") || n.includes("glaze"));
+  if (spec === "facial & grooming massage") return n.includes("facial") || n.includes("massage") || n.includes("detox");
+  return false;
+};
+
+const PREDEFINED_SPECS = [
+  "haircut & styling",
+  "beard sculpting & shave",
+  "hair spa & treatment",
+  "hair coloring & highlights",
+  "facial & grooming massage",
+  "ayurvedic head massage",
+  "all-rounder master stylist"
+];
+
+const doesServiceMatchSpecs = (serviceName, specs) => {
+  if (specs.length === 0) return true;
+  const normalizedSpecs = specs.map(s => s.toLowerCase());
+  if (normalizedSpecs.some(s => s.includes("all-rounder") || s.includes("master stylist"))) return true;
+  
+  const hasCustomSpec = normalizedSpecs.some(s => !PREDEFINED_SPECS.includes(s));
+  const fitsPredefined = fitsAnyPredefinedSpec(serviceName);
+  
+  if (!fitsPredefined && hasCustomSpec) {
+    return true;
+  }
+  
+  return normalizedSpecs.some(spec => fitsStandardCategory(serviceName, spec) || serviceName.toLowerCase().includes(spec));
+};
 function Stars({ rating }) {
   return (
     <div style={{ display: "flex", gap: 2 }}>
@@ -326,7 +381,14 @@ export default function BarberSelection() {
     const matchRating = b.rating >= minRating;
     const matchDist   = b.distance <= maxDistance;
     const matchAvail  = showAll || b.status === "Available";
-    return matchSearch && matchRating && matchDist && matchAvail;
+    
+    // Filter barbers by customer's selected service specialization
+    let matchService = true;
+    if (selectedService && selectedService.name) {
+      matchService = doesServiceMatchSpecs(selectedService.name, b.specialties);
+    }
+    
+    return matchSearch && matchRating && matchDist && matchAvail && matchService;
   });
 
   const handleAutoAssign = () => {
