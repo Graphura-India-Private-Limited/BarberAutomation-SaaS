@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Scissors, LogOut, Clock, CheckCircle, XCircle, Users, 
-  Coffee, Sandwich, ArrowLeft 
+  Coffee, Sandwich, ArrowLeft, Calendar 
 } from "lucide-react";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -68,7 +68,8 @@ export default function BreakApprovalDashboard() {
   const breakStats = useMemo(() => {
     const lunchCount = requests.filter(r => r.break_type === "lunch").length;
     const teaCount = requests.filter(r => r.break_type === "short" || r.break_type === "long").length;
-    return { total: requests.length, lunch: lunchCount, tea: teaCount };
+    const leaveCount = requests.filter(r => r.break_type === "leave").length;
+    return { total: requests.length, lunch: lunchCount, tea: teaCount, leave: leaveCount };
   }, [requests]);
 
   if (loading) {
@@ -86,7 +87,7 @@ export default function BreakApprovalDashboard() {
   }
 
   return (
-    <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen relative" style={{ background: "#FAF6F0" }}>
+    <div className="px-3.5 py-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen relative" style={{ background: "#FAF6F0" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
         body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
@@ -114,7 +115,7 @@ export default function BreakApprovalDashboard() {
       <div className="relative z-10 max-w-4xl mx-auto">
 
         {/* ── CONTEXT HEADER TITLE CARD (Rule 1 & Rule 2 Standard Set) ── */}
-        <header className="mb-8 rounded-3xl p-6 md:p-8 card relative overflow-hidden bg-white text-left">
+        <header className="mb-8 rounded-3xl p-4 sm:p-6 md:p-8 card relative overflow-hidden bg-white text-left">
           <div className="relative z-10">
             {/* Rule 2 tag label tag description tracker text parameters */}
             <p className="font-extrabold uppercase tracking-widest text-[11px] text-[#C5A059] mb-1.5 font-sans">
@@ -128,13 +129,13 @@ export default function BreakApprovalDashboard() {
             {/* Rule 3 Muted base contents summaries layouts elements */}
             <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-2">Manage staff status updates, lunchtime allocations, and active technician break coverage pipelines smoothly.</p>
           </div>
-          <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-5 transform rotate-6 pointer-events-none hidden sm:block">
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.03] transform rotate-6 pointer-events-none hidden xl:block">
             <Clock className="w-28 h-28 text-amber-700" strokeWidth={1} />
           </div>
         </header>
 
         {/* ── COUNTER METRICS DISPLAY SHARDS ── */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-left">
+        <section className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8 text-left">
           <div className="bg-white border border-[#EADBCE] rounded-2xl p-4 text-center shadow-sm card hover:transform-none">
             <div className="mx-auto w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center mb-2 text-amber-700">
               <Users size={16} />
@@ -156,6 +157,13 @@ export default function BreakApprovalDashboard() {
             </div>
             <span className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Short Breaks</span>
             <span className="block text-xl font-black font-serif text-stone-900 mt-0.5">{breakStats.tea}</span>
+          </div>
+          <div className="bg-white border border-[#EADBCE] rounded-2xl p-4 text-center shadow-sm card hover:transform-none">
+            <div className="mx-auto w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center mb-2 text-teal-700">
+              <Calendar size={16} />
+            </div>
+            <span className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Leave Requests</span>
+            <span className="block text-xl font-black font-serif text-stone-900 mt-0.5">{breakStats.leave}</span>
           </div>
         </section>
 
@@ -194,10 +202,16 @@ export default function BreakApprovalDashboard() {
                     <div className="flex items-center gap-4.5">
                       <div className="w-14 h-14 rounded-2xl border flex items-center justify-center text-xl shadow-inner flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
                            style={{ 
-                             backgroundColor: req.break_type === 'lunch' ? '#FFF7ED' : '#F0F9FF',
-                             borderColor: req.break_type === 'lunch' ? '#FED7AA' : '#BAE6FD'
+                             backgroundColor: req.break_type === 'lunch' ? '#FFF7ED' : req.break_type === 'leave' ? '#F0FDF4' : '#F0F9FF',
+                             borderColor: req.break_type === 'lunch' ? '#FED7AA' : req.break_type === 'leave' ? '#BBF7D0' : '#BAE6FD'
                            }}>
-                        {req.break_type === 'lunch' ? <Sandwich size={22} className="text-orange-600" /> : <Coffee size={22} className="text-sky-600" />}
+                        {req.break_type === 'lunch' ? (
+                          <Sandwich size={22} className="text-orange-600" />
+                        ) : req.break_type === 'leave' ? (
+                          <Calendar size={22} className="text-emerald-600" />
+                        ) : (
+                          <Coffee size={22} className="text-sky-600" />
+                        )}
                       </div>
                       <div>
                         {/* Operator Name text format details */}
@@ -207,8 +221,20 @@ export default function BreakApprovalDashboard() {
                         </div>
                         {/* Rule 2 metadata badge kicker tag config styles */}
                         <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-1 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-md inline-block font-sans">
-                          {req.break_type} • {req.duration_mins} Mins Duration
+                          {req.break_type === "leave" 
+                            ? `Leave Request • ${Math.round(req.duration_mins / 1440)} Days` 
+                            : `${req.break_type === "lunch" ? "Lunch Break" : req.break_type} • ${req.duration_mins} Mins Duration`}
                         </p>
+                        {req.break_type === "leave" && req.start_time && (
+                          <p className="text-[10px] font-bold text-stone-500 mt-1 font-sans">
+                            Range: {new Date(req.start_time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} to {new Date(new Date(req.start_time).getTime() + (req.duration_mins * 60000)).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </p>
+                        )}
+                        {req.reason && (
+                          <p className="text-[11px] text-[#8B5A2B] font-medium mt-1 font-sans italic">
+                            Reason: "{req.reason}"
+                          </p>
+                        )}
                       </div>
                     </div>
 

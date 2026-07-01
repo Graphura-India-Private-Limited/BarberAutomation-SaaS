@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
 
 import {
   SERVICES,
@@ -35,7 +35,7 @@ const ScissorIcon = ({ className }) => (
 
 
 // ─── QUEUE ROW COMPONENT ──────────────────────────────────────────────────────
-function QueueRow({ entry, idx, onClick, onServe }) {
+function QueueRow({ entry, idx, onClick }) {
   const barber  = BARBERS.find(b => b.id === entry.barber);
   const svc     = SERVICES.find(s => s.id === entry.service);
   const isFirst = entry.position === 1;
@@ -43,16 +43,18 @@ function QueueRow({ entry, idx, onClick, onServe }) {
   return (
     <div
       onClick={onClick}
-      className={`animate-slide-up flex items-center gap-4 px-5 py-4 cursor-pointer bg-white border border-stone-200/50 rounded-2xl transition-all hover:shadow-sm ${
-        isFirst ? 'ring-2 ring-[#C5A059] bg-[#FFFBF4]/40' : ''
+      className={`animate-slide-up flex items-center gap-4 px-5 py-4 cursor-pointer bg-white border rounded-2xl transition-all duration-300 hover:shadow-md hover:scale-[1.01] ${
+        isFirst 
+          ? 'border-[#C5A059] shadow-[0_4px_20px_rgba(197,160,89,0.08)] bg-gradient-to-r from-[#FFFBF4]/60 to-white' 
+          : 'border-stone-200/60 shadow-3xs hover:border-[#C5A059]/40'
       }`}
       style={{ animationDelay: `${idx * 0.07}s` }}
     >
       {/* Position Badge */}
       <div 
-        className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-black text-sm transition-colors"
+        className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-black text-sm transition-all"
         style={{
-          background: isFirst ? '#3E362E' : '#F5EFE6',
+          background: isFirst ? 'linear-gradient(135deg, #3E362E, #2A241F)' : '#F5EFE6',
           border: `1.5px solid ${isFirst ? '#2A241F' : '#EAD8C0'}`,
           color: isFirst ? '#FFF' : '#3E362E',
         }}
@@ -62,42 +64,25 @@ function QueueRow({ entry, idx, onClick, onServe }) {
 
       {/* Info context */}
       <div className="flex-1 min-w-0 text-left">
-        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+        <div className="flex items-center gap-2 flex-wrap mb-1">
           <span className="font-extrabold text-stone-900 text-base tracking-tight">{entry.name}</span>
           <SourceTag src={entry.source} />
-          {isFirst && <Chip color="#A37B58">● NEXT UP</Chip>}
+          {isFirst && <Chip color="#C5A059">● NEXT UP</Chip>}
         </div>
-        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
-          {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
+        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider flex items-center gap-1">
+          <span>{barber?.emoji} {barber?.name}</span>
+          <span className="text-stone-300 font-normal">·</span>
+          <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
-        {entry.services && entry.services.length > 1 && (
-          <div className="mt-2 pl-2 border-l border-[#C5A059] space-y-1">
-            {entry.services.slice(1).map((s, sIdx) => (
-              <p key={sIdx} className="text-xs text-stone-600 font-medium">
-                👥 <span className="font-bold text-stone-800">{s.member_name}</span>: <span className="italic">{s.service_name}</span>
-              </p>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Wait time text metric */}
-      <div className="text-right flex-shrink-0">
-        <p className="font-black text-sm text-stone-900 leading-none mb-1">
+      <div className="text-right flex-shrink-0 flex flex-col justify-center items-end">
+        <p className={`font-black text-sm leading-none mb-1 ${isFirst ? 'text-[#C5A059]' : 'text-stone-900'}`}>
           {fmtWait(entry.position, entry.service)}
         </p>
-        <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">{timeAgo(entry.joinedAt)}</p>
+        <p className="text-[9px] text-stone-400 font-bold uppercase tracking-wider">{timeAgo(entry.joinedAt)}</p>
       </div>
-
-      {/* Action Trigger */}
-      {isFirst && (
-        <button
-          onClick={e => { e.stopPropagation(); onServe(entry.id); }}
-          className="bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-[10px] uppercase tracking-widest px-4 py-2.5 rounded-xl transition-colors shadow-xs cursor-pointer"
-        >
-          SERVE
-        </button>
-      )}
     </div>
   );
 }
@@ -138,15 +123,6 @@ function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
         <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
           {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
         </p>
-        {entry.services && entry.services.length > 1 && (
-          <div className="mt-2 pl-2 border-l border-[#C5A059] space-y-1">
-            {entry.services.slice(1).map((s, sIdx) => (
-              <p key={sIdx} className="text-xs text-stone-600 font-medium">
-                👥 <span className="font-bold text-stone-800">{s.member_name}</span>: <span className="italic">{s.service_name}</span>
-              </p>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Trigger Handler */}
@@ -409,15 +385,12 @@ export default function SmartQueue() {
           {tab === 'queue' && (
             <div className="flex flex-col gap-3">
               {queue.length === 0 ? (
-                <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">
-                  <p className="font-extrabold text-stone-900 text-xl tracking-tight mb-1">Queue container empty</p>
-                  <p className="text-stone-400 text-xs font-semibold uppercase tracking-wider mb-6">No walk-in lines active</p>
-                  <button 
-                    className="bg-[#3E362E] hover:bg-[#2A241F] text-white font-black text-xs uppercase tracking-widest px-6 py-3.5 rounded-xl cursor-pointer transition-colors"
-                    onClick={() => setShowAdd(true)}
-                  >
-                    + Inject Customer
-                  </button>
+                <div className="bg-white/80 border border-stone-200/60 rounded-3xl p-12 text-center shadow-2xs backdrop-blur-md">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FAF6F0] border border-stone-200/60 flex items-center justify-center mx-auto mb-4 text-[#C5A059]">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <p className="font-serif font-black text-[#3E362E] text-lg tracking-tight mb-1">Queue is empty</p>
+                  <p className="text-stone-400 text-xs font-bold uppercase tracking-wider">No active walk-in lines right now</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">

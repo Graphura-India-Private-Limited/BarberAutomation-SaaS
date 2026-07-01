@@ -5,6 +5,7 @@ import Footer from "../../components/layout/Footer";
 import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 import CustomSelect from "../../components/common/CustomSelect";
 import { SlidersHorizontal, X } from "lucide-react";
+import { getPremiumServiceImage } from "../../components/common/Modals";
 
 const services = [
   // styling (Cuts & Styling) - 1 to 10
@@ -135,13 +136,73 @@ export default function WomenServices() {
   const [slideIndex, setSlideIndex]         = useState(0);
   const [visibleCards, setVisibleCards]     = useState(new Set());
   const [showFilters, setShowFilters]       = useState(false);
+  const [servicesList, setServicesList] = useState([]);
+  const [loadingState, setLoadingState] = useState(true);
   const cardRefs = useRef({});
 
   useEffect(() => {
-    const salonId = localStorage.getItem("selectedSalonId");
-    if (!salonId) {
-      navigate("/nearby");
-    }
+    const fetchServices = async () => {
+      try {
+        const salonId = localStorage.getItem("selectedSalonId");
+        if (!salonId) {
+          navigate("/nearby");
+          return;
+        }
+        const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        const res = await fetch(`${API}/services/${salonId}`);
+        const data = await res.json();
+        if (data.success) {
+          const mapped = data.services
+            .filter(bs => bs.category === "women" && bs.is_active !== false)
+            .map(bs => {
+              const match = services.find(s => s.name.toLowerCase() === bs.name.toLowerCase());
+              const image = getPremiumServiceImage(bs.name, "women");
+              
+              if (match) {
+                return {
+                  ...match,
+                  id: bs._id,
+                  price: bs.price,
+                  duration: `${bs.duration} min`,
+                  desc: bs.description || match.desc,
+                  img: image,
+                  gender: "women"
+                };
+              }
+              
+              let subcat = "styling";
+              const name = bs.name.toLowerCase();
+              if (name.includes("color") || name.includes("colour") || name.includes("highlight") || name.includes("balayage") || name.includes("ombre") || name.includes("streaks") || name.includes("henna") || name.includes("glaze") || name.includes("dye")) {
+                subcat = "color";
+              } else if (name.includes("spa") || name.includes("massage") || name.includes("facial") || name.includes("clean") || name.includes("scrub") || name.includes("detox") || name.includes("mask") || name.includes("wellness") || name.includes("therapy")) {
+                subcat = "spa";
+              } else if (name.includes("keratin") || name.includes("cysteine") || name.includes("olaplex") || name.includes("smooth") || name.includes("shine") || name.includes("anti-hairfall") || name.includes("biotin") || name.includes("treatment")) {
+                subcat = "treatment";
+              }
+              
+              return {
+                id: bs._id,
+                name: bs.name,
+                desc: bs.description || "Premium styling service.",
+                price: bs.price,
+                duration: `${bs.duration || 30} min`,
+                category: subcat,
+                gender: "women",
+                rating: 5,
+                reviews: 80,
+                tag: null,
+                img: image
+              };
+            });
+          setServicesList(mapped);
+        }
+      } catch (err) {
+        console.error("Error fetching salon services:", err);
+      } finally {
+        setLoadingState(false);
+      }
+    };
+    fetchServices();
   }, [navigate]);
 
   useEffect(() => {
@@ -163,11 +224,10 @@ export default function WomenServices() {
         observers.push(obs);
       });
     }, 60);
-    timers.push(t);
-    return () => { timers.forEach(clearTimeout); observers.forEach((o) => o.disconnect()); };
-  }, [activeCategory, selectedPrice, minRating, searchQuery, sortBy]);
+    return () => { clearTimeout(t); observers.forEach((o) => o.disconnect()); };
+  }, [activeCategory, selectedPrice, minRating, searchQuery, sortBy, servicesList]);
 
-  const filtered = services
+  const filtered = servicesList
     .filter((s) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -430,7 +490,11 @@ export default function WomenServices() {
 
           {/* CARDS */}
           <div className="flex-1 w-full min-w-0">
-            {filtered.length === 0 ? (
+            {loadingState ? (
+              <div style={{ textAlign: "center", padding: "100px 20px", background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0" }}>
+                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 14, color: "#888", letterSpacing: "0.05em" }}>Loading Catalog Services...</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
                 <div style={{ fontSize: 36, marginBottom: 14 }}>✦</div>
                 <p style={{ fontSize: 20, fontFamily: "'Cormorant Garamond',serif", color: "#8A7060", margin: "0 0 8px" }}>No services found</p>
@@ -509,35 +573,7 @@ export default function WomenServices() {
             )}
           </div>
 
-          {/* FLOATING FILTERS BUTTON FOR MOBILE/TABLET */}
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 lg:hidden">
-            <button
-              onClick={() => setShowFilters(true)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                background: "#2C241E",
-                color: "#F5EFE0",
-                border: "1px solid #C5A059",
-                borderRadius: 30,
-                padding: "10px 20px",
-                fontFamily: "'Montserrat',sans-serif",
-                fontWeight: 700,
-                fontSize: 11,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                cursor: "pointer",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-                transition: "all 0.3s"
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#2C241E"; e.currentTarget.style.color = "#F5EFE0"; }}
-            >
-              <SlidersHorizontal size={14} className="text-[#C5A059]" />
-              <span>Filters</span>
-            </button>
-          </div>
+
 
         </div>
       </div>

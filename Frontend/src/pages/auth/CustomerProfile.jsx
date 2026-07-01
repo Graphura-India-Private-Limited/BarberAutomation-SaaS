@@ -1543,12 +1543,7 @@ export default function CustomerProfile() {
                   <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Barber Stylist</span>
                   <span className="font-extrabold text-[#3D3126]">{selectedApptDetails.barberName}</span>
                 </div>
-                <div className="flex justify-between border-b border-stone-100 pb-2">
-                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Client (For Who)</span>
-                  <span className="font-extrabold text-[#3D3126]">
-                    {selectedApptDetails.servicesList?.[0]?.member_name || "Self"}
-                  </span>
-                </div>
+
                 <div className="flex justify-between border-b border-stone-100 pb-2">
                   <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Date</span>
                   <span className="font-extrabold text-[#3D3126] font-mono">{selectedApptDetails.date}</span>

@@ -92,7 +92,7 @@ export default function OwnerLiveMonitoring() {
     "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=400&q=80",
     "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=400&q=80",
     "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=400&q=80",
-    "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80"
+    "https://images.unsplash.com/photo-1593702295094-aec22597af65?auto=format&fit=crop&w=400&q=80"
   ][i % 5];
 
   return (

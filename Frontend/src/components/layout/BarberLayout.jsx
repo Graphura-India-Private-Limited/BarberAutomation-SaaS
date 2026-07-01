@@ -274,49 +274,36 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
                 {initials}
               </button>
 
-              {showProfileDropdown && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setShowProfileDropdown(false)} />
-                  <div className="absolute right-0 mt-2.5 w-52 bg-white border border-[#C5A059]/30 rounded-2xl p-4 shadow-xl z-[200] text-left text-[10px] font-black uppercase tracking-wider text-[#3E362E] animate-in fade-in slide-in-from-top-1 duration-200">
-                    <div className="border-b border-[#EADDCA]/50 pb-3 mb-3 px-1 text-left">
-                      <p className="font-serif font-black text-[#3E362E] text-sm tracking-normal capitalize">{barberName.split(" ")[0]}</p>
-                      <p className="text-[9px] text-[#C5A059] font-black tracking-widest mt-1">{specialization}</p>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <button 
-                        onClick={() => { navigate("/barber/profile"); setShowProfileDropdown(false); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#FAF6F0] hover:text-[#8B5A2B] rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
-                      >
-                        My Profile
-                      </button>
-                      <button 
-                        onClick={() => { navigate("/barber/service-console"); setShowProfileDropdown(false); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#FAF6F0] hover:text-[#8B5A2B] rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
-                      >
-                        Live Console
-                      </button>
-                      <button 
-                        onClick={() => { navigate("/barber/settings"); setShowProfileDropdown(false); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 hover:bg-[#FAF6F0] hover:text-[#8B5A2B] rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
-                      >
-                        Settings
-                      </button>
-                    </div>
-
-                    <div className="border-t border-[#EADDCA]/50 pt-2.5 mt-2.5">
-                      <button 
-                        onClick={() => { localStorage.clear(); navigate("/barber/login"); }} 
-                        className="w-full flex items-center gap-2 px-2.5 py-2 text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer text-left uppercase tracking-wider text-[10px]"
-                      >
-                        Logout
-                      </button>
-                    </div>
+       {showProfileDropdown && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowProfileDropdown(false)} />
+                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                  <div className="p-3.5 border-b border-gray-100 bg-gradient-to-r from-[#FDFBF7] to-[#F5F1ED]">
+                    <p className="font-serif font-black text-xs text-[#3E362E]">{barberName}</p>
+                    <p className="text-[10px] text-stone-500 mt-1 font-bold uppercase tracking-wider">{salonName}</p>
                   </div>
-                </>
-              )}
-            </div>
 
+                  <div className="py-1.5">
+                    <button
+                      onClick={() => { navigate("/barber/profile"); setShowProfileDropdown(false); }}
+                      className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >MY PROFILE</button>
+                    <button
+                      onClick={() => { navigate("/barber/settings"); setShowProfileDropdown(false); }}
+                      className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >SETTINGS</button>
+                  </div>
+
+                  <div className="border-t border-gray-100 py-1.5">
+                    <button
+                      onClick={() => { localStorage.clear(); navigate("/barber/login"); }}
+                      className="w-full px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
+                    >LOGOUT</button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
           </div>
         </header>
 

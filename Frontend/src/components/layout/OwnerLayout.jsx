@@ -17,7 +17,7 @@ export default function OwnerLayout() {
 
   const salonName = localStorage.getItem("salonName") || "Barber Salon";
   const ownerName = localStorage.getItem("name") || "Owner";
-  const initials = ownerName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "OW";
+  const initials = ownerName.replace(/[^a-zA-Z\s]/g, "").trim().split(/\s+/).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "OW";
 
   useEffect(() => {
     const fetchPendingCount = async () => {
@@ -170,44 +170,38 @@ export default function OwnerLayout() {
                   className="fixed inset-0 z-40" 
                   onClick={() => setShowProfileDropdown(false)}
                 />
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                  <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-[#FDFBF7] to-[#F5F1ED]">
-                    <p className="font-serif font-black text-sm text-[#3E362E]">{ownerName}</p>
-                    <p className="text-xs text-stone-500 mt-1.5 font-bold uppercase tracking-wider">{salonName}</p>
+                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                  <div className="p-3.5 border-b border-gray-100 bg-gradient-to-r from-[#FDFBF7] to-[#F5F1ED]">
+                    <p className="font-serif font-black text-xs text-[#3E362E]">{ownerName}</p>
+                    <p className="text-[10px] text-stone-500 mt-1 font-bold uppercase tracking-wider">{salonName}</p>
                   </div>
                   
-                  <div className="py-2">
+                  <div className="py-1.5">
                     <button
                       onClick={() => {
                         navigate("/owner/settings");
                         setShowProfileDropdown(false);
                       }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      MY PROFILE
-                    </button>
+                      className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >MY PROFILE</button>
                     
                     <button
                       onClick={() => {
                         navigate("/owner/approvals");
                         setShowProfileDropdown(false);
                       }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      BREAK APPROVALS
-                    </button>
+                      className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >BREAK APPROVALS</button>
                   </div>
                   
-                  <div className="border-t border-gray-100 py-2">
+                  <div className="border-t border-gray-100 py-1.5">
                     <button
                       onClick={() => {
                         localStorage.clear();
                         navigate("/owner/login");
                       }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      LOGOUT
-                    </button>
+                      className="w-full px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
+                    >LOGOUT</button>
                   </div>
                 </div>
               </>
@@ -238,44 +232,38 @@ export default function OwnerLayout() {
                   className="fixed inset-0 z-40" 
                   onClick={() => setShowProfileDropdown(false)}
                 />
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
-                  <div className="p-4 border-b border-gray-100">
-                    <p className="font-bold text-sm text-gray-900">{ownerName}</p>
-                    <p className="text-xs text-stone-500 mt-1 font-bold uppercase tracking-wider">{salonName}</p>
+                <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+                  <div className="p-3 border-b border-gray-100">
+                    <p className="font-bold text-xs text-gray-900">{ownerName}</p>
+                    <p className="text-[9px] text-stone-500 mt-1 font-bold uppercase tracking-wider">{salonName}</p>
                   </div>
                   
-                  <div className="py-2">
+                  <div className="py-1.5">
                     <button
                       onClick={() => {
                         navigate("/owner/settings");
                         setShowProfileDropdown(false);
                       }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      MY PROFILE
-                    </button>
+                      className="w-full px-3 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >MY PROFILE</button>
                     
                     <button
                       onClick={() => {
                         navigate("/owner/approvals");
                         setShowProfileDropdown(false);
                       }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      BREAK APPROVALS
-                    </button>
+                      className="w-full px-3 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
+                    >BREAK APPROVALS</button>
                   </div>
                   
-                  <div className="border-t border-gray-100 py-2">
+                  <div className="border-t border-gray-100 py-1.5">
                     <button
                       onClick={() => {
                         localStorage.clear();
                         navigate("/owner/login");
                       }}
-                      className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
-                    >
-                      LOGOUT
-                    </button>
+                      className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-bold uppercase tracking-wider transition-colors"
+                    >LOGOUT</button>
                   </div>
                 </div>
               </>

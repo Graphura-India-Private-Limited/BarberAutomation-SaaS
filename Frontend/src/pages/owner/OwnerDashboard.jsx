@@ -190,8 +190,14 @@ export default function OwnerDashboard() {
                               <div>
                                 <p className="text-xs font-black text-[#8B5A2B]">{req.barber_id?.name || "A Barber"}</p>
                                 <p className="text-[10px] text-stone-500 mt-0.5">
-                                  Type: <span className="capitalize">{req.break_type}</span> ({req.duration_mins || 15}m)
+                                  Type: <span className="capitalize">{req.break_type === "leave" ? "Multi-Day Leave" : req.break_type === "lunch" ? "Lunch Break" : req.break_type}</span>{" "}
+                                  ({req.break_type === "leave" ? `${Math.round((req.duration_mins || 1440) / 1440)} Days` : `${req.duration_mins || 15}m`})
                                 </p>
+                                {req.break_type === "leave" && req.start_time && (
+                                  <p className="text-[9px] font-bold text-stone-400 mt-0.5">
+                                    Range: {new Date(req.start_time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })} to {new Date(new Date(req.start_time).getTime() + (req.duration_mins * 60000)).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                  </p>
+                                )}
                                 {req.reason && <p className="text-[10px] italic text-stone-400 mt-1">"{req.reason}"</p>}
                               </div>
                               <div className="flex flex-col gap-1.5 shrink-0">

@@ -197,6 +197,60 @@ export default function HomeOverview() {
           </div>
         </div>
 
+        {/* ── ADDITIONAL ANNOUNCEMENTS & METRICS (Fills empty space on iPad mini) ── */}
+        <div className="grid md:grid-cols-2 gap-6 mt-6">
+          {/* Announcements & Bulletin */}
+          <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-2xs">
+            <h3 className="text-sm font-black uppercase tracking-wider text-stone-900 mb-4 border-b pb-2 border-stone-100 flex items-center gap-2">
+              <span className="w-1 h-3 bg-[#C5A059] rounded-full" />
+              Salon Bulletin & Alerts
+            </h3>
+            <div className="space-y-4">
+              <div className="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60 text-left">
+                <span className="inline-block px-2 py-0.5 rounded-md bg-amber-100 text-[9px] font-black text-amber-800 uppercase tracking-wider mb-2">Festive Rush Alert</span>
+                <p className="text-xs font-bold text-stone-850 leading-relaxed">Daily working hours extended by 30 minutes for the upcoming weekend. Overtime bonuses will apply automatically.</p>
+                <p className="text-[10px] text-stone-400 font-mono mt-1">Posted 2 hours ago</p>
+              </div>
+              <div className="p-3.5 rounded-xl bg-stone-50 border border-stone-200/50 text-left">
+                <span className="inline-block px-2 py-0.5 rounded-md bg-stone-200 text-[9px] font-black text-stone-700 uppercase tracking-wider mb-2">Console Operations</span>
+                <p className="text-xs font-bold text-stone-850 leading-relaxed">Ensure you mark client sessions as "Completed" immediately after service to ensure correct live queue wait times.</p>
+                <p className="text-[10px] text-stone-400 font-mono mt-1">Posted 1 day ago</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Performance & Hygiene Guidelines */}
+          <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-2xs">
+            <h3 className="text-sm font-black uppercase tracking-wider text-stone-900 mb-4 border-b pb-2 border-stone-100 flex items-center gap-2">
+              <span className="w-1 h-3 bg-[#C5A059] rounded-full" />
+              Service & Hygiene Guidelines
+            </h3>
+            <div className="space-y-3.5">
+              <div className="flex items-start gap-3.5">
+                <div className="w-6 h-6 rounded-lg bg-[#FAF6F0] border border-stone-150 flex items-center justify-center shrink-0 text-[#C5A059] text-xs font-black">1</div>
+                <div className="text-left">
+                  <h4 className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">Sanitization Routine</h4>
+                  <p className="text-xs text-stone-500 mt-0.5 leading-relaxed font-medium">Sanitize all scissors, combs, and razors before and after attending to every customer.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3.5 border-t pt-3.5 border-stone-100">
+                <div className="w-6 h-6 rounded-lg bg-[#FAF6F0] border border-stone-150 flex items-center justify-center shrink-0 text-[#C5A059] text-xs font-black">2</div>
+                <div className="text-left">
+                  <h4 className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">Customer Welcoming</h4>
+                  <p className="text-xs text-stone-500 mt-0.5 leading-relaxed font-medium">Verify service and haircut details with the customer before starting their session.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3.5 border-t pt-3.5 border-stone-100">
+                <div className="w-6 h-6 rounded-lg bg-[#FAF6F0] border border-stone-150 flex items-center justify-center shrink-0 text-[#C5A059] text-xs font-black">3</div>
+                <div className="text-left">
+                  <h4 className="text-xs font-extrabold text-stone-900 uppercase tracking-wider">Digital Check-in</h4>
+                  <p className="text-xs text-stone-500 mt-0.5 leading-relaxed font-medium">Always verify booking codes in the smart queue interface before serving walk-ins.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

@@ -42,7 +42,11 @@ const Navbar = () => {
     if (token && role) {
       setIsLoggedIn(true);
       const initials = name
-        .split(" ")
+        .replace(/\(.*?\)/g, "")
+        .replace(/[^a-zA-Z\s]/g, "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
         .map((n) => n[0])
         .join("")
         .slice(0, 2)

@@ -375,7 +375,7 @@ const barberImg = (i) => [
   "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=200&q=80",
   "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=200&q=80",
-  "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=80"
+  "https://images.unsplash.com/photo-1593702295094-aec22597af65?auto=format&fit=crop&w=200&q=80"
 ][i % 5];
 
 const bStatus  = s => s === "available" ? C.green : s === "busy" ? C.amber : s === "break" ? C.blue : "#9CA3AF";
@@ -1012,7 +1012,8 @@ export default function AdminOnboarding() {
       {/* Mobile Sidebar Backdrop */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-stone-900/60 z-50 2xl:hidden animate-in fade-in duration-200" 
+           
+          className="fixed inset-0 bg-stone-900/60 z-50 lg:hidden animate-in fade-in duration-200"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -1022,7 +1023,7 @@ export default function AdminOnboarding() {
         className={`bg-white border-r border-stone-200 h-screen fixed inset-y-0 left-0 w-64 z-50 transition-all duration-300 flex flex-col shrink-0 overflow-hidden
           ${isSidebarOpen 
             ? "translate-x-0 shadow-2xl" 
-           : "-translate-x-full 2xl:translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
           }
         `}
       >
@@ -1044,7 +1045,7 @@ export default function AdminOnboarding() {
             </div>
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className=" 2xl:hidden p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg cursor-pointer"
+              className="lg:hidden p-1.5 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-lg cursor-pointer"
             >
               <X size={18} />
             </button>
@@ -1114,7 +1115,7 @@ export default function AdminOnboarding() {
       </aside>
 
       {/* ════ MAIN ════ */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden 2xl:pl-64" style={{ width: "100%" }}>
+      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden lg:pl-64" style={{ width: "100%" }}>
         <div className="px-4 md:px-8 w-full min-w-0">
 
           {/* ── HEADER ── */}
@@ -1124,7 +1125,8 @@ export default function AdminOnboarding() {
             <div className="flex items-center gap-3 w-full lg:w-auto min-w-0">
               <button 
                 onClick={() => setIsSidebarOpen(true)}
-                className="2xl:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
+                // className="xl:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
+                className="lg:hidden p-2 rounded-lg border border-[#E7E5E4] bg-white text-stone-700 hover:bg-stone-50 cursor-pointer flex items-center justify-center shrink-0"
               >
                 <Menu size={18} className="text-[#C5A059]" />
               </button>

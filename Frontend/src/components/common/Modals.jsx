@@ -60,6 +60,61 @@ export function fmtWait(position, service) {
   return `~${Math.floor(mins/60)}h ${mins%60}m`;
 }
 
+export function getPremiumServiceImage(serviceName = "", category = "") {
+  const n = (serviceName || "").toLowerCase();
+  const c = (category || "").toLowerCase();
+
+  // Specific matches for public folder images:
+  if (n.includes("mustache") || n.includes("trim")) {
+    return "/ashish-sam-N6gZ_28vL3c-unsplash.jpg";
+  }
+  if (n.includes("charcoal beard") || n.includes("softening")) {
+    return "/salah-regouane-Z2WfmQC-sVk-unsplash.jpg";
+  }
+  if (n.includes("aromatic scalp") || n.includes("soothing")) {
+    return "/sandra-gabriel-4PQ0aGtzGGI-unsplash.jpg";
+  }
+  if (n.includes("beard color") || n.includes("touch-up")) {
+    return "/shan-a-rajpoot-BTC7uMsbjdM-unsplash.jpg";
+  }
+  if (n.includes("royal beard") || n.includes("royal grooming") || n.includes("wedding")) {
+    return "/WhatsApp Image 2026-05-25 at 2.11.24 PM.jpeg";
+  }
+
+  // 1. Women's Services
+  if (c === "women" || c === "treatment" || n.includes("bridal") || n.includes("girl") || n.includes("balayage") || n.includes("blowout") || n.includes("cysteine") || n.includes("olaplex") || n.includes("feather") || n.includes("bob") || n.includes("women")) {
+    if (n.includes("color") || n.includes("colour") || n.includes("highlight") || n.includes("balayage") || n.includes("ombre") || n.includes("dye")) {
+      return "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=600&q=80"; // Women's color
+    }
+    if (n.includes("spa") || n.includes("massage") || n.includes("scalp") || n.includes("facial") || n.includes("treatment") || n.includes("keratin") || n.includes("smooth")) {
+      return "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=600&q=80"; // Women's spa/treatment
+    }
+    // Default women's haircut/styling
+    return "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80";
+  }
+
+  // 2. Men's Services
+  if (c === "men" || c === "beard" || n.includes("gentleman") || n.includes("men") || n.includes("boy") || n.includes("fade") || n.includes("shave") || n.includes("mustache")) {
+    if (n.includes("beard") || n.includes("shave") || n.includes("mustache") || n.includes("razor")) {
+      return "/ashish-sam-N6gZ_28vL3c-unsplash.jpg";
+    }
+    if (n.includes("spa") || n.includes("massage") || n.includes("facial") || n.includes("scrub") || n.includes("detox") || n.includes("mask") || n.includes("champi")) {
+      return "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&q=80"; // Men's facial/spa
+    }
+    // Default men's haircut
+    return "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80";
+  }
+
+  // 3. Addons/General/Fallbacks
+  if (n.includes("massage") || n.includes("spa") || n.includes("facial") || n.includes("wellness")) {
+    return "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80";
+  }
+  if (n.includes("color") || n.includes("colour") || n.includes("highlight")) {
+    return "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80";
+  }
+  return "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80";
+}
+
 // ─── ATOMS ────────────────────────────────────────────────────────────────────
 export function LiveDot({ active }) {
   return (

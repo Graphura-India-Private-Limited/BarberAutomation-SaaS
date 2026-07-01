@@ -5,6 +5,7 @@ import Footer from "../../components/layout/Footer";
 import SalonSelectorBar from "../../components/salon/SalonSelectorBar";
 import CustomSelect from "../../components/common/CustomSelect";
 import { SlidersHorizontal, X } from "lucide-react";
+import { getPremiumServiceImage } from "../../components/common/Modals";
 
 
 /* ─── DATA ─────────────────────────────────────────────────── */
@@ -471,12 +472,68 @@ export default function AddonServices() {
   const [showFilters,    setShowFilters]     = useState(false);
 
   const cardRefs = useRef({});
+  const [servicesList, setServicesList] = useState([]);
+  const [loadingState, setLoadingState] = useState(true);
 
   useEffect(() => {
-    const salonId = localStorage.getItem("selectedSalonId");
-    if (!salonId) {
-      navigate("/nearby");
-    }
+    const fetchServices = async () => {
+      try {
+        const salonId = localStorage.getItem("selectedSalonId");
+        if (!salonId) {
+          navigate("/nearby");
+          return;
+        }
+        const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+        const res = await fetch(`${API}/services/${salonId}`);
+        const data = await res.json();
+        if (data.success) {
+          const mapped = data.services
+            .filter(bs => bs.category === "addon" && bs.is_active !== false)
+            .map(bs => {
+              const match = SERVICES.find(s => s.name.toLowerCase() === bs.name.toLowerCase());
+              const image = getPremiumServiceImage(bs.name, "addon");
+              
+              if (match) {
+                return {
+                  ...match,
+                  id: bs._id,
+                  price: bs.price,
+                  duration: `${bs.duration} min`,
+                  desc: bs.description || match.desc,
+                  img: image
+                };
+              }
+              
+              let subcat = "treatment";
+              const name = bs.name.toLowerCase();
+              if (name.includes("color") || name.includes("colour") || name.includes("highlight") || name.includes("streaks") || name.includes("henna") || name.includes("glaze") || name.includes("dye")) {
+                subcat = "color";
+              } else if (name.includes("massage") || name.includes("spa") || name.includes("facial") || name.includes("clean") || name.includes("scrub") || name.includes("detox") || name.includes("mask") || name.includes("wellness") || name.includes("shoulder") || name.includes("reflexology") || name.includes("champi") || name.includes("roller")) {
+                subcat = "massage";
+              }
+              
+              return {
+                id: bs._id,
+                name: bs.name,
+                desc: bs.description || "Premium addon service.",
+                price: bs.price,
+                duration: `${bs.duration || 20} min`,
+                category: subcat,
+                rating: 5,
+                reviews: 80,
+                tag: null,
+                img: image
+              };
+            });
+          setServicesList(mapped);
+        }
+      } catch (err) {
+        console.error("Error fetching salon services:", err);
+      } finally {
+        setLoadingState(false);
+      }
+    };
+    fetchServices();
   }, [navigate]);
 
   useEffect(() => {
@@ -510,10 +567,10 @@ export default function AddonServices() {
       });
     }, 60);
     return () => { clearTimeout(t); observers.forEach((o) => o.disconnect()); };
-  }, [activeCategory, selectedPrice, minRating, searchQuery, sortBy]);
+  }, [activeCategory, selectedPrice, minRating, searchQuery, sortBy, servicesList]);
 
   /* filtering + sorting */
-  const filtered = SERVICES
+  const filtered = servicesList
     .filter((s) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -804,7 +861,11 @@ export default function AddonServices() {
 
           {/* ── CARDS GRID ── */}
           <div className="flex-1 w-full min-w-0">
-            {filtered.length === 0 ? (
+            {loadingState ? (
+              <div style={{ textAlign: "center", padding: "100px 20px", background: "#fff", borderRadius: 16, border: "1px solid #EAE0D0" }}>
+                <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 14, color: "#888", letterSpacing: "0.05em" }}>Loading Catalog Services...</p>
+              </div>
+            ) : filtered.length === 0 ? (
               <div style={{ textAlign: "center", padding: "80px 20px", background: "#fff", borderRadius: 16, border: "1px dashed #DDD4C4" }}>
                 <div style={{ fontSize: 36, marginBottom: 14 }}>✦</div>
                 <p style={{ fontSize: 20, fontFamily: "'Cormorant Garamond',serif", color: "#8A7060", margin: "0 0 8px" }}>No add-ons found</p>

@@ -187,11 +187,6 @@ export default function BookingHistory() {
             <h3 className="text-xl font-serif font-bold text-[#3E362E] mt-1">{booking.salon}</h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <p className="text-[9px] text-stone-400 font-mono uppercase tracking-wider">{booking.ref}</p>
-              {booking.members.length > 0 && (
-                <span className="text-[9px] font-black bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded-full">
-                  +{booking.members.length} member{booking.members.length > 1 ? 's' : ''}: {booking.members.join(', ')}
-                </span>
-              )}
             </div>
           </div>
 
@@ -359,9 +354,7 @@ export default function BookingHistory() {
                     {b.barber && b.barber !== 'Assigned Barber' && (
                       <div className="flex justify-between"><span className="text-stone-500 font-medium text-xs">Barber</span><span className="font-bold text-[#3E362E]">{b.barber}</span></div>
                     )}
-                    {b.members.length > 0 && (
-                      <div className="flex justify-between"><span className="text-stone-500 font-medium text-xs">Members</span><span className="font-bold text-[#3E362E]">{b.members.join(', ')}</span></div>
-                    )}
+
                     <div className="flex justify-between items-center pt-2 border-t border-stone-100">
                       <span className="text-stone-500 font-medium text-xs">Status</span>
                       <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${cfg.bg} ${cfg.text} ${cfg.border}`}>{cfg.label}</span>
