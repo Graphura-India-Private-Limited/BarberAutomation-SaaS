@@ -538,7 +538,31 @@ export default function AddonServices() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const t = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 100);
+    return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    if (!loadingState) {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
+      const timer = setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [loadingState]);
 
   /* hero slideshow */
   useEffect(() => {
@@ -623,7 +647,7 @@ export default function AddonServices() {
       >
 
         {/* ── BACK BUTTON ── */}
-        <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[90px] md:left-5 z-[9999]">
+        <div className="fixed top-20 left-4 md:top-[90px] md:left-5 z-[9999]">
           <button
             onClick={() => navigate(-1)}
             style={{ width: 48, height: 48, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(10px)", cursor: "pointer", fontSize: 20, boxShadow: "0 8px 20px rgba(0,0,0,0.15)", transition: "all 0.3s ease", display: "flex", alignItems: "center", justifyContent: "center" }}

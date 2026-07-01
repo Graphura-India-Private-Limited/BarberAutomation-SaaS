@@ -212,7 +212,31 @@ export default function WomenServices() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const t = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 100);
+    return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    if (!loadingState) {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
+      const timer = setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [loadingState]);
 
   useEffect(() => {
     setVisibleCards(new Set());
@@ -270,7 +294,7 @@ export default function WomenServices() {
             <div key={idx} style={{ position: "absolute", inset: 0, backgroundImage: `url('${img}')`, backgroundSize: "cover", backgroundPosition: "center", opacity: idx === slideIndex ? 1 : 0, transition: "opacity 1.2s ease", filter: "brightness(0.38)" }} />
           ))}
 
-          <div className="fixed bottom-5 left-5 md:bottom-auto md:top-[90px] md:left-5 z-[9999]">
+          <div className="fixed top-20 left-4 md:top-[90px] md:left-5 z-[9999]">
             <button
               onClick={() => navigate(localStorage.getItem("token") ? "/dashboard" : "/")}
               style={{
