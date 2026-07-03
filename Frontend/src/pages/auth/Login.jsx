@@ -90,13 +90,55 @@ export default function Login() {
   };
 
   /* ── Google login flow ── */
-  const handleGoogleCredentialResponse = async (response) => {
+  const [googleClientId, setGoogleClientId] = useState("");
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch(`${API}/auth/config`);
+        const data = await res.json();
+        if (data.success && data.googleClientId) {
+          setGoogleClientId(data.googleClientId);
+        }
+      } catch (err) {
+        console.error("Failed to load configs:", err);
+      }
+    };
+    fetchConfig();
+  }, []);
+
+  const handleGoogleLogin = () => {
+    if (!googleClientId || !window.google) {
+      setError("Google Sign-In is initializing. Please try again in a moment.");
+      return;
+    }
+    setError("");
+    try {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: googleClientId,
+        scope: "email profile openid",
+        callback: async (tokenResponse) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            await handleGoogleLoginSuccess(tokenResponse.access_token);
+          } else {
+            setError("Google login was cancelled or failed.");
+          }
+        },
+      });
+      client.requestAccessToken();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to open Google sign-in window.");
+    }
+  };
+
+  const handleGoogleLoginSuccess = async (accessToken) => {
     setLoading(true); setError("");
     try {
       const res = await fetch(`${API}/auth/google-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: response.credential }),
+        body: JSON.stringify({ accessToken }),
       });
       const data = await res.json();
       if (!data.success) {
@@ -105,7 +147,7 @@ export default function Login() {
 
       if (data.needsMobile) {
         setGoogleInfo({
-          token: response.credential,
+          accessToken,
           email: data.email,
           name: data.name,
           picture: data.picture,
@@ -144,7 +186,7 @@ export default function Login() {
       const res = await fetch(`${API}/auth/google-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: googleInfo.token, mobile: googleMobile }),
+        body: JSON.stringify({ accessToken: googleInfo.accessToken, mobile: googleMobile }),
       });
       const data = await res.json();
       if (!data.success) {
@@ -172,35 +214,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const initGoogle = async () => {
-      try {
-        const res = await fetch(`${API}/auth/config`);
-        const data = await res.json();
-        if (data.success && data.googleClientId && window.google) {
-          window.google.accounts.id.initialize({
-            client_id: data.googleClientId,
-            callback: handleGoogleCredentialResponse,
-          });
-          const btnParent = document.getElementById("google-signin-btn");
-          if (btnParent) {
-            window.google.accounts.id.renderButton(btnParent, {
-              theme: "outline",
-              size: "large",
-              width: btnParent.offsetWidth || 320,
-              text: "continue_with",
-            });
-          }
-        }
-      } catch (err) {
-        console.error("Failed to initialize Google Sign-in:", err);
-      }
-    };
-    if (step === "mobile") {
-      setTimeout(initGoogle, 150);
-    }
-  }, [step]);
 
   const handleOtpChange = (el, idx) => {
     if (isNaN(el.value)) return;
@@ -342,9 +355,22 @@ export default function Login() {
                 </div>
 
                 {/* Google login */}
-                <div className="w-full flex justify-center py-1">
-                  <div id="google-signin-btn" style={{ minHeight: 40, width: "100%", maxWidth: 320 }}></div>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl border text-sm font-semibold text-stone-700 bg-white hover:bg-stone-50 active:scale-[0.98] transition-all duration-200 shadow-sm relative cursor-pointer"
+                  style={{ borderColor: "#E5E7EB" }}
+                >
+                  <svg className="w-5 h-5 shrink-0" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                    <path fill="none" d="M0 0h48v48H0z"/>
+                  </svg>
+                  <span className="font-semibold text-gray-700 tracking-wide">Continue with Google</span>
+                </button>
 
                 {/* Divider */}
                 <div className="flex items-center gap-3 my-1">
