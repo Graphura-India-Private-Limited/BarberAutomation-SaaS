@@ -718,3 +718,88 @@ exports.createAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+const { OAuth2Client } = require("google-auth-library");
+const googleAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// @desc    Login/Register with Google
+// @route   POST /api/auth/google-login
+// @access  Public
+exports.googleLogin = async (req, res) => {
+  try {
+    const { token, mobile } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: "Google token is required" });
+    }
+
+    let payload;
+    try {
+      const ticket = await googleAuthClient.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch (e) {
+      return res.status(400).json({ success: false, message: "Invalid Google token" });
+    }
+
+    const { email, name, picture } = payload;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email not provided by Google account" });
+    }
+
+    let customer = await Customer.findOne({ email: email.toLowerCase() });
+
+    if (!customer) {
+      if (!mobile) {
+        return res.json({ 
+          success: true, 
+          needsMobile: true, 
+          email: email.toLowerCase(), 
+          name: name || "", 
+          picture: picture || "" 
+        });
+      }
+
+      const mobileCheck = validateMobile(mobile);
+      if (!mobileCheck.valid) {
+        return res.status(400).json({ success: false, message: mobileCheck.message });
+      }
+      const cleanMobile = mobileCheck.clean;
+
+      const existsByMobile = await Customer.findOne({ mobile: cleanMobile });
+      if (existsByMobile) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "This mobile number is already registered." 
+        });
+      }
+
+      customer = await Customer.create({
+        name: (name || "Google User").trim(),
+        email: email.toLowerCase(),
+        mobile: cleanMobile,
+        profile_picture: picture || "",
+      });
+    }
+
+    const localToken = genToken(customer._id, "customer");
+    res.json({ success: true, token: localToken, user: customer, message: "Google login successful!" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Get public configurations
+// @route   GET /api/auth/config
+// @access  Public
+exports.getPublicConfig = async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      googleClientId: process.env.GOOGLE_CLIENT_ID || ""
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

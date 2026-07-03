@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   Scissors, Calendar, Clock, Star, Sparkles,
@@ -26,12 +26,14 @@ export default function Login() {
   const [mobile,  setMobile] = useState("");
   const [otp,     setOtp]    = useState(["", "", "", "", "", ""]);
   const [devOtp,  setDevOtp] = useState("");
+  const [googleInfo, setGoogleInfo] = useState(null);
+  const [googleMobile, setGoogleMobile] = useState("");
   const [loading, setLoading]= useState(false);
   const [error,   setError]  = useState("");
 
   const reset = () => {
     setError(""); setDevOtp(""); setOtp(["", "", "", "", "", ""]);
-    setMobile("");
+    setMobile(""); setGoogleMobile(""); setGoogleInfo(null);
   };
 
   /* ── Send OTP ── */
@@ -86,6 +88,119 @@ export default function Login() {
     } catch { setError("Server error!"); }
     finally { setLoading(false); }
   };
+
+  /* ── Google login flow ── */
+  const handleGoogleCredentialResponse = async (response) => {
+    setLoading(true); setError("");
+    try {
+      const res = await fetch(`${API}/auth/google-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: response.credential }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message || "Google login failed");
+      }
+
+      if (data.needsMobile) {
+        setGoogleInfo({
+          token: response.credential,
+          email: data.email,
+          name: data.name,
+          picture: data.picture,
+        });
+        setStep("google-mobile");
+      } else {
+        localStorage.setItem("token",  data.token);
+        localStorage.setItem("userId", data.user?._id || "");
+        localStorage.setItem("role",   "customer");
+        localStorage.setItem("name",   data.user?.name || "Customer");
+        localStorage.setItem("email",  data.user?.email || "");
+        localStorage.setItem("mobile", data.user?.mobile || "");
+        if (data.user?.name) {
+          localStorage.setItem("userName", data.user.name);
+        }
+
+        const from = location.state?.from;
+        if (from) {
+          navigate(from.pathname + (from.search || ""), { state: from.state, replace: true });
+        } else {
+          navigate("/customer/services");
+        }
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleMobileSubmit = async (e) => {
+    e.preventDefault();
+    if (googleMobile.length !== 10) { setError("Enter valid 10-digit mobile number"); return; }
+    setLoading(true); setError("");
+    try {
+      const res = await fetch(`${API}/auth/google-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: googleInfo.token, mobile: googleMobile }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message || "Google signup failed");
+      }
+      localStorage.setItem("token",  data.token);
+      localStorage.setItem("userId", data.user?._id || "");
+      localStorage.setItem("role",   "customer");
+      localStorage.setItem("name",   data.user?.name || "Customer");
+      localStorage.setItem("email",  data.user?.email || "");
+      localStorage.setItem("mobile", data.user?.mobile || googleMobile);
+      if (data.user?.name) {
+        localStorage.setItem("userName", data.user.name);
+      }
+
+      const from = location.state?.from;
+      if (from) {
+        navigate(from.pathname + (from.search || ""), { state: from.state, replace: true });
+      } else {
+        navigate("/customer/services");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initGoogle = async () => {
+      try {
+        const res = await fetch(`${API}/auth/config`);
+        const data = await res.json();
+        if (data.success && data.googleClientId && window.google) {
+          window.google.accounts.id.initialize({
+            client_id: data.googleClientId,
+            callback: handleGoogleCredentialResponse,
+          });
+          const btnParent = document.getElementById("google-signin-btn");
+          if (btnParent) {
+            window.google.accounts.id.renderButton(btnParent, {
+              theme: "outline",
+              size: "large",
+              width: btnParent.offsetWidth || 320,
+              text: "continue_with",
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to initialize Google Sign-in:", err);
+      }
+    };
+    if (step === "mobile") {
+      setTimeout(initGoogle, 150);
+    }
+  }, [step]);
 
   const handleOtpChange = (el, idx) => {
     if (isNaN(el.value)) return;
@@ -160,11 +275,13 @@ export default function Login() {
             {/* Title */}
             <div className="text-center mb-4">
               <h2 className="text-2xl font-serif font-semibold text-gray-900">
-                {step === "mobile" ? "Customer Login " : "Verify OTP 🔑"}
+                {step === "mobile" ? "Customer Login " : step === "google-mobile" ? "Complete Profile 👤" : "Verify OTP 🔑"}
               </h2>
               <p className="text-gray-400 text-xs mt-1">
                 {step === "mobile"
                   ? "Enter your mobile to receive a one-time password"
+                  : step === "google-mobile"
+                  ? "Finish setting up your Google login"
                   : `Code sent to +91 ${mobile}`}
               </p>
             </div>
@@ -225,24 +342,9 @@ export default function Login() {
                 </div>
 
                 {/* Google login */}
-                <button
-                  type="button"
-                  onClick={() => setError("Google login coming soon! Please use mobile OTP.")}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-semibold text-gray-700 hover:bg-gray-50 transition relative"
-                  style={{ borderColor: "#E5E7EB" }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 48 48">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    <path fill="none" d="M0 0h48v48H0z"/>
-                  </svg>
-                  Continue with Google
-                  <span className="absolute -top-2 -right-2 bg-[#C5A059] text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">
-                    Soon
-                  </span>
-                </button>
+                <div className="w-full flex justify-center py-1">
+                  <div id="google-signin-btn" style={{ minHeight: 40, width: "100%", maxWidth: 320 }}></div>
+                </div>
 
                 {/* Divider */}
                 <div className="flex items-center gap-3 my-1">
@@ -337,6 +439,53 @@ export default function Login() {
                   Resend OTP
                 </button>
               </div>
+            )}
+
+            {/* ══ STEP: Complete Google Profile ══ */}
+            {step === "google-mobile" && (
+              <form onSubmit={handleGoogleMobileSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-widest mb-2 text-gray-600">
+                    Mobile Number
+                  </label>
+                  <div className="flex border rounded-xl overflow-hidden" style={{ borderColor: "#E5E7EB" }}>
+                    <div className="flex items-center gap-1 px-4 py-3.5 border-r bg-gray-50 text-sm font-semibold text-gray-700 shrink-0" style={{ borderColor: "#E5E7EB" }}>
+                      <span>+91</span>
+                      <ChevronDown size={13} className="text-gray-400" />
+                    </div>
+                    <input
+                      required
+                      type="tel"
+                      maxLength={10}
+                      placeholder="98765 43210"
+                      value={googleMobile}
+                      onChange={e => setGoogleMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                      className="flex-1 px-4 py-3.5 outline-none text-sm font-semibold bg-white text-stone-800"
+                    />
+                  </div>
+                </div>
+
+                {error && <p className="text-red-500 text-xs font-medium text-center">{error}</p>}
+
+                <button
+                  type="submit"
+                  disabled={loading || googleMobile.length !== 10}
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ background: BROWN }}
+                  onMouseEnter={e => { if (!e.currentTarget.disabled) e.currentTarget.style.background = BROWN_HOVER; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = BROWN; }}
+                >
+                  {loading ? "Completing Setup…" : <><span>Verify & Sign In</span><ArrowRight size={16} /></>}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => { setStep("mobile"); reset(); }}
+                  className="w-full text-center text-xs text-stone-500 hover:text-stone-700 underline cursor-pointer mt-1"
+                >
+                  Cancel
+                </button>
+              </form>
             )}
 
          {/* Help */ }
