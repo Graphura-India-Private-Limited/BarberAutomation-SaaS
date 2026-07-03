@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 export default function AdminUserManagement() {
   const [activeTab, setActiveTab] = useState("owners");
   const [data, setData] = useState({ salons: [], barbers: [], customers: [] });
