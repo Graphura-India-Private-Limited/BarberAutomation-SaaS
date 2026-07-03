@@ -2,14 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html {
   max-width: 100%;
-  overflow-x: hidden;
 }
 
+
 body {
+  max-width: 100%;
+  overflow-x: hidden;
   background-color: #f7f5f2;
 }
+
+
 
 /* GRID - स्पेसिफिक क्लास वापरा जेणेकरून इतर ग्रिड्स खराब होणार नाहीत */
 .category-grid {
