@@ -16,6 +16,14 @@ JWT_SECRET=graphura_barber_secret_2026
 RAZORPAY_KEY_ID=rzp_test_XXXXXXXXXX
 RAZORPAY_KEY_SECRET=your_razorpay_secret
 FRONTEND_URL=http://localhost:5173
+
+# SMTP Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=Saloon.graphura@gmail.com
+SMTP_PASS=fdvxpdahkvhrqecs
+SMTP_FROM="BarberPro" <Saloon.graphura@gmail.com>
 ```
 
 ```bash

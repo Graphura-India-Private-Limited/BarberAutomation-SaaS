@@ -1,10 +1,31 @@
 const mongoose = require("mongoose");
+const { validateMobile, validateEmailReal } = require("../utils/validation");
 
 const salonSchema = new mongoose.Schema({
   owner_name:         { type:String, required:true },
   salon_name:         { type:String, required:true },
-  mobile:             { type:String, required:true, unique:true },
-  email:              { type:String, default:"" },
+  mobile: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: function(v) {
+        return validateMobile(v).valid;
+      },
+      message: props => `${props.value} is not a valid mobile number!`
+    }
+  },
+  email: {
+    type: String,
+    default: "",
+    validate: {
+      validator: async function(v) {
+        const check = await validateEmailReal(v);
+        return check.valid;
+      },
+      message: props => `${props.value} is not a valid active email address!`
+    }
+  },
   password_hash:      { type:String, default:"" },
   address:            { type:String, default:"" },
   state:              { type:String, default:"Maharashtra" },
