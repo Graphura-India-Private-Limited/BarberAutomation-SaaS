@@ -10,6 +10,7 @@ const Admin = require("../models/Admin");
 const Queue = require("../models/Queue");
 const BreakRequest = require("../models/BreakRequest");
 const ApprovalRequest = require("../models/ApprovalRequest");
+const { validateMobile } = require("../utils/validation");
 
 // @desc    Get global platform metrics
 // @route   GET /api/admin/global-metrics
@@ -531,12 +532,16 @@ exports.getAllBarbers = async (req, res) => {
 exports.addBarber = async (req, res) => {
   try {
     const { name, mobile, password, specialization, experience, salon_id } = req.body;
-    const exists = await Barber.findOne({ mobile });
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) return res.status(400).json({ success: false, message: mobileCheck.message });
+    const cleanMobile = mobileCheck.clean;
+
+    const exists = await Barber.findOne({ mobile: cleanMobile });
     if (exists) return res.status(400).json({ success: false, message: "Mobile already exists" });
     const password_hash = await bcrypt.hash(password, 10);
     const barber = await Barber.create({
       name,
-      mobile,
+      mobile: cleanMobile,
       password_hash,
       specialization: specialization || "",
       experience: Number(experience) || 0,

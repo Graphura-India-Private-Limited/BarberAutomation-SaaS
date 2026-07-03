@@ -4,6 +4,7 @@ const Queue = require("../models/Queue");
 const Booking = require("../models/Booking");
 const BreakRequest = require("../models/BreakRequest");
 const Payment = require("../models/Payment");
+const { validateMobile, validateEmailReal } = require("../utils/validation");
 
 // @desc    Get all active barbers of a salon
 // @route   GET /api/barber/salon/:salon_id
@@ -72,7 +73,20 @@ exports.createBarber = async (req, res) => {
       document,
       documentName
     } = req.body;
-    const exists = await Barber.findOne({ mobile });
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) {
+      return res.status(400).json({ success: false, message: mobileCheck.message });
+    }
+    const cleanMobile = mobileCheck.clean;
+
+    if (email) {
+      const emailCheck = await validateEmailReal(email);
+      if (!emailCheck.valid) {
+        return res.status(400).json({ success: false, message: emailCheck.message });
+      }
+    }
+
+    const exists = await Barber.findOne({ mobile: cleanMobile });
     if (exists) {
       return res.status(400).json({ success: false, message: "Mobile exists" });
     }
@@ -80,11 +94,11 @@ exports.createBarber = async (req, res) => {
     const barber = await Barber.create({ 
       salon_id, 
       name, 
-      mobile, 
+      mobile: cleanMobile, 
       password_hash, 
       specialization, 
       experience,
-      email,
+      email: email ? email.trim().toLowerCase() : "",
       aadhaar,
       pan,
       photo,

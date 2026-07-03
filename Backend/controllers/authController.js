@@ -6,6 +6,7 @@ const Admin = require("../models/Admin");
 const Salon = require("../models/Salon");
 const OtpStore = require("../models/OtpStore");
 const ApprovalRequest = require("../models/ApprovalRequest");
+const { validateMobile, validateEmailReal } = require("../utils/validation");
 
 // Helper: Generate JWT Token
 const genToken = (id, role = "customer") =>
@@ -79,11 +80,13 @@ const pickSalonProfile = (body) => ({
 exports.sendOtp = async (req, res) => {
   try {
     const { mobile } = req.body;
-    if (!mobile || mobile.length !== 10) {
-      return res.status(400).json({ success: false, message: "Enter valid 10-digit mobile" });
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) {
+      return res.status(400).json({ success: false, message: mobileCheck.message });
     }
+    const cleanMobile = mobileCheck.clean;
 
-    const customer = await Customer.findOne({ mobile });
+    const customer = await Customer.findOne({ mobile: cleanMobile });
     if (!customer) {
       return res.status(400).json({
         success: false,
@@ -94,12 +97,12 @@ exports.sendOtp = async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000);
-    await OtpStore.deleteMany({ mobile });
-    await OtpStore.create({ mobile, otp, expires_at: expires });
+    await OtpStore.deleteMany({ mobile: cleanMobile });
+    await OtpStore.create({ mobile: cleanMobile, otp, expires_at: expires });
 
-    await sendSMS(mobile, otp);
+    await sendSMS(cleanMobile, otp);
 
-    res.json({ success: true, message: `OTP sent to ${mobile}`, otp });
+    res.json({ success: true, message: `OTP sent to ${cleanMobile}`, otp });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -111,23 +114,28 @@ exports.sendOtp = async (req, res) => {
 exports.verifyOtp = async (req, res) => {
   try {
     const { mobile, otp } = req.body;
-    if (!mobile || !otp) {
-      return res.status(400).json({ success: false, message: "Mobile and OTP required" });
+    if (!otp) {
+      return res.status(400).json({ success: false, message: "OTP required" });
     }
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) {
+      return res.status(400).json({ success: false, message: mobileCheck.message });
+    }
+    const cleanMobile = mobileCheck.clean;
 
-    const record = await OtpStore.findOne({ mobile, otp });
+    const record = await OtpStore.findOne({ mobile: cleanMobile, otp });
     if (!record) {
       return res.status(400).json({ success: false, message: "Invalid OTP. Please try again." });
     }
 
     if (new Date() > record.expires_at) {
-      await OtpStore.deleteMany({ mobile });
+      await OtpStore.deleteMany({ mobile: cleanMobile });
       return res.status(400).json({ success: false, message: "OTP expired. Request a new one." });
     }
 
-    await OtpStore.deleteMany({ mobile });
+    await OtpStore.deleteMany({ mobile: cleanMobile });
 
-    const customer = await Customer.findOne({ mobile });
+    const customer = await Customer.findOne({ mobile: cleanMobile });
     if (!customer) {
       return res.status(400).json({ success: false, message: "User not found. Please register first." });
     }
@@ -145,14 +153,24 @@ exports.verifyOtp = async (req, res) => {
 exports.signup = async (req, res) => {
   try {
     const { mobile, name, email } = req.body;
-    if (!mobile || mobile.length !== 10) {
-      return res.status(400).json({ success: false, message: "Enter valid 10-digit mobile" });
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) {
+      return res.status(400).json({ success: false, message: mobileCheck.message });
     }
+    const cleanMobile = mobileCheck.clean;
+
     if (!name || !name.trim()) {
       return res.status(400).json({ success: false, message: "Name is required" });
     }
 
-    const exists = await Customer.findOne({ mobile });
+    if (email) {
+      const emailCheck = await validateEmailReal(email);
+      if (!emailCheck.valid) {
+        return res.status(400).json({ success: false, message: emailCheck.message });
+      }
+    }
+
+    const exists = await Customer.findOne({ mobile: cleanMobile });
     if (exists) {
       return res.status(400).json({
         success: false,
@@ -161,7 +179,7 @@ exports.signup = async (req, res) => {
       });
     }
 
-    const customer = await Customer.create({ mobile, name: name.trim(), email: email || "" });
+    const customer = await Customer.create({ mobile: cleanMobile, name: name.trim(), email: email ? email.trim().toLowerCase() : "" });
     res.status(201).json({ success: true, user: customer, message: "Account created! Please login with OTP." });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -247,15 +265,17 @@ exports.deleteFamilyMember = async (req, res) => {
 exports.sendOwnerOtp = async (req, res) => {
   try {
     const { mobile } = req.body;
-    if (!mobile || mobile.length !== 10) {
-      return res.status(400).json({ success: false, message: "Enter valid 10-digit mobile" });
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) {
+      return res.status(400).json({ success: false, message: mobileCheck.message });
     }
+    const cleanMobile = mobileCheck.clean;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 10 * 60 * 1000);
-    await OtpStore.deleteMany({ mobile });
-    await OtpStore.create({ mobile, otp, expires_at: expires });
-    await sendSMS(mobile, otp);
-    res.json({ success: true, message: `OTP sent to ${mobile}`, otp });
+    await OtpStore.deleteMany({ mobile: cleanMobile });
+    await OtpStore.create({ mobile: cleanMobile, otp, expires_at: expires });
+    await sendSMS(cleanMobile, otp);
+    res.json({ success: true, message: `OTP sent to ${cleanMobile}`, otp });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -275,18 +295,33 @@ exports.registerOwner = async (req, res) => {
     if (!password) {
       return res.status(400).json({ success: false, message: "Password is required for owner login" });
     }
+
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) {
+      return res.status(400).json({ success: false, message: mobileCheck.message });
+    }
+    profile.mobile = mobileCheck.clean;
+
+    if (profile.email) {
+      const emailCheck = await validateEmailReal(profile.email);
+      if (!emailCheck.valid) {
+        return res.status(400).json({ success: false, message: emailCheck.message });
+      }
+      profile.email = profile.email.trim().toLowerCase();
+    }
+
     if (otp) {
-      const record = await OtpStore.findOne({ mobile, otp });
+      const record = await OtpStore.findOne({ mobile: profile.mobile, otp });
       if (!record) {
         return res.status(400).json({ success: false, message: "Invalid OTP" });
       }
       if (new Date() > record.expires_at) {
-        await OtpStore.deleteMany({ mobile });
+        await OtpStore.deleteMany({ mobile: profile.mobile });
         return res.status(400).json({ success: false, message: "OTP expired" });
       }
-      await OtpStore.deleteMany({ mobile });
+      await OtpStore.deleteMany({ mobile: profile.mobile });
     }
-    const exists = await Salon.findOne({ mobile });
+    const exists = await Salon.findOne({ mobile: profile.mobile });
     if (exists) {
       return res.status(400).json({ success: false, message: "Salon already registered with this mobile" });
     }
@@ -495,13 +530,19 @@ exports.resubmitOwnerProfile = async (req, res) => {
 exports.registerBarber = async (req, res) => {
   try {
     const { salon_id, name, mobile, password, specialization, experience } = req.body;
-    const exists = await Barber.findOne({ mobile });
+    const mobileCheck = validateMobile(mobile);
+    if (!mobileCheck.valid) {
+      return res.status(400).json({ success: false, message: mobileCheck.message });
+    }
+    const cleanMobile = mobileCheck.clean;
+
+    const exists = await Barber.findOne({ mobile: cleanMobile });
     if (exists) {
       return res.status(400).json({ success: false, message: "Barber already exists with this mobile" });
     }
     const password_hash = await bcrypt.hash(password, 10);
     const barber = await Barber.create({
-      salon_id, name, mobile, password_hash,
+      salon_id, name, mobile: cleanMobile, password_hash,
       specialization: specialization || "",
       experience: experience || 0,
     });

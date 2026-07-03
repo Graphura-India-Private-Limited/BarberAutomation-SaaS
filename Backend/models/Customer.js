@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { validateMobile, validateEmailReal } = require("../utils/validation");
 
 const familySchema = new mongoose.Schema({
   name: String,
@@ -8,8 +9,28 @@ const familySchema = new mongoose.Schema({
 
 const customerSchema = new mongoose.Schema({
   name: { type: String, default: "" },
-  mobile: { type: String, required: true, unique: true },
-  email: { type: String, default: "" },
+  mobile: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: function(v) {
+        return validateMobile(v).valid;
+      },
+      message: props => `${props.value} is not a valid mobile number!`
+    }
+  },
+  email: {
+    type: String,
+    default: "",
+    validate: {
+      validator: async function(v) {
+        const check = await validateEmailReal(v);
+        return check.valid;
+      },
+      message: props => `${props.value} is not a valid active email address!`
+    }
+  },
   family_members: [familySchema],
   loyalty_points: { type: Number, default: 0 },
   
