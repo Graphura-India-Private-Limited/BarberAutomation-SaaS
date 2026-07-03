@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// import { BrowserRouter, Routes, Route, useNavigate, Outlet } from "react-router-dom";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Outlet, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminActivityTracker from "./components/auth/AdminActivityTracker";
