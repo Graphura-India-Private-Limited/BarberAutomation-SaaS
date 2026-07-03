@@ -174,15 +174,20 @@ export default function Login() {
   };
 
   useEffect(() => {
+    let cancelled = false;
     const initGoogle = async () => {
       try {
         const res = await fetch(`${API}/auth/config`);
         const data = await res.json();
-        if (data.success && data.googleClientId && window.google) {
-          window.google.accounts.id.initialize({
-            client_id: data.googleClientId,
-            callback: handleGoogleCredentialResponse,
-          });
+        if (!cancelled && data.success && data.googleClientId && window.google) {
+          // Guard: only initialize once per page load to prevent GSI_LOGGER warning
+          if (!window.__googleGsiInitialized) {
+            window.google.accounts.id.initialize({
+              client_id: data.googleClientId,
+              callback: handleGoogleCredentialResponse,
+            });
+            window.__googleGsiInitialized = true;
+          }
           const btnParent = document.getElementById("google-signin-btn");
           if (btnParent) {
             window.google.accounts.id.renderButton(btnParent, {
@@ -200,7 +205,9 @@ export default function Login() {
     if (step === "mobile") {
       setTimeout(initGoogle, 150);
     }
+    return () => { cancelled = true; };
   }, [step]);
+
 
   const handleOtpChange = (el, idx) => {
     if (isNaN(el.value)) return;
