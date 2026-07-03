@@ -39,6 +39,8 @@ function QueueRow({ entry, idx, onClick, onServe }) {
   const barber  = BARBERS.find(b => b.id === entry.barber);
   const svc     = SERVICES.find(s => s.id === entry.service);
   const isFirst = idx === 0;
+  // Use real service name from DB if available, else fall back to mock label
+  const displayService = entry.serviceLabel || svc?.label || entry.service;
 
   return (
     <div
@@ -73,10 +75,10 @@ function QueueRow({ entry, idx, onClick, onServe }) {
             </Chip>
           )}
         </div>
-        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider flex items-center gap-1">
+        <p className="text-xs text-stone-500 font-semibold flex items-center gap-1">
           <span>{barber?.emoji} {barber?.name}</span>
           <span className="text-stone-300 font-normal">·</span>
-          <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
+          <span className="text-stone-700 normal-case font-medium">{displayService}</span>
         </p>
       </div>
 
@@ -134,8 +136,8 @@ function BookingRow({ entry, idx, onClick, onMoveToQueue }) {
             {entry.status}
           </span>
         </div>
-        <p className="text-xs text-stone-500 font-semibold uppercase tracking-wider">
-          {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{svc?.label}</span>
+        <p className="text-xs text-stone-500 font-semibold flex items-center gap-1">
+          {barber?.emoji} {barber?.name} &nbsp;·&nbsp; <span className="text-stone-700 normal-case font-medium">{entry.serviceLabel || svc?.label || entry.service}</span>
         </p>
       </div>
 
@@ -343,6 +345,10 @@ export default function SmartQueue() {
         const services = item.booking_id?.services || [];
         const memberName = services[0]?.member_name || 'Self';
         const customerName = item.customer_id?.name || 'Customer';
+        // Build a readable label of all services chosen
+        const allServiceNames = services.length > 0
+          ? services.map(s => s.service_name).filter(Boolean).join(', ')
+          : null;
         return {
           id: item._id,
           bookingId: item.booking_id?._id || item.booking_id,
@@ -350,6 +356,7 @@ export default function SmartQueue() {
           memberName: memberName,
           phone: item.customer_id?.mobile || '—',
           service: mapDbServiceToId(services[0]?.service_name || item.service),
+          serviceLabel: allServiceNames || services[0]?.service_name || null,
           services: services,
           barber: currentBarberId,
           position: item.position || (idx + 1),
@@ -369,12 +376,16 @@ export default function SmartQueue() {
         const services = item.services || [];
         const memberName = services[0]?.member_name || 'Self';
         const customerName = item.customer_id?.name || 'Customer';
+        const allServiceNames = services.length > 0
+          ? services.map(s => s.service_name).filter(Boolean).join(', ')
+          : null;
         return {
           id: item._id,
           name: customerName,
           memberName: memberName,
           phone: item.customer_id?.mobile || '—',
           service: mapDbServiceToId(services[0]?.service_name || 'Haircut'),
+          serviceLabel: allServiceNames || services[0]?.service_name || null,
           services: services,
           barber: currentBarberId,
           slot: `${slotDate} ${slotTime}`.trim(),
@@ -575,24 +586,24 @@ export default function SmartQueue() {
     <div className="pb-24 bg-[#FAF6F0] font-sans text-stone-800 antialiased flex flex-col pt-6 min-h-screen">
       <Toast notif={notif} />
 
-      {/* Section Dynamic Header Info */}
-      <div className="max-w-lg mx-auto w-full px-1 pb-6 border-b border-stone-200/60 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-left">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
-            Live <span className="text-[#C5A059]">Queue</span>
-          </h1>
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
-            Real-Time Walk-In Timeline & Booking Orchestration
-          </p>
-        </div>
+   {/* Section Dynamic Header Info */}
+<div className="max-w-full w-full px-4 pb-6 border-b border-stone-200/60 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-left">
+  <div>
+    <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+      Live <span className="text-[#C5A059]">Queue</span>
+    </h1>
+    <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58] mt-1.5">
+      Real-Time Walk-In Timeline & Booking Orchestration
+    </p>
+  </div>
 
-        <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-black uppercase tracking-wider text-stone-500">
-            Queue Engine: <span className="text-[#C5A059] font-extrabold">Active</span>
-          </span>
-        </div>
-      </div>
+  <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+    <span className="text-[10px] font-black uppercase tracking-wider text-stone-500">
+      Queue Engine: <span className="text-[#C5A059] font-extrabold">Active</span>
+    </span>
+  </div>
+</div>
 
       {/* 📊 CORE GRID SUMMARY COUNTERS ROW */}
       <div className="bg-white border-b border-stone-200/40 shadow-2xs py-4 px-4">
@@ -667,12 +678,6 @@ export default function SmartQueue() {
           <div className="flex flex-col gap-3">
             <div className="flex justify-between items-center mb-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-[#A37B58]">Upcoming Registry</p>
-              <button 
-                onClick={() => setShowAdd(true)}
-                className="bg-white border border-stone-200 hover:border-stone-400 text-stone-700 font-bold text-xs px-3.5 py-2 rounded-xl transition-colors cursor-pointer"
-              >
-                + Create Slot
-              </button>
             </div>
             {myBookings.length === 0 ? (
               <div className="bg-white border border-stone-200/40 rounded-3xl p-12 text-center shadow-xs">

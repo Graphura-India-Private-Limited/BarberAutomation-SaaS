@@ -1,32 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, Award, Calendar, ArrowUpRight,
-  Wallet, Sparkles, CheckCircle2, ArrowRight, Download
+  Wallet, Sparkles, CheckCircle2, ArrowRight, Download, RefreshCw
 } from "lucide-react";
 
-
-const MOCK_EARNINGS_SUMMARY = {
-  todayEarned: 0,
-  thisWeekEarned: 0,
-  commissionRate: "0%",
-  totalTipsCollected: 0,
-};
-
-const MOCK_PAYOUT_HISTORY = [];
-
-const MOCK_DAILY_COMMISSIONS = [];
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function BarberEarnings() {
-  const [payouts] = useState(MOCK_PAYOUT_HISTORY);
-  const [dailyCuts] = useState(MOCK_DAILY_COMMISSIONS);
+  const [payouts] = useState([]);
   const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [earningsSummary, setEarningsSummary] = useState({
+    todayEarned: 0,
+    thisWeekEarned: 0,
+    commissionRate: "0%",
+    totalTipsCollected: 0,
+  });
+  const [shiftLog, setShiftLog] = useState([]);
 
   const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
   };
 
-  const profile = { salonName: "Master Barber Lounge", initials: "MB" };
+  const fetchEarnings = async () => {
+    const barberId = localStorage.getItem("barberId");
+    const token = localStorage.getItem("token");
+    if (!barberId || !token) { setLoading(false); return; }
+    try {
+      const res = await fetch(`${API}/barber/${barberId}/dashboard`, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      if (data.success) {
+        const stats = data.stats || {};
+        const todayRevenue = stats.todayRevenue || 0;
+        const weekRevenue = stats.weekRevenue || 0;
+        // Commission rate: assume 60% of revenue goes to barber
+        const commissionRate = "60%";
+        const todayEarned = Math.round(todayRevenue * 0.6);
+        const thisWeekEarned = Math.round(weekRevenue * 0.6);
+
+        setEarningsSummary({
+          todayEarned,
+          thisWeekEarned,
+          commissionRate,
+          totalTipsCollected: 0,
+        });
+
+        // Build shift log from today's completed queue
+        const todayQueue = (data.todayQueue || []).filter(q => q.status === "done" || q.status === "Completed");
+        const log = todayQueue.map(q => {
+          const services = q.booking_id?.services || [];
+          const serviceName = services.map(s => s.service_name).filter(Boolean).join(", ") || "Service";
+          const basePrice = q.booking_id?.total_amount || 0;
+          const time = q.served_at
+            ? new Date(q.served_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+            : "—";
+          return { service: serviceName, time, basePrice, cutEarned: Math.round(basePrice * 0.6), tip: 0 };
+        });
+        setShiftLog(log);
+      }
+    } catch (err) {
+      console.error("Failed to fetch earnings:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEarnings();
+  }, []);
+
 
   return (
     <div className="w-full text-stone-800 font-sans antialiased flex flex-col justify-between">
@@ -47,11 +92,20 @@ export default function BarberEarnings() {
             </div>
 
             {/* Structure baseline account metrics model pill */}
-            <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
-              <Wallet size={14} className="text-[#C5A059]" />
-              <span className="text-[10px] font-black uppercase tracking-wider text-stone-500">
-                Tier Settlement Model: <span className="text-emerald-700 font-extrabold">{MOCK_EARNINGS_SUMMARY.commissionRate} Split</span>
-              </span>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+                <Wallet size={14} className="text-[#C5A059]" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-500">
+                  Tier Settlement Model: <span className="text-emerald-700 font-extrabold">{earningsSummary.commissionRate} Split</span>
+                </span>
+              </div>
+              <button
+                onClick={() => { setLoading(true); fetchEarnings(); }}
+                className="w-9 h-9 rounded-xl bg-white border border-stone-200 flex items-center justify-center hover:bg-stone-50 transition cursor-pointer shadow-3xs"
+                title="Refresh earnings"
+              >
+                <RefreshCw size={14} className={`text-stone-500 ${loading ? 'animate-spin' : ''}`} />
+              </button>
             </div>
           </div>
 
@@ -65,7 +119,7 @@ export default function BarberEarnings() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">Today's Commission</p>
-                <h3 className="text-2xl font-black text-stone-900 font-serif">₹{MOCK_EARNINGS_SUMMARY.todayEarned.toLocaleString()}</h3>
+                <h3 className="text-2xl font-black text-stone-900 font-serif">₹{earningsSummary.todayEarned.toLocaleString()}</h3>
                 <p className="text-[10px] text-emerald-600 font-bold mt-1">Ready for settlement</p>
               </div>
             </div>
@@ -77,7 +131,7 @@ export default function BarberEarnings() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">Weekly Staged Pool</p>
-                <h3 className="text-2xl font-black text-stone-900 font-serif">₹{MOCK_EARNINGS_SUMMARY.thisWeekEarned.toLocaleString()}</h3>
+                <h3 className="text-2xl font-black text-stone-900 font-serif">₹{earningsSummary.thisWeekEarned.toLocaleString()}</h3>
                 <p className="text-[10px] text-stone-400 font-semibold mt-1">Payout scheduled Mon</p>
               </div>
             </div>
@@ -89,7 +143,7 @@ export default function BarberEarnings() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mb-0.5">Total Client Tips</p>
-                <h3 className="text-2xl font-black text-stone-900 font-serif">₹{MOCK_EARNINGS_SUMMARY.totalTipsCollected.toLocaleString()}</h3>
+                <h3 className="text-2xl font-black text-stone-900 font-serif">₹{earningsSummary.totalTipsCollected.toLocaleString()}</h3>
                 <p className="text-[10px] text-amber-700 font-bold mt-1">100% Barber retained</p>
               </div>
             </div>
@@ -122,7 +176,12 @@ export default function BarberEarnings() {
               </div>
 
               <div className="space-y-3">
-                {dailyCuts.map((cut, index) => (
+                {shiftLog.length === 0 ? (
+                  <div className="py-8 text-center text-stone-400">
+                    <p className="text-xs font-bold uppercase tracking-wider">No completed services today</p>
+                    <p className="text-[10px] mt-1 font-medium">Earnings will appear here once you complete services</p>
+                  </div>
+                ) : shiftLog.map((cut, index) => (
                   <div key={index} className="group flex items-center justify-between p-4 border border-stone-100 bg-stone-50/40 rounded-xl hover:bg-white hover:border-[#C5A059]/40 transition-all duration-300 shadow-3xs">
                     <div className="min-w-0 flex-1">
                       <p className="font-extrabold text-stone-900 text-sm truncate tracking-tight">{cut.service}</p>
