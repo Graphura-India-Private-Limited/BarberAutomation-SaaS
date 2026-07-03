@@ -14,6 +14,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState(null); // { code: '...', type: '...', value: 100 }
   const [promoError, setPromoError] = useState("");
+  const [paymentError, setPaymentError] = useState("");
 
   const [unusedRewards, setUnusedRewards] = useState(0);
   const [hasPreviousBookings, setHasPreviousBookings] = useState(false);
@@ -103,6 +104,57 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
   const taxesIncluded = Math.round(amountToPayNow * taxRate);
 
   const handlePay = async () => {
+    setPaymentError("");
+
+    if (payMethod === "upi") {
+      const upi = upiId.trim();
+      if (!upi) {
+        setPaymentError("Please enter your UPI ID.");
+        return;
+      }
+      
+      const upiRegex = /^[\w.-]+@[\w.-]+$/;
+      if (!upiRegex.test(upi)) {
+        setPaymentError("Invalid UPI ID format. Example: username@okhdfcbank");
+        return;
+      }
+
+      // Check for common email domains to prevent entering email
+      const commonEmailDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com", "@icloud.com", "@mail.com", "@protonmail.com", "@zoho.com"];
+      if (commonEmailDomains.some(domain => upi.toLowerCase().endsWith(domain))) {
+        setPaymentError("You entered an email address. Please enter a valid UPI ID (e.g., name@okaxis) instead.");
+        return;
+      }
+    } else if (payMethod === "card") {
+      if (!cardDetails.name.trim()) {
+        setPaymentError("Please enter the cardholder's name.");
+        return;
+      }
+
+      const num = cardDetails.number.replace(/\s+/g, "");
+      if (!num || !/^\d+$/.test(num)) {
+        setPaymentError("Please enter a valid card number (digits only).");
+        return;
+      }
+
+      if (num.length < 12 || num.length > 19) {
+        setPaymentError("Card number must be between 12 and 19 digits.");
+        return;
+      }
+
+      const expiryClean = cardDetails.expiry.replace(/\s+/g, "");
+      if (!expiryClean || !/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiryClean)) {
+        setPaymentError("Please enter expiry date in MM/YY format (e.g., 12/28).");
+        return;
+      }
+
+      const cvcClean = cardDetails.cvc.replace(/\s+/g, "");
+      if (!cvcClean || !/^\d{3,4}$/.test(cvcClean)) {
+        setPaymentError("Please enter a valid 3 or 4-digit CVC code.");
+        return;
+      }
+    }
+
     setProcessing(true);
     // Simulate Razorpay handshake / payment gateway loader
     setTimeout(async () => {
@@ -288,7 +340,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
         <div className="flex gap-2 mb-4 border-b border-stone-100 pb-3">
           <button 
             type="button" 
-            onClick={() => setPayMethod("upi")}
+            onClick={() => { setPayMethod("upi"); setPaymentError(""); }}
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
               payMethod === "upi" ? "bg-[#3E362E] text-white border-transparent" : "bg-white text-stone-500 border-stone-200 hover:bg-stone-50"
             }`}
@@ -297,7 +349,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
           </button>
           <button 
             type="button" 
-            onClick={() => setPayMethod("card")}
+            onClick={() => { setPayMethod("card"); setPaymentError(""); }}
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
               payMethod === "card" ? "bg-[#3E362E] text-white border-transparent" : "bg-white text-stone-500 border-stone-200 hover:bg-stone-50"
             }`}
@@ -373,6 +425,13 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
           Payments are secure and processed via <strong>Razorpay Payment Gateway</strong>. Once booked, bookings are non-refundable as per our Cancellation and Refund Policy.
         </p>
       </div>
+
+      {paymentError && (
+        <div className="mb-4 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2.5 text-xs font-semibold text-red-600">
+          <AlertCircle size={15} className="shrink-0 text-red-500" />
+          <span>{paymentError}</span>
+        </div>
+      )}
 
       <button
         onClick={handlePay}
