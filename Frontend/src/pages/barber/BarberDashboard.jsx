@@ -595,7 +595,7 @@ export default function BarberDashboard() {
   {/* Chart Section */}
   <div className="h-48 w-full relative min-w-0" style={{ minHeight: 0 }}>
     <ResponsiveContainer width="100%" height={180}>
-      <BarChart data={weekChartData} barGap={8}>
+      <BarChart data={weekChartData} barGap={8} margin={{ top: 25, right: 10, left: 10, bottom: 5 }}>
         <XAxis 
           dataKey="day" 
           axisLine={false} 
