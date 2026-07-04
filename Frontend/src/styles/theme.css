@@ -252,23 +252,30 @@ body {
 .summary-item {
   display: flex;
   justify-content: space-between;
+  gap: 16px;
   font-size: 15px;
   color: #555;
 }
 
 .summary-item strong {
   color: #222;
+  text-align: right;
 }
 
 .summary-total {
   display: flex;
   justify-content: space-between;
+  gap: 16px;
   font-size: 18px;
   font-weight: bold;
   color: #111;
   border-top: 2px dashed #eee;
   padding-top: 15px;
   margin-top: 10px;
+}
+
+.summary-total strong {
+  text-align: right;
 }
 
 .page-container {

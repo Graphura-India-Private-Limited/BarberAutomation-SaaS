@@ -227,7 +227,7 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
             </button>
 
             {dropdownOpen && (
-              <div className="absolute left-0 right-0 mt-2 bg-white border border-[#EADBCE] rounded-2xl shadow-xl z-50 max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute left-0 right-0 mt-2 bg-white border border-[#EADBCE] rounded-2xl shadow-xl z-50 max-h-48 sm:max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="py-1.5">
                   {allSlots.map(time => {
                     const isPast = isSlotInPast(selectedDate, time);

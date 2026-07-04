@@ -65,6 +65,7 @@ const serviceImageMap = {
   "bridal style & updo": "https://images.unsplash.com/photo-1591551010154-18652a9f3ad7?w=600&q=80",
   "bridal style": "https://images.unsplash.com/photo-1591551010154-18652a9f3ad7?w=600&q=80",
   "bridal updo": "https://images.unsplash.com/photo-1591551010154-18652a9f3ad7?w=600&q=80",
+  "indian wedding grooming": "/wedding_grooming.png",
 
   // Women's services matching
   "precision cut & blow dry": "/images (1).jpg",

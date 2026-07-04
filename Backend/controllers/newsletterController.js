@@ -1,4 +1,5 @@
 const Subscriber = require("../models/Subscriber");
+const { validateEmailReal } = require("../utils/validation");
 
 // @desc    Subscribe to newsletter
 // @route   POST /api/newsletter/subscribe
@@ -12,8 +13,9 @@ exports.subscribe = async (req, res) => {
     }
 
     const emailTrimmed = email.trim().toLowerCase();
-    if (!emailTrimmed.includes("@")) {
-      return res.status(400).json({ success: false, message: "Please enter a valid email address." });
+    const emailCheck = await validateEmailReal(emailTrimmed);
+    if (!emailCheck.valid) {
+      return res.status(400).json({ success: false, message: emailCheck.message });
     }
 
     // Check if email already exists

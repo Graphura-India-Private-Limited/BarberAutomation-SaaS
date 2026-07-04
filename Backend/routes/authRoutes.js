@@ -19,6 +19,8 @@ router.post("/verify-otp", authController.verifyOtp);
 
 /* ── Signup — creates new account ── */
 router.post("/signup", authController.signup);
+router.post("/google-login", authController.googleLogin);
+router.get("/config", authController.getPublicConfig);
 
 router.get("/profile", protect, requireRoles("customer"), authController.getProfile);
 router.put("/profile", protect, requireRoles("customer"), authController.updateProfile);

@@ -465,21 +465,10 @@ export default function BarberSelection() {
 
         {/* ── HERO ── */}
         <div className="relative h-[260px] sm:h-[280px] md:h-[320px] lg:h-[420px] overflow-hidden">
-          {/* ── BACK BUTTON ── */}
-          {!showFilters && (
-            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-20">
-              <button
-                onClick={() => navigate(-1)}
-                style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", cursor: "pointer", fontSize: 18, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", transition: "all 0.3s", display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center", color: "#2C241E" }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = "#C5A059"; e.currentTarget.style.color = "#fff"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.95)"; e.currentTarget.style.color = "#2C241E"; }}
-              >←</button>
-            </div>
-          )}
           <div style={{ position: "absolute", inset: 0, backgroundImage: "url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.32)" }} />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(20,14,8,0.78))" }} />
 
-          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }} className="px-[72px] md:px-6">
+          <div style={{ position: "absolute", inset: 0, zIndex: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }} className="px-6 md:px-[72px]">
             {/* step badge */}
             <div style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(197,160,89,0.45)", borderRadius: 40, padding: "5px 18px", marginBottom: 10, background: "rgba(0,0,0,0.25)" }}>
               <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 9, fontWeight: 700, letterSpacing: "0.28em", textTransform: "uppercase", color: "#C5A059" }}>Step 02 — Appointment Allocation</span>
