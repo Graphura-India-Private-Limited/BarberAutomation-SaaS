@@ -94,7 +94,7 @@ export default function AllReviews() {
           </div>
 
           {/* WRITE REVIEW BUTTON (Top Right) */}
-          <div className="absolute top-6 right-4 sm:right-6 md:left-auto z-20">
+          <div className="absolute top-24 right-4 sm:right-6 md:right-8 z-20">
             <button
               onClick={() => navigate(activeTab === "service" ? "/write-review" : "/write-booking-review")}
               className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
