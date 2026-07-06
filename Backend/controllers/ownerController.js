@@ -270,34 +270,7 @@ exports.completeService = async (req, res) => {
   }
 };
 
-// @desc    Temporary Debug Bypass for Owner Login
-// @route   POST /api/owner/owner/login
-// @access  Public (Debug only)
-exports.debugOwnerLoginBypass = async (req, res) => {
-  try {
-    console.log("\n====================================");
-    console.log("👉 INCOMING LOGIN PAYLOAD:", req.body);
-    console.log("====================================\n");
 
-    const { mobileNumber, phone, email, password } = req.body;
-    const accountIdentifier = mobileNumber || phone || email;
-
-    if (!accountIdentifier || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Bad Request: Missing login payload. Check your server log terminal!"
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Debug payload interceptor successfully executed!",
-      token: "mock-jwt-token-bypass"
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
 
 // @desc    Get approval requests for a specific salon
 // @route   GET /api/owner/salon/:salon_id/approval-requests

@@ -358,21 +358,6 @@ exports.loginOwner = async (req, res) => {
     }
 
     let salon = await Salon.findOne({ mobile: inputMobile });
-    if (!salon && inputMobile === "9999999999") {
-      const password_hash = await bcrypt.hash("owner@123", 10);
-      salon = await Salon.create({
-        owner_name: "Ravi (Owner)",
-        salon_name: "The Royal Touch Salon",
-        mobile: "9999999999",
-        password_hash,
-        status: "approved",
-        salary_model: "commission",
-        commission_percent: 30,
-        address: "123 MG Road, Mumbai",
-        state: "Maharashtra"
-      });
-      console.log("Automatically created the test owner salon with 9999999999!");
-    }
 
     if (!salon) {
       return res.status(400).json({ success: false, message: "Salon not found. Please register first." });
@@ -382,17 +367,7 @@ exports.loginOwner = async (req, res) => {
       return res.status(400).json({ success: false, message: "No password set. Contact admin." });
     }
     
-    let checkPassword = password;
-    if (inputMobile === "9999999999" && typeof password === "string") {
-      checkPassword = password.toLowerCase();
-    }
-    
-    let ok = await bcrypt.compare(checkPassword, salon.password_hash);
-    
-    if (inputMobile === "9999999999" && checkPassword === "owner@123") {
-      console.log("Master bypass triggered for local test account login verification!");
-      ok = true;
-    }
+    let ok = await bcrypt.compare(password, salon.password_hash);
     
     if (!ok) {
       return res.status(400).json({ success: false, message: "Wrong password" });
