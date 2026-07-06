@@ -79,11 +79,12 @@ export default function AllReviews() {
         <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-[#C5A059]/10 rounded-full blur-[100px] pointer-events-none" />
 
         {/* Premium Hero Banner */}
-        <div className="relative h-[320px] sm:h-[360px] flex items-center justify-center overflow-hidden mb-6">
+        <div className="relative pt-32 pb-12 flex flex-col items-center justify-center overflow-hidden mb-6">
           <div className="absolute inset-0 bg-gradient-to-b from-[#EADDCA]/20 via-transparent to-[#FAF6F0]" />
           
-          {/* RETURN BUTTON */}
-          <div className="absolute top-24 left-4 sm:left-6 md:left-8 z-20">
+          {/* HEADER BUTTONS BAR */}
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center relative z-20 mb-8">
+            {/* RETURN BUTTON */}
             <button
               onClick={() => navigate(-1)}
               className="group flex items-center gap-2 bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-2 rounded-xl text-[#3E362E] font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-md hover:bg-[#3E362E] hover:text-white hover:border-[#3E362E] cursor-pointer"
@@ -91,10 +92,8 @@ export default function AllReviews() {
               <ArrowLeft className="w-3.5 h-3.5 text-[#C5A059] group-hover:text-white transition-transform duration-300 transform group-hover:-translate-x-0.5" />
               <span>Back</span>
             </button>
-          </div>
 
-          {/* WRITE REVIEW BUTTON (Top Right) */}
-          <div className="absolute top-24 right-4 sm:right-6 md:right-8 z-20">
+            {/* WRITE REVIEW BUTTON (Top Right) */}
             <button
               onClick={() => navigate(activeTab === "service" ? "/write-review" : "/write-booking-review")}
               className="group flex items-center gap-2 bg-[#3E362E] text-white border border-[#C5A059]/30 px-5 py-2 rounded-xl font-sans font-extrabold text-xs tracking-wider uppercase transition-all duration-300 shadow-md hover:bg-[#C5A059] hover:text-[#2A241F] cursor-pointer"
@@ -104,7 +103,7 @@ export default function AllReviews() {
             </button>
           </div>
 
-          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto pt-8">
+          <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
             {/* Kicker Tag — Rule 2 */}
             <span className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-white/80 backdrop-blur-md border border-[#EADDCA] px-4 py-1.5 rounded-full shadow-sm inline-block mb-4">
               Guest Testimonials
