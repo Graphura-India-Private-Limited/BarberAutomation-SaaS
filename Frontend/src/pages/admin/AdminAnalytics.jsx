@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Users, Store, Clock, Award, Lightbulb } from "lucide-react";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 export default function AdminAnalytics() {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -9,7 +11,7 @@ export default function AdminAnalytics() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/admin/global-metrics");
+        const res = await fetch(`${API}/admin/global-metrics`);
         const json = await res.json();
         if (json.success) setMetrics(json.metrics);
       } catch (err) {

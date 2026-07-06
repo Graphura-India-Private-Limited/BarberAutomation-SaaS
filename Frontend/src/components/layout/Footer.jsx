@@ -568,7 +568,8 @@ const Footer = () => {
           const targetEmail = e.target.elements.footerEmail.value.trim();
           
           try {
-            const res = await fetch("http://localhost:5000/api/newsletter/subscribe", {
+            const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+            const res = await fetch(`${API}/newsletter/subscribe`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ email: targetEmail }),

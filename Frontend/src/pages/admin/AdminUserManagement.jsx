@@ -17,7 +17,7 @@ export default function AdminUserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/users-overview");
+      const res = await fetch(`${API_BASE}/admin/users-overview`);
       const json = await res.json();
       if (json.success) {
         setData(json.data);
@@ -31,7 +31,7 @@ export default function AdminUserManagement() {
 
   const handleUpdateLimit = async (salonId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/salon-limit/${salonId}`, {
+      const res = await fetch(`${API_BASE}/admin/salon-limit/${salonId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ max_barbers_limit: newLimit })
