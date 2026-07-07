@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, financeData as contextFinanceData } from "../../contexts/AppContext";
 import { 
@@ -108,6 +108,9 @@ export default function FinancialAnalytics() {
   const [time, setTime] = useState(new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }));
   const [dbBarbers, setDbBarbers] = useState([]);
   const [dbSalons, setDbSalons] = useState([]);
+  const [salonReports, setSalonReports] = useState([]);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+  const exportDropdownRef = useRef(null);
 
   // ─── QUEUE TAB STATES ───
   const [queueTabSub, setQueueTabSub] = useState('overview');
@@ -121,6 +124,26 @@ export default function FinancialAnalytics() {
       setTime(new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }));
     }, 60000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    apiGet(`/payment/revenue/salon-breakdown?timeFilter=${timeFilter}`)
+      .then(data => {
+        if (data.reports) {
+          setSalonReports(data.reports);
+        }
+      })
+      .catch(err => console.error("Error fetching salon breakdown reports:", err));
+  }, [timeFilter]);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (exportDropdownRef.current && !exportDropdownRef.current.contains(e.target)) {
+        setExportDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
   const query = useMemo(() => {
@@ -280,38 +303,19 @@ export default function FinancialAnalytics() {
     });
   }, [dbBarbers]);
 
-  const salonReports = useMemo(() => {
-    if (dbSalons.length === 0) {
-      return [
-        { id: 1, name: 'Elite Cuts - Downtown', customers: 145, revenue: 18500, delayAvg: '5 mins', bookings: 160 },
-        { id: 2, name: 'Urban Barber - Westside', customers: 98, revenue: 12000, delayAvg: '12 mins', bookings: 105 },
-        { id: 3, name: 'Classic Shave - North', customers: 112, revenue: 14200, delayAvg: '8 mins', bookings: 125 },
-        { id: 4, name: 'Modern Fade - South', customers: 85, revenue: 10800, delayAvg: '15 mins', bookings: 90 },
-        { id: 5, name: 'Premium Trims - Central', customers: 130, revenue: 16500, delayAvg: '4 mins', bookings: 140 },
-      ];
-    }
-    return dbSalons.map((s, idx) => {
-      const charSum = s.salon_name.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-      const bookings = 50 + (charSum % 150);
-      const customers = Math.round(bookings * 0.9);
-      const delayVal = 3 + (charSum % 15);
-      const revenue = bookings * 120 + (charSum % 10) * 50;
-      return {
-        id: s._id || String(idx),
-        name: s.salon_name,
-        bookings,
-        customers,
-        delayAvg: `${delayVal} mins`,
-        revenue
-      };
-    });
-  }, [dbSalons]);
-
   const topSalons = useMemo(() => {
+    const defaultVal = { name: "Loading...", customers: 0, revenue: 0, delayAvg: "0 mins" };
+    if (!salonReports || salonReports.length === 0) {
+      return {
+        leastDelay: defaultVal,
+        mostCustomers: defaultVal,
+        highestRevenue: defaultVal,
+      };
+    }
     return {
-      leastDelay: [...salonReports].sort((a, b) => parseInt(a.delayAvg) - parseInt(b.delayAvg))[0],
-      mostCustomers: [...salonReports].sort((a, b) => b.customers - a.customers)[0],
-      highestRevenue: [...salonReports].sort((a, b) => b.revenue - a.revenue)[0],
+      leastDelay: [...salonReports].sort((a, b) => parseInt(a.delayAvg) - parseInt(b.delayAvg))[0] || defaultVal,
+      mostCustomers: [...salonReports].sort((a, b) => b.customers - a.customers)[0] || defaultVal,
+      highestRevenue: [...salonReports].sort((a, b) => b.revenue - a.revenue)[0] || defaultVal,
     };
   }, [salonReports]);
 
@@ -324,63 +328,9 @@ export default function FinancialAnalytics() {
     } else {
       reports.sort((a, b) => a.name.localeCompare(b.name));
     }
-
-    if (timeFilter === 'weekly') {
-      return reports.map(s => ({ ...s, customers: s.customers * 6, revenue: s.revenue * 6, bookings: s.bookings * 6 }));
-    } else if (timeFilter === 'monthly') {
-      return reports.map(s => ({ ...s, customers: s.customers * 24, revenue: s.revenue * 24, bookings: s.bookings * 24 }));
-    }
     return reports;
-  }, [timeFilter, reportType, salonReports]);
+  }, [reportType, salonReports]);
 
-  // const handleExportCSV = () => {
-  //   if (!displayData.length) return;
-  //   const headers = ["Active Salon Node", "Bookings", "Customers Served", "Avg Operational Delay", "Revenue Yield"];
-  //   const rows = displayData.map(salon => [
-  //     `"${salon.name.replace(/"/g, '""')}"`,
-  //     salon.bookings,
-  //     salon.customers,
-  //     `"${salon.delayAvg}"`,
-  //     salon.revenue
-  //   ]);
-  //   const csvContent = [
-  //     headers.join(","),
-  //     ...rows.map(r => r.join(","))
-  //   ].join("\n");
-  //   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  //   const url = URL.createObjectURL(blob);
-  //   const link = document.createElement("a");
-  //   link.setAttribute("href", url);
-  //   link.setAttribute("download", `Salon_Telemetry_Report_${timeFilter}_${reportType}.csv`);
-  //   link.style.visibility = "hidden";
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
-  const handleExportCSV = () => {
-    if (!displayData.length) return;
-    const headers = ["Active Salon Node", "Bookings", "Customers Served", "Avg Operational Delay", "Revenue Yield"];
-    const rows = displayData.map(salon => [
-      `"${salon.name.replace(/"/g, '""')}"`,
-      salon.bookings,
-      salon.customers,
-      `"${salon.delayAvg}"`,
-      salon.revenue
-    ]);
-    const csvContent = [
-      headers.join(","),
-      ...rows.map(r => r.join(","))
-    ].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Salon_Telemetry_Report_${timeFilter}_${reportType}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   // Builds the exportable dataset for whichever tab/sub-view is currently active,
   // so the header-level Export CSV button always reflects what's on screen.
@@ -457,6 +407,80 @@ export default function FinancialAnalytics() {
   };
 
   const activeExportRowCount = getActiveExportPayload().rows.length;
+
+  const handleExportCSV = () => {
+    if (!displayData.length) return;
+    const headers = ["Active Salon Node", "Bookings", "Customers Served", "Avg Operational Delay", "Revenue Yield"];
+    const rows = displayData.map(salon => [
+      `"${salon.name.replace(/"/g, '""')}"`,
+      salon.bookings,
+      salon.customers,
+      `"${salon.delayAvg}"`,
+      salon.revenue
+    ]);
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(r => r.join(","))
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Salon_Telemetry_Report_${timeFilter}_${reportType}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportExcel = () => {
+    if (!displayData.length) return;
+    let excelContent = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Salon Report</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+      <body>
+      <table>
+        <thead>
+          <tr>
+            <th>Active Salon Node</th>
+            <th>Bookings</th>
+            <th>Customers Served</th>
+            <th>Avg Operational Delay</th>
+            <th>Revenue Yield</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    displayData.forEach(salon => {
+      excelContent += `
+        <tr>
+          <td>${salon.name}</td>
+          <td>${salon.bookings}</td>
+          <td>${salon.customers}</td>
+          <td>${salon.delayAvg}</td>
+          <td>${salon.revenue}</td>
+        </tr>
+      `;
+    });
+    
+    excelContent += `
+        </tbody>
+      </table>
+      </body>
+      </html>
+    `;
+    
+    const blob = new Blob([excelContent], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Salon_Telemetry_Report_${timeFilter}_${reportType}.xls`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // ─── FINANCE TAB STATES & CONFIGS ───
   const isOwner = currentUser?.role === "owner" || true; // Fallback for testing
@@ -953,7 +977,7 @@ export default function FinancialAnalytics() {
                     <div className="card p-4 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-sm bg-white font-sans">
                       
                       <div className="flex flex-wrap justify-center sm:justify-start bg-stone-100 p-1 rounded-xl border border-stone-200/60 w-full lg:w-auto shadow-inner">
-                        {['daily', 'weekly', 'monthly'].map(t => (
+                        {['daily', 'weekly', 'monthly', 'yearly'].map(t => (
                           <button
                             key={t}
                             onClick={() => setTimeFilter(t)}
@@ -1036,21 +1060,54 @@ export default function FinancialAnalytics() {
                           </h2>
                           <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Detailed structural matrix audit metrics across active franchise coordinates logs ({timeFilter})</p>
                         </div>
-                        <button 
-                          onClick={handleExportCSV}
-                          className="rounded-xl border h-10 px-4 text-xs font-extrabold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer font-sans border-none"
-                          style={{ backgroundColor: `${GOLD}10`, color: GOLD, borderColor: `${GOLD}40` }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = GOLD;
-                            e.currentTarget.style.color = '#FFFFFF';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = `${GOLD}10`;
-                            e.currentTarget.style.color = GOLD;
-                          }}
-                        >
-                          Export CSV Matrix
-                        </button>
+                        <div className="relative font-sans" ref={exportDropdownRef}>
+                          <button 
+                            type="button"
+                            onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
+                            className="rounded-xl border h-10 px-4 text-xs font-extrabold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer font-sans border-none"
+                            style={{ backgroundColor: `${GOLD}10`, color: GOLD, borderColor: `${GOLD}40` }}
+                            onMouseEnter={(e) => {
+                              if (!exportDropdownOpen) {
+                                e.currentTarget.style.backgroundColor = GOLD;
+                                e.currentTarget.style.color = '#FFFFFF';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!exportDropdownOpen) {
+                                e.currentTarget.style.backgroundColor = `${GOLD}10`;
+                                e.currentTarget.style.color = GOLD;
+                              }
+                            }}
+                          >
+                            Export Report ↓
+                          </button>
+                          {exportDropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-40 bg-white border border-stone-200 rounded-xl shadow-lg z-50 overflow-hidden font-sans">
+                              <div className="py-1">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleExportCSV();
+                                    setExportDropdownOpen(false);
+                                  }}
+                                  className="w-full px-4 py-2.5 text-left text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors border-none bg-transparent cursor-pointer"
+                                >
+                                  Export as CSV
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    handleExportExcel();
+                                    setExportDropdownOpen(false);
+                                  }}
+                                  className="w-full px-4 py-2.5 text-left text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors border-none bg-transparent cursor-pointer"
+                                >
+                                  Export as Excel
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       
                       <div className="overflow-x-auto custom-scrollbar font-sans">
