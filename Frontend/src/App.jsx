@@ -41,7 +41,6 @@ import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import FinancialAnalytics from "./pages/owner/FinancialAnalytics";
 import OwnerLayout from "./components/layout/OwnerLayout";
 import BarberTeam from "./pages/owner/BarberTeam";
-import OwnerLiveMonitoring from "./pages/owner/OwnerLiveMonitoring";
 import AddBarber from "./pages/owner/AddBarber";
 import OwnerSupportPage from "./pages/owner/OwnerSupportPage";
 import SalonSettlements from "./pages/owner/SalonSettlements";
@@ -67,7 +66,6 @@ import AdminUserManagement from "./pages/admin/AdminUserManagement";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import BookingManagement from "./pages/owner/BookingManagement";
 import SalonManagement from "./pages/admin/SalonManagement";
-import CustomerManagement from "./pages/customer/CustomerManagement";
 import AllReviews from "./pages/customer/AllReviews";
 import FaqPage from "./pages/public/FaqPage";
 import AboutPage from "./pages/public/AboutPage";
@@ -212,10 +210,8 @@ function App() {
           <Route path="finance" element={<FinancialAnalytics />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="queue" element={<LiveQueue />} />
-          <Route path="live" element={<OwnerLiveMonitoring />} />
           <Route path="barbers" element={<BarberTeam />} />
           <Route path="add-barber" element={<AddBarber />} />
-          <Route path="customers" element={<CustomerManagement />} />
           <Route path="support" element={<OwnerSupportPage ticketState={ticketState} />} />
           <Route path="settlements" element={<SalonSettlements />} />
         </Route>

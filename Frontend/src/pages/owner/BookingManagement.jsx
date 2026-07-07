@@ -17,7 +17,12 @@ import {
   SlidersHorizontal,
   ArrowLeft,
   CheckCircle,
-  XCircle
+  XCircle,
+  Mail,
+  Star,
+  Zap,
+  ArrowUpRight,
+  TrendingUp
 } from "lucide-react";
 
 import Navbar from "../../components/layout/Navbar";
@@ -34,6 +39,10 @@ export default function BookingManagement() {
   const [search, setSearch] = useState("");
   const [selectedTypeFilter, setSelectedTypeFilter] = useState("ALL"); // ALL, Queue, Slot
   const [view, setView] = useState("list"); // "list", "create"
+  const [activeTab, setActiveTab] = useState("bookings"); // "bookings" or "customers"
+  const [customers, setCustomers] = useState([]);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [createStep, setCreateStep] = useState(1); // 1, 2, 3, 4
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
@@ -105,6 +114,7 @@ export default function BookingManagement() {
           }))
         }));
         setBookings(mapped);
+        fetchReviewsAndCompileCustomers(data.bookings);
       } else {
         setError(data.message || "Failed to load bookings");
       }
@@ -113,6 +123,82 @@ export default function BookingManagement() {
       setError("Error connecting to backend");
     } finally {
       setLoading(false);
+    }
+  };
+
+  async function fetchReviewsAndCompileCustomers(rawBookings) {
+    if (!salonId || !token) return;
+    try {
+      setLoadingCustomers(true);
+      const reviewsRes = await fetch(`${API}/review/salon/${salonId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(() => null);
+      const reviewsData = reviewsRes ? await reviewsRes.json() : { success: false, reviews: [] };
+
+      // Group bookings by customer
+      const customerMap = {};
+      rawBookings.forEach((booking) => {
+        if (!booking.customer_id) return;
+        const cId = booking.customer_id._id || booking.customer_id;
+        if (!cId) return;
+
+        if (!customerMap[cId]) {
+          customerMap[cId] = {
+            id: cId,
+            name: booking.customer_id.name || "Guest Customer",
+            email: booking.customer_id.email || booking.customer_id.mobile || "No Email",
+            bookingsList: []
+          };
+        }
+        customerMap[cId].bookingsList.push(booking);
+      });
+
+      // Group reviews by customer
+      const reviewMap = {};
+      if (reviewsData.success && reviewsData.reviews) {
+        reviewsData.reviews.forEach((rev) => {
+          if (!rev.customer_id) return;
+          const custId = rev.customer_id._id || rev.customer_id;
+          if (!custId) return;
+          if (!reviewMap[custId]) {
+            reviewMap[custId] = [];
+          }
+          reviewMap[custId].push(rev.salon_rating);
+        });
+      }
+
+      const aggregatedCustomers = Object.values(customerMap).map((c) => {
+        const bookingsCount = c.bookingsList.length;
+        const completedBookings = c.bookingsList.filter(b => b.status === "completed");
+        const visitsCount = completedBookings.length || bookingsCount;
+        const totalSpent = c.bookingsList
+          .filter(b => b.status !== "cancelled")
+          .reduce((sum, b) => sum + (b.total_amount || 0), 0);
+        
+        const customerReviews = reviewMap[c.id] || [];
+        const avgRating = customerReviews.length > 0
+          ? customerReviews.reduce((sum, val) => sum + val, 0) / customerReviews.length
+          : null;
+
+        const status = bookingsCount >= 5 ? "Active" : "Regular";
+
+        return {
+          id: c.id,
+          name: c.name,
+          email: c.email,
+          bookings: bookingsCount,
+          visits: visitsCount,
+          amount: totalSpent,
+          rating: avgRating,
+          status: status
+        };
+      });
+
+      setCustomers(aggregatedCustomers);
+    } catch (err) {
+      console.error("Error aggregating customer registry:", err);
+    } finally {
+      setLoadingCustomers(false);
     }
   };
 
@@ -779,180 +865,449 @@ export default function BookingManagement() {
             </div>
           )}
 
-          {/* ── SYSTEM MATRIX SUMMARY NUMBERS ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 text-left">
-            {[
-              { title: "Today's Bookings", value: stats.today, icon: Calendar, color: "bg-orange-50 text-orange-700 border-orange-100" },
-              { title: "Customers Total", value: stats.customers, icon: Users, color: "bg-amber-50 text-amber-700 border-amber-100" },
-              { title: "Revenue Index", value: stats.revenue, icon: IndianRupee, color: "bg-emerald-50 text-emerald-700 border-[#C5A059]/20" },
-              { title: "Pending Bookings", value: stats.pendingCount, icon: Clock3, color: "bg-sky-50 text-sky-700 border-sky-100" },
-            ].map((item) => (
-              <div key={item.title} className="card p-5 bg-white flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center flex-shrink-0 ${item.color}`}>
-                  <item.icon size={22} />
-                </div>
-                <div>
-                  {/* Rule 2: Minor Heading kicker tag structure */}
-                  <h3 className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans mb-0.5">{item.title}</h3>
-                  <p className="text-2xl font-black font-serif tracking-normal text-stone-900 leading-none">{item.value}</p>
-                </div>
+          {/* Tab Selector */}
+          <div className="flex gap-6 border-b border-stone-200 pb-3 mb-6 text-left relative z-10">
+            <button
+              onClick={() => setActiveTab("bookings")}
+              className={`pb-2.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer outline-none ${
+                activeTab === "bookings"
+                  ? "border-[#C5A059] text-stone-900"
+                  : "border-transparent text-stone-400 hover:text-stone-600"
+              }`}
+            >
+              Bookings & Slots
+            </button>
+            <button
+              onClick={() => setActiveTab("customers")}
+              className={`pb-2.5 text-xs font-black uppercase tracking-wider border-b-2 transition-all cursor-pointer outline-none ${
+                activeTab === "customers"
+                  ? "border-[#C5A059] text-stone-900"
+                  : "border-transparent text-stone-400 hover:text-stone-600"
+              }`}
+            >
+              Customer Registry
+            </button>
+          </div>
+
+          {activeTab === "customers" ? (
+            <div className="animate-fade-in text-left">
+              {/* --- SHINY LUXURY GRADIENT GLOW LAYERS --- */}
+              <div className="absolute top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-[#C5A059]/10 via-[#EADDCA]/20 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse duration-[8000ms]" />
+              
+              {/* SEARCH BOX FOR CUSTOMERS */}
+              <div className="card p-4 mb-6 flex items-center gap-3 bg-white text-left font-sans">
+                <Search className="text-[#C5A059] shrink-0" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search verified clients in registry by name..."
+                  value={customerSearch}
+                  onChange={(e) => setCustomerSearch(e.target.value)}
+                  className="bg-transparent outline-none w-full text-stone-800 placeholder-stone-400 text-sm font-medium font-sans border-none"
+                />
               </div>
-            ))}
-          </div>
 
-          {/* ── SEARCH INDEX CONSOLE ── */}
-          <div className="card p-4 mb-6 flex items-center gap-3 bg-white text-left font-sans">
-            <Search className="text-[#C5A059] shrink-0" size={18} />
-            <input
-              type="text"
-              placeholder="Search active guest by name identifier..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent outline-none w-full text-stone-800 placeholder-stone-400 text-sm font-medium font-sans"
-            />
-            {selectedTypeFilter !== "ALL" && (
-              /* Rule 4: Standardized Link/Badge Action button */
-              <button 
-                onClick={() => setSelectedTypeFilter("ALL")}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase tracking-wider bg-stone-100 text-stone-500 hover:bg-stone-200 transition cursor-pointer font-sans border-none outline-none"
-              >
-                <SlidersHorizontal size={12} /> Clear Filter
-              </button>
-            )}
-          </div>
+              {/* 📊 SUMMARY EXECUTIVE STATS ROW */}
+              {(() => {
+                const totalDatabase = customers.length;
+                const frequentUsers = customers.filter(c => c.visits >= 3).length;
+                const activeAccounts = customers.filter(c => c.status === "Active" || c.bookings > 0).length;
+                const ratedCustomers = customers.filter(c => c.rating !== null && c.rating !== undefined);
+                const avgRetention = ratedCustomers.length > 0
+                  ? Number(ratedCustomers.reduce((sum, c) => sum + c.rating, 0) / ratedCustomers.length).toFixed(1)
+                  : "—";
 
-          {/* ── INTERACTIVE FILTER SEGMENTS ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-left">
-            {[
-              { filterKey: "Queue", title: "Queue Bookings", icon: Clock3, desc: "On-demand routing slot entries" },
-              { filterKey: "Slot", title: "Slot Bookings", icon: Calendar, desc: "Pre-arranged appointment times" },
-            ].map((item) => {
-              const isTargetActive = selectedTypeFilter === item.filterKey;
-              return (
-                <div 
-                  key={item.filterKey} 
-                  onClick={() => setSelectedTypeFilter(isTargetActive ? "ALL" : item.filterKey)}
-                  className={`card p-5 flex items-center gap-4 cursor-pointer select-none bg-white ${isTargetActive ? 'card-active' : 'hover:border-[#C5A059]'}`}
-                >
-                  <div className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all ${isTargetActive ? 'text-white' : 'bg-amber-50/60 border-amber-100 text-[#C5A059]'}`} style={{ backgroundColor: isTargetActive ? CHARCOAL : '' }}>
-                    <item.icon size={22} />
+                const cardStyle = "bg-white border border-[#EADDCA] rounded-2xl p-5 md:p-6 shadow-2xs hover:shadow-xs transition-all duration-300 text-left";
+
+                return (
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div className={cardStyle}>
+                      <div className="text-[#3E362E] bg-[#EADDCA]/30 p-2.5 rounded-xl w-fit border border-[#EADDCA]/40"><Users size={18} /></div>
+                      <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{totalDatabase}</h3>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Total Database</p>
+                    </div>
+
+                    <div className={cardStyle}>
+                      <div className="text-[#3E362E] bg-[#EADDCA]/30 p-2.5 rounded-xl w-fit border border-[#EADDCA]/40"><TrendingUp size={18} /></div>
+                      <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{frequentUsers}</h3>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Frequent Users</p>
+                    </div>
+
+                    <div className={cardStyle}>
+                      <div className="text-[#C5A059] bg-[#C5A059]/10 p-2.5 rounded-xl w-fit border border-[#C5A059]/20"><Zap size={18} /></div>
+                      <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{activeAccounts}</h3>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Active Accounts</p>
+                    </div>
+
+                    <div className={cardStyle}>
+                      <div className="text-[#8B5A2B] bg-[#FAF6F0] p-2.5 rounded-xl w-fit border border-[#C5A059]/20"><Star size={18} /></div>
+                      <h3 className="text-3xl font-serif font-black text-[#3E362E] tracking-tight mt-4 leading-none">{avgRetention}</h3>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-stone-400 mt-2">Avg Retention Score</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-base font-black font-serif text-stone-900 leading-tight">{item.title}</h2>
-                    {/* Rule 3: Balanced small description string */}
-                    <p className="text-stone-600 text-[11px] font-normal leading-relaxed font-sans mt-0.5">{item.desc}</p>
-                  </div>
+                );
+              })()}
+
+              {/* 👥 CUSTOMER DETAIL TABLE LIST */}
+              <div className="bg-white border border-[#EADDCA] rounded-[24px] overflow-hidden shadow-2xs mb-8">
+                {/* Table Header */}
+                <div className="hidden md:grid grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr] border-b border-stone-100 bg-[#FDFBF9] px-6 py-4 text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">
+                  <span>Customer Details</span>
+                  <span>Bookings</span>
+                  <span>Visits Logged</span>
+                  <span>Rating Given</span>
+                  <span>Gross Revenue Spent</span>
                 </div>
-              );
-            })}
-          </div>
 
-          {/* ── LEDGER TABLE CONTENT CONTAINER ── */}
-          <div className="card p-6 bg-white overflow-hidden mb-8 text-left">
-            <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
-              {/* Rule 1: Master Section Sub-Header Title Layout */}
-              <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex flex-wrap items-center justify-start gap-2">
-                <span className="font-bold uppercase">Live Operations</span>
-                <span className="italic text-[#C5A059] normal-case font-medium">Queue</span>
-                {selectedTypeFilter !== "ALL" && <span className="text-xs font-sans font-bold text-[#C5A059] lowercase">({selectedTypeFilter} only)</span>}
-              </h2>
-              <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-50 px-2.5 py-1 rounded-md font-sans">
-                {filteredBookings.length} Active Rows
-              </span>
-            </div>
-            
-            <div className="overflow-x-auto w-full custom-scrollbar font-sans">
-              <table className="w-full min-w-[640px] text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-stone-100 text-stone-400 text-[11px] font-extrabold uppercase tracking-widest font-sans">
-                    <th className="text-left py-4 pr-4">Customer Entity</th>
-                    <th className="text-left pr-4">Pipeline Type</th>
-                    <th className="text-left pr-4">Target Window</th>
-                    <th className="text-left pr-4">State</th>
-                    <th className="text-right">Operations</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-50">
-                  {filteredBookings.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="text-center py-12 text-stone-400 italic font-medium font-sans">
-                        No matching transaction entries discovered in this viewport segment.
-                      </td>
-                    </tr>
-                  ) : (
-                    paginatedBookings.map((booking) => (
-                      <tr key={booking.id} className="hover:bg-stone-50/60 transition-colors group">
-                        <td className="py-4.5 pr-4 whitespace-nowrap font-bold text-stone-900 text-sm">{booking.name}</td>
-                        <td className="pr-4 whitespace-nowrap">
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded ${booking.type === 'Slot' ? 'bg-blue-50 text-blue-700' : 'bg-stone-100 text-stone-700'}`}>
-                            {booking.type}
-                          </span>
-                        </td>
-                        <td className="pr-4 whitespace-nowrap text-stone-500 font-medium font-mono">{booking.slot}</td>
-                        <td className="pr-4 whitespace-nowrap">
-                          <span className={`px-2.5 py-0.5 rounded border text-[10px] font-black uppercase tracking-wider ${getStatusStyle(booking.status)}`}>
-                            {booking.status}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="flex gap-2 justify-end font-sans">
-                            <button
-                              onClick={() => approveBooking(booking.id)}
-                              disabled={booking.status === "Approved"}
-                              className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
-                              title="Approve Slot"
-                            >
-                              <Check size={14} strokeWidth={3} />
-                            </button>
-                            <button
-                              onClick={() => rejectBooking(booking.id)}
-                              disabled={booking.status === "Rejected"}
-                              className="bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
-                              title="Reject Slot"
-                            >
-                              <X size={14} strokeWidth={3} />
-                            </button>
-                            <button
-                              onClick={() => handleEditClick(booking)}
-                              className="bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100 p-2 rounded-xl transition shrink-0 cursor-pointer outline-none"
-                              title="Edit Allocation"
-                            >
-                              <Edit size={14} />
-                            </button>
+                {/* Table Body */}
+                <div className="divide-y divide-stone-100">
+                  {(() => {
+                    const filteredCustomers = customers.filter((item) =>
+                      item.name.toLowerCase().includes(customerSearch.toLowerCase())
+                    );
+
+                    if (filteredCustomers.length === 0) {
+                      return (
+                        <div className="p-12 text-center">
+                          <p className="text-stone-400 text-sm font-medium">No verified clients found in this salon's registry.</p>
+                        </div>
+                      );
+                    }
+
+                    return filteredCustomers.map((customer) => (
+                      <div 
+                        key={customer.id} 
+                        className="grid gap-3 p-6 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.2fr] md:items-center hover:bg-[#FAF6F0]/20 transition-colors group text-left"
+                      >
+                        {/* Monogram, Name & Email */}
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-10 h-10 rounded-full bg-[#3E362E] text-white flex items-center justify-center font-serif font-black text-sm border border-[#2A241F] shadow-sm flex-shrink-0">
+                            {customer.name.charAt(0)}
                           </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                          <div className="min-w-0">
+                            <h4 className="font-serif font-bold text-[#3E362E] text-base tracking-tight leading-tight mb-1">
+                              {customer.name}
+                            </h4>
+                            <div className="flex items-center gap-1.5 text-stone-400">
+                              <Mail className="w-3 h-3 flex-shrink-0" />
+                              <p className="text-[11px] font-medium font-mono truncate tracking-tight">
+                                {customer.email}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-            {/* Pagination Controls */}
-            {filteredBookings.length > 0 && (
-              <div className="flex justify-between items-center mt-6 pt-4 border-t border-stone-100 font-sans text-xs">
-                <span className="text-stone-500 font-medium">
-                  Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredBookings.length)} of {filteredBookings.length} bookings
-                </span>
-                <div className="flex gap-2">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-40 disabled:hover:bg-stone-100 rounded-xl font-extrabold uppercase tracking-wider transition cursor-pointer disabled:cursor-not-allowed border-none outline-none"
-                  >
-                    Prev
-                  </button>
-                  <button
-                    disabled={currentPage >= totalPages}
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-40 disabled:hover:bg-stone-100 rounded-xl font-extrabold uppercase tracking-wider transition cursor-pointer disabled:cursor-not-allowed border-none outline-none"
-                  >
-                    Next
-                  </button>
+                        {/* Bookings */}
+                        <div className="md:block flex justify-between items-center">
+                          <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Bookings</span>
+                          <p className="font-serif font-bold text-[#3E362E] text-sm md:text-base leading-none">{customer.bookings}</p>
+                        </div>
+
+                        {/* Visits */}
+                        <div className="md:block flex justify-between items-center">
+                          <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Visits Logged</span>
+                          <p className="font-serif font-bold text-[#3E362E] text-sm md:text-base leading-none">{customer.visits}</p>
+                        </div>
+
+                        {/* Rating */}
+                        <div className="md:block flex justify-between items-center">
+                          <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Rating Given</span>
+                          <p className="font-serif font-bold text-[#3E362E] text-sm md:text-base leading-none flex items-center gap-1">
+                            {customer.rating !== null && customer.rating !== undefined ? (
+                              <>
+                                {Number(customer.rating).toFixed(1)} <Star className="w-3.5 h-3.5 text-[#C5A059] fill-[#C5A059]" />
+                              </>
+                            ) : (
+                              <span className="text-stone-300 font-sans text-xs font-normal">—</span>
+                            )}
+                          </p>
+                        </div>
+
+                        {/* Revenue / Progress bar */}
+                        <div className="md:block flex flex-col gap-1.5 justify-start">
+                          <div className="flex justify-between items-center mb-1 md:mb-0">
+                            <span className="md:hidden text-[9px] text-stone-400 uppercase font-black tracking-wider">Revenue</span>
+                            <p className="font-mono font-black text-xs text-[#3E362E] bg-[#FAF6F0] px-2 py-0.5 rounded border border-[#EADDCA]/40">₹{customer.amount}</p>
+                          </div>
+                          <div className="hidden md:block w-3/4 h-1.5 rounded-full bg-[#FAF6F0] border border-[#EADDCA]/40 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-[#3E362E] to-[#C5A059]"
+                              style={{ width: `${Math.min(100, (customer.amount / 70000) * 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ));
+                  })()}
                 </div>
               </div>
-            )}
-          </div>
+
+              {/* 📈 INSIGHTS METRICS FOOTER CHARTS */}
+              {(() => {
+                const frequentCustomersList = [...customers]
+                  .sort((a, b) => b.visits - a.visits)
+                  .slice(0, 5)
+                  .filter(c => c.visits > 0);
+
+                const highValueSpendersList = [...customers]
+                  .sort((a, b) => b.amount - a.amount)
+                  .slice(0, 5)
+                  .filter(c => c.amount > 0);
+
+                const cardStyle = "bg-white border border-[#EADDCA] rounded-2xl p-5 md:p-6 shadow-2xs hover:shadow-xs transition-all duration-300 text-left";
+
+                return (
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    {/* Panel 1: Frequent Visitors */}
+                    <div className={cardStyle}>
+                      <div className="flex items-center justify-between mb-5 border-b border-[#FAF6F0] pb-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="text-[#C5A059] bg-[#C5A059]/10 p-2 rounded-lg"><Calendar size={16} /></div>
+                          <h4 className="font-serif font-bold text-[#3E362E] text-md tracking-wide">Frequent Customer Flow</h4>
+                        </div>
+                        <ArrowUpRight className="w-4 h-4 text-stone-400" />
+                      </div>
+
+                      <div className="divide-y divide-[#FAF6F0]">
+                        {frequentCustomersList.length === 0 ? (
+                          <p className="text-stone-400 text-xs font-semibold py-4 text-center">No recurring visits logged yet.</p>
+                        ) : (
+                          frequentCustomersList.map((x) => (
+                            <div key={x.id} className="flex justify-between items-center py-3.5 text-sm font-medium">
+                              <p className="text-[#3E362E] font-semibold">{x.name}</p>
+                              <p className="text-[10px] font-black uppercase bg-[#3E362E] text-white tracking-wider px-2.5 py-1 rounded-md">
+                                {x.visits} visits
+                              </p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Panel 2: High Value Spenders */}
+                    <div className={cardStyle}>
+                      <div className="flex items-center justify-between mb-5 border-b border-[#FAF6F0] pb-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="text-[#C5A059] bg-[#C5A059]/10 p-2 rounded-lg"><TrendingUp size={16} /></div>
+                          <h4 className="font-serif font-bold text-[#3E362E] text-md tracking-wide">High Value Client Spends</h4>
+                        </div>
+                        <ArrowUpRight className="w-4 h-4 text-stone-400" />
+                      </div>
+
+                      <div className="divide-y divide-[#FAF6F0]">
+                        {highValueSpendersList.length === 0 ? (
+                          <p className="text-stone-400 text-xs font-semibold py-4 text-center">No spend history recorded yet.</p>
+                        ) : (
+                          highValueSpendersList.map((x) => (
+                            <div key={x.id} className="flex justify-between items-center py-3.5 text-sm font-medium">
+                              <p className="text-[#3E362E] font-semibold">{x.name}</p>
+                              <p className="font-mono font-black text-[#C5A059] bg-[#FAF6F0] border border-[#EADDCA] px-3 py-1 rounded-md">
+                                ₹{x.amount}
+                              </p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          ) : (
+            <>
+              {/* ── SYSTEM MATRIX SUMMARY NUMBERS ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 text-left">
+                {[
+                  { title: "Today's Bookings", value: stats.today, icon: Calendar, color: "bg-orange-50 text-orange-700 border-orange-100" },
+                  { title: "Customers Total", value: stats.customers, icon: Users, color: "bg-amber-50 text-amber-700 border-amber-100" },
+                  { title: "Revenue Index", value: stats.revenue, icon: IndianRupee, color: "bg-emerald-50 text-emerald-700 border-[#C5A059]/20" },
+                  { title: "Pending Bookings", value: stats.pendingCount, icon: Clock3, color: "bg-sky-50 text-sky-700 border-sky-100" },
+                ].map((item) => (
+                  <div key={item.title} className="card p-5 bg-white flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl border flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                      <item.icon size={22} />
+                    </div>
+                    <div>
+                      {/* Rule 2: Minor Heading kicker tag structure */}
+                      <h3 className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans mb-0.5">{item.title}</h3>
+                      <p className="text-2xl font-black font-serif tracking-normal text-stone-900 leading-none">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── SEARCH INDEX CONSOLE ── */}
+              <div className="card p-4 mb-6 flex items-center gap-3 bg-white text-left font-sans">
+                <Search className="text-[#C5A059] shrink-0" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search active guest by name identifier..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="bg-transparent outline-none w-full text-stone-800 placeholder-stone-400 text-sm font-medium font-sans border-none"
+                />
+                {selectedTypeFilter !== "ALL" && (
+                  /* Rule 4: Standardized Link/Badge Action button */
+                  <button 
+                    onClick={() => setSelectedTypeFilter("ALL")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase tracking-wider bg-stone-100 text-stone-500 hover:bg-stone-200 transition cursor-pointer font-sans border-none outline-none"
+                  >
+                    <SlidersHorizontal size={12} /> Clear Filter
+                  </button>
+                )}
+              </div>
+
+              {/* ── INTERACTIVE FILTER SEGMENTS ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-left">
+                {[
+                  { filterKey: "Queue", title: "Queue Bookings", icon: Clock3, desc: "On-demand routing slot entries" },
+                  { filterKey: "Slot", title: "Slot Bookings", icon: Calendar, desc: "Pre-arranged appointment times" },
+                ].map((item) => {
+                  const isTargetActive = selectedTypeFilter === item.filterKey;
+                  return (
+                    <div 
+                      key={item.filterKey} 
+                      onClick={() => setSelectedTypeFilter(isTargetActive ? "ALL" : item.filterKey)}
+                      className={`card p-5 flex items-center gap-4 cursor-pointer select-none bg-white ${isTargetActive ? 'card-active' : 'hover:border-[#C5A059]'}`}
+                    >
+                      <div className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all ${isTargetActive ? 'text-white' : 'bg-amber-50/60 border-amber-100 text-[#C5A059]'}`} style={{ backgroundColor: isTargetActive ? CHARCOAL : '' }}>
+                        <item.icon size={22} />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-black font-serif text-stone-900 leading-tight">{item.title}</h2>
+                        {/* Rule 3: Balanced small description string */}
+                        <p className="text-stone-600 text-[11px] font-normal leading-relaxed font-sans mt-0.5">{item.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ── LEDGER TABLE CONTENT CONTAINER ── */}
+              <div className="card p-6 bg-white overflow-hidden mb-8 text-left">
+                <div className="flex items-center justify-between mb-6 border-b border-stone-100 pb-4">
+                  {/* Rule 1: Master Section Sub-Header Title Layout */}
+                  <h2 className="font-serif text-xl sm:text-2xl tracking-normal text-stone-900 flex flex-wrap items-center justify-start gap-2">
+                    <span className="font-bold uppercase">Live Operations</span>
+                    <span className="italic text-[#C5A059] normal-case font-medium">Queue</span>
+                    {selectedTypeFilter !== "ALL" && <span className="text-xs font-sans font-bold text-[#C5A059] lowercase">({selectedTypeFilter} only)</span>}
+                  </h2>
+                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] bg-stone-50 px-2.5 py-1 rounded-md font-sans">
+                    {filteredBookings.length} Active Rows
+                  </span>
+                </div>
+                
+                <div className="overflow-x-auto w-full custom-scrollbar font-sans">
+                  <table className="w-full min-w-[640px] text-sm border-collapse">
+                    <thead>
+                      <tr className="border-b border-stone-100 text-stone-400 text-[11px] font-extrabold uppercase tracking-widest font-sans">
+                        <th className="text-left py-4 pr-4">Customer Entity</th>
+                        <th className="text-left pr-4">Pipeline Type</th>
+                        <th className="text-left pr-4">Target Window</th>
+                        <th className="text-left pr-4">State</th>
+                        <th className="text-right">Operations</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100">
+                      {paginatedBookings.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" className="text-center py-12 text-stone-400 font-semibold font-sans">
+                            No matching transaction entries discovered in this viewport segment.
+                          </td>
+                        </tr>
+                      ) : (
+                        paginatedBookings.map((booking) => (
+                          <tr key={booking.id} className="hover:bg-stone-50/40 transition">
+                            <td className="py-4 pr-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-[#FAF6F0] text-stone-700 border border-[#EADBCE]/50 flex items-center justify-center font-serif text-sm font-black overflow-hidden flex-shrink-0">
+                                  {booking.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="min-w-0">
+                                  <h4 className="font-serif font-black text-[#3E362E] text-sm truncate leading-snug">{booking.name}</h4>
+                                  <p className="text-stone-400 text-[10px] font-mono leading-none mt-0.5">{booking.mobile || "Walk-in"}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 pr-4">
+                              <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border font-sans ${
+                                booking.type === "Slot" ? "bg-amber-50 text-[#C5A059] border-[#C5A059]/20" : "bg-stone-100 text-stone-600 border-stone-200"
+                              }`}>
+                                {booking.type}
+                              </span>
+                            </td>
+                            <td className="py-4 pr-4">
+                              <span className="text-[#3E362E] text-xs font-semibold font-sans">{booking.slot}</span>
+                            </td>
+                            <td className="py-4 pr-4">
+                              <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border font-sans ${
+                                booking.status === "Approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (
+                                  booking.status === "Rejected" ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-amber-50 text-amber-600 border-amber-200/60"
+                                )
+                              }`}>
+                                {booking.status}
+                              </span>
+                            </td>
+                            <td className="py-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => approveBooking(booking.id)}
+                                  disabled={booking.status === "Approved"}
+                                  className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
+                                  title="Approve Slot"
+                                >
+                                  <Check size={14} strokeWidth={3} />
+                                </button>
+                                <button
+                                  onClick={() => rejectBooking(booking.id)}
+                                  disabled={booking.status === "Rejected"}
+                                  className="bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
+                                  title="Reject Slot"
+                                >
+                                  <X size={14} strokeWidth={3} />
+                                </button>
+                                <button
+                                  onClick={() => handleEditClick(booking)}
+                                  className="bg-stone-50 text-stone-600 border border-stone-200 hover:bg-stone-100 p-2 rounded-xl transition shrink-0 cursor-pointer outline-none"
+                                  title="Edit Allocation"
+                                >
+                                  <Edit size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                {filteredBookings.length > 0 && (
+                  <div className="flex justify-between items-center mt-6 pt-4 border-t border-stone-100 font-sans text-xs">
+                    <span className="text-stone-500 font-medium">
+                      Showing {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, filteredBookings.length)} of {filteredBookings.length} bookings
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-40 disabled:hover:bg-stone-100 rounded-xl font-extrabold uppercase tracking-wider transition cursor-pointer disabled:cursor-not-allowed border-none outline-none"
+                      >
+                        Prev
+                      </button>
+                      <button
+                        disabled={currentPage >= totalPages}
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 disabled:opacity-40 disabled:hover:bg-stone-100 rounded-xl font-extrabold uppercase tracking-wider transition cursor-pointer disabled:cursor-not-allowed border-none outline-none"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       )}
       {toast && (

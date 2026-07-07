@@ -12,7 +12,6 @@ export default function OwnerLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sideOpen, setSideOpen] = useState(false);
-  const [pendingBreakCount, setPendingBreakCount] = useState(0);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const salonName = localStorage.getItem("salonName") || "Barber Salon";
@@ -30,29 +29,7 @@ export default function OwnerLayout() {
     };
   }, [sideOpen]);
 
-  useEffect(() => {
-    const fetchPendingCount = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const res = await fetch(`${API}/breaks/pending`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        const data = await res.json();
-        if (data.success) {
-          setPendingBreakCount(data.data?.length || 0);
-        }
-      } catch (err) {
-        console.error("Error fetching pending breaks count:", err);
-      }
-    };
-
-    fetchPendingCount();
-    const interval = setInterval(fetchPendingCount, 15000); // Poll every 15 seconds
-    return () => clearInterval(interval);
-  }, []);
+  // Break approvals checking removed
 
   // const NAV = [
   //   { id: "dashboard", label: "Console Home", icon: LayoutDashboard, route: "/owner/dashboard" },
@@ -73,12 +50,9 @@ export default function OwnerLayout() {
   const NAV = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, route: "/owner/dashboard" },
     { id: "queue", label: "Live Queue", icon: Clock, route: "/owner/queue" },
-    { id: "live", label: "Live Monitoring", icon: Activity, route: "/owner/live" },
     { id: "bookings", label: "Bookings & Slots", icon: Calendar, route: "/owner/bookings" },
     { id: "services", label: "Services Catalog", icon: Scissors, route: "/owner/manage-services" },
     { id: "barbers", label: "Barber Team", icon: Users, route: "/owner/barbers" },
-    { id: "customers", label: "Customer Registry", icon: Users, route: "/owner/customers" },
-    { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
     { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
     { id: "settlements", label: "Salon Settlements", icon: IndianRupee, route: "/owner/settlements" },
     { id: "financial-analytics", label: "Financial Analytics", icon: BarChart2, route: "/owner/financial-analytics" },
@@ -150,9 +124,6 @@ export default function OwnerLayout() {
               >
                 <n.icon className="w-4 h-4 shrink-0 transition-colors" style={{ color: isActive ? "#8B5A2B" : "#A39796" }} />
                 <span className="text-xs uppercase tracking-wider font-sans">{n.label}</span>
-                {n.id === "approvals" && pendingBreakCount > 0 && (
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 animate-pulse ml-2 shrink-0" />
-                )}
                 
                 {isActive && (
                   <div className="w-1.5 h-4 rounded-full bg-[#8B5A2B] ml-auto" />
@@ -212,14 +183,6 @@ export default function OwnerLayout() {
                       }}
                       className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
                     >MY PROFILE</button>
-                    
-                    <button
-                      onClick={() => {
-                        navigate("/owner/approvals");
-                        setShowProfileDropdown(false);
-                      }}
-                      className="w-full px-4 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >BREAK APPROVALS</button>
                   </div>
                   
                   <div className="border-t border-gray-100 py-1.5">
@@ -274,14 +237,6 @@ export default function OwnerLayout() {
                       }}
                       className="w-full px-3 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
                     >MY PROFILE</button>
-                    
-                    <button
-                      onClick={() => {
-                        navigate("/owner/approvals");
-                        setShowProfileDropdown(false);
-                      }}
-                      className="w-full px-3 py-2 text-left text-xs text-[#3E362E] hover:bg-[#8B5A2B]/5 font-bold uppercase tracking-wider transition-colors"
-                    >BREAK APPROVALS</button>
                   </div>
                   
                   <div className="border-t border-gray-100 py-1.5">

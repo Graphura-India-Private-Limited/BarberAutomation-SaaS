@@ -125,8 +125,7 @@ export default function BarberTeam() {
   }, [barbers, location]);
 
 
-  const toggleStatus = async (barberId, currentStatus) => {
-    const nextStatus = currentStatus === "available" ? "break" : "available";
+  const changeBarberStatus = async (barberId, nextStatus) => {
     setBusyId(barberId);
     try {
       const res = await fetch(`${API}/barber/${barberId}/status`, {
@@ -136,7 +135,7 @@ export default function BarberTeam() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`Barber status updated to ${nextStatus === "break" ? "On Break" : "Available"}`);
+        showToast(`Barber status set to ${nextStatus}`);
         setBarbers(prev => prev.map(b => b._id === barberId ? { ...b, status: nextStatus } : b));
       } else {
         showToast(data.message || "Failed to update status", "error");
@@ -480,38 +479,31 @@ export default function BarberTeam() {
                     </div>
 
                     {/* Bottom Status Toggles */}
-                    <div className="mt-2 flex items-center justify-between gap-4">
-                      <span className={`px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider ${statusMeta.style}`}>
-                        {statusMeta.label}
-                      </span>
+                    <div className="mt-2 flex flex-col gap-3 pt-3 border-t border-stone-100/60">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Status:</span>
+                        <span className={`px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wider ${statusMeta.style}`}>
+                          {statusMeta.label}
+                        </span>
+                      </div>
 
-                      {barber.status !== "busy" ? (
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); toggleStatus(barber._id, barber.status); }}
-                          disabled={busyId === barber._id}
-                          className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-extrabold text-[10px] uppercase tracking-wider transition-all active:scale-95 cursor-pointer border shadow-xs ${
-                            barber.status === "break" 
-                              ? "bg-white text-stone-700 border-[#EADBCE] hover:bg-stone-50"
-                              : "bg-[#3E362E] text-white border-transparent hover:opacity-90"
-                          }`}
-                        >
-                          {barber.status === "break" ? (
-                            <>
-                              <Check size={12} className="text-emerald-500" />
-                              Set Available
-                            </>
-                          ) : (
-                            <>
-                              <Coffee size={12} className="text-amber-500" />
-                              Go On Break
-                            </>
-                          )}
-                        </button>
-                      ) : (
-                        <div className="px-4 py-2 rounded-xl border border-dashed border-stone-200 text-stone-400 font-extrabold text-[10px] uppercase tracking-wider text-center select-none bg-stone-50/50">
-                          Busy
-                        </div>
-                      )}
+                      <div className="flex gap-1.5 w-full" onClick={(e) => e.stopPropagation()}>
+                        {["available", "busy", "break"].map(s => (
+                          <button
+                            key={s}
+                            type="button"
+                            disabled={barber.status === s || busyId === barber._id}
+                            onClick={() => changeBarberStatus(barber._id, s)}
+                            className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer border text-center font-sans ${
+                              barber.status === s
+                                ? "bg-[#FAF6F0] text-[#C5A059] border-[#C5A059]"
+                                : "bg-[#FAFAF8] text-stone-500 border-[#EADBCE] hover:bg-stone-50"
+                            }`}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 );
