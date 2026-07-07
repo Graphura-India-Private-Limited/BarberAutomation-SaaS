@@ -220,10 +220,29 @@ exports.getBarberDashboard = async (req, res) => {
       });
     }
 
+    const completedQueue = await Queue.find({
+      barber_id: req.params.id,
+      status: "completed",
+      joined_at: { $gte: today }
+    })
+      .populate("customer_id", "name mobile")
+      .populate("booking_id", "booking_type total_amount services")
+      .sort({ served_at: -1 });
+
+    const payouts = await Payment.find({
+      barber_id: req.params.id,
+      status: "SUCCESS"
+    })
+      .populate("customer_id", "name")
+      .sort({ created_at: -1 })
+      .limit(20);
+
     res.json({
       success: true,
       barber,
       todayQueue,
+      completedQueue,
+      payouts,
       stats: {
         completedToday,
         totalServed,

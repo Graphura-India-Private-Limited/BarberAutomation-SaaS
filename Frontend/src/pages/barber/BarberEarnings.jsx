@@ -7,7 +7,7 @@ import {
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function BarberEarnings() {
-  const [payouts] = useState([]);
+  const [payouts, setPayouts] = useState([]);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [earningsSummary, setEarningsSummary] = useState({
@@ -49,8 +49,8 @@ export default function BarberEarnings() {
         });
 
         // Build shift log from today's completed queue
-        const todayQueue = (data.todayQueue || []).filter(q => q.status === "done" || q.status === "Completed");
-        const log = todayQueue.map(q => {
+        const completedQueue = data.completedQueue || [];
+        const log = completedQueue.map(q => {
           const services = q.booking_id?.services || [];
           const serviceName = services.map(s => s.service_name).filter(Boolean).join(", ") || "Service";
           const basePrice = q.booking_id?.total_amount || 0;
@@ -60,6 +60,16 @@ export default function BarberEarnings() {
           return { service: serviceName, time, basePrice, cutEarned: Math.round(basePrice * 0.6), tip: 0 };
         });
         setShiftLog(log);
+
+        // Build payouts list from payout history
+        const history = (data.payouts || []).map(p => ({
+          id: p._id ? p._id.toString().slice(-6).toUpperCase() : "PAYOUT",
+          type: p.payment_type === "FULL" ? "Full Commission Settlement" : "Token Settlement",
+          date: new Date(p.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
+          amount: Math.round(p.amount * 0.6),
+          status: "SUCCESS"
+        }));
+        setPayouts(history);
       }
     } catch (err) {
       console.error("Failed to fetch earnings:", err);

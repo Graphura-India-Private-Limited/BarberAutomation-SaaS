@@ -496,9 +496,16 @@ export default function ServiceConsole() {
                       <StatusBadge status={c.status} small />
                     </div>
                   </div>
-                  <span className="text-xs font-black text-stone-300">
-                    {c.status === "in-progress" ? "In Chair" : `#${c.position}`}
-                  </span>
+                  <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                    <span className="text-xs font-black text-stone-300">
+                      {c.status === "in-progress" ? "In Chair" : `#${c.position}`}
+                    </span>
+                    {c.joined_at && (
+                      <span className="text-[10px] font-black uppercase tracking-wider text-stone-400 font-mono">
+                        {new Date(c.joined_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -523,8 +530,14 @@ export default function ServiceConsole() {
                     <h4 className="text-lg font-black tracking-tight text-stone-900 mt-0.5 leading-none">
                       {cur.customer_name}
                     </h4>
-                    <p className="text-xs font-bold text-stone-400 mt-1 inline-flex items-center gap-1">
+                    <p className="text-xs font-bold text-stone-400 mt-1 inline-flex items-center gap-1.5 flex-wrap">
                       <Phone size={12} className="text-[#C5A059]" /> {cur.customer_mobile}
+                      {cur.joined_at && (
+                        <>
+                          <span className="text-stone-300">|</span>
+                          <Clock size={12} className="text-[#C5A059]" /> Booked: {new Date(cur.joined_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -906,7 +919,6 @@ export default function ServiceConsole() {
                       type="button" 
                       onClick={() => {
                         setModal(null);
-                        navigate("/barber/overview");
                       }} 
                       className="w-full py-3 px-5 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-stone-900 hover:bg-stone-800 shadow-xs border-none cursor-pointer text-center"
                     >
