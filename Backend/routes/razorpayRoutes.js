@@ -34,6 +34,7 @@ router.get("/revenue/services", requireRoles("owner", "admin"), revenueControlle
 router.get("/revenue/barbers", requireRoles("owner", "admin"), revenueController.getBarberWiseRevenue);
 router.get("/revenue/monthly", requireRoles("owner", "admin"), revenueController.getMonthlyRevenue);
 router.get("/revenue/trends", requireRoles("owner", "admin"), revenueController.getRevenueTrends);
+router.get("/revenue/salon-breakdown", requireRoles("owner", "admin"), revenueController.getSalonBreakdown);
 router.get("/:id", requireRoles("owner", "admin"), paymentController.getPaymentById);
 
 module.exports = router;
