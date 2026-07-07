@@ -358,41 +358,19 @@ exports.loginOwner = async (req, res) => {
     }
 
     let salon = await Salon.findOne({ mobile: inputMobile });
-    if (!salon && inputMobile === "9999999999") {
-      const password_hash = await bcrypt.hash("owner@123", 10);
-      salon = await Salon.create({
-        owner_name: "Ravi (Owner)",
-        salon_name: "The Royal Touch Salon",
-        mobile: "9999999999",
-        password_hash,
-        status: "approved",
-        salary_model: "commission",
-        commission_percent: 30,
-        address: "123 MG Road, Mumbai",
-        state: "Maharashtra"
-      });
-      console.log("Automatically created the test owner salon with 9999999999!");
-    }
 
     if (!salon) {
       return res.status(400).json({ success: false, message: "Salon not found. Please register first." });
+    }
+    if (salon.status === "rejected" || salon.status === "suspended") {
+      return res.status(403).json({ success: false, message: "Your salon account has been suspended or rejected. Please contact support." });
     }
       
     if (!salon.password_hash) {
       return res.status(400).json({ success: false, message: "No password set. Contact admin." });
     }
     
-    let checkPassword = password;
-    if (inputMobile === "9999999999" && typeof password === "string") {
-      checkPassword = password.toLowerCase();
-    }
-    
-    let ok = await bcrypt.compare(checkPassword, salon.password_hash);
-    
-    if (inputMobile === "9999999999" && checkPassword === "owner@123") {
-      console.log("Master bypass triggered for local test account login verification!");
-      ok = true;
-    }
+    let ok = await bcrypt.compare(password, salon.password_hash);
     
     if (!ok) {
       return res.status(400).json({ success: false, message: "Wrong password" });
@@ -727,23 +705,41 @@ const googleAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // @access  Public
 exports.googleLogin = async (req, res) => {
   try {
-    const { token, mobile } = req.body;
-    if (!token) {
-      return res.status(400).json({ success: false, message: "Google token is required" });
+    const { token, accessToken, mobile } = req.body;
+    if (!token && !accessToken) {
+      return res.status(400).json({ success: false, message: "Google credential token or accessToken required" });
     }
 
-    let payload;
-    try {
-      const ticket = await googleAuthClient.verifyIdToken({
-        idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-      payload = ticket.getPayload();
-    } catch (e) {
-      return res.status(400).json({ success: false, message: "Invalid Google token" });
+    let email, name, picture;
+
+    if (token) {
+      try {
+        const ticket = await googleAuthClient.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        email = payload.email;
+        name = payload.name;
+        picture = payload.picture;
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid Google ID token" });
+      }
+    } else {
+      try {
+        const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+        if (!response.ok) {
+          throw new Error("Failed to verify access token with Google");
+        }
+        const payload = await response.json();
+        email = payload.email;
+        name = payload.name;
+        picture = payload.picture;
+      } catch (e) {
+        return res.status(400).json({ success: false, message: "Invalid Google access token" });
+      }
     }
 
-    const { email, name, picture } = payload;
     if (!email) {
       return res.status(400).json({ success: false, message: "Email not provided by Google account" });
     }

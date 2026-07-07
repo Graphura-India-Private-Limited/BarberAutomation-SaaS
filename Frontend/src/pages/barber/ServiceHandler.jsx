@@ -6,15 +6,6 @@ const ServiceHandler = () => {
   const [selectedGender, setSelectedGender] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
 
-  // const serviceCatalog = [
-  //   { id: 's1', name: 'Premium Haircut', time: 30, price: '₹500', intensity: 70, bestBarber: "Amit", img: 'https://i.pinimg.com/736x/7e/7d/b6/7e7db69384f023cf935f954d09e5f5c3.jpg' },
-  //   { id: 's2', name: 'Beard Grooming', time: 15, price: '₹200', intensity: 40, bestBarber: "Vicky", img: 'https://i.pinimg.com/1200x/7f/c5/a2/7fc5a2bfa31be902b66a6049d8f4b890.jpg' },
-  //   { id: 's3', name: 'Face Clean-up', time: 20, price: '₹400', intensity: 30, bestBarber: "Rahul", img: 'https://i.pinimg.com/736x/f5/74/dc/f574dc0a7ae5e8937e0d923b95fdbfa4.jpg' },
-  //   { id: 's5', name: 'Signature Styling', time: 25, price: '₹600', intensity: 80, bestBarber: "Sahil", img: 'https://i.pinimg.com/736x/c4/af/f7/c4aff7cfc65e4a207eb6d58bbfdb37a2.jpg' },
-  //   { id: 's6', name: 'Head Massage & Spa', time: 40, price: '₹700', intensity: 50, bestBarber: "Sameer", img: 'https://i.pinimg.com/736x/24/0f/56/240f567877004691c5f56df55ab368d2.jpg' },
-  //   { id: 's4', name: 'Full Grooming Combo', time: 50, price: '₹800', intensity: 95, bestBarber: "Asif", img: 'https://i.pinimg.com/1200x/69/03/4b/69034b21f1c6a462bc242526af9455bd.jpg' },
-  // ];
-
   const serviceCatalog = {
     Gentlemen: [
       { id: 'g1', name: 'Premium Haircut', time: 30, price: '₹500', bestBarber: 'Amit', img: 'https://i.pinimg.com/736x/7e/7d/b6/7e7db69384f023cf935f954d09e5f5c3.jpg' },

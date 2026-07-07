@@ -83,7 +83,16 @@ export default function AdminLogin() {
     }, 800);
   };
 
-  const fillDemo = () => { setMobile(DEMO.mobile); setPassword(DEMO.password); setError(""); };
+  const handleSecretKeyAutofill = () => {
+    const key = prompt("Enter Secret Key to autofill Admin credentials:");
+    if (key === "admin" || key === "BarberProAdmin2026") {
+      setMobile(DEMO.mobile);
+      setPassword(DEMO.password);
+      setError("");
+    } else if (key !== null) {
+      setError("Invalid Secret Key!");
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col md:flex-row relative">
@@ -173,28 +182,16 @@ export default function AdminLogin() {
               </p>
             </div>
 
-            {/* Demo credentials */}
             {!show2FA && (
-              <div
-                className="rounded-xl px-4 py-2.5 mb-4 flex items-center justify-between"
-                style={{ background: "#FEF9EE", border: `1px solid ${GOLD}40` }}
-              >
-                <div>
-                  <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest mb-1" style={{ color: GOLD }}>
-                    Demo Credentials
-                  </p>
-                  <p className="font-sans text-sm font-normal text-stone-600">
-                    {DEMO.mobile} &nbsp;|&nbsp; {DEMO.password}
-                  </p>
-                </div>
+              <div className="mb-4">
                 <button
-                  onClick={fillDemo}
-                  className="font-sans text-xs font-extrabold uppercase tracking-wider px-3 py-1.5 rounded-lg text-white transition shrink-0"
-                  style={{ background: BROWN }}
-                  onMouseEnter={e => (e.currentTarget.style.background = BROWN_HOVER)}
-                  onMouseLeave={e => (e.currentTarget.style.background = BROWN)}
+                  type="button"
+                  onClick={handleSecretKeyAutofill}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed text-xs font-bold uppercase tracking-wider transition hover:bg-stone-50 active:scale-95"
+                  style={{ borderColor: GOLD, color: BROWN, cursor: "pointer" }}
                 >
-                  Use
+                  <Lock size={12} />
+                  <span>Autofill with Secret Key</span>
                 </button>
               </div>
             )}

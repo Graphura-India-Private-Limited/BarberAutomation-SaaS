@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const Barber = require("../models/Barber");
+const Salon = require("../models/Salon");
 const Queue = require("../models/Queue");
 const Booking = require("../models/Booking");
 const BreakRequest = require("../models/BreakRequest");
@@ -11,6 +12,11 @@ const { validateMobile, validateEmailReal } = require("../utils/validation");
 // @access  Public
 exports.getBarbersBySalon = async (req, res) => {
   try {
+    const salon = await Salon.findOne({ _id: req.params.salon_id, status: "approved" });
+    if (!salon) {
+      return res.status(404).json({ success: false, message: "Salon is suspended or not live" });
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 

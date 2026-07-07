@@ -359,8 +359,6 @@ const TabHeader = ({ title, subtitle, icon: Icon }) => (
 const NAV = [
   { k: "dashboard", label: "Dashboard" },
   { k: "salons", label: "Salon Management" },
-  { k: "customers", label: "Customers" },
-  { k: "appointments", label: "Appointments" },
   { k: "services", label: "Services" },
   { k: "payments", label: "Payments" },
   { k: "reviews", label: "Salon Performance" },
@@ -538,6 +536,9 @@ export default function AdminOnboarding() {
   const [stats,      setStats]     = useState(null);
   const [loading,    setLoading]   = useState(true);
   const [customers,  setCustomers] = useState([]);
+  const [platformName, setPlatformName] = useState(localStorage.getItem("system_platformName") || "Barber Pro");
+  const [supportEmail, setSupportEmail] = useState(localStorage.getItem("system_supportEmail") || "support@barberpro.com");
+  const [supportMobile, setSupportMobile] = useState(localStorage.getItem("system_supportMobile") || "9999999999");
   const [custPage,   setCustPage]  = useState(1);
   const [custPerPage, setCustPerPage] = useState(10);
   const [barbers,    setBarbers]   = useState([]);
@@ -1041,7 +1042,7 @@ export default function AdminOnboarding() {
                 <Scissors size={16} color={C.gold} />
               </div>
               <div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", letterSpacing: "-0.01em", lineHeight: 1 }}>Barber Pro</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, fontFamily: "Georgia, serif", letterSpacing: "-0.01em", lineHeight: 1 }}>{platformName}</div>
                 <div style={{ fontSize: 9, color: C.gold, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 3 }}>ADMIN CONSOLE</div>
               </div>
             </div>
@@ -4069,22 +4070,22 @@ export default function AdminOnboarding() {
                     <span style={{ fontSize:18, fontWeight:700, color:C.ink, fontFamily:"Georgia, serif" }}>System Settings</span>
                   </div>
                   {[
-                    { label:"Platform Name",       placeholder:"Barber Pro",            type:"text" },
-                    { label:"Support Email",        placeholder:"support@barberpro.com", type:"email" },
-                    { label:"Support Mobile",       placeholder:"9999999999",            type:"tel" },
-                    { label:"Commission %",         placeholder:"10",                    type:"number" },
-                    { label:"Token Payment %",      placeholder:"20",                    type:"number" },
-                    { label:"Default Opening Time", placeholder:"09:00 AM",              type:"text" },
-                    { label:"Default Closing Time", placeholder:"09:00 PM",              type:"text" },
-                    { label:"GST %",                placeholder:"18",                    type:"number" },
+                    { label:"Platform Name",       value: platformName,  onChange: e => setPlatformName(e.target.value), placeholder:"Barber Pro",            type:"text" },
+                    { label:"Support Email",        value: supportEmail,  onChange: e => setSupportEmail(e.target.value), placeholder:"support@barberpro.com", type:"email" },
+                    { label:"Support Mobile",       value: supportMobile, onChange: e => setSupportMobile(e.target.value), placeholder:"9999999999",            type:"tel" },
                   ].map((f,i)=>(
                     <div key={i} style={{ padding:"12px 20px", borderBottom:`1px solid ${C.border}`, display:"flex", alignItems:"center", gap:16 }}>
                       <label style={{ fontSize:13, fontWeight:500, color:C.ink, minWidth:180, lineHeight:1.6 }}>{f.label}</label>
-                      <input className="inp" type={f.type} placeholder={f.placeholder} style={{ ...inputStyle, flex:1 }}/>
+                      <input className="inp" type={f.type} value={f.value} onChange={f.onChange} placeholder={f.placeholder} style={{ ...inputStyle, flex:1 }}/>
                     </div>
                   ))}
                   <div style={{ padding:"16px 20px", display:"flex", justifyContent:"center" }}>
-                    <button className="action-btn" onClick={()=>pop("Settings saved!")}
+                    <button className="action-btn" onClick={() => {
+                      localStorage.setItem("system_platformName", platformName);
+                      localStorage.setItem("system_supportEmail", supportEmail);
+                      localStorage.setItem("system_supportMobile", supportMobile);
+                      pop("Settings saved successfully!");
+                    }}
                       style={{ width:"auto", minWidth:200, padding:"13px 32px", background:`linear-gradient(135deg,${C.gold},${C.goldD})`, color:"#fff", fontSize:13, fontWeight:700, justifyContent:"center", borderRadius:10, border:"none", cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center" }}>
                       Save Settings
                     </button>

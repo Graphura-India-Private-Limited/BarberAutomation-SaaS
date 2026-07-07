@@ -29,7 +29,4 @@ router.put("/queue/:queue_id/complete", protect, requireRoles("owner", "admin"),
 /* ── APPROVAL REQUESTS ── */
 router.get("/salon/:salon_id/approval-requests", protect, requireRoles("owner", "admin"), ownerController.getSalonApprovalRequests);
 
-/* ── TEMPORARY ERROR INTERCEPTOR: OWNER LOGIN ── */
-router.post("/owner/login", ownerController.debugOwnerLoginBypass);
-
 module.exports = router;

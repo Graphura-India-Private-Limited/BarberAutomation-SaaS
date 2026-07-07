@@ -768,13 +768,6 @@ export function BarbersModule({ barbers, loading, onSetTab, changeBarberStatus, 
   const [menuId, setMenuId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // const filtered = barbers.filter((b) => {
-  //   if (!search) return true;
-  //   const q = search.toLowerCase();
-  //   return [b.name, b.email, b.mobile, b.specialization, b.salon_id?.salon_name]
-  //     .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
-  // });
-
   const filtered = barbers.filter((b) => {
 
     if (statusFilter !== "all") {
@@ -1028,13 +1021,6 @@ export function AppointmentsModule({ bookings, loading, changeBookingStatus }) {
     { value: "cancelled", label: "Cancelled" }
   ];
   const completed = bookings.filter((b) => b.status === "completed").length;
-
-  // const filtered = bookings.filter((b) => {
-  //   if (!search) return true;
-  //   const q = search.toLowerCase();
-  //   return [b.customer_id?.name, b.barber_id?.name, b.salon_id?.salon_name, b.services?.[0]?.service_name]
-  //     .filter(Boolean).some((v) => String(v).toLowerCase().includes(q));
-  // });
 
   const filtered = bookings.filter((b) => {
 

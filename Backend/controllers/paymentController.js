@@ -202,7 +202,7 @@ const retryFailedPayment = asyncHandler(async (req, res) => {
 });
 
 const handleWebhook = asyncHandler(async (req, res) => {
-  const event = req.razorpayEvent || req.body;
+  const event = req.razorpayEvent || (Buffer.isBuffer(req.body) ? JSON.parse(req.body.toString("utf8")) : req.body);
   const entity = event?.payload?.payment?.entity || event?.payload?.order?.entity || {};
   const orderId = entity.order_id || entity.id;
 

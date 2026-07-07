@@ -83,10 +83,12 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
         }
 
         // 2. Fetch existing bookings to block busy slots
-        if (token && targetSalonId) {
-          const res = await fetch(`${API}/booking/salon/${targetSalonId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+        if (targetSalonId) {
+          const headers = {};
+          if (token) {
+            headers.Authorization = `Bearer ${token}`;
+          }
+          const res = await fetch(`${API}/booking/salon/${targetSalonId}`, { headers });
           const data = await res.json();
           if (data.success && data.bookings) {
             setExistingBookings(data.bookings);
@@ -122,14 +124,16 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
     const candidateStart = new Date(candidateStartStr);
     const duration = bookingData?.duration || 30; // default to 30 mins
     const candidateEnd = new Date(candidateStart.getTime() + duration * 60 * 1000);
+    const currentSalonId = localStorage.getItem("selectedSalonId");
 
     return existingBookings.some(b => {
+      const matchSalon = String(b.salon_id?._id || b.salon_id) === String(currentSalonId);
       const matchBarber =
         String(b.barber_id?._id || b.barber_id) === String(bookingData?.barber_id) ||
         (b.barber_id?.name?.toLowerCase().includes(bookingData?.barber?.toLowerCase()));
       const isActive = !["cancelled", "completed", "noshow"].includes(b.status);
       
-      if (matchBarber && isActive && b.slot_time) {
+      if (matchSalon && matchBarber && isActive && b.slot_time) {
         const bStart = new Date(b.slot_time);
         // calculate booking duration (sum of service durations)
         const bDuration = (b.services || []).reduce((sum, s) => sum + (s.duration || 30), 0);
@@ -235,7 +239,6 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
                     const isDisabled = isPast || isBooked;
                     const isSelected = selectedTime === time;
 
-                    let label = time;
                     let badge = null;
                     if (isBooked) {
                       badge = <span className="text-[9px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">Booked</span>;
@@ -260,7 +263,7 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
                               : "text-stone-700 hover:bg-amber-50/30 hover:text-[#C5A059] cursor-pointer"
                         }`}
                       >
-                        <span className={isSelected ? "text-[#3E362E] font-extrabold" : "text-stone-800"}>{label}</span>
+                        <span className={isSelected ? "text-[#3E362E] font-extrabold" : "text-stone-800"}>{time}</span>
                         {badge}
                       </button>
                     );

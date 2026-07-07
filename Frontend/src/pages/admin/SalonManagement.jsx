@@ -7,7 +7,6 @@ export default function SalonManagement() {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  // For the screenshot match we show empty requests list
   const requests = [];
 
   const counts = {

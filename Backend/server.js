@@ -23,7 +23,6 @@ app.use("/api/owner",    require("./routes/ownerRoutes"));
 app.use("/api/booking",  require("./routes/bookingRoutes"));
 app.use("/api/queue",    require("./routes/queueRoutes"));
 app.use("/api/payment",  require("./routes/razorpayRoutes"));
-app.use("/api/admin",    require("./routes/adminRoutes"));
 app.use("/api/services", require("./routes/serviceRoutes"));
 app.use("/api/reminder", require("./routes/reminderRoutes"));
 app.use("/api/noshow",   require("./routes/noshowRoutes"));
@@ -35,10 +34,36 @@ app.use("/api/newsletter", require("./routes/newsletterRoutes"));
 
 
 
-app.get("/", (req, res) => res.json({ message:"Graphura Barber SaaS API v2.0", database:"MongoDB", status:"running" }));
+app.get("/", (req, res) => res.json({ message: "Graphura Barber SaaS API v2.0", database: "MongoDB", status: "running" }));
+
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({ success:false, message:err.message || "Server error" });
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Server error";
+
+  // Handle Mongoose duplicate key error (code 11000)
+  if (err.code === 11000) {
+    statusCode = 400;
+    const field = Object.keys(err.keyValue || {})[0] || "field";
+    message = `This ${field} is already registered. Please use another one.`;
+  }
+
+  // Handle Mongoose validation errors
+  if (err.name === "ValidationError") {
+    statusCode = 400;
+    message = Object.values(err.errors).map(val => val.message).join(", ");
+  }
+
+  // Handle JWT validation errors
+  if (err.name === "JsonWebTokenError") {
+    statusCode = 401;
+    message = "Invalid authentication token. Please login again.";
+  }
+  if (err.name === "TokenExpiredError") {
+    statusCode = 401;
+    message = "Authentication token expired. Please login again.";
+  }
+
+  res.status(statusCode).json({ success: false, message });
 });
 
 const PORT = process.env.PORT || 5000;
