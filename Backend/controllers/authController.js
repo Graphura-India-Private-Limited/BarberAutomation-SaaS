@@ -321,9 +321,27 @@ exports.registerOwner = async (req, res) => {
       }
       await OtpStore.deleteMany({ mobile: profile.mobile });
     }
-    const exists = await Salon.findOne({ mobile: profile.mobile });
+    // Check if mobile or support number is already registered
+    const exists = await Salon.findOne({
+      $or: [
+        { mobile: profile.mobile },
+        { support_number: profile.mobile }
+      ]
+    });
     if (exists) {
-      return res.status(400).json({ success: false, message: "Salon already registered with this mobile" });
+      return res.status(400).json({ success: false, message: "Salon already registered with this mobile number" });
+    }
+
+    if (profile.support_number && profile.support_number.trim() !== "") {
+      const supportExists = await Salon.findOne({
+        $or: [
+          { mobile: profile.support_number },
+          { support_number: profile.support_number }
+        ]
+      });
+      if (supportExists) {
+        return res.status(400).json({ success: false, message: "Customer support number is already in use by another salon" });
+      }
     }
     const password_hash = await bcrypt.hash(password, 10);
     const salon = await Salon.create({
@@ -412,8 +430,30 @@ exports.updateOwnerProfile = async (req, res) => {
 
     const updates = pickSalonProfile(req.body);
     delete updates.mobile;
+    
+    // Check if updates.support_number is already in use by another salon
+    if (updates.support_number && updates.support_number.trim() !== "") {
+      const dupSupport = await Salon.findOne({
+        _id: { $ne: req.user.id },
+        $or: [
+          { mobile: updates.support_number },
+          { support_number: updates.support_number }
+        ]
+      });
+      if (dupSupport) {
+        return res.status(400).json({ success: false, message: "Customer support number is already in use by another salon" });
+      }
+    }
+
     Object.keys(updates).forEach(key => {
-      if (updates[key] === "" || updates[key] === null || updates[key] === undefined) {
+      // Allow clearing string fields if they were explicitly provided in the request body
+      if (updates[key] === "") {
+        const isProvided = req.body[key] !== undefined || 
+                           req.body[key.replace(/_([a-z])/g, g => g[1].toUpperCase())] !== undefined;
+        if (!isProvided) {
+          delete updates[key];
+        }
+      } else if (updates[key] === null || updates[key] === undefined) {
         delete updates[key];
       }
     });

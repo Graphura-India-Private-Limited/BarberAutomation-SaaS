@@ -20,6 +20,17 @@ export default function OwnerLayout() {
   const initials = ownerName.replace(/[^a-zA-Z\s]/g, "").trim().split(/\s+/).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "OW";
 
   useEffect(() => {
+    if (sideOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sideOpen]);
+
+  useEffect(() => {
     const fetchPendingCount = async () => {
       try {
         const token = localStorage.getItem("token");

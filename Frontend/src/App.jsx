@@ -58,7 +58,6 @@ import MenServices from "./pages/customer/MenServices";
 import WomenServices from "./pages/customer/WomenServices";
 import AddonServices from "./pages/customer/AddonServices";
 import BarberSelection from "./pages/customer/BarberSelection";
-import SelectLook from "./pages/customer/SelectLook";
 import CustomerDetails from "./pages/customer/CustomerDetails";
 import Booking from "./pages/customer/Booking";
 import BookingHistory from "./pages/customer/BookingHistory";
@@ -156,7 +155,6 @@ function App() {
           <Route path="barber" element={<BarberSelection />} />
           {/* Protected customer booking paths */}
           <Route element={<ProtectedRoute allowedRoles={["customer"]}><Outlet /></ProtectedRoute>}>
-            <Route path="look" element={<SelectLook />} />
             <Route path="details" element={<CustomerDetails />} />
             <Route path="booking" element={<CustomerBookingFlow />} />
             <Route path="history" element={<BookingHistory />} />

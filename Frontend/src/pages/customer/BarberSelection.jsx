@@ -273,6 +273,28 @@ export default function BarberSelection() {
   const gender          = location.state?.gender || "men";
 
   const [selectedBarber, setSelectedBarber] = useState(null);
+
+  const handleSelectBarber = (b) => {
+    const isLaptop = window.innerWidth >= 1024;
+    if (isLaptop) {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (!token || role !== "customer") {
+        navigate("/login", {
+          state: {
+            from: {
+              pathname: "/customer/details",
+              state: { service: selectedService, barber: b, gender }
+            }
+          }
+        });
+      } else {
+        navigate("/customer/details", { state: { service: selectedService, barber: b, gender } });
+      }
+    } else {
+      setSelectedBarber(b);
+    }
+  };
   const [searchQuery,    setSearchQuery]     = useState("");
   const [minRating,      setMinRating]       = useState(0);
   const [maxDistance,    setMaxDistance]     = useState(20);
@@ -670,7 +692,7 @@ export default function BarberSelection() {
                         index={i}
                         visible={visibleCards.has(String(b.id))}
                         isSelected={selectedBarber?.id === b.id}
-                        onSelect={setSelectedBarber}
+                        onSelect={handleSelectBarber}
                       />
                     </div>
                   ))}
@@ -698,13 +720,13 @@ export default function BarberSelection() {
                         navigate("/login", {
                           state: {
                             from: {
-                              pathname: "/customer/look",
+                              pathname: "/customer/details",
                               state: { service: selectedService, barber: selectedBarber, gender }
                             }
                           }
                         });
                       } else {
-                        navigate("/customer/look", { state: { service: selectedService, barber: selectedBarber, gender } });
+                        navigate("/customer/details", { state: { service: selectedService, barber: selectedBarber, gender } });
                       }
                     }}
                     className="w-auto justify-center py-2.5 px-4 xl:py-3.5 xl:px-8 text-[10px] xl:text-[11px]"
@@ -712,7 +734,7 @@ export default function BarberSelection() {
                     onMouseEnter={(e) => { e.currentTarget.style.background = "#2C241E"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "#C5A059"; }}
                   >
-                    Choose Your Look →
+                    Confirm & Proceed →
                   </button>
                 </div>
               )}

@@ -27,6 +27,17 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
   const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   React.useEffect(() => {
+    if (sideOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sideOpen]);
+
+  React.useEffect(() => {
     if (!barberId) return;
     const fetchStatus = async () => {
       try {

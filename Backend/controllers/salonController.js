@@ -5,6 +5,36 @@ const Salon = require("../models/Salon");
 // @access  Public
 exports.registerSalon = async (req, res) => {
   try {
+    const { mobile, support_number } = req.body;
+    if (mobile) {
+      const exists = await Salon.findOne({
+        $or: [
+          { mobile },
+          { support_number: mobile }
+        ]
+      });
+      if (exists) {
+        return res.status(400).json({
+          success: false,
+          message: "A salon with this mobile number is already registered. Please use a unique mobile number."
+        });
+      }
+    }
+    if (support_number && support_number.trim() !== "") {
+      const exists = await Salon.findOne({
+        $or: [
+          { mobile: support_number },
+          { support_number }
+        ]
+      });
+      if (exists) {
+        return res.status(400).json({
+          success: false,
+          message: "A salon with this customer support number is already registered. Please use a unique support number."
+        });
+      }
+    }
+
     const salon = await Salon.create({
       ...req.body,
       status: req.body.status || "pending",

@@ -181,6 +181,17 @@ export default function CustomerProfile() {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isSidebarOpen]);
+
   // Auto-poll active queue status when queue tab is open
   useEffect(() => {
     let intervalId;
