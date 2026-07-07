@@ -110,13 +110,14 @@ export default function OwnerDashboard() {
           let refunds = 0;
           
           data.payments.forEach(p => {
+            const isOnline = !!(p.razorpay_payment_id || p.razorpayPaymentId || p.razorpay_order_id || p.razorpayOrderId);
             if (p.status === "SUCCESS") {
-              if (p.payment_method === "CASH" || p.method === "CASH" || p.payment_type === "CASH") {
-                cash += p.amount || 0;
-              } else {
+              if (isOnline) {
                 online += p.amount || 0;
+              } else {
+                cash += p.amount || 0;
               }
-            } else if (p.status === "REFUNDED" || p.status === "REFUND") {
+            } else if (p.status === "REFUNDED") {
               refunds += p.amount || 0;
             }
           });
@@ -145,24 +146,21 @@ export default function OwnerDashboard() {
 
   const approved = salon?.status === "approved";
 
-  const totalPayments = paymentStats.cash + paymentStats.online + paymentStats.refunds + paymentStats.profit;
-  const pctCash = totalPayments > 0 ? (paymentStats.cash / totalPayments) * 100 : 25;
-  const pctOnline = totalPayments > 0 ? (paymentStats.online / totalPayments) * 100 : 45;
+  const totalPayments = paymentStats.cash + paymentStats.online + paymentStats.refunds;
+  const pctCash = totalPayments > 0 ? (paymentStats.cash / totalPayments) * 100 : 30;
+  const pctOnline = totalPayments > 0 ? (paymentStats.online / totalPayments) * 100 : 60;
   const pctRefunds = totalPayments > 0 ? (paymentStats.refunds / totalPayments) * 100 : 10;
-  const pctProfit = totalPayments > 0 ? (paymentStats.profit / totalPayments) * 100 : 20;
 
   const rVal = 40;
   const cVal = 2 * Math.PI * rVal;
   
-  const strokeProfit = cVal * (pctProfit / 100);
   const strokeOnline = cVal * (pctOnline / 100);
   const strokeCash = cVal * (pctCash / 100);
   const strokeRefunds = cVal * (pctRefunds / 100);
 
-  const offsetProfit = 0;
-  const offsetOnline = strokeProfit;
-  const offsetCash = strokeProfit + strokeOnline;
-  const offsetRefunds = strokeProfit + strokeOnline + strokeCash;
+  const offsetOnline = 0;
+  const offsetCash = strokeOnline;
+  const offsetRefunds = strokeOnline + strokeCash;
 
   if (loading) {
     return (
@@ -410,19 +408,6 @@ export default function OwnerDashboard() {
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="40" fill="transparent" stroke="#F5F1ED" strokeWidth="10" />
                     
-                    {/* Profit */}
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="40" 
-                      fill="transparent" 
-                      stroke="#8B5A2B" 
-                      strokeWidth="10" 
-                      strokeDasharray={`${strokeProfit} ${cVal}`}
-                      strokeDashoffset={-offsetProfit}
-                      className="transition-all duration-500 ease-out"
-                    />
-                    
                     {/* Online */}
                     <circle 
                       cx="50" 
@@ -475,7 +460,7 @@ export default function OwnerDashboard() {
                       <span className="w-2.5 h-2.5 rounded-full bg-[#8B5A2B]" />
                       <span className="text-stone-600 font-medium">Net Profit</span>
                     </div>
-                    <span className="text-stone-900 font-mono font-bold">₹{paymentStats.profit.toLocaleString()} ({pctProfit.toFixed(0)}%)</span>
+                    <span className="text-stone-900 font-mono font-bold">₹{paymentStats.profit.toLocaleString()}</span>
                   </div>
 
                   <div className="flex items-center justify-between text-xs font-semibold">
