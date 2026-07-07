@@ -9,7 +9,7 @@ const CHARCOAL = "#3E362E";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-export default function BarberReviews() {
+export default function BarberReviews({ isEmbedded = false }) {
   const barberId = localStorage.getItem("barberId");
   const [reviews, setReviews] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -88,37 +88,41 @@ export default function BarberReviews() {
 
   return (
     /* ✅ FIX: Removed 'justify-between' structure and enforced 'h-auto overflow-y-auto' layout blueprint so you can see all elements clearly when scrolling down */
-    <div className="w-full text-stone-800 font-sans antialiased flex flex-col h-auto overflow-y-auto pb-12">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-        body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
-        .font-serif { font-family: 'Playfair Display', serif !important; }
-      `}</style>
+    <div className={`w-full text-stone-800 font-sans antialiased flex flex-col ${isEmbedded ? "" : "h-auto overflow-y-auto pb-12"}`}>
+      {!isEmbedded && (
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+          body, .font-sans { font-family: 'Plus Jakarta Sans', sans-serif !important; }
+          .font-serif { font-family: 'Playfair Display', serif !important; }
+        `}</style>
+      )}
         
       <div className="w-full flex-grow">
         {/* ── MAIN WORKSPACE CONTENT CANVAS ── */}
-        <main className="max-w-6xl mx-auto w-full px-5 py-10 text-left">
+        <main className={isEmbedded ? "w-full text-left" : "max-w-6xl mx-auto w-full px-5 py-10 text-left"}>
           
           {/* Header Description Title Blocks */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
-            <div>
-              {/* Rule 1: Clean Section Header Configuration layout split alignment */}
-             <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
-  Client <span className="text-[#C5A059]">Reviews</span>
-</h1>
-              {/* Rule 2: Minor tag headings trackers formatting */}
-              <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2">
-                Verified Customer Feedback & Quality Satisfaction Matrix
-              </p>
-            </div>
+          {!isEmbedded && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 border-b border-stone-200/60 pb-6">
+              <div>
+                {/* Rule 1: Clean Section Header Configuration layout split alignment */}
+                <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">
+                  Client <span className="text-[#C5A059]">Reviews</span>
+                </h1>
+                {/* Rule 2: Minor tag headings trackers formatting */}
+                <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-2">
+                  Verified Customer Feedback & Quality Satisfaction Matrix
+                </p>
+              </div>
 
-            <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
-              <MessageSquare size={13} className="text-[#C5A059]" />
-              <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
-                {stats.totalReviews} Global Client Reviews Checked
-              </span>
+              <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl border border-stone-200/80 shadow-3xs w-fit">
+                <MessageSquare size={13} className="text-[#C5A059]" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 font-mono">
+                  {stats.totalReviews} Global Client Reviews Checked
+                </span>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* ── RATING OVERVIEW DATA PARAMETERS BLOCK ── */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">

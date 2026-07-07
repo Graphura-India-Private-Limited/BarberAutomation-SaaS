@@ -576,70 +576,11 @@ export default function BarberDashboard() {
     </div>
   )}
 
-<motion.div 
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  className="bg-white/50 p-6 rounded-3xl border border-[#E6D5C3]"
->
-  {/* Header Section */}
-  <div className="flex justify-between items-start mb-8">
-    <div>
-      <h3 className="font-serif text-[#4A3E3D] text-lg font-black">WEEKLY REVENUE</h3>
-      <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Mon — Sun</p>
-    </div>
-    <div className="px-4 py-2 rounded-full border border-[#E6D5C3] text-[11px] font-bold text-[#4A3E3D]">
-      THIS WEEK ₹{useDbData ? (dbStats?.weekRevenue || 0).toLocaleString() : stats.weekRevenue.toLocaleString()}
-    </div>
-  </div>
-
-  {/* Chart Section */}
-  <div className="h-48 w-full relative min-w-0" style={{ minHeight: 0 }}>
-    <ResponsiveContainer width="100%" height={180}>
-      <BarChart data={weekChartData} barGap={8} margin={{ top: 25, right: 10, left: 10, bottom: 5 }}>
-        <XAxis 
-          dataKey="day" 
-          axisLine={false} 
-          tickLine={false} 
-          tick={{ fontSize: 10, fontWeight: 700, fill: '#A39796' }} 
-          dy={10}
-        />
-        <Bar 
-          dataKey="val" 
-          radius={[8, 8, 8, 8]}
-          label={<CustomBarLabel />}
-          isAnimationActive={false}
-        >
-          {weekChartData.map((entry, index) => (
-            <Cell 
-              key={`cell-${index}`} 
-              fill={entry.current ? "#8B5A2B" : "#F5EFE9"} 
-            />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-</motion.div>
-
-  {/* Target Progress Section */}
-<div className="bg-white/50 p-4 rounded-2xl border border-[#E6D5C3] mt-2">
-  <div className="flex justify-between text-[10px] font-black uppercase mb-1">
-    <span className="text-[#8B5A2B]">Daily Target</span>
-    <span className="text-stone-500">{((useDbData ? (dbStats?.todayRevenue || 0) : stats.todayRevenue) / 15000 * 100).toFixed(0)}%</span>
-  </div>
-  <div className="h-1.5 w-full bg-[#E6D5C3] rounded-full overflow-hidden">
-    <div className="h-full bg-[#8B5A2B]" style={{ width: `${((useDbData ? (dbStats?.todayRevenue || 0) : stats.todayRevenue) / 15000 * 100)}%` }} />
-  </div>
-</div>
-
-
   {/* ── QUICK ACTIONS STRIP ── */}
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
     {[
       { label: "Request Break",   icon: Coffee,      color: "#8B5A2B", route: "/barber/breaks" },
-      { label: "View Profile",    icon: User,        color: "#4A3E3D", route: "/barber/profile" },
       { label: "Live Console",    icon: PlayCircle,  color: "#8B5A2B", route: "/barber/service-console" },
-      { label: "Barber Services", icon: Scissors,    color: "#D9534F", route: "/barber/services" },
     ].map((a, i) => (
       <button key={i}
         onClick={() => { if (a.route) navigate(a.route); else showToast(`${a.label} — coming soon`); }}
@@ -652,6 +593,51 @@ export default function BarberDashboard() {
       </button>
     ))}
   </div>
+
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-white/50 p-6 rounded-3xl border border-[#E6D5C3]"
+  >
+    {/* Header Section */}
+    <div className="flex justify-between items-start mb-8">
+      <div>
+        <h3 className="font-serif text-[#4A3E3D] text-lg font-black">WEEKLY REVENUE</h3>
+        <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Mon — Sun</p>
+      </div>
+      <div className="px-4 py-2 rounded-full border border-[#E6D5C3] text-[11px] font-bold text-[#4A3E3D]">
+        THIS WEEK ₹{useDbData ? (dbStats?.weekRevenue || 0).toLocaleString() : stats.weekRevenue.toLocaleString()}
+      </div>
+    </div>
+
+    {/* Chart Section */}
+    <div className="h-48 w-full relative min-w-0" style={{ minHeight: 0 }}>
+      <ResponsiveContainer width="100%" height={180}>
+        <BarChart data={weekChartData} barGap={8} margin={{ top: 25, right: 10, left: 10, bottom: 5 }}>
+          <XAxis 
+            dataKey="day" 
+            axisLine={false} 
+            tickLine={false} 
+            tick={{ fontSize: 10, fontWeight: 700, fill: '#A39796' }} 
+            dy={10}
+          />
+          <Bar 
+            dataKey="val" 
+            radius={[8, 8, 8, 8]}
+            label={<CustomBarLabel />}
+            isAnimationActive={false}
+          >
+            {weekChartData.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                fill={entry.current ? "#8B5A2B" : "#F5EFE9"} 
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </motion.div>
 
 </main>
       </div>

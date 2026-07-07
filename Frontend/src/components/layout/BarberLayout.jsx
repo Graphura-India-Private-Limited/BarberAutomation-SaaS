@@ -71,14 +71,10 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
   const NAV = [
     { id: "overview", label: "Overview", icon: Layers, route: "/barber/overview" },
     { id: "dashboard", label: "Dashboard", icon: Clock, route: "/barber/dashboard" },
-    { id: "queue", label: "My Queue", icon: Users, route: "/barber/queue" },
-    { id: "interactions", label: "Interactions", icon: UserCheck, route: "/barber/interactions" },
-    { id: "bookings", label: "Bookings", icon: Calendar, route: "/barber/bookings" },
+    { id: "console", label: "Live Console", icon: Play, route: "/barber/service-console" },
     { id: "earnings", label: "Earnings", icon: IndianRupee, route: "/barber/earnings" },
-    { id: "reviews", label: "Reviews", icon: Star, route: "/barber/reviews" },
     { id: "breaks", label: "Break Requests", icon: Coffee, route: "/barber/breaks", badge: 1 },
     { id: "services", label: "Services", icon: ServicesIcon, route: "/barber/services" },
-    { id: "console", label: "Live Console", icon: Play, route: "/barber/service-console" },
     { id: "profile", label: "My Profile", icon: User, route: "/barber/profile" },
     { id: "settings", label: "Settings", icon: Settings, route: "/barber/settings" },
   ];
