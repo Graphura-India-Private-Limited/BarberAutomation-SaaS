@@ -222,7 +222,7 @@ exports.getMyBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ customer_id: req.user.id })
       .populate("salon_id", "salon_name address")
-      .populate("barber_id", "name")
+      .populate("barber_id", "name photo")
       .sort({ created_at: -1 });
 
     res.json({ success: true, bookings });
@@ -238,7 +238,7 @@ exports.getSalonBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ salon_id: req.params.id })
       .populate("customer_id", "name mobile email")
-      .populate("barber_id", "name")
+      .populate("barber_id", "name photo")
       .sort({ created_at: -1 });
 
     res.json({ success: true, bookings });

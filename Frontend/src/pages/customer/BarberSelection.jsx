@@ -376,7 +376,7 @@ export default function BarberSelection() {
               status: status,
               distance: Math.floor(Math.random() * 3) + 1,
               specialties: specs,
-              img: BARBER_IMAGES[index % BARBER_IMAGES.length],
+              img: b.photo || BARBER_IMAGES[index % BARBER_IMAGES.length],
               aiWait: aiWait,
             };
           });

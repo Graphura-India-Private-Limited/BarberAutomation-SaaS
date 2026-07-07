@@ -46,8 +46,8 @@ const getBarberImage = (name) => {
   return null;
 };
 
-const BarberAvatar = ({ name, sizeClass = "w-12 h-12", iconSize = 20 }) => {
-  const imgUrl = getBarberImage(name);
+const BarberAvatar = ({ name, photo, sizeClass = "w-12 h-12", iconSize = 20 }) => {
+  const imgUrl = photo || getBarberImage(name);
   if (imgUrl) {
     return (
       <img
@@ -381,7 +381,8 @@ export default function CustomerProfile() {
           service: b.services?.[0]?.service_name || "Custom Haircut",
           barberName: b.barber_id?.name || "Barber Ajay",
           salonName: b.salon_id?.salon_name || "The Royal Blade",
-          barberImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
+          barberImage: b.barber_id?.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
+          barberPhoto: b.barber_id?.photo || "",
           date: b.slot_time ? b.slot_time.split("T")[0] : new Date(b.created_at).toISOString().split("T")[0],
           time: b.slot_time ? new Date(b.slot_time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "10:30 AM",
           status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
@@ -1101,7 +1102,7 @@ export default function CustomerProfile() {
                           upcomingAppts.map(appt => (
                             <div key={appt._id} className="p-4 border border-[#EADBCE] rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#FAF6F0]/20">
                               <div className="flex items-center gap-3">
-                                <BarberAvatar name={appt.barberName} sizeClass="w-10 h-10" iconSize={16} />
+                                <BarberAvatar name={appt.barberName} photo={appt.barberPhoto} sizeClass="w-10 h-10" iconSize={16} />
                                 <div>
                                   <h4 className="text-xs font-black text-[#3D3126]">{appt.service}</h4>
                                   <p className="text-[10px] text-[#8A7A6A] font-medium mt-0.5">Stylist: {appt.barberName} • Cost: ₹{appt.total}</p>
@@ -1228,7 +1229,7 @@ export default function CustomerProfile() {
                         upcomingAppts.map(appt => (
                           <div key={appt._id} className="p-5 bg-white border border-[#EADBCE] rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-3xs cursor-pointer hover:border-[#B58B67] transition-all" onClick={() => setSelectedApptDetails(appt)}>
                             <div className="flex items-center gap-4">
-                              <BarberAvatar name={appt.barberName} sizeClass="w-12 h-12" iconSize={20} />
+                              <BarberAvatar name={appt.barberName} photo={appt.barberPhoto} sizeClass="w-12 h-12" iconSize={20} />
                               <div>
                                 <span className="bg-[#FEF9EE] text-[#9E7452] border border-[#EADBCE] text-[8px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Scheduled Session</span>
                                 <h4 className="text-sm font-black text-[#3D3126] mt-2">{appt.service}</h4>
@@ -1280,7 +1281,7 @@ export default function CustomerProfile() {
                                   <tr key={appt._id} className="hover:bg-[#FAF6F0]/40 transition-colors cursor-pointer" onClick={() => setSelectedApptDetails(appt)}>
                                     <td className="px-5 py-4">
                                       <div className="flex items-center gap-3">
-                                        <BarberAvatar name={appt.barberName} sizeClass="w-9 h-9" iconSize={14} />
+                                        <BarberAvatar name={appt.barberName} photo={appt.barberPhoto} sizeClass="w-9 h-9" iconSize={14} />
                                         <div><p className="font-bold text-[#3D3126]">{appt.service}</p><p className="text-[9px] text-[#8A7A6A] font-medium mt-0.5">With {appt.barberName} • ₹{appt.total}</p></div>
                                       </div>
                                     </td>

@@ -184,7 +184,7 @@ export default function SalonDetailPage() {
   };
 
   const getServiceImage = (service) => {
-    return getPremiumServiceImage(service.name, service.category);
+    return service.image || getPremiumServiceImage(service.name, service.category);
   };
 
   const filteredServices = servicesList.filter((service) => {

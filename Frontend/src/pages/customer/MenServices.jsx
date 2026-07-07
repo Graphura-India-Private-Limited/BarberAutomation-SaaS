@@ -156,7 +156,7 @@ export default function MenServices() {
             .filter(bs => bs.category === "men" && bs.is_active !== false)
             .map(bs => {
               const match = services.find(s => s.name.toLowerCase() === bs.name.toLowerCase());
-              const image = getPremiumServiceImage(bs.name, "men");
+              const image = bs.image || getPremiumServiceImage(bs.name, "men");
               
               if (match) {
                 return {

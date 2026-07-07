@@ -107,7 +107,7 @@ exports.getActiveCustomerQueue = async (req, res, next) => {
       status: { $in: ["waiting", "in-progress", "paused", "delayed"] }
     })
     .populate("salon_id", "salon_name address")
-    .populate("barber_id", "name")
+    .populate("barber_id", "name photo")
     .populate("booking_id");
 
     if (!entry) {

@@ -491,7 +491,7 @@ export default function AddonServices() {
             .filter(bs => bs.category === "addon" && bs.is_active !== false)
             .map(bs => {
               const match = SERVICES.find(s => s.name.toLowerCase() === bs.name.toLowerCase());
-              const image = getPremiumServiceImage(bs.name, "addon");
+              const image = bs.image || getPremiumServiceImage(bs.name, "addon");
               
               if (match) {
                 return {
