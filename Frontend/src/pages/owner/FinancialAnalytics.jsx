@@ -333,6 +333,30 @@ export default function FinancialAnalytics() {
     return reports;
   }, [timeFilter, reportType, salonReports]);
 
+  // const handleExportCSV = () => {
+  //   if (!displayData.length) return;
+  //   const headers = ["Active Salon Node", "Bookings", "Customers Served", "Avg Operational Delay", "Revenue Yield"];
+  //   const rows = displayData.map(salon => [
+  //     `"${salon.name.replace(/"/g, '""')}"`,
+  //     salon.bookings,
+  //     salon.customers,
+  //     `"${salon.delayAvg}"`,
+  //     salon.revenue
+  //   ]);
+  //   const csvContent = [
+  //     headers.join(","),
+  //     ...rows.map(r => r.join(","))
+  //   ].join("\n");
+  //   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement("a");
+  //   link.setAttribute("href", url);
+  //   link.setAttribute("download", `Salon_Telemetry_Report_${timeFilter}_${reportType}.csv`);
+  //   link.style.visibility = "hidden";
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
   const handleExportCSV = () => {
     if (!displayData.length) return;
     const headers = ["Active Salon Node", "Bookings", "Customers Served", "Avg Operational Delay", "Revenue Yield"];
@@ -357,6 +381,82 @@ export default function FinancialAnalytics() {
     link.click();
     document.body.removeChild(link);
   };
+
+  // Builds the exportable dataset for whichever tab/sub-view is currently active,
+  // so the header-level Export CSV button always reflects what's on screen.
+  const getActiveExportPayload = () => {
+    if (activeTab === "revenue") {
+      return {
+        filenamePrefix: "revenue-streams",
+        headers: ["Date", "Revenue (INR)"],
+        rows: trends.map(t => [t.date, t.revenue])
+      };
+    }
+    if (activeTab === "queue") {
+      if (queueTabSub === "overview") {
+        return {
+          filenamePrefix: "barber-performance-ledger",
+          headers: ["Styling Specialist", "Served Today", "User Rating", "Revenue (INR)", "Efficiency Rate (%)"],
+          rows: barberAnalytics.map(b => [b.name, b.served, b.rating, b.revenue, b.efficiency])
+        };
+      }
+      return {
+        filenamePrefix: `salon-telemetry-report-${timeFilter}-${reportType}`,
+        headers: ["Active Salon Node", "Bookings", "Customers Served", "Avg Operational Delay", "Revenue Yield (INR)"],
+        rows: displayData.map(s => [s.name, s.bookings, s.customers, s.delayAvg, s.revenue])
+      };
+    }
+    if (activeTab === "finance") {
+      return {
+        filenamePrefix: "barber-earnings-breakdown",
+        headers: ["Barber Name", "Type", "Generated Revenue (INR)", "Commission Rate", "Payout Share (INR)", "Monthly Salary (INR)"],
+        rows: barberData.map(b => {
+          const hasCustomFields = b.generatedRevenue !== undefined;
+          const genRev = hasCustomFields ? b.generatedRevenue : b.today;
+          const commRate = hasCustomFields ? b.commissionRate : b.commission;
+          const payout = hasCustomFields ? b.payoutShare : b.earned;
+          const badgeText = b.type || (commRate ? "COMMISSION" : "FIXED");
+          return [b.name, badgeText, genRev ?? "", commRate ?? "", payout ?? "", b.salary ?? ""];
+        })
+      };
+    }
+    return { filenamePrefix: "export", headers: [], rows: [] };
+  };
+
+  const escapeCSVFieldHeader = (value) => {
+    if (value === null || value === undefined) return "";
+    const str = String(value);
+    if (/[",\n\r]/.test(str)) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const handleHeaderExportCSV = () => {
+    const { filenamePrefix, headers, rows } = getActiveExportPayload();
+    if (!rows.length) return;
+
+    const csvContent =
+      "\uFEFF" +
+      [headers, ...rows]
+        .map(row => row.map(escapeCSVFieldHeader).join(","))
+        .join("\r\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    const today = new Date().toISOString().slice(0, 10);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `${filenamePrefix}-${today}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const activeExportRowCount = getActiveExportPayload().rows.length;
 
   // ─── FINANCE TAB STATES & CONFIGS ───
   const isOwner = currentUser?.role === "owner" || true; // Fallback for testing
@@ -435,12 +535,31 @@ export default function FinancialAnalytics() {
       <div className="max-w-5xl mx-auto">
         
         {/* TIMING CONTROL METADATA BANNER */}
-        <div className="flex justify-between items-center mb-4 font-sans text-left">
+        {/* <div className="flex justify-between items-center mb-4 font-sans text-left"> */}
+          {/* Header Title */}
+          {/* <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200/60 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Live Clock: <span className="text-stone-800 font-mono tracking-normal">{time} IST</span></span>
+          </div>
+        </div> */}
+        {/* TIMING CONTROL METADATA BANNER */}
+        <div className="flex justify-between items-center mb-4 font-sans text-left gap-3">
           {/* Header Title */}
           <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200/60 shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059]">Live Clock: <span className="text-stone-800 font-mono tracking-normal">{time} IST</span></span>
           </div>
+
+          {/* Header-level Export CSV — exports whatever the active tab is currently showing */}
+          <button
+            onClick={handleHeaderExportCSV}
+            disabled={!activeExportRowCount}
+            title={!activeExportRowCount ? "No data available to export" : "Export the current view as CSV"}
+            className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200/60 shadow-sm text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] hover:bg-[#8B5A2B]/5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059]"></span>
+            {activeExportRowCount ? "Export CSV" : "No Data To Export"}
+          </button>
         </div>
 
         {/* Premium Brand Header Banner */}

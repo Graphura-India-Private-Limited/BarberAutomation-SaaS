@@ -54,14 +54,29 @@ export default function OwnerLayout() {
     return () => clearInterval(interval);
   }, []);
 
+  // const NAV = [
+  //   { id: "dashboard", label: "Console Home", icon: LayoutDashboard, route: "/owner/dashboard" },
+  //   { id: "queue", label: "Live Queue", icon: Clock, route: "/owner/queue" },
+  //   { id: "live", label: "Live Monitoring", icon: Activity, route: "/owner/live" },
+  //   { id: "bookings", label: "Bookings & Slots", icon: Calendar, route: "/owner/bookings" },
+  //   { id: "services", label: "Services Catalog", icon: Scissors, route: "/owner/manage-services" },
+  //   { id: "barbers", label: "Barber Team", icon: Users, route: "/owner/barbers" },
+  //   { id: "addbarber", label: "Add Barber", icon: UserPlus, route: "/owner/add-barber" },
+  //   { id: "customers", label: "Customer Registry", icon: Users, route: "/owner/customers" },
+  //   { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
+  //   { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
+  //   { id: "settlements", label: "Salon Settlements", icon: IndianRupee, route: "/owner/settlements" },
+  //   { id: "financial-analytics", label: "Financial Analytics", icon: BarChart2, route: "/owner/financial-analytics" },
+  //   { id: "support", label: "Support Tickets", icon: HeadphonesIcon, route: "/owner/support" },
+  //   { id: "settings", label: "Profile ", icon: Settings, route: "/owner/settings" },
+  // ];
   const NAV = [
-    { id: "dashboard", label: "Console Home", icon: LayoutDashboard, route: "/owner/dashboard" },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, route: "/owner/dashboard" },
     { id: "queue", label: "Live Queue", icon: Clock, route: "/owner/queue" },
     { id: "live", label: "Live Monitoring", icon: Activity, route: "/owner/live" },
     { id: "bookings", label: "Bookings & Slots", icon: Calendar, route: "/owner/bookings" },
     { id: "services", label: "Services Catalog", icon: Scissors, route: "/owner/manage-services" },
     { id: "barbers", label: "Barber Team", icon: Users, route: "/owner/barbers" },
-    { id: "addbarber", label: "Add Barber", icon: UserPlus, route: "/owner/add-barber" },
     { id: "customers", label: "Customer Registry", icon: Users, route: "/owner/customers" },
     { id: "approvals", label: "Break Approvals", icon: Coffee, route: "/owner/approvals" },
     { id: "payments", label: "Payment Gateway", icon: CreditCard, route: "/owner/payments" },
