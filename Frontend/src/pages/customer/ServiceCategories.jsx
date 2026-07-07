@@ -107,18 +107,6 @@ function CategoryCard({ cat, index, navigate }) {
         {/* gradient overlay */}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(20,15,10,0.55) 100%)" }} />
 
-        {/* tag pill */}
-        <span style={{
-          position: "absolute", top: 16, right: 16,
-          background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)",
-          border: "1px solid rgba(255,255,255,0.3)",
-          color: "#fff", fontSize: 11, fontFamily: "'Montserrat',sans-serif",
-          fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase",
-          padding: "4px 12px", borderRadius: 20,
-        }}>
-          {cat.tag}
-        </span>
-
         {/* bottom title overlay */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "20px 24px 18px" }}>
           <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: cat.accent, fontWeight: 600, margin: "0 0 4px" }}>
@@ -135,16 +123,6 @@ function CategoryCard({ cat, index, navigate }) {
         <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: 13, color: "#888", lineHeight: 1.7, margin: "0 0 20px", fontWeight: 400 }}>
           {cat.desc}
         </p>
-
-        {/* Stats row */}
-        <div style={{ display: "flex", gap: 0, marginBottom: 20, borderTop: "1px solid #F0E8DA", borderBottom: "1px solid #F0E8DA", padding: "14px 0" }}>
-          {cat.stats.map((s, i) => (
-            <div key={i} style={{ flex: 1, textAlign: "center", padding: "0 6px", borderRight: i < cat.stats.length - 1 ? "1px solid #F0E8DA" : "none", wordBreak: "break-word", overflowWrap: "break-word" }}>
-              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 22, fontWeight: 700, color: "#2C241E", margin: 0 }}>{s.val}</p>
-              <p style={{ fontFamily: "'Montserrat',sans-serif", fontSize: "clamp(8px, 1.1vw, 9.5px)", color: "#AAA", margin: 0, letterSpacing: "0.02em", textTransform: "uppercase", lineHeight: 1.15 }}>{s.label}</p>
-            </div>
-          ))}
-        </div>
 
         {/* CTA button */}
         <button

@@ -82,7 +82,9 @@ export default function OwnerLayout() {
             <Scissors className="w-4.5 h-4.5 text-white" size={18} />
           </div>
           <div className="overflow-hidden">
-            <p className="font-serif font-black text-sm leading-none uppercase tracking-wider truncate w-40">Barber Pro</p>
+            <p className="font-serif font-black text-sm leading-none uppercase tracking-wider truncate w-40">
+              {localStorage.getItem("system_platformName") || "Barber Pro"}
+            </p>
             <p className="text-[10px] mt-1.5 font-bold uppercase tracking-widest text-[#8B5A2B]">Owner Hub</p>
           </div>
         </div>

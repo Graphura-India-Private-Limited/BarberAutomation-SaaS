@@ -236,8 +236,29 @@ exports.getMyBookings = async (req, res) => {
 // @access  Private (Owner/Admin)
 exports.getSalonBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ salon_id: req.params.id })
-      .populate("customer_id", "name mobile email")
+    const jwt = require("jsonwebtoken");
+    const auth = req.headers.authorization;
+    let isPrivileged = false;
+    if (auth && auth.startsWith("Bearer ")) {
+      try {
+        const token = auth.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.role === "admin" || decoded.role === "owner") {
+          isPrivileged = true;
+        }
+      } catch (e) {
+        // ignore invalid token for public slot viewing
+      }
+    }
+
+    let query = Booking.find({ salon_id: req.params.id });
+    if (isPrivileged) {
+      query = query.populate("customer_id", "name mobile email");
+    } else {
+      query = query.select("salon_id barber_id slot_time status services");
+    }
+
+    const bookings = await query
       .populate("barber_id", "name")
       .sort({ created_at: -1 });
 

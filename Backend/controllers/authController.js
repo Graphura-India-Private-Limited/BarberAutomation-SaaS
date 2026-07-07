@@ -362,6 +362,9 @@ exports.loginOwner = async (req, res) => {
     if (!salon) {
       return res.status(400).json({ success: false, message: "Salon not found. Please register first." });
     }
+    if (salon.status === "rejected" || salon.status === "suspended") {
+      return res.status(403).json({ success: false, message: "Your salon account has been suspended or rejected. Please contact support." });
+    }
       
     if (!salon.password_hash) {
       return res.status(400).json({ success: false, message: "No password set. Contact admin." });

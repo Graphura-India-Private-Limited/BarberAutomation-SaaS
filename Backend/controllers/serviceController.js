@@ -6,6 +6,11 @@ const Salon = require("../models/Salon");
 // @access  Public
 exports.getSalonServices = async (req, res) => {
   try {
+    const salon = await Salon.findOne({ _id: req.params.salon_id, status: "approved" });
+    if (!salon) {
+      return res.status(404).json({ success: false, message: "Salon is suspended or not live" });
+    }
+
     const services = await Service.find({
       salon_id: req.params.salon_id,
       is_active: true

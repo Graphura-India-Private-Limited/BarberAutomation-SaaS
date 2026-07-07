@@ -241,7 +241,9 @@ export default function Login() {
             <div className="flex items-center gap-3">
               <Scissors size={20} className="xl:w-[26px] xl:h-[26px]" color={GOLD} strokeWidth={2} />
               <div>
-                <div className="text-white font-bold tracking-[0.25em] text-xs xl:text-sm uppercase">Barber Pro</div>
+                <div className="text-white font-bold tracking-[0.25em] text-xs xl:text-sm uppercase">
+                  {localStorage.getItem("system_platformName") || "Barber Pro"}
+                </div>
                 <div className="text-white/60 text-[8px] xl:text-[10px] tracking-[0.35em] uppercase mt-0.5">— Est. 2026 —</div>
               </div>
             </div>
