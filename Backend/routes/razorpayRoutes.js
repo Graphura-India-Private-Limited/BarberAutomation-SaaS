@@ -26,6 +26,8 @@ router.get("/pending", requireRoles("owner", "admin"), paymentController.getPend
 router.get("/salon/:salonId", requireRoles("owner", "admin"), paymentController.getPaymentsBySalon);
 router.get("/barber/:barberId", requireRoles("owner", "admin"), paymentController.getPaymentsByBarber);
 router.get("/date-range", requireRoles("owner", "admin"), paymentController.getPaymentsByDateRange);
+router.get("/owner/settlements", requireRoles("owner"), paymentController.getOwnerSettlements);
+router.post("/:id/settle", requireRoles("owner"), paymentController.settleCounterDues);
 
 router.get("/revenue/dashboard", requireRoles("owner", "admin"), revenueController.getRevenueDashboard);
 router.get("/revenue/daily", requireRoles("owner", "admin"), revenueController.getDailyRevenue);

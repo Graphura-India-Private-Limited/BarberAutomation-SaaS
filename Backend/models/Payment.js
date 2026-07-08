@@ -94,6 +94,9 @@ const paymentSchema = new mongoose.Schema(
     },
     failure_reason: { type: String, default: "", alias: "failureReason" },
     raw_event: { type: Object, default: null, alias: "rawEvent", select: false },
+    counter_settled_amount: { type: Number, default: 0 },
+    counter_settled_method: { type: String, default: "PENDING" },
+    counter_settled_status: { type: String, default: "PENDING" },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

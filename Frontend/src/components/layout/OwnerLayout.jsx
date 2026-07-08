@@ -13,10 +13,36 @@ export default function OwnerLayout() {
   const location = useLocation();
   const [sideOpen, setSideOpen] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [hasPendingBreaks, setHasPendingBreaks] = useState(false);
 
   const salonName = localStorage.getItem("salonName") || "Barber Salon";
   const ownerName = localStorage.getItem("name") || "Owner";
   const initials = ownerName.replace(/[^a-zA-Z\s]/g, "").trim().split(/\s+/).map(n => n[0]).join("").toUpperCase().slice(0, 2) || "OW";
+
+  useEffect(() => {
+    const token = localStorage.getItem("token") || localStorage.getItem("ownerToken");
+    if (!token) return;
+
+    const checkPendingBreaks = async () => {
+      try {
+        const res = await fetch(`${API}/breaks/pending`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.requests && data.requests.length > 0) {
+          setHasPendingBreaks(true);
+        } else {
+          setHasPendingBreaks(false);
+        }
+      } catch (err) {
+        console.error("Error checking pending breaks in layout:", err);
+      }
+    };
+
+    checkPendingBreaks();
+    const interval = setInterval(checkPendingBreaks, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (sideOpen) {
@@ -125,6 +151,13 @@ export default function OwnerLayout() {
                 <n.icon className="w-4 h-4 shrink-0 transition-colors" style={{ color: isActive ? "#8B5A2B" : "#A39796" }} />
                 <span className="text-xs uppercase tracking-wider font-sans">{n.label}</span>
                 
+                {n.id === "barbers" && hasPendingBreaks && (
+                  <span className="relative flex h-2.5 w-2.5 ml-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                  </span>
+                )}
+
                 {isActive && (
                   <div className="w-1.5 h-4 rounded-full bg-[#8B5A2B] ml-auto" />
                 )}

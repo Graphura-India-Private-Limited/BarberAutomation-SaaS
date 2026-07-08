@@ -10,6 +10,21 @@ export function useTickets() {
   useEffect(() => {
     localStorage.setItem('app_tickets', JSON.stringify(tickets));
   }, [tickets]);
+
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'app_tickets' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setTickets(parsed);
+        } catch (err) {
+          console.error("Error synchronizing tickets across tabs:", err);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
   const [filterStatus, setFilterStatus] = useState('All')
   const [filterType, setFilterType] = useState('All')
   const [filterPriority, setFilterPriority] = useState('All')

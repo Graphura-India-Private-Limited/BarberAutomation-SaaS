@@ -55,8 +55,8 @@ export default function LiveQueue() {
         setUsingDemo(true);
       }
       
-      if (dRes.success && dRes.barbers && dRes.barbers.length > 0) {
-        setBarbers(dRes.barbers);
+      if (dRes.success) {
+        setBarbers(dRes.barbers || []);
       } else {
         if (barbers.length === 0) {
           setBarbers(MOCK_BARBERS);

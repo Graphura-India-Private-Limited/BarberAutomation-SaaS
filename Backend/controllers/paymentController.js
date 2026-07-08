@@ -107,6 +107,9 @@ const createRazorpayOrder = asyncHandler(async (req, res) => {
     razorpayOrderId: order.id,
     serviceIds: (booking.services || []).map(item => item.service_id).filter(Boolean),
     bookingType: booking.booking_type,
+    counter_settled_amount: 0,
+    counter_settled_method: paymentType === "FULL" ? "ONLINE" : "PENDING",
+    counter_settled_status: paymentType === "FULL" ? "SETTLED" : "PENDING",
   });
 
   res.status(201).json({
@@ -140,6 +143,10 @@ const verifyPayment = asyncHandler(async (req, res) => {
   payment.paymentStatus = "SUCCESS";
   payment.razorpayPaymentId = razorpayPaymentId;
   payment.razorpaySignature = razorpaySignature;
+  if (payment.payment_type === "FULL") {
+    payment.counter_settled_status = "SETTLED";
+    payment.counter_settled_method = "ONLINE";
+  }
   await payment.save();
   await Booking.findByIdAndUpdate(payment.booking_id, { status: "confirmed" });
 
@@ -212,6 +219,11 @@ const handleWebhook = asyncHandler(async (req, res) => {
   if (event.event === "payment.captured" || event.event === "order.paid") {
     update.status = "SUCCESS";
     if (entity.id && entity.order_id) update.razorpay_payment_id = entity.id;
+    const existingPayment = await Payment.findOne({ razorpay_order_id: orderId });
+    if (existingPayment && existingPayment.payment_type === "FULL") {
+      update.counter_settled_status = "SETTLED";
+      update.counter_settled_method = "ONLINE";
+    }
   } else if (event.event === "payment.failed") {
     update.status = "FAILED";
     update.failure_reason = entity.error_description || entity.error_reason || "Razorpay payment failed";
@@ -236,6 +248,80 @@ const refundPayment = asyncHandler(async (req, res) => {
   res.json({ success: true, message: "Refund initiated", payment });
 });
 
+const getOwnerSettlements = asyncHandler(async (req, res) => {
+  if (req.user?.role !== "owner") {
+    throw new ApiError(403, "Owner access only");
+  }
+  const salonId = req.user._id;
+
+  const payments = await Payment.find({ salon_id: salonId, status: "SUCCESS" })
+    .populate("booking_id")
+    .populate("customer_id", "name mobile")
+    .populate("barber_id", "name")
+    .sort({ created_at: -1 });
+
+  const completedPayments = payments.filter(p => p.booking_id && p.booking_id.status === "completed");
+
+  const settlements = completedPayments.map(p => {
+    const isFull = p.payment_type === "FULL";
+    return {
+      id: p._id,
+      customerName: p.customer_id?.name || "Walk-in Customer",
+      mobile: p.customer_id?.mobile || "N/A",
+      services: (p.booking_id.services || []).map(s => s.service_name).join(", "),
+      barberName: p.barber_id ? p.barber_id.name : "Unassigned",
+      totalAmount: p.booking_id.total_amount,
+      tokenPaid: p.amount,
+      balancePaid: isFull ? 0 : p.counter_settled_amount,
+      method: isFull ? "ONLINE" : p.counter_settled_method,
+      status: isFull ? "SETTLED" : p.counter_settled_status,
+      timestamp: new Date(p.created_at || p.createdAt).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+      })
+    };
+  });
+
+  res.json({ success: true, settlements });
+});
+
+const settleCounterDues = asyncHandler(async (req, res) => {
+  if (req.user?.role !== "owner") {
+    throw new ApiError(403, "Owner access only");
+  }
+  const { method } = req.body;
+  if (!["CASH", "UPI (SALON QR)", "CARD (SALON POS)"].includes(method)) {
+    throw new ApiError(400, "Invalid payment method");
+  }
+
+  const payment = await Payment.findOne({ _id: req.params.id, salon_id: req.user._id });
+  if (!payment) throw new ApiError(404, "Payment transaction not found");
+
+  if (payment.payment_type !== "TOKEN") {
+    throw new ApiError(400, "Only token payments need counter settlement");
+  }
+
+  const booking = await Booking.findById(payment.booking_id);
+  if (!booking) throw new ApiError(404, "Associated booking not found");
+
+  const due = booking.total_amount - payment.amount;
+
+  payment.counter_settled_amount = due;
+  payment.counter_settled_method = method;
+  payment.counter_settled_status = "SETTLED";
+  await payment.save();
+
+  res.json({
+    success: true,
+    message: "Counter dues settled successfully",
+    payment
+  });
+});
+
 module.exports = {
   createRazorpayOrder,
   verifyPayment,
@@ -251,4 +337,6 @@ module.exports = {
   retryFailedPayment,
   handleWebhook,
   refundPayment,
+  getOwnerSettlements,
+  settleCounterDues,
 };

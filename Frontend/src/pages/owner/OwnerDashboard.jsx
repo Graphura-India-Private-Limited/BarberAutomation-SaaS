@@ -18,11 +18,31 @@ export default function OwnerDashboard() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [pendingBreaks, setPendingBreaks] = useState([]);
   const [showBreaks, setShowBreaks] = useState(false);
+  const [rawPayments, setRawPayments] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState({
+    barbers: [],
+    todayStats: { pending: 0, completed: 0 },
+    liveQueueCount: 0,
+    pendingBreakRequests: []
+  });
   const [paymentStats, setPaymentStats] = useState({
-    cash: 18450,
-    online: 33850,
-    refunds: 5200,
-    profit: 47100
+    cash: 0,
+    online: 0,
+    card: 0,
+    refunds: 0,
+    profit: 0,
+    todayRevenue: 0,
+    totalRevenue: 0,
+    weeklyRevenue: 0,
+    weeklyDays: [
+      { day: "Mon", val: "₹0", h: "15%", rawVal: 0 },
+      { day: "Tue", val: "₹0", h: "15%", rawVal: 0 },
+      { day: "Wed", val: "₹0", h: "15%", rawVal: 0 },
+      { day: "Thu", val: "₹0", h: "15%", rawVal: 0 },
+      { day: "Fri", val: "₹0", h: "15%", rawVal: 0 },
+      { day: "Sat", val: "₹0", h: "15%", rawVal: 0 },
+      { day: "Sun", val: "₹0", h: "15%", rawVal: 0 }
+    ]
   });
 
   const token = localStorage.getItem("token");
@@ -37,10 +57,31 @@ export default function OwnerDashboard() {
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Unable to load profile");
       setSalon(data.salon);
+      localStorage.setItem("salonId", data.salon._id);
     } catch (err) {
       setError(err.message || "Unable to load profile");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDashboardStats = async (salonId) => {
+    if (!salonId || !token) return;
+    try {
+      const res = await fetch(`${API}/owner/salon/${salonId}/dashboard`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDashboardStats({
+          barbers: data.barbers || [],
+          todayStats: data.todayStats || { pending: 0, completed: 0 },
+          liveQueueCount: data.liveQueueCount || 0,
+          pendingBreakRequests: data.pendingBreakRequests || []
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching dashboard stats:", err);
     }
   };
 
@@ -98,6 +139,12 @@ export default function OwnerDashboard() {
   }, []);
 
   useEffect(() => {
+    if (salon?._id) {
+      fetchDashboardStats(salon._id);
+    }
+  }, [salon?._id]);
+
+  useEffect(() => {
     const fetchPayments = async () => {
       try {
         const res = await fetch(`${API}/payment/history?limit=100`, {
@@ -105,30 +152,103 @@ export default function OwnerDashboard() {
         });
         const data = await res.json();
         if (data.success && data.payments) {
+          setRawPayments(data.payments);
           let cash = 0;
           let online = 0;
+          let card = 0;
           let refunds = 0;
-          
+          let todayRevenue = 0;
+          let totalRevenue = 0;
+          let weeklyRevenue = 0;
+
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+
+          const weekStart = new Date();
+          const day = weekStart.getDay();
+          const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+          weekStart.setDate(diff);
+          weekStart.setHours(0, 0, 0, 0);
+
+          const dayMap = {
+            1: { day: "Mon", val: 0 },
+            2: { day: "Tue", val: 0 },
+            3: { day: "Wed", val: 0 },
+            4: { day: "Thu", val: 0 },
+            5: { day: "Fri", val: 0 },
+            6: { day: "Sat", val: 0 },
+            0: { day: "Sun", val: 0 }
+          };
+
           data.payments.forEach(p => {
-            const isOnline = !!(p.razorpay_payment_id || p.razorpayPaymentId || p.razorpay_order_id || p.razorpayOrderId);
             if (p.status === "SUCCESS") {
-              if (isOnline) {
-                online += p.amount || 0;
-              } else {
-                cash += p.amount || 0;
+              online += p.amount || 0;
+              totalRevenue += p.amount || 0;
+
+              const pDate = new Date(p.created_at || p.createdAt);
+              if (pDate >= todayStart) {
+                todayRevenue += p.amount || 0;
+              }
+              if (pDate >= weekStart) {
+                weeklyRevenue += p.amount || 0;
+                const pDay = pDate.getDay();
+                if (dayMap[pDay] !== undefined) {
+                  dayMap[pDay].val += p.amount || 0;
+                }
+              }
+
+              if (p.counter_settled_status === "SETTLED") {
+                const counterAmt = p.counter_settled_amount || 0;
+                totalRevenue += counterAmt;
+
+                if (p.counter_settled_method === "CASH") {
+                  cash += counterAmt;
+                } else if (p.counter_settled_method === "CARD (SALON POS)") {
+                  card += counterAmt;
+                } else {
+                  online += counterAmt;
+                }
+
+                if (pDate >= todayStart) {
+                  todayRevenue += counterAmt;
+                }
+                if (pDate >= weekStart) {
+                  weeklyRevenue += counterAmt;
+                  const pDay = pDate.getDay();
+                  if (dayMap[pDay] !== undefined) {
+                    dayMap[pDay].val += counterAmt;
+                  }
+                }
               }
             } else if (p.status === "REFUNDED") {
               refunds += p.amount || 0;
             }
           });
 
-          const profit = Math.max(0, (cash + online) - refunds);
-          
+          const profit = Math.max(0, (cash + online + card) - refunds);
+
+          const maxVal = Math.max(...Object.values(dayMap).map(d => d.val), 1);
+          const weeklyDays = [1, 2, 3, 4, 5, 6, 0].map(k => {
+            const item = dayMap[k];
+            const pct = maxVal > 1 ? Math.round((item.val / maxVal) * 80) + 15 : 15;
+            return {
+              day: item.day,
+              val: `₹${item.val.toLocaleString("en-IN")}`,
+              h: item.val > 0 ? `${pct}%` : "15%",
+              rawVal: item.val
+            };
+          });
+
           setPaymentStats({
             cash,
             online,
+            card,
             refunds,
-            profit
+            profit,
+            todayRevenue,
+            totalRevenue,
+            weeklyRevenue,
+            weeklyDays
           });
         }
       } catch (err) {
@@ -146,21 +266,25 @@ export default function OwnerDashboard() {
 
   const approved = salon?.status === "approved";
 
-  const totalPayments = paymentStats.cash + paymentStats.online + paymentStats.refunds;
-  const pctCash = totalPayments > 0 ? (paymentStats.cash / totalPayments) * 100 : 30;
-  const pctOnline = totalPayments > 0 ? (paymentStats.online / totalPayments) * 100 : 60;
-  const pctRefunds = totalPayments > 0 ? (paymentStats.refunds / totalPayments) * 100 : 10;
+  const totalPayments = paymentStats.cash + paymentStats.online + paymentStats.card + paymentStats.refunds;
+  const hasPayments = totalPayments > 0;
+  const pctCash = hasPayments ? (paymentStats.cash / totalPayments) * 100 : 0;
+  const pctOnline = hasPayments ? (paymentStats.online / totalPayments) * 100 : 100;
+  const pctCard = hasPayments ? (paymentStats.card / totalPayments) * 100 : 0;
+  const pctRefunds = hasPayments ? (paymentStats.refunds / totalPayments) * 100 : 0;
 
   const rVal = 40;
   const cVal = 2 * Math.PI * rVal;
   
   const strokeOnline = cVal * (pctOnline / 100);
   const strokeCash = cVal * (pctCash / 100);
+  const strokeCard = cVal * (pctCard / 100);
   const strokeRefunds = cVal * (pctRefunds / 100);
 
   const offsetOnline = 0;
   const offsetCash = strokeOnline;
-  const offsetRefunds = strokeOnline + strokeCash;
+  const offsetCard = strokeOnline + strokeCash;
+  const offsetRefunds = strokeOnline + strokeCash + strokeCard;
 
   if (loading) {
     return (
@@ -302,7 +426,7 @@ export default function OwnerDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Total Revenue (per day)</p>
-              <h3 className="text-xl font-black text-stone-900 font-serif">₹{salon?.basic_pricing ? salon.basic_pricing * 14 : "8,450"}</h3>
+              <h3 className="text-xl font-black text-stone-900 font-serif">₹{paymentStats.todayRevenue.toLocaleString("en-IN")}</h3>
             </div>
           </div>
           <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs">
@@ -311,7 +435,7 @@ export default function OwnerDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Live Queue</p>
-              <h3 className="text-xl font-black text-stone-900 font-serif">4 <span className="text-xs text-stone-400 font-sans font-medium">Waiting</span></h3>
+              <h3 className="text-xl font-black text-stone-900 font-serif">{dashboardStats.liveQueueCount} <span className="text-xs text-stone-400 font-sans font-medium">Waiting</span></h3>
             </div>
           </div>
           <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs">
@@ -320,7 +444,7 @@ export default function OwnerDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Active Staff</p>
-              <h3 className="text-xl font-black text-stone-900 font-serif">{typeof salon?.number_of_barbers === 'number' ? salon.number_of_barbers : "0"} / {salon?.max_barbers_limit || "3"}</h3>
+              <h3 className="text-xl font-black text-stone-900 font-serif">{dashboardStats.barbers.length} / {salon?.max_barbers_limit || "3"}</h3>
             </div>
           </div>
           <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs">
@@ -329,7 +453,7 @@ export default function OwnerDashboard() {
             </div>
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Avg Wait Time (per day)</p>
-              <h3 className="text-xl font-black text-stone-900 font-serif">18 min</h3>
+              <h3 className="text-xl font-black text-stone-900 font-serif">{dashboardStats.liveQueueCount > 0 ? `${dashboardStats.liveQueueCount * 15} min` : "0 min"}</h3>
             </div>
           </div>
         </section>
@@ -350,20 +474,12 @@ export default function OwnerDashboard() {
                   </h2>
                   <p className="text-stone-600 text-sm font-normal leading-relaxed font-sans mt-0.5">Mon — Sun parameters pipeline</p>
                 </div>
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/50 font-sans font-semibold">This Week ₹52,300</span>
+                <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/50 font-sans font-semibold">This Week ₹{paymentStats.weeklyRevenue.toLocaleString("en-IN")}</span>
               </div>
 
               {/* Chart visual display tracking bar lines */}
               <div className="flex justify-between items-end h-32 pt-4 px-2">
-                {[
-                  { day: "Mon", val: "₹3,200", h: "35%" },
-                  { day: "Tue", val: "₹4,100", h: "45%" },
-                  { day: "Wed", val: "₹3,800", h: "40%" },
-                  { day: "Thu", val: "₹5,200", h: "60%" },
-                  { day: "Fri", val: "₹6,800", h: "75%" },
-                  { day: "Sat", val: "₹9,100", h: "95%" },
-                  { day: "Sun", val: "₹5,600", h: "65%" }
-                ].map((item, i) => {
+                {paymentStats.weeklyDays.map((item, i) => {
                   const isSelected = selectedDay === item.day;
                   return (
                     <div 
@@ -434,6 +550,19 @@ export default function OwnerDashboard() {
                       className="transition-all duration-500 ease-out"
                     />
                     
+                    {/* Card POS */}
+                    <circle 
+                      cx="50" 
+                      cy="50" 
+                      r="40" 
+                      fill="transparent" 
+                      stroke="#8F754B" 
+                      strokeWidth="10" 
+                      strokeDasharray={`${strokeCard} ${cVal}`}
+                      strokeDashoffset={-offsetCard}
+                      className="transition-all duration-500 ease-out"
+                    />
+                    
                     {/* Refunds */}
                     <circle 
                       cx="50" 
@@ -481,6 +610,14 @@ export default function OwnerDashboard() {
 
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#8F754B]" />
+                      <span className="text-stone-600 font-medium">Card POS</span>
+                    </div>
+                    <span className="text-stone-900 font-mono font-bold">₹{paymentStats.card.toLocaleString()} ({pctCard.toFixed(0)}%)</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
                       <span className="text-stone-600 font-medium">Refunds</span>
                     </div>
@@ -508,35 +645,87 @@ export default function OwnerDashboard() {
             </h3>
             
             {(() => {
-              const ledger = MOCK_DAY_LEDGERS[selectedDay] || { revenue: 0, count: 0, haircut: 0, shave: 0, facial: 0, topBarber: "N/A" };
+              const dayIndexMap = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 0 };
+              const targetDayIndex = dayIndexMap[selectedDay];
+              
+              let revenue = 0;
+              let count = 0;
+              let servicesCount = {};
+              let barberRevenue = {};
+              
+              const weekStart = new Date();
+              const day = weekStart.getDay();
+              const diff = weekStart.getDate() - day + (day === 0 ? -6 : 1);
+              weekStart.setDate(diff);
+              weekStart.setHours(0, 0, 0, 0);
+              
+              rawPayments.forEach(p => {
+                if (p.status === "SUCCESS") {
+                  const pDate = new Date(p.created_at || p.createdAt);
+                  if (pDate >= weekStart && pDate.getDay() === targetDayIndex) {
+                    count++;
+                    const amt = p.amount || 0;
+                    revenue += amt;
+                    
+                    if (p.booking_id && p.booking_id.services) {
+                      p.booking_id.services.forEach(s => {
+                        const sName = s.service_name || "Service";
+                        servicesCount[sName] = (servicesCount[sName] || 0) + 1;
+                      });
+                    }
+                    
+                    const bName = p.barber_id?.name || "Unassigned";
+                    barberRevenue[bName] = (barberRevenue[bName] || 0) + amt;
+                  }
+                  
+                  if (p.counter_settled_status === "SETTLED") {
+                    const pDate = new Date(p.created_at || p.createdAt);
+                    if (pDate >= weekStart && pDate.getDay() === targetDayIndex) {
+                      const counterAmt = p.counter_settled_amount || 0;
+                      revenue += counterAmt;
+                      
+                      const bName = p.barber_id?.name || "Unassigned";
+                      barberRevenue[bName] = (barberRevenue[bName] || 0) + counterAmt;
+                    }
+                  }
+                }
+              });
+              
+              let topBarber = "N/A";
+              let maxBRev = -1;
+              Object.keys(barberRevenue).forEach(b => {
+                if (barberRevenue[b] > maxBRev) {
+                  maxBRev = barberRevenue[b];
+                  topBarber = b;
+                }
+              });
+              
               return (
                 <div className="space-y-4 text-xs font-semibold text-stone-600">
                   <div className="flex justify-between items-center border-b pb-2 border-stone-100">
                     <span className="text-stone-400 uppercase tracking-widest text-[9px]">Total Revenue</span>
-                    <span className="text-base font-black text-[#8B5A2B] font-mono">₹{ledger.revenue.toLocaleString()}</span>
+                    <span className="text-base font-black text-[#8B5A2B] font-mono">₹{revenue.toLocaleString("en-IN")}</span>
                   </div>
                   <div className="flex justify-between items-center border-b pb-2 border-stone-100">
                     <span className="text-stone-400 uppercase tracking-widest text-[9px]">Customers Served</span>
-                    <span className="text-sm font-bold text-stone-900 font-mono">{ledger.count} Guests</span>
+                    <span className="text-sm font-bold text-stone-900 font-mono">{count} Guests</span>
                   </div>
-                  <div className="space-y-2 pt-1">
+                  <div className="space-y-2 pt-1 font-sans">
                     <p className="text-[10px] font-bold text-[#C5A059] uppercase tracking-wider mb-2">Services Completed</p>
-                    <div className="flex justify-between items-center pl-2">
-                      <span>Haircut & Styling</span>
-                      <span className="font-mono font-bold text-stone-900">{ledger.haircut}</span>
-                    </div>
-                    <div className="flex justify-between items-center pl-2">
-                      <span>Beard Grooming / Shave</span>
-                      <span className="font-mono font-bold text-stone-900">{ledger.shave}</span>
-                    </div>
-                    <div className="flex justify-between items-center pl-2">
-                      <span>Facial Scrub / Spa</span>
-                      <span className="font-mono font-bold text-stone-900">{ledger.facial}</span>
-                    </div>
+                    {Object.keys(servicesCount).length === 0 ? (
+                      <p className="text-[10px] text-stone-400 italic">No services recorded</p>
+                    ) : (
+                      Object.keys(servicesCount).map(sName => (
+                        <div key={sName} className="flex justify-between items-center pl-2">
+                          <span className="truncate max-w-[180px]">{sName}</span>
+                          <span className="font-mono font-bold text-stone-900">{servicesCount[sName]}</span>
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className="flex justify-between items-center pt-3 border-t border-stone-100">
                     <span className="text-stone-400 uppercase tracking-widest text-[9px]">Top Artist Stylist</span>
-                    <span className="text-xs font-black bg-amber-50 text-[#8B5A2B] border border-amber-200/50 px-2 py-0.5 rounded-md">{ledger.topBarber}</span>
+                    <span className="text-xs font-black bg-amber-50 text-[#8B5A2B] border border-amber-200/50 px-2 py-0.5 rounded-md">{topBarber}</span>
                   </div>
                 </div>
               );
@@ -545,20 +734,9 @@ export default function OwnerDashboard() {
         </div>
       )}
 
-
     </div>
   );
 }
-
-const MOCK_DAY_LEDGERS = {
-  Mon: { revenue: 3200, count: 8, haircut: 5, shave: 2, facial: 1, topBarber: "Ali" },
-  Tue: { revenue: 4100, count: 11, haircut: 7, shave: 3, facial: 1, topBarber: "Ravi" },
-  Wed: { revenue: 3800, count: 9, haircut: 6, shave: 2, facial: 1, topBarber: "Ali" },
-  Thu: { revenue: 5200, count: 14, haircut: 9, shave: 3, facial: 2, topBarber: "James" },
-  Fri: { revenue: 6800, count: 18, haircut: 11, shave: 4, facial: 3, topBarber: "Ravi" },
-  Sat: { revenue: 9100, count: 24, haircut: 15, shave: 6, facial: 3, topBarber: "Ali" },
-  Sun: { revenue: 5600, count: 15, haircut: 10, shave: 3, facial: 2, topBarber: "James" },
-};
 
 function Info({ label, value }) {
   return (

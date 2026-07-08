@@ -3725,8 +3725,8 @@ export default function AdminOnboarding() {
 
             {/* ══ SUPPORT TICKETS ══ */}
 
-            {tab==="tickets" && (() => {
-               const typeFilter = window.location.pathname.includes("customer-issues") ? "Customer" : window.location.pathname.includes("salon-issues")? "Salon" : undefined;
+             {tab==="tickets" && (() => {
+               const typeFilter = window.location.pathname.includes("customer-issues") ? "Customer Issue" : window.location.pathname.includes("salon-issues")? "Salon Issue" : undefined;
              return (
                  <div className="fade-in" style={{ marginTop: '-69px' }}>  {/* adjust value as needed */}
                   <TicketsPage {...ticketState} typeFilter={typeFilter} /></div>);

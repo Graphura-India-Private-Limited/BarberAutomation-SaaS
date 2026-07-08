@@ -8,15 +8,11 @@ import CustomSelect from "../../components/common/CustomSelect";
 
 const GOLD = "#C5A059";
 const CHARCOAL = "#3E362E";
-
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const money = val => `₹${Number(val || 0).toLocaleString("en-IN")}`;
 
-/* ══════════════════════════════════════════════════════════════
-   SALON SETTLEMENTS — single page, counter-settlement table as
-   original, with dedicated Customer & Barber columns, plus
-   Export CSV / Refresh Ledger actions.
-   ══════════════════════════════════════════════════════════════ */
 export default function SalonSettlements() {
+  const token = localStorage.getItem("token") || localStorage.getItem("ownerToken");
   const [toast, setToast] = useState("");
   const showToast = (msg) => setToast(msg);
 
@@ -25,74 +21,51 @@ export default function SalonSettlements() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [settlingPayment, setSettlingPayment] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [settlements, setSettlements] = useState([
-    {
-      id: "SET-8821",
-      customerName: "Vansh Test3",
-      mobile: "98765 43211",
-      services: "Beard Trim, Beard Trim",
-      barberName: "Ali (Master Stylist)",
-      totalAmount: 450,
-      tokenPaid: 100,
-      balancePaid: 350,
-      method: "CASH",
-      status: "SETTLED",
-      timestamp: "28 Jun 2026, 4:22 pm"
-    },
-    {
-      id: "SET-8822",
-      customerName: "Vijay Patel",
-      mobile: "99112 23344",
-      services: "Classic Haircut & Styling",
-      barberName: "Ravi (Beard Expert)",
-      totalAmount: 300,
-      tokenPaid: 100,
-      balancePaid: 200,
-      method: "UPI (SALON QR)",
-      status: "SETTLED",
-      timestamp: "28 Jun 2026, 3:15 pm"
-    },
-    {
-      id: "SET-8823",
-      customerName: "Karan Johar",
-      mobile: "98765 00000",
-      services: "Royal Shave Treatment",
-      barberName: "James (Color Specialist)",
-      totalAmount: 250,
-      tokenPaid: 100,
-      balancePaid: 150,
-      method: "CARD (SALON POS)",
-      status: "SETTLED",
-      timestamp: "27 Jun 2026, 6:40 pm"
-    },
-    {
-      id: "SET-8824",
-      customerName: "Vjhoi",
-      mobile: "99223 34455",
-      services: "Beard Trim, Beard Trim",
-      barberName: "Ali (Master Stylist)",
-      totalAmount: 450,
-      tokenPaid: 100,
-      balancePaid: 0,
-      method: "PENDING",
-      status: "PENDING_BALANCE",
-      timestamp: "28 Jun 2026, 3:52 pm"
-    },
-    {
-      id: "SET-8825",
-      customerName: "Amit Sharma",
-      mobile: "98877 66554",
-      services: "Luxury Head Spa Massage",
-      barberName: "Ravi (Beard Expert)",
-      totalAmount: 600,
-      tokenPaid: 150,
-      balancePaid: 0,
-      method: "PENDING",
-      status: "PENDING_BALANCE",
-      timestamp: "28 Jun 2026, 5:10 pm"
+  const [settlements, setSettlements] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, methodFilter, statusFilter, settlements]);
+
+  const fetchSettlements = async () => {
+    setRefreshing(true);
+    const startTime = Date.now();
+    try {
+      const res = await fetch(`${API}/payment/owner/settlements`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      
+      const elapsed = Date.now() - startTime;
+      const minDelay = 600;
+      if (elapsed < minDelay) {
+        await new Promise(r => setTimeout(r, minDelay - elapsed));
+      }
+
+      if (data.success) {
+        setSettlements(data.settlements || []);
+        showToast("Ledger updated successfully!");
+      } else {
+        showToast(data.message || "Failed to load settlements");
+      }
+    } catch (err) {
+      console.error("Error loading settlements:", err);
+      showToast("Error loading settlements");
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    fetchSettlements();
+  }, []);
 
   const totals = useMemo(() => {
     let settledSum = 0, cashSum = 0, onlineSum = 0, pendingSum = 0, settledCount = 0, pendingCount = 0;
@@ -112,42 +85,54 @@ export default function SalonSettlements() {
 
   const filteredSettlements = useMemo(() => {
     return settlements.filter(s => {
-      const matchesSearch = s.customerName.toLowerCase().includes(search.toLowerCase()) ||
-                            s.mobile.includes(search) ||
-                            s.id.toLowerCase().includes(search.toLowerCase());
+      const customerName = s.customerName || "";
+      const mobile = s.mobile || "";
+      const id = String(s.id || "");
+      const matchesSearch = customerName.toLowerCase().includes(search.toLowerCase()) ||
+                            mobile.includes(search) ||
+                            id.toLowerCase().includes(search.toLowerCase());
       const matchesMethod = methodFilter === "ALL" ||
                             (methodFilter === "CASH" && s.method === "CASH") ||
-                            (methodFilter === "ONLINE" && s.method !== "CASH" && s.method !== "PENDING");
-      const matchesStatus = statusFilter === "ALL" || s.status === statusFilter;
+                            (methodFilter === "ONLINE" && s.method !== "CASH");
+      const matchesStatus = statusFilter === "ALL" ||
+                            s.status === statusFilter ||
+                            (statusFilter === "PENDING_BALANCE" && (s.status === "PENDING" || s.status === "PENDING_BALANCE"));
       return matchesSearch && matchesMethod && matchesStatus;
     });
   }, [settlements, search, methodFilter, statusFilter]);
 
-  const handleSettle = (paymentMethod) => {
+  const paginatedSettlements = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredSettlements.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredSettlements, currentPage]);
+
+  const handleSettle = async (paymentMethod) => {
     if (!settlingPayment) return;
-    setSettlements(prev => prev.map(s => {
-      if (s.id === settlingPayment.id) {
-        const bal = s.totalAmount - s.tokenPaid;
-        return {
-          ...s,
-          balancePaid: bal,
-          method: paymentMethod,
-          status: "SETTLED",
-          timestamp: new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' }) + ", Today"
-        };
+    try {
+      const res = await fetch(`${API}/payment/${settlingPayment.id}/settle`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ method: paymentMethod })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Successfully settled full balance for ${settlingPayment.customerName}!`);
+        setSettlingPayment(null);
+        fetchSettlements();
+      } else {
+        showToast(data.message || "Failed to settle dues");
       }
-      return s;
-    }));
-    showToast(`Successfully settled full balance for ${settlingPayment.customerName}!`);
-    setSettlingPayment(null);
+    } catch (err) {
+      console.error("Error settling dues:", err);
+      showToast("Error settling dues");
+    }
   };
 
   const handleRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-      showToast("Ledger refreshed.");
-    }, 500);
+    fetchSettlements();
   };
 
   const exportToCSV = () => {
@@ -163,9 +148,9 @@ export default function SalonSettlements() {
     ];
 
     const rows = filteredSettlements.map(s => [
-      `"${s.id}"`,
+      `="${s.id}"`,
       `"${s.customerName}"`,
-      `"${s.mobile}"`,
+      `="${s.mobile}"`,
       `"${s.barberName}"`,
       `"${s.services}"`,
       s.totalAmount,
@@ -344,7 +329,7 @@ export default function SalonSettlements() {
         <div className="flex justify-end mb-4">
           <button
             onClick={() => {
-              const firstPending = settlements.find(s => s.status === "PENDING_BALANCE");
+              const firstPending = settlements.find(s => s.status === "PENDING" || s.status === "PENDING_BALANCE");
               if (firstPending) setSettlingPayment(firstPending);
               else showToast("No pending balances left to settle!");
             }}
@@ -355,7 +340,7 @@ export default function SalonSettlements() {
         </div>
 
         {/* Ledger Table */}
-        <section className="bg-white border border-[#EADBCE] rounded-3xl overflow-hidden text-left">
+        <section className="bg-white border border-[#EADBCE] rounded-3xl overflow-hidden text-left shadow-2xs">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -370,26 +355,26 @@ export default function SalonSettlements() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-50">
-                {filteredSettlements.length === 0 ? (
+                {paginatedSettlements.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-stone-400 text-sm italic">
                       No matching settlement transactions found.
                     </td>
                   </tr>
                 ) : (
-                  filteredSettlements.map(s => {
-                    const isPending = s.status === "PENDING_BALANCE";
+                  paginatedSettlements.map(s => {
+                    const isPending = s.status === "PENDING" || s.status === "PENDING_BALANCE";
                     return (
                       <tr key={s.id} className="hover:bg-stone-50/20 transition-colors group">
-                        <td className="py-4.5 px-6">
+                        <td className="py-5 px-6">
                           <p className="font-bold text-sm text-stone-900 tracking-tight font-mono">{s.id}</p>
                           <p className="text-[10px] text-stone-400 font-mono mt-0.5">{s.timestamp}</p>
                         </td>
 
-                        <td className="py-4.5 px-6">
+                        <td className="py-5 px-6">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-center font-bold text-[10px] text-stone-500 font-serif">
-                              {s.customerName[0]}
+                              {s.customerName ? s.customerName[0] : "?"}
                             </div>
                             <div>
                               <p className="font-bold text-sm text-stone-900 tracking-tight">{s.customerName}</p>
@@ -398,17 +383,17 @@ export default function SalonSettlements() {
                           </div>
                         </td>
 
-                        <td className="py-4.5 px-6">
+                        <td className="py-5 px-6">
                           <p className="text-xs font-bold text-stone-800">{s.barberName}</p>
                           <p className="text-[10px] text-[#C5A059] font-medium mt-0.5 truncate max-w-[180px]">{s.services}</p>
                         </td>
 
-                        <td className="py-4.5 px-6 text-center">
+                        <td className="py-5 px-6 text-center">
                           <span className="font-mono font-bold text-stone-600 text-sm">{money(s.tokenPaid)}</span>
                           <span className="block text-[8px] font-black uppercase text-stone-400 mt-0.5">Online</span>
                         </td>
 
-                        <td className="py-4.5 px-6 text-center">
+                        <td className="py-5 px-6 text-center">
                           {isPending ? (
                             <span className="font-mono font-bold text-amber-700 text-sm">—</span>
                           ) : (
@@ -419,11 +404,11 @@ export default function SalonSettlements() {
                           )}
                         </td>
 
-                        <td className="py-4.5 px-6 text-right">
+                        <td className="py-5 px-6 text-right">
                           <span className="font-mono font-bold text-stone-900 text-sm">{money(s.totalAmount)}</span>
                         </td>
 
-                        <td className="py-4.5 px-6 text-center">
+                        <td className="py-5 px-6 text-center">
                           {isPending ? (
                             <button
                               onClick={() => setSettlingPayment(s)}
@@ -445,6 +430,42 @@ export default function SalonSettlements() {
             </table>
           </div>
         </section>
+
+        {/* Pagination Controls */}
+        {(() => {
+          const totalPages = Math.ceil(filteredSettlements.length / itemsPerPage) || 1;
+          if (totalPages <= 1) return null;
+          return (
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-6 bg-white border border-[#EADBCE] rounded-3xl px-6 py-4 card hover:transform-none gap-4">
+              <span className="text-xs text-stone-500 font-semibold">
+                Showing <span className="text-stone-900 font-bold">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
+                <span className="text-stone-900 font-bold">
+                  {Math.min(currentPage * itemsPerPage, filteredSettlements.length)}
+                </span>{" "}
+                of <span className="text-stone-900 font-bold">{filteredSettlements.length}</span> transactions
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-4.5 py-2.5 text-xs font-black uppercase tracking-wider border border-[#EADBCE] rounded-xl hover:bg-stone-50 disabled:opacity-50 disabled:hover:bg-transparent transition-all duration-150 cursor-pointer text-[#3E362E] disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-xs font-bold text-stone-700 min-w-[80px] text-center">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-4.5 py-2.5 text-xs font-black uppercase tracking-wider border border-[#EADBCE] rounded-xl hover:bg-stone-50 disabled:opacity-50 disabled:hover:bg-transparent transition-all duration-150 cursor-pointer text-[#3E362E] disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Settle Balance Dialog Modal */}
         {settlingPayment && (
