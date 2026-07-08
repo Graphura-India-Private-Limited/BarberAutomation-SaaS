@@ -35,9 +35,9 @@ import SalonRegistration from "./pages/owner/SalonRegistration";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import ManageServices from "./pages/owner/ManageServices";
 import HomeOverview from "./pages/barber/HomeOverview";
-import PaymentDashboard from "./pages/owner/PaymentDashboard";
+// import PaymentDashboard from "./pages/owner/PaymentDashboard";
 import SettingsPage from "./pages/owner/SettingsPage";
-import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
+// import BreakApprovalDashboard from "./pages/owner/BreakApprovalDashboard";
 import FinancialAnalytics from "./pages/owner/FinancialAnalytics";
 import OwnerLayout from "./components/layout/OwnerLayout";
 import BarberTeam from "./pages/owner/BarberTeam";
@@ -202,10 +202,10 @@ function App() {
           <Route path="dashboard" element={<OwnerDashboard />} />
           <Route path="dashboard/analytics" element={<FinancialAnalytics />} />
           <Route path="financial-analytics" element={<FinancialAnalytics />} />
-          <Route path="payments" element={<PaymentDashboard />} />
+          {/* <Route path="payments" element={<PaymentDashboard />} /> */}
           <Route path="revenue" element={<FinancialAnalytics />} />
           <Route path="manage-services" element={<ManageServices />} />
-          <Route path="approvals" element={<BreakApprovalDashboard />} />
+          {/* <Route path="approvals" element={<BreakApprovalDashboard />} /> */}
           <Route path="bookings" element={<BookingManagement />} />
           <Route path="finance" element={<FinancialAnalytics />} />
           <Route path="settings" element={<SettingsPage />} />

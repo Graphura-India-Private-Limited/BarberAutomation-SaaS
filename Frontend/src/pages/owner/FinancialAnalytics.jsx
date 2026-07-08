@@ -334,6 +334,52 @@ export default function FinancialAnalytics() {
 
   // Builds the exportable dataset for whichever tab/sub-view is currently active,
   // so the header-level Export CSV button always reflects what's on screen.
+  // const getActiveExportPayload = () => {
+    const isOwner = currentUser?.role === "owner" || true; // Fallback for testing
+  const hasContextData = contextFinanceData && (contextFinanceData.todayRevenue > 0 || contextFinanceData.barberBreakdown?.length > 0);
+  
+  const activeFinance = useMemo(() => {
+    const rawFinance = hasContextData ? contextFinanceData : fallbackFinanceData;
+    if (dbBarbers.length === 0) {
+      return rawFinance;
+    }
+    
+    const mappedBreakdown = dbBarbers.map((b, idx) => {
+      const charSum = b.name.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      const isCommission = charSum % 2 === 0;
+      const todayRevenueVal = 1000 + (charSum % 15) * 100;
+      if (isCommission) {
+        return {
+          name: b.name,
+          today: todayRevenueVal,
+          commission: "30%",
+          earned: Math.round(todayRevenueVal * 0.3),
+          type: "COMMISSION"
+        };
+      } else {
+        return {
+          name: b.name,
+          today: todayRevenueVal,
+          salary: 15000 + (charSum % 5) * 1000,
+          type: "Fixed"
+        };
+      }
+    });
+
+    return {
+      ...rawFinance,
+      barberBreakdown: mappedBreakdown
+    };
+  }, [dbBarbers, hasContextData]);
+
+  const barberData = useMemo(() => {
+    return isOwner
+      ? (activeFinance.barberBreakdown || [])
+      : (activeFinance.barberBreakdown || []).filter(b => b.name?.includes(currentUser?.name || ""));
+  }, [activeFinance, isOwner, currentUser]);
+
+  const showRestrictedFinance = canViewFinance && !canViewFinance();
+
   const getActiveExportPayload = () => {
     if (activeTab === "revenue") {
       return {
@@ -482,51 +528,6 @@ export default function FinancialAnalytics() {
     document.body.removeChild(link);
   };
 
-  // ─── FINANCE TAB STATES & CONFIGS ───
-  const isOwner = currentUser?.role === "owner" || true; // Fallback for testing
-  const hasContextData = contextFinanceData && (contextFinanceData.todayRevenue > 0 || contextFinanceData.barberBreakdown?.length > 0);
-  
-  const activeFinance = useMemo(() => {
-    const rawFinance = hasContextData ? contextFinanceData : fallbackFinanceData;
-    if (dbBarbers.length === 0) {
-      return rawFinance;
-    }
-    
-    const mappedBreakdown = dbBarbers.map((b, idx) => {
-      const charSum = b.name.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-      const isCommission = charSum % 2 === 0;
-      const todayRevenueVal = 1000 + (charSum % 15) * 100;
-      if (isCommission) {
-        return {
-          name: b.name,
-          today: todayRevenueVal,
-          commission: "30%",
-          earned: Math.round(todayRevenueVal * 0.3),
-          type: "COMMISSION"
-        };
-      } else {
-        return {
-          name: b.name,
-          today: todayRevenueVal,
-          salary: 15000 + (charSum % 5) * 1000,
-          type: "Fixed"
-        };
-      }
-    });
-
-    return {
-      ...rawFinance,
-      barberBreakdown: mappedBreakdown
-    };
-  }, [dbBarbers, hasContextData]);
-
-  const barberData = useMemo(() => {
-    return isOwner
-      ? (activeFinance.barberBreakdown || [])
-      : (activeFinance.barberBreakdown || []).filter(b => b.name?.includes(currentUser?.name || ""));
-  }, [activeFinance, isOwner, currentUser]);
-
-  const showRestrictedFinance = canViewFinance && !canViewFinance();
 
   return (
     <div className="p-6 md:p-10 font-sans text-stone-800 selection:bg-amber-100 min-h-screen" style={{ background: "#FAF6F0" }}>
@@ -582,7 +583,7 @@ export default function FinancialAnalytics() {
             className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200/60 shadow-sm text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] hover:bg-[#8B5A2B]/5 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059]"></span>
-            {activeExportRowCount ? "Export CSV" : "No Data To Export"}
+            {activeExportRowCount ? "Export Reports" : "No Data To Export"}
           </button>
         </div>
 

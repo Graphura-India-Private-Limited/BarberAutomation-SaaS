@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, Scissors, Phone, Award, ShieldCheck, 
   Trash2, Coffee, Sparkles, Check, Star, RefreshCw, Plus,
-  Minimize2, Maximize2, Eye, FileText, X, Edit, Upload
+  Minimize2, Maximize2, Eye, FileText, X, Edit, Upload,
+  Sandwich, Calendar, CheckCircle, XCircle, Clock
 } from "lucide-react";
 import CustomSelect from "../../components/common/CustomSelect";
 
@@ -40,6 +43,11 @@ export default function BarberTeam() {
   const [selectedSpecs, setSelectedSpecs] = useState([]);
   const [customSpecInput, setCustomSpecInput] = useState("");
   const [showCustomInput, setShowCustomInput] = useState(false);
+
+  // ── Break / Leave Approval state (merged in from the old Break Approval page) ──
+  const [breakRequests, setBreakRequests] = useState([]);
+  const [breakLoading, setBreakLoading] = useState(true);
+  const [breakActionId, setBreakActionId] = useState(null);
 
   const handleToggleSpec = (spec) => {
     let next;
@@ -107,8 +115,52 @@ export default function BarberTeam() {
     }
   };
 
+  // ── Break / Leave Approval: fetch + actions (merged in from the old Break Approval page) ──
+  const fetchBreakRequests = async () => {
+    setBreakLoading(true);
+    try {
+      const res = await fetch(`${API}/breaks/pending`, { headers: headers() });
+      const data = await res.json();
+      if (data.success) setBreakRequests(data.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setBreakLoading(false);
+    }
+  };
+
+  const handleBreakAction = async (id, status) => {
+    setBreakActionId(id);
+    try {
+      const res = await fetch(`${API}/breaks/action/${id}`, {
+        method: "PUT",
+        headers: headers(),
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        setBreakRequests(prev => prev.filter(req => req._id !== id));
+        showToast(status === "approved" ? "Break request approved" : "Break request rejected");
+      } else {
+        showToast("Failed to update break request", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Network error updating break request", "error");
+    } finally {
+      setBreakActionId(null);
+    }
+  };
+
+  const breakStats = useMemo(() => {
+    const lunchCount = breakRequests.filter(r => r.break_type === "lunch").length;
+    const teaCount = breakRequests.filter(r => r.break_type === "short" || r.break_type === "long").length;
+    const leaveCount = breakRequests.filter(r => r.break_type === "leave").length;
+    return { total: breakRequests.length, lunch: lunchCount, tea: teaCount, leave: leaveCount };
+  }, [breakRequests]);
+
   useEffect(() => {
     fetchBarbers();
+    fetchBreakRequests();
   }, []);
 
   const location = useLocation();
@@ -363,7 +415,7 @@ export default function BarberTeam() {
             Add Barber
           </button>
           <button 
-            onClick={fetchBarbers} 
+            onClick={() => { fetchBarbers(); fetchBreakRequests(); }} 
             disabled={loading}
             className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white border border-[#EADBCE] text-xs font-black uppercase tracking-wider text-stone-700 shadow-sm hover:bg-stone-50 cursor-pointer disabled:opacity-50 transition-all active:scale-95"
           >
@@ -511,7 +563,149 @@ export default function BarberTeam() {
             </div>
           )}
         </>
-      )}      {/* Barber Details Modal */}
+      )}
+
+      {/* ── Break / Leave Approval Section (merged in from the old Break Approval page) ── */}
+      <section className="mt-10">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-serif text-lg sm:text-xl text-stone-900 flex items-center gap-2">
+            <span className="font-bold uppercase">Break &amp;</span>
+            <span className="italic text-[#C5A059] normal-case font-medium">Leave Requests</span>
+          </h3>
+          {breakRequests.length > 0 && (
+            <span className="px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-black uppercase tracking-wider">
+              {breakRequests.length} Pending
+            </span>
+          )}
+        </div>
+
+        {/* Stat shards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+          <div className="bg-white border border-[#EADBCE] rounded-2xl p-4 text-center shadow-sm card hover:transform-none">
+            <div className="mx-auto w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center mb-2 text-amber-700">
+              <Users size={16} />
+            </div>
+            <span className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Queue Active</span>
+            <span className="block text-xl font-black font-serif text-stone-900 mt-0.5">{breakStats.total === 0 ? "Clear" : breakStats.total}</span>
+          </div>
+          <div className="bg-white border border-[#EADBCE] rounded-2xl p-4 text-center shadow-sm card hover:transform-none">
+            <div className="mx-auto w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center mb-2 text-orange-700">
+              <Sandwich size={16} />
+            </div>
+            <span className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Lunch</span>
+            <span className="block text-xl font-black font-serif text-stone-900 mt-0.5">{breakStats.lunch}</span>
+          </div>
+          <div className="bg-white border border-[#EADBCE] rounded-2xl p-4 text-center shadow-sm card hover:transform-none">
+            <div className="mx-auto w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center mb-2 text-sky-700">
+              <Coffee size={16} />
+            </div>
+            <span className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Short Breaks</span>
+            <span className="block text-xl font-black font-serif text-stone-900 mt-0.5">{breakStats.tea}</span>
+          </div>
+          <div className="bg-white border border-[#EADBCE] rounded-2xl p-4 text-center shadow-sm card hover:transform-none">
+            <div className="mx-auto w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center mb-2 text-teal-700">
+              <Calendar size={16} />
+            </div>
+            <span className="block text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] font-sans">Leave</span>
+            <span className="block text-xl font-black font-serif text-stone-900 mt-0.5">{breakStats.leave}</span>
+          </div>
+        </div>
+
+        {/* Requests queue */}
+        {breakLoading ? (
+          <div className="flex items-center justify-center py-10 gap-3 text-stone-400 text-xs font-semibold">
+            <RefreshCw size={14} className="animate-spin" /> Syncing pending requests...
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <AnimatePresence mode="popLayout">
+              {breakRequests.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-white border border-[#EADBCE] p-8 rounded-2xl text-center shadow-sm flex flex-col items-center justify-center card hover:transform-none"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl flex items-center justify-center border border-amber-100 shadow-sm text-2xl mb-2">
+                    ✨
+                  </div>
+                  <p className="text-stone-400 text-xs font-semibold">No pending break or leave requests right now.</p>
+                </motion.div>
+              ) : (
+                breakRequests.map((req) => (
+                  <motion.div
+                    key={req._id}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.2 } }}
+                    className="card p-4 sm:p-5 bg-white group text-left"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl border flex items-center justify-center text-lg shadow-inner flex-shrink-0"
+                             style={{ 
+                               backgroundColor: req.break_type === 'lunch' ? '#FFF7ED' : req.break_type === 'leave' ? '#F0FDF4' : '#F0F9FF',
+                               borderColor: req.break_type === 'lunch' ? '#FED7AA' : req.break_type === 'leave' ? '#BBF7D0' : '#BAE6FD'
+                             }}>
+                          {req.break_type === 'lunch' ? (
+                            <Sandwich size={20} className="text-orange-600" />
+                          ) : req.break_type === 'leave' ? (
+                            <Calendar size={20} className="text-emerald-600" />
+                          ) : (
+                            <Coffee size={20} className="text-sky-600" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-stone-900 text-sm tracking-tight font-sans">{req.barber_id?.name || "Personnel Barber"}</h4>
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 animate-pulse" title="Pending request" />
+                          </div>
+                          <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#C5A059] mt-1 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-md inline-block font-sans">
+                            {req.break_type === "leave" 
+                              ? `Leave Request • ${Math.round(req.duration_mins / 1440)} Days` 
+                              : `${req.break_type === "lunch" ? "Lunch Break" : req.break_type} • ${req.duration_mins} Mins`}
+                          </p>
+                          {req.break_type === "leave" && req.start_time && (
+                            <p className="text-[10px] font-bold text-stone-500 mt-1 font-sans">
+                              Range: {new Date(req.start_time).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} to {new Date(new Date(req.start_time).getTime() + (req.duration_mins * 60000)).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </p>
+                          )}
+                          {req.reason && (
+                            <p className="text-[11px] text-[#8B5A2B] font-medium mt-1 font-sans italic">
+                              Reason: "{req.reason}"
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 justify-end sm:items-center font-sans flex-shrink-0">
+                        <button 
+                          onClick={() => handleBreakAction(req._id, "rejected")} 
+                          disabled={breakActionId === req._id}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-stone-500 hover:text-rose-600 hover:bg-rose-50/50 rounded-xl transition-all font-extrabold text-xs uppercase tracking-wider border border-transparent hover:border-rose-200/60 cursor-pointer font-sans disabled:opacity-40"
+                        >
+                          <XCircle size={14} /> Reject
+                        </button>
+                        <button 
+                          onClick={() => handleBreakAction(req._id, "approved")} 
+                          disabled={breakActionId === req._id}
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 text-white rounded-xl font-extrabold text-xs uppercase tracking-wider shadow-md transition-all active:scale-98 cursor-pointer font-sans hover:opacity-95 disabled:opacity-60"
+                          style={{ background: CHARCOAL }}
+                        >
+                          <CheckCircle size={14} color={GOLD} /> Approve
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </section>
+
+      {/* Barber Details Modal */}
       {selectedBarber && (
         <div style={{ zIndex: 1000 }} className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 md:p-10 animate-in fade-in duration-200">
           <div className={`bg-white border border-[#EADBCE] shadow-2xl relative duration-300 text-left flex flex-col overflow-hidden transition-all ${
