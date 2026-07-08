@@ -6,6 +6,18 @@ import {
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+const getCommissionPercent = (barber, stats) => {
+  const raw = Number(
+    stats?.commission_percent ??
+    barber?.salon_id?.commission_percent ??
+    10
+  );
+  return Number.isFinite(raw) && raw >= 0 && raw <= 100 ? raw : 10;
+};
+
+const calcCommission = (revenue, commissionPercent) =>
+  Math.round(revenue * (commissionPercent / 100));
+
 export default function BarberEarnings() {
   const [payouts, setPayouts] = useState([]);
   const [toast, setToast] = useState(null);
@@ -33,13 +45,18 @@ export default function BarberEarnings() {
       });
       const data = await res.json();
       if (data.success) {
-        const stats = data.stats || {};
+        const stats  = data.stats  || {};
+        const barber = data.barber || {};
+
         const todayRevenue = stats.todayRevenue || 0;
-        const weekRevenue = stats.weekRevenue || 0;
-        // Commission rate: assume 60% of revenue goes to barber
-        const commissionRate = "60%";
-        const todayEarned = Math.round(todayRevenue * 0.6);
-        const thisWeekEarned = Math.round(weekRevenue * 0.6);
+        const weekRevenue  = stats.weekRevenue  || 0;
+
+        // Salon commission_percent = barber's share (e.g. 10% of ₹100 → ₹10 commission)
+        const commissionPercent = getCommissionPercent(barber, stats);
+        const commissionRate = `${commissionPercent}%`;
+
+        const todayEarned = stats.todayCommission ?? calcCommission(todayRevenue, commissionPercent);
+        const thisWeekEarned = stats.weekCommission ?? calcCommission(weekRevenue, commissionPercent);
 
         setEarningsSummary({
           todayEarned,
@@ -57,7 +74,7 @@ export default function BarberEarnings() {
           const time = q.served_at
             ? new Date(q.served_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
             : "—";
-          return { service: serviceName, time, basePrice, cutEarned: Math.round(basePrice * 0.6), tip: 0 };
+          return { service: serviceName, time, basePrice, cutEarned: calcCommission(basePrice, commissionPercent), tip: 0 };
         });
         setShiftLog(log);
 
@@ -66,7 +83,7 @@ export default function BarberEarnings() {
           id: p._id ? p._id.toString().slice(-6).toUpperCase() : "PAYOUT",
           type: p.payment_type === "FULL" ? "Full Commission Settlement" : "Token Settlement",
           date: new Date(p.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
-          amount: Math.round(p.amount * 0.6),
+          amount: calcCommission(p.amount, commissionPercent),
           status: "SUCCESS"
         }));
         setPayouts(history);

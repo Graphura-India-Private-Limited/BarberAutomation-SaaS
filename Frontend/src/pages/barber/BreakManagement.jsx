@@ -324,14 +324,8 @@ export default function BreakManagement() {
       <main className="max-w-5xl mx-auto w-full py-6 md:py-10 pb-24">
 
         {/* HEADER */}
-        <div className="mb-10 border-b border-[#EADDCA]/60 pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="mb-10 border-b border-[#EADDCA]/60 pb-6">
           <h1 className="text-3xl font-black tracking-tight text-stone-900 uppercase font-serif">Break <span className="text-[#C5A059]">Management</span></h1>
-          <button
-            onClick={() => navigate('/barber/queue')}
-            className="bg-[#3E362E] hover:bg-[#2A241F] text-[#C5A059] border border-[#C5A059] px-4 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all cursor-pointer shadow-xs self-start sm:self-auto"
-          >
-            Live Monitoring
-          </button>
         </div>
 
         {/* 3-GRID LAYOUT */}

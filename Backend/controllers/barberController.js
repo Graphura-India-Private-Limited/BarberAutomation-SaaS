@@ -146,8 +146,14 @@ exports.updateBarberStatus = async (req, res) => {
 // @access  Private (Barber)
 exports.getBarberDashboard = async (req, res) => {
   try {
-    const barber = await Barber.findById(req.params.id).populate("salon_id", "salon_name address support_number salary_model");
+    const barber = await Barber.findById(req.params.id).populate(
+      "salon_id",
+      "salon_name address support_number salary_model commission_percent"
+    );
     if (!barber) return res.status(404).json({ success: false, message: "Not found" });
+
+    const commissionPercent = Number(barber.salon_id?.commission_percent ?? 10);
+    const commissionRate = commissionPercent / 100;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -249,6 +255,9 @@ exports.getBarberDashboard = async (req, res) => {
         rating: barber.rating || 5.0,
         todayRevenue,
         weekRevenue,
+        commission_percent: commissionPercent,
+        todayCommission: Math.round(todayRevenue * commissionRate),
+        weekCommission: Math.round(weekRevenue * commissionRate),
         activeBarbers,
         liveQueue,
         avgWait,
