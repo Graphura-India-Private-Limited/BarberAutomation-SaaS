@@ -113,6 +113,10 @@ exports.reassignQueueEntry = async (req, res) => {
 
     await Queue.findByIdAndUpdate(req.params.queue_id, { barber_id: new_barber_id, position: newPos });
     await Booking.findByIdAndUpdate(q.booking_id, { barber_id: new_barber_id });
+    if (q.booking_id) {
+      const Payment = require("../models/Payment");
+      await Payment.updateMany({ booking_id: q.booking_id }, { barber_id: new_barber_id });
+    }
 
     if (q.barber_id) {
       await Queue.updateMany(
@@ -144,6 +148,10 @@ exports.manualAssignQueueEntry = async (req, res) => {
 
     await Queue.findByIdAndUpdate(req.params.queue_id, { barber_id, position: newPos });
     await Booking.findByIdAndUpdate(q.booking_id, { barber_id });
+    if (q.booking_id) {
+      const Payment = require("../models/Payment");
+      await Payment.updateMany({ booking_id: q.booking_id }, { barber_id });
+    }
 
     res.json({
       success: true,
@@ -192,6 +200,10 @@ exports.autoAssignQueueEntry = async (req, res) => {
 
     await Queue.findByIdAndUpdate(req.params.queue_id, { barber_id: chosen._id, position: newPos });
     await Booking.findByIdAndUpdate(q.booking_id, { barber_id: chosen._id });
+    if (q.booking_id) {
+      const Payment = require("../models/Payment");
+      await Payment.updateMany({ booking_id: q.booking_id }, { barber_id: chosen._id });
+    }
 
     res.json({
       success: true,
@@ -251,7 +263,11 @@ exports.completeService = async (req, res) => {
       served_at: new Date(),
     });
     if (q.booking_id) {
-      await Booking.findByIdAndUpdate(q.booking_id, { status: "completed" });
+      await Booking.findByIdAndUpdate(q.booking_id, { status: "completed", barber_id: q.barber_id });
+      if (q.barber_id) {
+        const Payment = require("../models/Payment");
+        await Payment.updateMany({ booking_id: q.booking_id }, { barber_id: q.barber_id });
+      }
     }
 
     if (q.barber_id) {

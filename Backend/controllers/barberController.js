@@ -229,7 +229,7 @@ exports.getBarberDashboard = async (req, res) => {
     const completedQueue = await Queue.find({
       barber_id: req.params.id,
       status: "completed",
-      joined_at: { $gte: today }
+      served_at: { $gte: today }
     })
       .populate("customer_id", "name mobile")
       .populate("booking_id", "booking_type total_amount services")
@@ -307,7 +307,9 @@ exports.completeService = async (req, res) => {
     const q = await Queue.findByIdAndUpdate(req.params.queue_id, { status: "completed", served_at: new Date() }, { new: true });
     await Barber.findByIdAndUpdate(req.params.barber_id, { status: "available" });
     if (q && q.booking_id) {
-      await Booking.findByIdAndUpdate(q.booking_id, { status: "completed" });
+      await Booking.findByIdAndUpdate(q.booking_id, { status: "completed", barber_id: req.params.barber_id });
+      const Payment = require("../models/Payment");
+      await Payment.updateMany({ booking_id: q.booking_id }, { barber_id: req.params.barber_id });
     }
     await Queue.updateMany(
       { barber_id: req.params.barber_id, status: "waiting", position: { $gt: q.position } },

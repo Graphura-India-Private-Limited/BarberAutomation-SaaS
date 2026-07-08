@@ -71,10 +71,25 @@ export default function BarberEarnings() {
           const services = q.booking_id?.services || [];
           const serviceName = services.map(s => s.service_name).filter(Boolean).join(", ") || "Service";
           const basePrice = q.booking_id?.total_amount || 0;
-          const time = q.served_at
+          
+          let timeDisplay = "—";
+          const servedTime = q.served_at
             ? new Date(q.served_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
-            : "—";
-          return { service: serviceName, time, basePrice, cutEarned: calcCommission(basePrice, commissionPercent), tip: 0 };
+            : null;
+          
+          if (q.booking_id?.booking_type === "slot" && q.booking_id?.slot_time) {
+            try {
+              const slotDate = new Date(q.booking_id.slot_time);
+              const slotTimeFormatted = slotDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "UTC" });
+              timeDisplay = servedTime ? `${slotTimeFormatted} (Completed: ${servedTime})` : slotTimeFormatted;
+            } catch (e) {
+              timeDisplay = servedTime || "—";
+            }
+          } else {
+            timeDisplay = servedTime || "—";
+          }
+          
+          return { service: serviceName, time: timeDisplay, basePrice, cutEarned: calcCommission(basePrice, commissionPercent), tip: 0 };
         });
         setShiftLog(log);
 
@@ -83,7 +98,7 @@ export default function BarberEarnings() {
           id: p._id ? p._id.toString().slice(-6).toUpperCase() : "PAYOUT",
           type: p.payment_type === "FULL" ? "Full Commission Settlement" : "Token Settlement",
           date: new Date(p.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }),
-          amount: calcCommission(p.amount, commissionPercent),
+          amount: p.payment_type === "FULL" ? calcCommission(p.amount, commissionPercent) : p.amount,
           status: "SUCCESS"
         }));
         setPayouts(history);
