@@ -260,7 +260,7 @@ const getOwnerSettlements = asyncHandler(async (req, res) => {
     .populate("barber_id", "name")
     .sort({ created_at: -1 });
 
-  const completedPayments = payments.filter(p => p.booking_id && p.booking_id.status === "completed");
+  const completedPayments = payments.filter(p => p.booking_id && p.booking_id.status?.toLowerCase() === "completed");
 
   const settlements = completedPayments.map(p => {
     const isFull = p.payment_type === "FULL";

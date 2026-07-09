@@ -327,7 +327,7 @@ exports.completeService = async (req, res) => {
     if (q && q.booking_id) {
       await Booking.findByIdAndUpdate(q.booking_id, { status: "completed", barber_id: req.params.barber_id });
       const Payment = require("../models/Payment");
-      await Payment.updateMany({ booking_id: q.booking_id }, { barber_id: req.params.barber_id });
+      await Payment.updateMany({ booking_id: q.booking_id }, { barber_id: req.params.barber_id, status: "SUCCESS" });
     }
     await Queue.updateMany(
       { barber_id: req.params.barber_id, status: "waiting", position: { $gt: q.position } },

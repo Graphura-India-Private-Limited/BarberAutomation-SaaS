@@ -336,14 +336,14 @@ export default function SalonDetailPage() {
 
           {/* Right Side: Showcase Image Frame */}
           <div className="2xl:col-span-5">
-            <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] 2xl:aspect-[4/3] rounded-[2rem] overflow-hidden border border-[#E8DCCB] bg-stone-100 shadow-xl group">
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] 2xl:aspect-[4/3] rounded-[2rem] overflow-hidden border border-[#E8DCCB] bg-[#1A1613] shadow-xl group">
               <img
                 src={activeImage || salon.image}
                 alt={salon.name}
                 onError={(e) => {
                   e.currentTarget.src = defaultShopImage;
                 }}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
+                className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
             </div>
@@ -380,7 +380,7 @@ export default function SalonDetailPage() {
                     <div
                       key={idx}
                       onClick={() => setActiveImage(img)}
-                      className={`relative aspect-video rounded-xl overflow-hidden bg-black/5 group border cursor-pointer transition-all duration-300 ${
+                      className={`relative aspect-video rounded-xl overflow-hidden bg-[#1A1613] group border cursor-pointer transition-all duration-300 ${
                         activeImage === img ? "border-[#C5A059] ring-2 ring-[#C5A059]/20" : "border-[#E8DCCB] hover:border-[#C5A059]"
                       }`}
                     >
@@ -390,7 +390,7 @@ export default function SalonDetailPage() {
                         onError={(e) => {
                           e.currentTarget.src = defaultShopImage;
                         }}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
                   ))}

@@ -263,10 +263,12 @@ exports.completeService = async (req, res) => {
     });
     if (q.booking_id) {
       await Booking.findByIdAndUpdate(q.booking_id, { status: "completed", barber_id: q.barber_id });
+      const Payment = require("../models/Payment");
+      const updateData = { status: "SUCCESS" };
       if (q.barber_id) {
-        const Payment = require("../models/Payment");
-        await Payment.updateMany({ booking_id: q.booking_id }, { barber_id: q.barber_id });
+        updateData.barber_id = q.barber_id;
       }
+      await Payment.updateMany({ booking_id: q.booking_id }, updateData);
     }
 
     if (q.barber_id) {

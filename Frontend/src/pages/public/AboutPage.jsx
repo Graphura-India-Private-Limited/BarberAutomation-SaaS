@@ -144,7 +144,7 @@ export default function AboutPage() {
       <img 
         src="https://i.pinimg.com/1200x/a0/aa/9a/a0aa9ab25439f003bf28beb0b35fb9c0.jpg"
         alt="Grooming Consultation"
-        className="w-full aspect-[4/3] object-cover rounded-[2.5rem] border border-[#E8DCCB] relative z-10 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
+        className="w-full aspect-[4/3] object-contain bg-[#1E1915] rounded-[2.5rem] border border-[#E8DCCB] relative z-10 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
       />
       {/* Subtle floating badge */}
       <div className="absolute -bottom-6 -right-6 bg-[#2A241F] text-white p-6 rounded-2xl shadow-xl z-20">

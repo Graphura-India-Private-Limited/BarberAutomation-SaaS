@@ -69,7 +69,6 @@ export default function BarberLayout({ children, profile, status, setStatus, toa
 
   // ═══ स्क्रीनशॉटनुसार सर्व पेजेसची अचूक लिस्ट ═══
   const NAV = [
-    { id: "overview", label: "Overview", icon: Layers, route: "/barber/overview" },
     { id: "dashboard", label: "Dashboard", icon: Clock, route: "/barber/dashboard" },
     { id: "console", label: "Live Console", icon: Play, route: "/barber/service-console" },
     { id: "earnings", label: "Earnings", icon: IndianRupee, route: "/barber/earnings" },

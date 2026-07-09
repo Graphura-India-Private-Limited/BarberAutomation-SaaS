@@ -32,7 +32,7 @@ export default function StaffLogin() {
       if (ok) {
         const role = localStorage.getItem("role");
         if (role === "barber") {
-          navigate("/barber/overview");
+          navigate("/barber/dashboard");
         } else {
           logout();
           setError("Access Denied. Only staff (barbers) are allowed to access the Staff Portal.");
@@ -51,7 +51,7 @@ export default function StaffLogin() {
       if (ok) {
         const role = localStorage.getItem("role");
         if (role === "barber") {
-          navigate("/barber/overview");
+          navigate("/barber/dashboard");
         } else {
           logout();
           setError("Access Denied. Only staff (barbers) are allowed to access the Staff Portal.");

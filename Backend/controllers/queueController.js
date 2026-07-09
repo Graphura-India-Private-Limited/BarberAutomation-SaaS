@@ -73,6 +73,14 @@ exports.updateQueueStatus = async (req, res) => {
     // Update Booking status
     if (entry.booking_id) {
       await Booking.findByIdAndUpdate(entry.booking_id, { status: status === "noshow" ? "noshow" : status });
+      if (status === "completed") {
+        const Payment = require("../models/Payment");
+        const updateData = { status: "SUCCESS" };
+        if (entry.barber_id) {
+          updateData.barber_id = entry.barber_id;
+        }
+        await Payment.updateMany({ booking_id: entry.booking_id }, updateData);
+      }
     }
 
     // Update Barber status

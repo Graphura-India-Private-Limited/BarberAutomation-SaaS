@@ -301,8 +301,12 @@ exports.updateBookingStatus = async (req, res) => {
     // If barber is assigned or changed, sync with payments
     const Payment = require("../models/Payment");
     const finalBarberId = booking.barber_id || (queueEntry ? queueEntry.barber_id : null);
-    if (finalBarberId) {
-      await Payment.updateMany({ booking_id: booking._id }, { barber_id: finalBarberId });
+    const updateData = {};
+    if (finalBarberId) updateData.barber_id = finalBarberId;
+    if (status === "completed") updateData.status = "SUCCESS";
+    
+    if (Object.keys(updateData).length > 0) {
+      await Payment.updateMany({ booking_id: booking._id }, updateData);
     }
 
     // If there is an associated Queue entry, keep it in sync

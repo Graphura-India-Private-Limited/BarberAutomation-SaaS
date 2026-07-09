@@ -642,6 +642,14 @@ exports.getAllBookings = async (req, res) => {
 exports.updateBookingStatus = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    if (booking && req.body.status === "completed") {
+      const Payment = require("../models/Payment");
+      const updateData = { status: "SUCCESS" };
+      if (booking.barber_id) {
+        updateData.barber_id = booking.barber_id;
+      }
+      await Payment.updateMany({ booking_id: booking._id }, updateData);
+    }
     res.json({ success: true, booking });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

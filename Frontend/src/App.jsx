@@ -175,9 +175,8 @@ function App() {
         {/* --- BARBER PROFILE & ACTIONS (RESTRICTED BY RBAC) --- */}
         <Route path="/barber/login" element={<BarberLogin />} />
         <Route path="/barber" element={<ProtectedRoute allowedRoles={["barber"]}><Outlet /></ProtectedRoute>}>
-          <Route index element={<Navigate to="overview" replace />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BarberDashboard stats={stats} currentSvc={currentSvc} setCurrentSvc={setCurrentSvc} getElapsed={getElapsed} showToast={showToast} queue={queue} breakRequests={breakRequests} reviews={reviews} /></BarberLayout>} />
-          <Route path="overview" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><HomeOverview /></BarberLayout>} />
           <Route path="profile" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}><BarberProfile /></BarberLayout>} />
           <Route path="breaks" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout>} />
           <Route path="break" element={<BarberLayout profile={profile} status={status} setStatus={setStatus} toast={toast}> <BreakManagement /></BarberLayout>} />
