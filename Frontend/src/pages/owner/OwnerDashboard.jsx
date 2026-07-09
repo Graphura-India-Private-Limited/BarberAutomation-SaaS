@@ -153,6 +153,7 @@ export default function OwnerDashboard() {
         const data = await res.json();
         if (data.success && data.payments) {
           setRawPayments(data.payments);
+            console.log("Fetched payments:", data.payments.length, data.payments);
           let cash = 0;
           let online = 0;
           let card = 0;
@@ -257,6 +258,25 @@ export default function OwnerDashboard() {
     };
     fetchPayments();
   }, [token]);
+
+  // const statusMeta = useMemo(() => {
+    const paymentButtonStats = useMemo(() => {
+    const tokenPayments = rawPayments.filter(p => p.payment_type === "TOKEN");
+    const pendingPayments = rawPayments.filter(p => p.status === "PENDING");
+
+    const tokenAmount = tokenPayments
+      .filter(p => p.status === "SUCCESS")
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const pendingAmount = pendingPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    return {
+      tokenCount: tokenPayments.length,
+      tokenAmount,
+      pendingCount: pendingPayments.length,
+      pendingAmount
+    };
+  }, [rawPayments]);
 
   const statusMeta = useMemo(() => {
     if (salon?.status === "approved") return { label: "Approved & Live", dot: "bg-emerald-500", panel: "bg-emerald-50/60 border-emerald-200 text-emerald-800" };
@@ -454,6 +474,45 @@ export default function OwnerDashboard() {
             <div>
               <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Avg Wait Time (per day)</p>
               <h3 className="text-xl font-black text-stone-900 font-serif">{dashboardStats.liveQueueCount > 0 ? `${dashboardStats.liveQueueCount * 15} min` : "0 min"}</h3>
+            </div>
+          </div>
+        </section>
+
+        {/* {error && <p className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-center text-xs font-bold text-red-600 font-sans">{error}</p>} */}
+        
+        {/* ── OWNER ACTION BUTTONS: Token / Pending / Bookings Today ── */}
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs text-left">
+            <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+              <CreditCard className="text-blue-600 w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Token Payments</p>
+              <h3 className="text-xl font-black text-stone-900 font-serif">
+                {paymentButtonStats.tokenCount} <span className="text-xs text-stone-400 font-sans font-medium">₹{paymentButtonStats.tokenAmount.toLocaleString("en-IN")}</span>
+              </h3>
+            </div>
+          </div>
+
+          <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs text-left">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+              <Clock className="text-amber-600 w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Pending Payments</p>
+              <h3 className="text-xl font-black text-stone-900 font-serif">
+                {paymentButtonStats.pendingCount} <span className="text-xs text-stone-400 font-sans font-medium">₹{paymentButtonStats.pendingAmount.toLocaleString("en-IN")}</span>
+              </h3>
+            </div>
+          </div>
+
+          <div className="card p-5 flex items-center gap-4 bg-white shadow-2xs text-left">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+              <UserCheck className="text-emerald-600 w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#C5A059] mb-0.5 font-sans">Bookings Done Today</p>
+              <h3 className="text-xl font-black text-stone-900 font-serif">{dashboardStats.todayStats.completed}</h3>
             </div>
           </div>
         </section>
