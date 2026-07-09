@@ -133,7 +133,7 @@ function App() {
         {/* --- CUSTOMER AUTH --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/customerprofile" element={<ProtectedRoute allowedRoles={["customer"]}><CustomerProfile /></ProtectedRoute>} />
+        <Route path="/customerprofile" element={<CustomerProfile />}/>
         <Route path="/dashboard" element={<ProtectedRoute allowedRoles={["customer"]}><CustomerProfile /></ProtectedRoute>} />
         <Route path="/otp-login" element={<OTPLogin />} />
         <Route path="/otp-verify" element={<OTPVerify />} />
