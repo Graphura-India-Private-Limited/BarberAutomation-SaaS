@@ -6,7 +6,7 @@ const Salon = require("../models/Salon");
 // @access  Public
 exports.getSalonServices = async (req, res) => {
   try {
-    const salon = await Salon.findOne({ _id: req.params.salon_id, status: "approved" });
+    const salon = await Salon.findOne({ _id: req.params.salon_id, status: "approved" }).select("_id status");
     if (!salon) {
       return res.status(404).json({ success: false, message: "Salon is suspended or not live" });
     }

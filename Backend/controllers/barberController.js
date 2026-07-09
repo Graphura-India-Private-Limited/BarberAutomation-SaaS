@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Barber = require("../models/Barber");
 const Salon = require("../models/Salon");
@@ -12,7 +13,7 @@ const { validateMobile, validateEmailReal } = require("../utils/validation");
 // @access  Public
 exports.getBarbersBySalon = async (req, res) => {
   try {
-    const salon = await Salon.findOne({ _id: req.params.salon_id, status: "approved" });
+    const salon = await Salon.findOne({ _id: req.params.salon_id, status: "approved" }).select("_id status");
     if (!salon) {
       return res.status(404).json({ success: false, message: "Salon is suspended or not live" });
     }
@@ -20,34 +21,51 @@ exports.getBarbersBySalon = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const barbersList = await Barber.find({ salon_id: req.params.salon_id, is_active: true });
+    const barbersList = await Barber.find({ salon_id: req.params.salon_id, is_active: true })
+      .select("-password_hash -document -photo");
 
-    // Sync barber status based on active in-progress queue entries today
-    const barbers = await Promise.all(
-      barbersList.map(async (barber) => {
-        const hasInProgress = await Queue.findOne({
-          barber_id: barber._id,
-          status: "in-progress",
-          joined_at: { $gte: today }
-        });
-        if (hasInProgress) {
-          if (barber.status !== "busy") {
-            barber.status = "busy";
-            await Barber.findByIdAndUpdate(barber._id, { status: "busy" });
-          }
-        } else {
-          if (barber.status === "busy") {
-            barber.status = "available";
-            await Barber.findByIdAndUpdate(barber._id, { status: "available" });
-          }
-        }
+    // Fetch all in-progress queue entries for this salon today in a single query
+    const activeQueues = await Queue.find({
+      salon_id: req.params.salon_id,
+      status: "in-progress",
+      joined_at: { $gte: today }
+    });
+    const busyBarberIds = new Set(activeQueues.map(q => q.barber_id.toString()));
 
-        const queueCount = await Queue.countDocuments({
-          barber_id: barber._id,
+    // Aggregate queue counts for all barbers in this salon today
+    const queueCounts = await Queue.aggregate([
+      {
+        $match: {
+          salon_id: new mongoose.Types.ObjectId(req.params.salon_id),
           status: { $in: ["waiting", "in-progress"] },
           joined_at: { $gte: today }
-        });
+        }
+      },
+      {
+        $group: {
+          _id: "$barber_id",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    const queueCountMap = {};
+    queueCounts.forEach(c => {
+      if (c._id) {
+        queueCountMap[c._id.toString()] = c.count;
+      }
+    });
 
+    // Sync barber status and append queue counts in-memory
+    const barbers = await Promise.all(
+      barbersList.map(async (barber) => {
+        const isBusy = busyBarberIds.has(barber._id.toString());
+        const targetStatus = isBusy ? "busy" : (barber.status === "busy" ? "available" : barber.status);
+        if (barber.status !== targetStatus) {
+          barber.status = targetStatus;
+          await Barber.findByIdAndUpdate(barber._id, { status: targetStatus });
+        }
+
+        const queueCount = queueCountMap[barber._id.toString()] || 0;
         const barberObj = barber.toObject();
         barberObj.queue_count = queueCount;
         return barberObj;
@@ -146,10 +164,12 @@ exports.updateBarberStatus = async (req, res) => {
 // @access  Private (Barber)
 exports.getBarberDashboard = async (req, res) => {
   try {
-    const barber = await Barber.findById(req.params.id).populate(
-      "salon_id",
-      "salon_name address support_number salary_model commission_percent"
-    );
+    const barber = await Barber.findById(req.params.id)
+      .select("-password_hash -document -photo")
+      .populate(
+        "salon_id",
+        "salon_name address support_number salary_model commission_percent"
+      );
     if (!barber) return res.status(404).json({ success: false, message: "Not found" });
 
     const commissionPercent = Number(barber.salon_id?.commission_percent ?? 10);
@@ -203,7 +223,7 @@ exports.getBarberDashboard = async (req, res) => {
     // 5. Average wait calculation
     const avgWait = liveQueue * 20;
 
-    // 6. Calculate weekly chart revenue breakdown for the last 7 days (Mon-Sun or relative)
+    // 6. Calculate weekly chart revenue breakdown in-memory for the last 7 days (Mon-Sun or relative)
     const weekData = [];
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     for (let i = 6; i >= 0; i--) {
@@ -213,12 +233,10 @@ exports.getBarberDashboard = async (req, res) => {
       const nextD = new Date(d);
       nextD.setDate(nextD.getDate() + 1);
 
-      const dayPayments = await Payment.find({
-        barber_id: req.params.id,
-        status: "SUCCESS",
-        created_at: { $gte: d, $lt: nextD }
-      });
-      const dayVal = dayPayments.reduce((sum, p) => sum + p.amount, 0);
+      const dayVal = weekPayments
+        .filter(p => p.created_at >= d && p.created_at < nextD)
+        .reduce((sum, p) => sum + p.amount, 0);
+
       weekData.push({
         day: dayNames[d.getDay()],
         val: dayVal,

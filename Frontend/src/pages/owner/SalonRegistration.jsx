@@ -1258,6 +1258,31 @@ export default function SalonRegistration() {
     );
   };
 
+  const [uploading, setUploading] = useState(false);
+
+  const uploadToCloudinary = async (base64Data) => {
+    try {
+      setUploading(true);
+      setError("");
+      const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file: base64Data })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message || "Failed to upload file");
+      }
+      return data.url;
+    } catch (err) {
+      console.error(err);
+      setError(`Upload failed: ${err.message}`);
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleImages = async (event) => {
     const files = Array.from(event.target.files || []).slice(0, 5);
 
@@ -1278,14 +1303,21 @@ export default function SalonRegistration() {
       return;
     }
 
-    const encoded = await Promise.all(
-      validFiles.map(file => new Promise(resolve => {
+    const uploadedUrls = [];
+    for (const file of validFiles) {
+      const base64 = await new Promise(resolve => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
         reader.readAsDataURL(file);
-      }))
-    );
-    setForm(prev => ({ ...prev, images: [...prev.images, ...encoded].slice(0, 5) }));
+      });
+      const url = await uploadToCloudinary(base64);
+      if (url) {
+        uploadedUrls.push(url);
+      }
+    }
+    if (uploadedUrls.length > 0) {
+      setForm(prev => ({ ...prev, images: [...prev.images, ...uploadedUrls].slice(0, 5) }));
+    }
     event.target.value = "";
   };
 
@@ -1307,12 +1339,15 @@ export default function SalonRegistration() {
 
     setError("");
     const reader = new FileReader();
-    reader.onload = () => {
-      setForm(prev => ({
-        ...prev,
-        [fieldName]: reader.result,
-        [`${fieldName}_name`]: file.name,
-      }));
+    reader.onload = async () => {
+      const url = await uploadToCloudinary(reader.result);
+      if (url) {
+        setForm(prev => ({
+          ...prev,
+          [fieldName]: url,
+          [`${fieldName}_name`]: file.name,
+        }));
+      }
     };
     reader.readAsDataURL(file);
     event.target.value = "";
@@ -1881,11 +1916,11 @@ export default function SalonRegistration() {
           <div className="pt-4">
             <button 
               type="submit"
-              disabled={loading} 
+              disabled={loading || uploading} 
               className="w-full h-14 md:h-16 rounded-2xl flex items-center justify-center text-xs sm:text-sm font-extrabold uppercase tracking-wider text-white shadow-md transition-all duration-200 hover:opacity-95 disabled:opacity-50 cursor-pointer active:scale-[0.98] hover:shadow-lg font-sans"
               style={{ backgroundColor: CHARCOAL }}
             >
-              {loading ? "Registering Studio System..." : "Submit Profile for Approval"}
+              {uploading ? "Uploading files to cloud..." : loading ? "Registering Studio System..." : "Submit Profile for Approval"}
             </button>
           </div>
         </form>

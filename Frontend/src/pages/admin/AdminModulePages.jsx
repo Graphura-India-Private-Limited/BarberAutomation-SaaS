@@ -325,6 +325,23 @@ export function SalonsModule({
   const [selectedCity, setSelectedCity] = useState("all");
   const [adding, setAdding] = useState(false);
   const [viewingSalon, setViewingSalon] = useState(null);
+
+  const handleViewSalon = async (salonId) => {
+    try {
+      const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      const token = localStorage.getItem("token");
+      const h = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+      const r = await fetch(`${API}/admin/salon/${salonId}`, { headers: h });
+      const d = await r.json();
+      if (d.success) {
+        setViewingSalon(d.salon);
+      } else {
+        alert(d.message || "Failed to load salon details");
+      }
+    } catch (err) {
+      alert("Server error loading details");
+    }
+  };
   const [newSalon, setNewSalon] = useState({
     salon_name: "",
     owner_name: "",
@@ -635,7 +652,7 @@ export function SalonsModule({
                   </select>
                   <button
                     type="button"
-                    onClick={() => setViewingSalon(s)}
+                    onClick={() => handleViewSalon(s._id)}
                     className="p-2 rounded-full text-stone-600 hover:bg-stone-50 transition-colors"
                     title="View Details"
                   >

@@ -598,6 +598,40 @@ export default function AdminOnboarding() {
 
   const h = () => ({ Authorization:`Bearer ${getToken()}`, "Content-Type":"application/json" });
 
+  const handleViewSalon = async (salonId) => {
+    setBusy(true);
+    try {
+      const r = await fetch(`${API}/admin/salon/${salonId}`, { headers: h() });
+      const d = await r.json();
+      if (d.success) {
+        setViewingSalon(d.salon);
+      } else {
+        pop(d.message || "Failed to load salon details", "error");
+      }
+    } catch (err) {
+      pop("Server error loading details", "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleViewBarber = async (barberId) => {
+    setBusy(true);
+    try {
+      const r = await fetch(`${API}/admin/barber/${barberId}`, { headers: h() });
+      const d = await r.json();
+      if (d.success) {
+        setSelectedBarber(d.barber);
+      } else {
+        pop(d.message || "Failed to load barber details", "error");
+      }
+    } catch (err) {
+      pop("Server error loading details", "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const fetchAll = async (stateFilter = selectedState) => {
     setLoading(true);
     try {
@@ -1905,7 +1939,7 @@ export default function AdminOnboarding() {
                           <button 
                             type="button" 
                             className="action-btn" 
-                            onClick={() => setViewingSalon(s)} 
+                            onClick={() => handleViewSalon(s._id)} 
                             style={{ 
                               display: "inline-flex", 
                               alignItems: "center", 
@@ -3693,7 +3727,7 @@ export default function AdminOnboarding() {
                     {filteredBarbers.map((b,i)=>(
                       <div 
                         key={b._id} 
-                        onClick={() => setSelectedBarber(b)}
+                        onClick={() => handleViewBarber(b._id)}
                         onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)"; }}
                         onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,.04)"; }}
                         style={{ background:C.card, borderRadius:16, border:`2px solid ${b.status==="available"?C.green+"40":C.border}`, overflow:"hidden", boxShadow:"0 1px 4px rgba(0,0,0,.04)", cursor:"pointer", transition:"transform 0.2s, box-shadow 0.2s" }}

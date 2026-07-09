@@ -409,7 +409,9 @@ exports.getOwnerProfile = async (req, res) => {
     if (req.user?.role !== "owner") {
       return res.status(403).json({ success: false, message: "Owner access only" });
     }
-    const salon = await Salon.findById(req.user.id);
+    const salon = await Salon.findById(req.user.id)
+      .select("-password_hash -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document")
+      .slice("images", 1);
     if (!salon) return res.status(404).json({ success: false, message: "Not found" });
     res.json({ success: true, salon });
   } catch (err) {
@@ -503,7 +505,9 @@ exports.updateOwnerProfile = async (req, res) => {
       approvalSubmitted = true;
     }
 
-    const salon = await Salon.findByIdAndUpdate(req.user.id, updates, { new: true });
+    const salon = await Salon.findByIdAndUpdate(req.user.id, updates, { new: true })
+      .select("-password_hash -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document")
+      .slice("images", 1);
     res.json({ 
       success: true, 
       salon, 
@@ -580,6 +584,7 @@ exports.loginBarber = async (req, res) => {
       return res.status(400).json({ success: false, message: "Mobile and password required" });
     }
     let barber = await Barber.findOne({ mobile, is_active: true })
+      .select("-document -photo")
       .populate("salon_id", "salon_name address status");
     if (!barber && mobile === "8888888801") {
       let testSalon = await Salon.findOne({ mobile: "9999999999" });
@@ -609,7 +614,9 @@ exports.loginBarber = async (req, res) => {
         rating: 4.8,
         is_active: true
       });
-      barber = await Barber.findById(newBarber._id).populate("salon_id", "salon_name address status");
+      barber = await Barber.findById(newBarber._id)
+        .select("-document -photo")
+        .populate("salon_id", "salon_name address status");
       console.log("Automatically created the test barber Ali with 8888888801!");
     }
 
@@ -627,7 +634,9 @@ exports.loginBarber = async (req, res) => {
       return res.status(400).json({ success: false, message: "Wrong password" });
     }
     const token = genToken(barber._id, "barber");
-    res.json({ success: true, token, barber });
+    const barberObj = barber.toObject();
+    delete barberObj.password_hash;
+    res.json({ success: true, token, barber: barberObj });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

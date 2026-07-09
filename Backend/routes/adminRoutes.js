@@ -12,6 +12,7 @@ router.get("/stats", protect, requireRoles("admin"), adminController.getAdminSta
 
 /* ── SALONS ── */
 router.get("/salons", protect, requireRoles("admin"), adminController.getAllSalons);
+router.get("/salon/:id", protect, requireRoles("admin"), adminController.getSalonById);
 router.put("/salon/:id/status", protect, requireRoles("admin"), adminController.updateSalonStatus);
 router.delete("/salon/:id", protect, requireRoles("admin"), adminController.deleteSalon);
 
@@ -22,6 +23,7 @@ router.delete("/customer/:id", protect, requireRoles("admin"), adminController.d
 
 /* ── BARBERS ── */
 router.get("/barbers", protect, requireRoles("admin"), adminController.getAllBarbers);
+router.get("/barber/:id", protect, requireRoles("admin"), adminController.getBarberById);
 router.post("/barber", protect, requireRoles("admin"), adminController.addBarber);
 router.put("/barber/:id/status", protect, requireRoles("admin"), adminController.updateBarberStatus);
 router.delete("/barber/:id", protect, requireRoles("admin"), adminController.deleteBarber);

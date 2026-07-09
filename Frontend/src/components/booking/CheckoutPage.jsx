@@ -156,7 +156,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
     }
 
     setProcessing(true);
-    // Simulate Razorpay handshake / payment gateway loader
+    // Simulate Razorpay handshake / payment gateway loader (reduced from 2000ms to 500ms for responsiveness)
     setTimeout(async () => {
       try {
         await onComplete(paymentType, amountToPayNow, appliedPromo?.code || "");
@@ -165,7 +165,7 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
       } finally {
         setProcessing(false);
       }
-    }, 2000);
+    }, 500);
   };
 
   return (

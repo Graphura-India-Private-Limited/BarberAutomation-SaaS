@@ -9,11 +9,11 @@ async function main() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log("Connected to MongoDB cluster.");
 
-  const salons = await Salon.find();
+  const salons = await Salon.find().select("-password_hash -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document");
   console.log(`\n--- SALONS (${salons.length}) ---`);
   salons.forEach(s => console.log(`Salon ID: ${s._id}, Name: ${s.salon_name}`));
 
-  const barbers = await Barber.find();
+  const barbers = await Barber.find().select("-password_hash -document -photo");
   console.log(`\n--- BARBERS (${barbers.length}) ---`);
   barbers.forEach(b => console.log(`Barber ID: ${b._id}, Name: ${b.name}, Status: ${b.status}, IsActive: ${b.is_active}, SalonID: ${b.salon_id}`));
 

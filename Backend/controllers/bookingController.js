@@ -172,10 +172,14 @@ exports.createBooking = async (req, res) => {
       promo_code: promo_code || ""
     });
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const position = await Queue.countDocuments({
       barber_id: finalBarberId,
       salon_id,
-      status: { $in: ["waiting", "in-progress"] }
+      status: { $in: ["waiting", "in-progress", "paused", "delayed"] },
+      joined_at: { $gte: today }
     }) + 1;
 
     const queue = await Queue.create({
@@ -215,9 +219,6 @@ exports.createBooking = async (req, res) => {
   }
 };
 
-// @desc    Get customer's own bookings
-// @route   GET /api/booking/my
-// @access  Private (Customer)
 exports.getMyBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ customer_id: req.user.id })
@@ -225,7 +226,15 @@ exports.getMyBookings = async (req, res) => {
       .populate("barber_id", "name photo")
       .sort({ created_at: -1 });
 
-    res.json({ success: true, bookings });
+    const cleanedBookings = bookings.map(b => {
+      const bookingObj = b.toObject();
+      if (bookingObj.barber_id && bookingObj.barber_id.photo && bookingObj.barber_id.photo.startsWith("data:")) {
+        bookingObj.barber_id.photo = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80";
+      }
+      return bookingObj;
+    });
+
+    res.json({ success: true, bookings: cleanedBookings });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -236,10 +245,17 @@ exports.getMyBookings = async (req, res) => {
 // @access  Private (Owner/Admin)
 exports.getSalonBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ salon_id: req.params.id })
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const bookings = await Booking.find({
+      salon_id: req.params.id,
+      status: { $in: ["confirmed", "pending", "in-progress"] },
+      slot_time: { $gte: today }
+    })
       .populate("customer_id", "name mobile email")
-      .populate("barber_id", "name photo")
-      .sort({ created_at: -1 });
+      .populate("barber_id", "name")
+      .sort({ slot_time: 1 });
 
     res.json({ success: true, bookings });
   } catch (err) {
@@ -336,7 +352,20 @@ exports.updateBookingStatus = async (req, res) => {
 exports.cancelBooking = async (req, res) => {
   try {
     await Booking.findByIdAndUpdate(req.params.id, { status: "cancelled" });
-    await Queue.deleteOne({ booking_id: req.params.id });
+    
+    const cancelledEntry = await Queue.findOne({ booking_id: req.params.id });
+    if (cancelledEntry) {
+      await Queue.updateMany(
+        { 
+          barber_id: cancelledEntry.barber_id, 
+          salon_id: cancelledEntry.salon_id,
+          status: { $in: ["waiting", "paused", "delayed"] },
+          position: { $gt: cancelledEntry.position } 
+        },
+        { $inc: { position: -1 } }
+      );
+      await Queue.deleteOne({ _id: cancelledEntry._id });
+    }
 
     res.json({ success: true, message: "Cancelled" });
   } catch (err) {
@@ -441,8 +470,22 @@ exports.cancelWithRefund = async (req, res) => {
     booking.status = "cancelled";
     await booking.save();
 
-    // Delete queue entry if any
-    await Queue.deleteOne({ booking_id: req.params.id });
+    // Delete queue entry if any and shift other waiting customers' positions
+    const cancelledEntry = await Queue.findOne({ booking_id: req.params.id });
+    if (cancelledEntry) {
+      await Queue.updateMany(
+        { 
+          barber_id: cancelledEntry.barber_id, 
+          salon_id: cancelledEntry.salon_id,
+          status: { $in: ["waiting", "paused", "delayed"] },
+          position: { $gt: cancelledEntry.position } 
+        },
+        { $inc: { position: -1 } }
+      );
+      await Queue.deleteOne({ _id: cancelledEntry._id });
+    } else {
+      await Queue.deleteOne({ booking_id: req.params.id });
+    }
 
     res.json({
       success: true,

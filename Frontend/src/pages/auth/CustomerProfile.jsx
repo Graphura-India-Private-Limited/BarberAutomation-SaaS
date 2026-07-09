@@ -104,7 +104,7 @@ const LiveVisualQueue = ({ activeQueue }) => {
         <div className="flex items-center gap-10 pl-6 z-10 relative">
           <AnimatePresence>
             {/* If someone else is in the chair and we are waiting, render a placeholder person representing 'Current Client' */}
-            {status !== "in-progress" && (
+            {status !== "in-progress" && activeQueue.chairOccupied && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -608,8 +608,11 @@ export default function CustomerProfile() {
     }, 1200);
   };
 
-  const upcomingAppts = appointments.filter(a => a.status === "Upcoming" || a.status === "Pending" || a.status === "Confirmed" || a.status === "In-progress");
-  const completedAppts = appointments.filter(a => a.status === "Completed");
+  const upcomingAppts = appointments.filter(a => {
+    const s = String(a.status || "").toLowerCase();
+    return s === "upcoming" || s === "pending" || s === "confirmed" || s === "in-progress";
+  });
+  const completedAppts = appointments.filter(a => String(a.status || "").toLowerCase() === "completed");
 
   const getBarberFrequencies = () => {
     const counts = {};
@@ -1632,6 +1635,41 @@ export default function CustomerProfile() {
                 : `Pos #${activeQueue.position} (${activeQueue.estimated_wait}m) ⏳`}
             </span>
           </button>
+        </div>
+      )}
+
+      {/* ── Sticky Bottom Banner for Active Queue on Dashboard Hub ── */}
+      {activeQueue && activeTab === "overview" && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-xl animate-in slide-in-from-bottom-8 duration-500">
+          <div 
+            onClick={() => setActiveTab("queue")}
+            className="cursor-pointer group flex items-center justify-between p-4 rounded-2xl bg-[#3D3126] text-white shadow-[0_12px_40px_rgba(0,0,0,0.25)] border border-[#C5A059]/30 hover:border-[#C5A059] transition-all hover:scale-[1.02]"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/20 flex flex-col items-center justify-center text-[#C5A059] font-sans">
+                <span className="text-[9px] font-black tracking-widest uppercase">Wait</span>
+                <span className="text-lg font-bold leading-none mt-0.5">{activeQueue.estimated_wait || 0}m</span>
+              </div>
+              <div className="text-left">
+                <h4 className="font-serif text-sm font-bold text-[#FFFBF2] flex items-center gap-1.5">
+                  {activeQueue.status === "in-progress" ? (
+                    <>Your Turn is Active! <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-ping" /></>
+                  ) : (
+                    `Estimated Wait: ${activeQueue.estimated_wait} mins`
+                  )}
+                </h4>
+                <p className="text-stone-300 text-[10px] uppercase font-bold tracking-wider mt-0.5">
+                  {activeQueue.status === "in-progress" 
+                    ? "Grooming Session in progress" 
+                    : `Position #${activeQueue.position} in Queue • ${activeQueue.peopleAhead || 0} clients ahead`}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#C5A059] text-white text-[10px] font-black uppercase tracking-wider group-hover:bg-[#D5B069] transition-colors">
+              Live Tracker <span className="text-xs">→</span>
+            </div>
+          </div>
         </div>
       )}
     </>

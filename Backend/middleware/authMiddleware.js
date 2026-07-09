@@ -11,9 +11,9 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ success:false, message:"No token" });
     const token   = auth.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role === "barber")      req.user = await Barber.findById(decoded.id).select("-password_hash");
+    if (decoded.role === "barber")      req.user = await Barber.findById(decoded.id).select("-password_hash -document -photo");
     else if (decoded.role === "admin")  req.user = await Admin.findById(decoded.id).select("-password_hash -mpin_hash");
-    else if (decoded.role === "owner")  req.user = await Salon.findById(decoded.id).select("-password_hash");
+    else if (decoded.role === "owner")  req.user = await Salon.findById(decoded.id).select("-password_hash -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document");
     else                                req.user = await Customer.findById(decoded.id);
     if (!req.user) return res.status(401).json({ success:false, message:"User not found" });
     req.user.role = decoded.role;

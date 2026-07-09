@@ -102,9 +102,13 @@ exports.updateQueueStatus = async (req, res) => {
 // @access  Private (Customer)
 exports.getActiveCustomerQueue = async (req, res, next) => {
   try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const entry = await Queue.findOne({
       customer_id: req.user.id,
-      status: { $in: ["waiting", "in-progress", "paused", "delayed"] }
+      status: { $in: ["waiting", "in-progress", "paused", "delayed"] },
+      joined_at: { $gte: today }
     })
     .populate("salon_id", "salon_name address")
     .populate("barber_id", "name photo")
@@ -117,6 +121,19 @@ exports.getActiveCustomerQueue = async (req, res, next) => {
     let services = [];
     if (entry.booking_id && entry.booking_id.services) {
       services = entry.booking_id.services;
+    }
+
+    let chairOccupied = false;
+    if (entry.barber_id) {
+      const activeSession = await Queue.findOne({
+        barber_id: entry.barber_id,
+        status: "in-progress",
+        _id: { $ne: entry._id },
+        joined_at: { $gte: today }
+      });
+      if (activeSession) {
+        chairOccupied = true;
+      }
     }
 
     const peopleAhead = Math.max(0, entry.position - 1);
@@ -135,7 +152,8 @@ exports.getActiveCustomerQueue = async (req, res, next) => {
         salon: entry.salon_id,
         barber: entry.barber_id,
         services,
-        booking: entry.booking_id
+        booking: entry.booking_id,
+        chairOccupied
       }
     });
   } catch (error) {

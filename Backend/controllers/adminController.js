@@ -202,8 +202,25 @@ exports.getAllSalons = async (req, res) => {
     if (state && state !== "All" && state !== "All India") {
       query.state = state;
     }
-    const salons = await Salon.find(query).sort({ created_at: -1 });
+    const salons = await Salon.find(query)
+      .select("-password_hash -images -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document")
+      .sort({ created_at: -1 });
     res.json({ success: true, salons });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Get a single salon by ID with all certificates
+// @route   GET /api/admin/salon/:id
+// @access  Private (Admin)
+exports.getSalonById = async (req, res) => {
+  try {
+    const salon = await Salon.findById(req.params.id);
+    if (!salon) {
+      return res.status(404).json({ success: false, message: "Salon not found" });
+    }
+    res.json({ success: true, salon });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -519,8 +536,26 @@ exports.getAllBarbers = async (req, res) => {
       const salonIds = await Salon.find({ state }).distinct("_id");
       query.salon_id = { $in: salonIds };
     }
-    const barbers = await Barber.find(query).populate("salon_id", "salon_name address").sort({ created_at: -1 });
+    const barbers = await Barber.find(query)
+      .select("-password_hash -document -photo")
+      .populate("salon_id", "salon_name address")
+      .sort({ created_at: -1 });
     res.json({ success: true, barbers });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Get a single barber by ID with all documents
+// @route   GET /api/admin/barber/:id
+// @access  Private (Admin)
+exports.getBarberById = async (req, res) => {
+  try {
+    const barber = await Barber.findById(req.params.id).populate("salon_id", "salon_name address");
+    if (!barber) {
+      return res.status(404).json({ success: false, message: "Barber not found" });
+    }
+    res.json({ success: true, barber });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

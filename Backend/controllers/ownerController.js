@@ -15,26 +15,25 @@ exports.getOwnerDashboardStats = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const barbersList = await Barber.find({ salon_id: req.params.salon_id, is_active: true });
+    const barbersList = await Barber.find({ salon_id: req.params.salon_id, is_active: true })
+      .select("-password_hash -document -photo");
+
+    // Fetch all in-progress queue entries for this salon today in a single query
+    const activeQueues = await Queue.find({
+      salon_id: req.params.salon_id,
+      status: "in-progress",
+      joined_at: { $gte: today }
+    });
+    const busyBarberIds = new Set(activeQueues.map(q => q.barber_id.toString()));
 
     // Sync barber status based on active in-progress queue entries today
     const barbers = await Promise.all(
       barbersList.map(async (barber) => {
-        const hasInProgress = await Queue.findOne({
-          barber_id: barber._id,
-          status: "in-progress",
-          joined_at: { $gte: today }
-        });
-        if (hasInProgress) {
-          if (barber.status !== "busy") {
-            barber.status = "busy";
-            await Barber.findByIdAndUpdate(barber._id, { status: "busy" });
-          }
-        } else {
-          if (barber.status === "busy") {
-            barber.status = "available";
-            await Barber.findByIdAndUpdate(barber._id, { status: "available" });
-          }
+        const isBusy = busyBarberIds.has(barber._id.toString());
+        const targetStatus = isBusy ? "busy" : (barber.status === "busy" ? "available" : barber.status);
+        if (barber.status !== targetStatus) {
+          barber.status = targetStatus;
+          await Barber.findByIdAndUpdate(barber._id, { status: targetStatus });
         }
         return barber;
       })

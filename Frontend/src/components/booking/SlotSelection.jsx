@@ -66,18 +66,15 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
             }
           }
         } else {
-          // Fetch the specific salon's hours
+          // Fetch the specific salon's hours directly by ID
           try {
-            const res = await fetch(`${API}/salon`);
+            const res = await fetch(`${API}/salon/${salonId}`);
             const data = await res.json();
-            if (data.success && data.salons) {
-              const salon = data.salons.find(s => s._id === salonId) || data.salons[0];
-              if (salon) {
-                setSalonHours({
-                  opening_time: salon.opening_time || "09:00",
-                  closing_time: salon.closing_time || "21:00"
-                });
-              }
+            if (data.success && data.salon) {
+              setSalonHours({
+                opening_time: data.salon.opening_time || "09:00",
+                closing_time: data.salon.closing_time || "21:00"
+              });
             }
           } catch { /* use defaults */ }
         }

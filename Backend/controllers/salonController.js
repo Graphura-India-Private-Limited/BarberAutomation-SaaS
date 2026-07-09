@@ -70,8 +70,22 @@ exports.registerSalon = async (req, res) => {
 // @access  Public
 exports.getApprovedSalons = async (req, res) => {
   try {
-    const salons = await Salon.find({ status: "approved" });
-    res.json({ success: true, salons });
+    const salons = await Salon.find({ status: "approved" })
+      .select("-password_hash -images -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document");
+
+    const cleanedSalons = salons.map((salon, index) => {
+      const s = salon.toObject();
+      const defaultImages = [
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500",
+        "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=500",
+        "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=500",
+        "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500"
+      ];
+      s.images = [defaultImages[index % defaultImages.length]];
+      return s;
+    });
+
+    res.json({ success: true, salons: cleanedSalons });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -82,8 +96,22 @@ exports.getApprovedSalons = async (req, res) => {
 // @access  Public
 exports.getNearbySalons = async (req, res) => {
   try {
-    const salons = await Salon.find({ status: "approved" });
-    res.json({ success: true, salons });
+    const salons = await Salon.find({ status: "approved" })
+      .select("-password_hash -images -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document");
+
+    const cleanedSalons = salons.map((salon, index) => {
+      const s = salon.toObject();
+      const defaultImages = [
+        "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500",
+        "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=500",
+        "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=500",
+        "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500"
+      ];
+      s.images = [defaultImages[index % defaultImages.length]];
+      return s;
+    });
+
+    res.json({ success: true, salons: cleanedSalons });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -97,13 +125,20 @@ exports.getSalonById = async (req, res) => {
     const salon = await Salon.findOne({
       _id: req.params.id,
       status: "approved"
-    });
+    }).select("-password_hash -shop_establishment_certificate -trade_license -gst_certificate -aadhaar_card -photo -document");
 
     if (!salon) {
       return res.status(404).json({ success: false, message: "Salon is not live" });
     }
 
-    res.json({ success: true, salon });
+    const s = salon.toObject();
+    if (s.images && s.images.length > 0) {
+      s.images = s.images.map(img => img && img.startsWith("data:") ? "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500" : img);
+    } else {
+      s.images = ["https://images.unsplash.com/photo-1560066984-138dadb4c035?w=500"];
+    }
+
+    res.json({ success: true, salon: s });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -75,17 +75,52 @@ export default function AddBarber() {
     Authorization: `Bearer ${token}`
   });
 
+  const [uploading, setUploading] = useState(false);
+
+  const uploadToCloudinary = async (base64Data) => {
+    try {
+      setUploading(true);
+      setAddError("");
+      const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file: base64Data })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message || "Failed to upload file");
+      }
+      return data.url;
+    } catch (err) {
+      console.error(err);
+      setAddError(`Upload failed: ${err.message}`);
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handlePhotoChange = (e) => {
     const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setNewBarber(p => ({ ...p, photo: file, photoPreview: ev.target.result }));
+    reader.onload = async (ev) => {
+      const url = await uploadToCloudinary(ev.target.result);
+      if (url) {
+        setNewBarber(p => ({ ...p, photo: file, photoPreview: url }));
+      }
+    };
     reader.readAsDataURL(file);
   };
 
   const handleDocChange = (e) => {
     const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setNewBarber(p => ({ ...p, document: ev.target.result, documentName: file.name }));
+    reader.onload = async (ev) => {
+      const url = await uploadToCloudinary(ev.target.result);
+      if (url) {
+        setNewBarber(p => ({ ...p, document: url, documentName: file.name }));
+      }
+    };
     reader.readAsDataURL(file);
   };
 
@@ -444,11 +479,11 @@ export default function AddBarber() {
             <div className="flex gap-4 pt-4 border-t border-stone-100 mt-6 font-sans">
               <button 
                 type="submit" 
-                disabled={busy}
+                disabled={busy || uploading}
                 className="rounded-xl px-6 py-3.5 text-xs font-extrabold tracking-wider uppercase text-white shadow-md hover:opacity-95 transition-all cursor-pointer flex-1 disabled:opacity-50" 
                 style={{ background: CHARCOAL }}
               >
-                {busy ? "Creating Profile..." : "Create Profile"}
+                {uploading ? "Uploading media to cloud..." : busy ? "Creating Profile..." : "Create Profile"}
               </button>
               <button 
                 type="button" 
