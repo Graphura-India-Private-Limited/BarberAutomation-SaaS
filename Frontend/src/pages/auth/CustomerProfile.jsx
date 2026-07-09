@@ -666,7 +666,6 @@ export default function CustomerProfile() {
                   { id: "queue", label: "Live Queue Tracker", icon: Clock },
                   { id: "studios", label: "Our Studios", icon: Compass },
                   { id: "history", label: "Appointments Registry", icon: Calendar },
-                  { id: "dummy_services", label: "Grooming Menu", icon: ShoppingBag },
                   { id: "preferences", label: "Profile Settings", icon: User },
                   { id: "alerts", label: "Live System Alerts", icon: Bell, count: notifications.filter(n => !n.read).length },
                   { id: "homepage", label: "Return to Homepage", icon: Home, action: () => navigate("/home") }
@@ -745,7 +744,6 @@ export default function CustomerProfile() {
                     {activeTab === "queue" && "Live Queue Tracker"}
                     {activeTab === "studios" && "Our Studios"}
                     {activeTab === "history" && "Appointments Registry"}
-                    {activeTab === "dummy_services" && "Grooming Menu"}
                     {activeTab === "membership" && "Membership Perks"}
                     {activeTab === "preferences" && "Profile Settings"}
                     {activeTab === "alerts" && "Live System Alerts"}
@@ -1313,45 +1311,7 @@ export default function CustomerProfile() {
                 </div>
               )}
 
-              {/* TAB: GROOMING MENU */}
-              {activeTab === "dummy_services" && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300 text-left">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 border-[#EADBCE] gap-4">
-                    <div>
-                      <h2 className="text-lg font-black uppercase tracking-wider text-[#3D3126]">Premium Grooming Catalog</h2>
-                      <p className="text-xs text-[#8A7A6A]">Browse and search through all of our premium grooming services.</p>
-                    </div>
-                    <div className="flex border border-[#EADBCE] rounded-xl overflow-hidden bg-white select-none shadow-3xs">
-                      {["All", "Men", "Women", "Addons"].map(cat => (
-                        <button key={cat} onClick={() => setSelectedServiceCategory(cat)} className={`px-4 py-2.5 text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer ${selectedServiceCategory === cat ? "bg-[#3D3126] text-white" : "text-[#8A7A6A] hover:bg-[#FEF9EE] hover:text-[#3D3126]"}`}>{cat}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="relative flex items-center max-w-md shadow-3xs rounded-2xl bg-white border border-[#EADBCE] overflow-hidden">
-                    <Search size={16} className="absolute left-4 text-[#8A7A6A]" />
-                    <input type="text" placeholder="Search services..." value={servicesSearch} onChange={(e) => setServicesSearch(e.target.value)} className="w-full pl-12 pr-4 py-3 text-xs outline-none bg-white text-[#3D3126] font-sans font-medium" />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {filteredServices.length === 0 ? (
-                      <div className="text-center py-12 col-span-full"><ShoppingBag size={32} className="mx-auto text-stone-200 mb-2" /><p className="text-xs font-black uppercase tracking-wider text-[#8A7A6A]">No matching services found</p></div>
-                    ) : (
-                      filteredServices.map(service => (
-                        <div key={service.id} className="bg-white border border-[#EADBCE] rounded-2xl p-5 flex flex-col justify-between shadow-3xs hover:shadow-xs transition-shadow">
-                          <div className="space-y-2">
-                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded ${service.category === "Men" ? "bg-amber-50 text-[#B06000]" : service.category === "Women" ? "bg-purple-50 text-purple-600" : "bg-blue-50 text-blue-600"}`}>{service.category}</span>
-                            <h4 className="text-sm font-black text-[#3D3126] leading-snug">{service.name}</h4>
-                            <p className="text-[10px] text-[#8A7A6A] leading-relaxed line-clamp-3 font-medium">{service.description}</p>
-                          </div>
-                          <div className="pt-4 border-t border-[#FAF6F0] flex justify-between items-center mt-4">
-                            <div><p className="text-[8px] font-black uppercase text-stone-400 tracking-wider">Estimated Price</p><span className="font-mono text-xs font-black text-[#3D3126]">₹{service.price}</span></div>
-                            <button onClick={() => handleBookDummyService(service)} className="px-3.5 py-1.5 bg-[#B58B67] hover:bg-[#9E7452] text-white text-[9px] font-black uppercase tracking-wider rounded-lg transition-all cursor-pointer">Book Now</button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
+            
 
 
 
