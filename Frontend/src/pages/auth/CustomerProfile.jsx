@@ -650,6 +650,60 @@ export default function CustomerProfile() {
     return Object.entries(counts).map(([name, count]) => ({ name, count }));
   };
 
+  const getDynamicQueueTimes = () => {
+    if (!activeQueue) return { enteredAt: "", estimatedTurn: "", timeRemaining: 0 };
+
+    const now = new Date();
+    const isSlot = activeQueue.booking?.booking_type === "slot" || !!activeQueue.booking?.slot_time;
+    
+    let enteredAt = "";
+    let estimatedTurnDate = null;
+    let timeRemaining = 0;
+
+    if (isSlot && activeQueue.booking?.slot_time) {
+      enteredAt = new Date(activeQueue.joined_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+      estimatedTurnDate = new Date(activeQueue.booking.slot_time);
+      const diffMs = estimatedTurnDate.getTime() - now.getTime();
+      timeRemaining = Math.ceil(diffMs / 60000);
+      
+      if (timeRemaining < 0) {
+        if (activeQueue.status === "in-progress") {
+          timeRemaining = 0;
+        } else {
+          timeRemaining = Math.max(10, activeQueue.estimated_wait || (activeQueue.position * 20));
+        }
+      }
+    } else {
+      enteredAt = new Date(activeQueue.joined_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+      const originalTurnMs = new Date(activeQueue.joined_at).getTime() + (activeQueue.estimated_wait || 20) * 60000;
+      estimatedTurnDate = new Date(originalTurnMs);
+      const diffMs = originalTurnMs - now.getTime();
+      timeRemaining = Math.ceil(diffMs / 60000);
+      
+      if (timeRemaining < 0) {
+        if (activeQueue.status === "in-progress") {
+          timeRemaining = 0;
+        } else {
+          timeRemaining = Math.max(10, activeQueue.estimated_wait || (activeQueue.position * 20));
+        }
+      }
+    }
+
+    if (activeQueue.status !== "in-progress" && now.getTime() > estimatedTurnDate.getTime()) {
+      estimatedTurnDate = new Date(now.getTime() + timeRemaining * 60000);
+    }
+
+    const estimatedTurn = estimatedTurnDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
+    return {
+      enteredAt,
+      estimatedTurn,
+      timeRemaining
+    };
+  };
+
+  const dynamicQueue = getDynamicQueueTimes();
+
   const filteredServices = dummyServices.filter(s => {
     const matchesSearch = s.name.toLowerCase().includes(servicesSearch.toLowerCase()) || s.description.toLowerCase().includes(servicesSearch.toLowerCase());
     const matchesCategory = selectedServiceCategory === "All" || s.category === selectedServiceCategory;
@@ -1002,7 +1056,7 @@ export default function CustomerProfile() {
 
                           <div className="my-6">
                             <h2 className="text-5xl font-serif font-black tracking-tight text-[#B58B67] ">
-                              {activeQueue.status === "in-progress" ? "0" : activeQueue.estimated_wait}
+                              {activeQueue.status === "in-progress" ? "0" : dynamicQueue.timeRemaining}
                               <span className="text-lg font-sans font-bold ml-1 text-white">mins</span>
                             </h2>
                             <p className="text-[10px] text-stone-400 uppercase tracking-widest font-black mt-2">Time Remaining</p>
@@ -1012,13 +1066,13 @@ export default function CustomerProfile() {
                             <div className="flex justify-between items-center text-stone-300">
                               <span>Entered Line At:</span>
                               <span className="font-mono text-white font-bold">
-                                {new Date(activeQueue.joined_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                                {dynamicQueue.enteredAt}
                               </span>
                             </div>
                             <div className="flex justify-between items-center text-stone-300">
                               <span>Estimated Turn:</span>
                               <span className="font-mono text-[#B58B67] font-bold">
-                                {new Date(new Date(activeQueue.joined_at).getTime() + activeQueue.estimated_wait * 60000).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                                {dynamicQueue.estimatedTurn}
                               </span>
                             </div>
                             <div className="flex justify-between items-center text-stone-300">
@@ -1662,7 +1716,7 @@ export default function CustomerProfile() {
             <span className="text-[9px] font-black tracking-widest writing-mode-vertical uppercase [writing-mode:vertical-lr] rotate-180 font-sans">
               {activeQueue.status === "in-progress"
                 ? "Styling Chair ⚡"
-                : `Pos #${activeQueue.position} (${activeQueue.estimated_wait}m) ⏳`}
+                : `Pos #${activeQueue.position} (${dynamicQueue.timeRemaining}m) ⏳`}
             </span>
           </button>
         </div>
@@ -1678,14 +1732,14 @@ export default function CustomerProfile() {
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-[#C5A059]/10 border border-[#C5A059]/20 flex flex-col items-center justify-center text-[#C5A059] font-sans">
                 <span className="text-[9px] font-black tracking-widest uppercase">Wait</span>
-                <span className="text-lg font-bold leading-none mt-0.5">{activeQueue.estimated_wait || 0}m</span>
+                <span className="text-lg font-bold leading-none mt-0.5">{dynamicQueue.timeRemaining || 0}m</span>
               </div>
               <div className="text-left">
                 <h4 className="font-serif text-sm font-bold text-[#FFFBF2] flex items-center gap-1.5">
                   {activeQueue.status === "in-progress" ? (
                     <>Your Turn is Active! <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-ping" /></>
                   ) : (
-                    `Estimated Wait: ${activeQueue.estimated_wait} mins`
+                    `Estimated Wait: ${dynamicQueue.timeRemaining} mins`
                   )}
                 </h4>
                 <p className="text-stone-300 text-[10px] uppercase font-bold tracking-wider mt-0.5">
