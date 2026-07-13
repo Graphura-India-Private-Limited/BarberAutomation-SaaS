@@ -32,7 +32,7 @@ const STATUS_MAP = {
 };
 
 const getStatusTab = (status) => {
-  return STATUS_MAP[status]?.tab || "upcoming";
+  return STATUS_MAP[String(status || "").toLowerCase()]?.tab || "upcoming";
 };
 
 export default function BookingHistory() {
@@ -56,11 +56,13 @@ export default function BookingHistory() {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchMyBookings();
+    const interval = setInterval(() => fetchMyBookings(true), 10000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchMyBookings = async () => {
+  const fetchMyBookings = async (isBackground = false) => {
     if (!token) return;
-    setLoadingBookings(true);
+    if (!isBackground) setLoadingBookings(true);
     setBookingsError("");
     try {
       const res = await fetch(`${API}/booking/my`, {
@@ -73,9 +75,9 @@ export default function BookingHistory() {
         setBookingsError(data.message || "Failed to load bookings.");
       }
     } catch {
-      setBookingsError("Network error. Please try again.");
+      if (!isBackground) setBookingsError("Network error. Please try again.");
     } finally {
-      setLoadingBookings(false);
+      if (!isBackground) setLoadingBookings(false);
     }
   };
 
@@ -174,7 +176,7 @@ export default function BookingHistory() {
     activeTab === 'completed' ? completedBookings : cancelledBookings;
 
   const BookingCard = ({ booking, tab }) => {
-    const statusCfg = STATUS_MAP[booking.status] || STATUS_MAP.confirmed;
+    const statusCfg = STATUS_MAP[String(booking.status || "").toLowerCase()] || STATUS_MAP.confirmed;
     return (
       <div className={`bg-white/90 backdrop-blur-md rounded-[24px] border border-[#EADDCA] shadow-[0_8px_25px_rgba(0,0,0,0.01)] hover:shadow-[0_15px_35px_rgba(62,54,46,0.05)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden text-left ${
         tab === 'completed' ? 'border-l-4 border-l-[#C5A059]' : tab === 'cancelled' ? 'border-l-4 border-l-red-400' : 'border-l-4 border-l-[#3E362E]'

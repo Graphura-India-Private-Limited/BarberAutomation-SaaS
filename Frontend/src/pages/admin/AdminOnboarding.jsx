@@ -586,6 +586,10 @@ export default function AdminOnboarding() {
   useEffect(() => { fetchAll(selectedState); }, [selectedState]);
 
   useEffect(() => {
+    setSearch("");
+  }, [tab, selectedSalonId]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (adminMenuRef.current && !adminMenuRef.current.contains(event.target)) {
         setAdminMenuOpen(false);

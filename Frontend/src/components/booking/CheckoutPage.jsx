@@ -119,9 +119,10 @@ export default function CheckoutPage({ bookingData, onBack, onComplete }) {
         return;
       }
 
-      // Check for common email domains to prevent entering email
+      // Check for email domains (indicated by a dot in the handle or common domains) to prevent entering email
       const commonEmailDomains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com", "@icloud.com", "@mail.com", "@protonmail.com", "@zoho.com"];
-      if (commonEmailDomains.some(domain => upi.toLowerCase().endsWith(domain))) {
+      const handlePart = upi.split("@")[1] || "";
+      if (handlePart.includes(".") || commonEmailDomains.some(domain => upi.toLowerCase().endsWith(domain))) {
         setPaymentError("You entered an email address. Please enter a valid UPI ID (e.g., name@okaxis) instead.");
         return;
       }

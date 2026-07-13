@@ -287,7 +287,7 @@ export default function CustomerProfile() {
   const [showAddFamily, setShowAddFamily] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedBarberForReview, setSelectedBarberForReview] = useState("");
-  const [reviewForm, setReviewForm] = useState({ rating: 5, feedback: "" });
+  const [reviewForm, setReviewForm] = useState({ rating: 5, feedback: "", barber_id: null, salon_id: null, booking_id: null });
   const [newMember, setNewMember] = useState({ name: "", relation: "Son", age: "" });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
@@ -415,12 +415,14 @@ export default function CustomerProfile() {
           _id: b._id,
           service: b.services?.[0]?.service_name || "Custom Haircut",
           barberName: b.barber_id?.name || "Barber Ajay",
+          barberId: b.barber_id?._id || b.barber_id || null,
           salonName: b.salon_id?.salon_name || "The Royal Blade",
+          salonId: b.salon_id?._id || b.salon_id || null,
           barberImage: b.barber_id?.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
           barberPhoto: b.barber_id?.photo || "",
-          date: b.slot_time ? formatLocalDate(b.slot_time) : formatLocalDate(b.created_at),
+          date: b.slot_time ? formatLocalDate(b.slot_time) : (b.created_at ? formatLocalDate(b.created_at) : getLocalTodayStr()),
           time: b.slot_time ? new Date(b.slot_time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "10:30 AM",
-          status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
+          status: b.status ? (b.status.charAt(0).toUpperCase() + b.status.slice(1)) : "Pending",
           servicesList: b.services?.map(s => ({ name: s.service_name, price: s.price, member_name: s.member_name })) || [{ name: "Custom Haircut", price: 400, member_name: "Self" }],
           total: b.total_amount || 400, paymentMethod: "Razorpay Secure",
           styleNotes: b.notes || "Standard clean fade cut.",
@@ -593,12 +595,28 @@ export default function CustomerProfile() {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     const token = getToken();
-    const payload = { barber_id: null, salon_rating: reviewForm.rating, barber_rating: reviewForm.rating, review_text: reviewForm.feedback };
+    const payload = { 
+      barber_id: reviewForm.barber_id || null, 
+      salon_id: reviewForm.salon_id || null, 
+      booking_id: reviewForm.booking_id || null,
+      salon_rating: reviewForm.rating, 
+      barber_rating: reviewForm.rating, 
+      review_text: reviewForm.feedback 
+    };
     if (token) {
-      try { await fetch(`${API}/review`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) }); } catch (err) {}
+      try { 
+        await fetch(`${API}/review`, { 
+          method: "POST", 
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, 
+          body: JSON.stringify(payload) 
+        }); 
+        triggerToast("Grooming experience review submitted!");
+      } catch (err) {
+        console.error(err);
+      }
     }
-    setShowReviewModal(false); setReviewForm({ rating: 5, feedback: "" });
-    triggerToast("Feedback received! Review confirmed.");
+    setShowReviewModal(false); 
+    setReviewForm({ rating: 5, feedback: "", barber_id: null, salon_id: null, booking_id: null });
   };
 
   const handleCancelBooking = (id) => {
@@ -1384,7 +1402,18 @@ export default function CustomerProfile() {
                                     <td className="px-5 py-4 text-[#8A7A6A] font-sans font-semibold">{appt.date}</td>
                                     <td className="px-5 py-4"><span className="bg-[#E6F4EA] text-[#137333] border border-[#CEEAD6] text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full inline-block">COMPLETED</span></td>
                                     <td className="px-5 py-4 text-right">
-                                      <button onClick={(e) => { e.stopPropagation(); setSelectedBarberForReview(appt.barberName); setShowReviewModal(true); }} className="px-3 py-1.5 border border-[#EADBCE] hover:bg-[#FEF9EE] rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer text-[#9E7452]">Leave Review</button>
+                                      <button onClick={(e) => {
+                                        e.stopPropagation();
+                                        setReviewForm({
+                                          rating: 5,
+                                          feedback: "",
+                                          barber_id: appt.barberId,
+                                          salon_id: appt.salonId,
+                                          booking_id: appt._id
+                                        });
+                                        setSelectedBarberForReview(appt.barberName);
+                                        setShowReviewModal(true);
+                                      }} className="px-3 py-1.5 border border-[#EADBCE] hover:bg-[#FEF9EE] rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer text-[#9E7452]">Leave Review</button>
                                     </td>
                                   </tr>
                                 ))}

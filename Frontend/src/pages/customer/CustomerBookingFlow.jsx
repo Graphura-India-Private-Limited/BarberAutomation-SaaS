@@ -133,14 +133,24 @@ export default function Wrapper() {
 
       const servicesRes = await fetch(`${API}/services/${salonId}`);
       const servicesData = await servicesRes.json();
+      const isValidObjectId = (id) => {
+        return id && typeof id === "string" && /^[0-9a-fA-F]{24}$/.test(id);
+      };
+
       let matchedServiceId = null;
       let matchedPrice = finalBookingData.price || 200;
 
       if (servicesData.success && servicesData.services && servicesData.services.length > 0) {
-        const match = servicesData.services.find(
-          s => s.name.toLowerCase().includes(finalBookingData.service.toLowerCase()) ||
-               finalBookingData.service.toLowerCase().includes(s.name.toLowerCase())
-        );
+        let match = null;
+        if (isValidObjectId(finalBookingData.service_id)) {
+          match = servicesData.services.find(s => String(s._id) === String(finalBookingData.service_id));
+        }
+        if (!match) {
+          match = servicesData.services.find(
+            s => s.name.toLowerCase().includes(finalBookingData.service.toLowerCase()) ||
+                 finalBookingData.service.toLowerCase().includes(s.name.toLowerCase())
+          );
+        }
         if (match) {
           matchedServiceId = match._id;
           matchedPrice = match.price;
@@ -167,10 +177,16 @@ export default function Wrapper() {
           if (b.salon_id === "6a23177862fa6d8d2c894a3c") return 1;
           return 0;
         });
-        let match = allServices.find(
-          s => s.name.toLowerCase().includes(finalBookingData.service.toLowerCase()) ||
-               finalBookingData.service.toLowerCase().includes(s.name.toLowerCase())
-        );
+        let match = null;
+        if (isValidObjectId(finalBookingData.service_id)) {
+          match = allServices.find(s => String(s._id) === String(finalBookingData.service_id));
+        }
+        if (!match) {
+          match = allServices.find(
+            s => s.name.toLowerCase().includes(finalBookingData.service.toLowerCase()) ||
+                 finalBookingData.service.toLowerCase().includes(s.name.toLowerCase())
+          );
+        }
         if (!match) {
           const words = finalBookingData.service.toLowerCase().split(/\s+/);
           match = allServices.find(s => words.some(w => w.length > 3 && s.name.toLowerCase().includes(w)));
@@ -178,10 +194,6 @@ export default function Wrapper() {
         if (match) { matchedServiceId = match._id; matchedPrice = match.price; }
         else if (allServices.length > 0) { matchedServiceId = allServices[0]._id; matchedPrice = allServices[0].price; }
       }
-
-      const isValidObjectId = (id) => {
-        return id && typeof id === "string" && /^[0-9a-fA-F]{24}$/.test(id);
-      };
 
       let matchedBarberId = null;
       if (isValidObjectId(finalBookingData.barber_id)) {
