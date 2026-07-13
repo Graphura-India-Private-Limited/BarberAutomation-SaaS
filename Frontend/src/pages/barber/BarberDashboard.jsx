@@ -58,6 +58,7 @@ export default function BarberDashboard() {
   const [showNextClient, setShowNextClient] = useState(false);
   const [dbQueue, setDbQueue] = useState([]);
   const [dbStats, setDbStats] = useState(null);
+  const [dbCompletedQueue, setDbCompletedQueue] = useState([]);
 
   const getInitials = (name) => {
     if (!name) return "AM";
@@ -197,6 +198,23 @@ export default function BarberDashboard() {
     }
   });
 
+  const mockCompleted = globalQueue.filter(e => {
+    return (e.status === "done" || e.status === "Completed") && e.barber === currentBarberId;
+  }).map((item, index) => {
+    const svcObj = SERVICES_LIST.find(s => s.id === item.service);
+    return {
+      _id: item.id || `mock-completed-${index}`,
+      customer_id: { name: item.customer || item.name || "Customer" },
+      booking_id: {
+        services: [{ service_name: svcObj?.label || item.serviceLabel || item.service || "Service" }],
+        total_amount: item.amount || (svcObj ? svcObj.price * 80 : 499)
+      },
+      served_at: item.time || new Date().toISOString()
+    };
+  });
+
+  const completedQueueList = useDbData ? dbCompletedQueue : mockCompleted;
+
   const [breakRequests] = useState([]);
 
   const [reviews] = useState([]);
@@ -224,6 +242,7 @@ export default function BarberDashboard() {
       const data = await res.json();
       if (data.success) {
         setDbQueue(data.todayQueue || []);
+        setDbCompletedQueue(data.completedQueue || []);
         if (data.stats) {
           setDbStats(data.stats);
         }
@@ -483,7 +502,7 @@ export default function BarberDashboard() {
           </div>
 
           {/* ── STAT CARDS ── */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mx-auto w-full">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mx-auto w-full">
     {[
       { 
         label: "Today's Revenue",  
@@ -502,12 +521,20 @@ export default function BarberDashboard() {
         color: "#4A3E3D" 
       },
       { 
+        label: "Completed Today",        
+        value: useDbData ? (dbStats?.completedToday || 0) : servedCount,                         
+        sub: useDbData ? `Total: ${dbStats?.totalServed || 0}` : `Total: ${servedCount}`,     
+        icon: CheckCircle,       
+        up: null,  
+        color: "#8B5A2B" 
+      },
+      { 
         label: "Active Barbers",    
         value: useDbData ? (dbStats?.activeBarbers || "1/1") : stats.activeBarbers,                      
         sub: useDbData ? "Salon staff active" : "1 on break",       
         icon: UserCheck,   
         up: null,  
-        color: "#8B5A2B" 
+        color: "#4A3E3D" 
       },
       { 
         label: "Avg Wait Time",     
@@ -515,7 +542,7 @@ export default function BarberDashboard() {
         sub: useDbData ? "Estimated wait" : "Peak: 28 min at 2PM", 
         icon: Timer,    
         up: null, 
-        color: "#4A3E3D" 
+        color: "#8B5A2B" 
       },
     ].map((s, i) => (
       <div key={i} className="bg-white/80 backdrop-blur-md p-4 md:p-5 rounded-2xl border border-[#E6D5C3] transition-all duration-300 hover:bg-white shadow-[0_4px_20px_rgba(74,62,61,0.02)]">
@@ -594,50 +621,127 @@ export default function BarberDashboard() {
     ))}
   </div>
 
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="bg-white/50 p-6 rounded-3xl border border-[#E6D5C3]"
-  >
-    {/* Header Section */}
-    <div className="flex justify-between items-start mb-8">
-      <div>
-        <h3 className="font-serif text-[#4A3E3D] text-lg font-black">WEEKLY REVENUE</h3>
-        <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Mon — Sun</p>
+  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="col-span-12 lg:col-span-7 bg-white/50 p-6 rounded-3xl border border-[#E6D5C3]"
+    >
+      {/* Header Section */}
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h3 className="font-serif text-[#4A3E3D] text-lg font-black">WEEKLY REVENUE</h3>
+          <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Mon — Sun</p>
+        </div>
+        <div className="px-4 py-2 rounded-full border border-[#E6D5C3] text-[11px] font-bold text-[#4A3E3D]">
+          THIS WEEK ₹{useDbData ? (dbStats?.weekRevenue || 0).toLocaleString() : stats.weekRevenue.toLocaleString()}
+        </div>
       </div>
-      <div className="px-4 py-2 rounded-full border border-[#E6D5C3] text-[11px] font-bold text-[#4A3E3D]">
-        THIS WEEK ₹{useDbData ? (dbStats?.weekRevenue || 0).toLocaleString() : stats.weekRevenue.toLocaleString()}
-      </div>
-    </div>
 
-    {/* Chart Section */}
-    <div className="h-48 w-full relative min-w-0" style={{ minHeight: 0 }}>
-      <ResponsiveContainer width="100%" height={180}>
-        <BarChart data={weekChartData} barGap={8} margin={{ top: 25, right: 10, left: 10, bottom: 5 }}>
-          <XAxis 
-            dataKey="day" 
-            axisLine={false} 
-            tickLine={false} 
-            tick={{ fontSize: 10, fontWeight: 700, fill: '#A39796' }} 
-            dy={10}
-          />
-          <Bar 
-            dataKey="val" 
-            radius={[8, 8, 8, 8]}
-            label={<CustomBarLabel />}
-            isAnimationActive={false}
-          >
-            {weekChartData.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={entry.current ? "#8B5A2B" : "#F5EFE9"} 
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  </motion.div>
+      {/* Chart Section */}
+      <div className="h-48 w-full relative min-w-0" style={{ minHeight: 0 }}>
+        <ResponsiveContainer width="100%" height={180}>
+          <BarChart data={weekChartData} barGap={8} margin={{ top: 25, right: 10, left: 10, bottom: 5 }}>
+            <XAxis 
+              dataKey="day" 
+              axisLine={false} 
+              tickLine={false} 
+              tick={{ fontSize: 10, fontWeight: 700, fill: '#A39796' }} 
+              dy={10}
+            />
+            <Bar 
+              dataKey="val" 
+              radius={[8, 8, 8, 8]}
+              label={<CustomBarLabel />}
+              isAnimationActive={false}
+            >
+              {weekChartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={entry.current ? "#8B5A2B" : "#F5EFE9"} 
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </motion.div>
+
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="col-span-12 lg:col-span-5 bg-white/50 p-6 rounded-3xl border border-[#E6D5C3] flex flex-col justify-between"
+    >
+      <div>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h3 className="font-serif text-[#4A3E3D] text-lg font-black">COMPLETED TODAY</h3>
+            <p className="text-[11px] font-bold text-stone-400 uppercase tracking-widest mt-0.5">Today's finished sessions</p>
+          </div>
+          <div className="px-3 py-1 rounded-full bg-[#8B5A2B]/10 border border-[#8B5A2B]/20 text-[10px] font-black text-[#8B5A2B] uppercase tracking-wider">
+            {completedQueueList.length} Sessions
+          </div>
+        </div>
+
+        {completedQueueList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-40 text-stone-400">
+            <CheckCircle className="w-8 h-8 opacity-25 mb-2 text-[#4A3E3D]" />
+            <p className="text-xs font-bold uppercase tracking-wider">No completed services yet</p>
+            <p className="text-[10px] mt-1 font-medium">Completed jobs will appear here</p>
+          </div>
+        ) : (
+          <div className="space-y-2.5 max-h-[190px] overflow-y-auto pr-1">
+            {completedQueueList.map((item, index) => {
+              const customerName = item.customer_id?.name || item.customer || "Customer";
+              const firstLetter = customerName[0]?.toUpperCase() || "C";
+              const services = item.booking_id?.services || [];
+              const serviceName = services.map(s => s.service_name).filter(Boolean).join(", ") || item.service || "Service";
+              const amount = item.booking_id?.total_amount || item.amount || 0;
+              
+              let servedTime = "—";
+              if (item.served_at) {
+                try {
+                  servedTime = new Date(item.served_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+                } catch (e) {
+                  servedTime = item.served_at;
+                }
+              }
+
+              return (
+                <div key={item._id || index} className="flex items-center justify-between p-3 border border-stone-100 bg-[#FAF6F0]/40 rounded-2xl hover:bg-white hover:border-[#8B5A2B]/30 transition-all duration-300 shadow-2xs">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-stone-900 text-[#C5A059] flex items-center justify-center font-serif text-sm font-black shrink-0">
+                      {firstLetter}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-extrabold text-stone-900 text-xs truncate tracking-tight">{customerName}</p>
+                      <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mt-0.5 truncate">
+                        {serviceName}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0 ml-3">
+                    <p className="font-mono text-xs font-black text-stone-900">₹{amount}</p>
+                    <p className="text-[9px] font-bold text-stone-400 mt-0.5">{servedTime}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-[#E6D5C3]/40 flex justify-between items-center">
+        <span className="text-[9px] font-black uppercase tracking-wider text-stone-400">Ledger details</span>
+        <button 
+          onClick={() => navigate("/barber/earnings")}
+          className="text-[10px] font-black uppercase tracking-widest text-[#8B5A2B] hover:text-[#734A22] transition-colors border-none bg-transparent cursor-pointer flex items-center gap-1 font-bold"
+        >
+          View full ledger <ChevronRight className="w-3 h-3" />
+        </button>
+      </div>
+    </motion.div>
+  </div>
 
 </main>
       </div>
