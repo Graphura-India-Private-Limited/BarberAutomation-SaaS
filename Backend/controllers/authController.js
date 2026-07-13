@@ -380,8 +380,14 @@ exports.loginOwner = async (req, res) => {
     if (!salon) {
       return res.status(400).json({ success: false, message: "Salon not found. Please register first." });
     }
-    if (salon.status === "rejected" || salon.status === "suspended") {
-      return res.status(403).json({ success: false, message: "Your salon account has been suspended or rejected. Please contact support." });
+    if (salon.status !== "approved") {
+      let msg = "Your salon account is pending verification. Please wait for admin approval.";
+      if (salon.status === "rejected") {
+        msg = `Your salon account has been rejected by admin. Reason: ${salon.rejection_reason || "Incomplete documentation"}`;
+      } else if (salon.status === "inactive" || salon.status === "suspended") {
+        msg = "Your salon account is inactive or suspended. Please contact support.";
+      }
+      return res.status(403).json({ success: false, message: msg });
     }
       
     if (!salon.password_hash) {

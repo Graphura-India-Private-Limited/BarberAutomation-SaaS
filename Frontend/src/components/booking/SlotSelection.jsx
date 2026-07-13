@@ -107,13 +107,17 @@ export default function SlotSelection({ bookingData = { barber: "Rahul", service
     let bookingDateObj = new Date();
     if (dateLabel === "Tomorrow") bookingDateObj.setDate(bookingDateObj.getDate() + 1);
     else if (dateLabel === "Day After") bookingDateObj.setDate(bookingDateObj.getDate() + 2);
-    const dateStr = bookingDateObj.toISOString().split("T")[0];
+    
     let [timePart, modifier] = timeStr.split(" ");
     let [hours, minutes] = timePart.split(":");
     let h = parseInt(hours, 10);
-    if (h === 12) h = 0;
-    if (modifier === "PM") h += 12;
-    return `${dateStr}T${String(h).padStart(2, "0")}:${minutes}:00.000Z`;
+    
+    const isPM = modifier && modifier.toUpperCase() === "PM";
+    if (isPM && h !== 12) h += 12;
+    if (!isPM && h === 12) h = 0;
+    
+    bookingDateObj.setHours(h, parseInt(minutes, 10), 0, 0);
+    return bookingDateObj.toISOString();
   };
 
   const isSlotBooked = (dateLabel, timeStr) => {

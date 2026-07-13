@@ -97,9 +97,7 @@ export default function BookingManagement() {
           slot: b.booking_type === "slot" && b.slot_time 
             ? new Date(b.slot_time).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })
             : (b.created_at ? new Date(b.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "N/A"),
-          status: b.status === "confirmed" || b.status === "completed" || b.status === "in-progress" 
-            ? "Approved" 
-            : (b.status === "cancelled" || b.status === "noshow" ? "Rejected" : "Pending"),
+          status: b.status || "pending",
           total_amount: b.total_amount || 0,
           created_at: b.created_at,
           mobile: b.customer_id?.mobile || "",
@@ -264,7 +262,7 @@ export default function BookingManagement() {
       });
       const data = await res.json();
       if (data.success) {
-        setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "Approved" } : b));
+        setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "confirmed" } : b));
       } else {
         showToast(data.message || "Failed to approve booking");
       }
@@ -286,7 +284,7 @@ export default function BookingManagement() {
       });
       const data = await res.json();
       if (data.success) {
-        setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "Rejected" } : b));
+        setBookings(prev => prev.map((b) => b.id === id ? { ...b, status: "cancelled" } : b));
       } else {
         showToast(data.message || "Failed to reject booking");
       }
@@ -387,10 +385,14 @@ export default function BookingManagement() {
         let [timePart, modifier] = timeStr.split(" ");
         let [hours, minutes] = timePart.split(":");
         let h = parseInt(hours, 10);
-        if (h === 12) h = 0;
-        if (modifier === "PM") h += 12;
-        let hStr = String(h).padStart(2, "0");
-        formattedSlot = `${dateStr}T${hStr}:${minutes}:00.000Z`;
+        
+        const isPM = modifier && modifier.toUpperCase() === "PM";
+        if (isPM && h !== 12) h += 12;
+        if (!isPM && h === 12) h = 0;
+        
+        const [year, month, day] = dateStr.split("-").map(n => parseInt(n, 10));
+        const bookingDateObj = new Date(year, month - 1, day, h, parseInt(minutes, 10), 0, 0);
+        formattedSlot = bookingDateObj.toISOString();
       }
 
       const finalAttendees = formData.attendees.map((att, i) => ({
@@ -474,7 +476,8 @@ export default function BookingManagement() {
     }).length;
 
     const totalRevenue = bookings.reduce((sum, b) => {
-      if (b.status === "Approved") {
+      const statusLower = String(b.status || "").toLowerCase();
+      if (statusLower === "confirmed" || statusLower === "completed" || statusLower === "in-progress") {
         return sum + b.total_amount;
       }
       return sum;
@@ -484,13 +487,14 @@ export default function BookingManagement() {
       today: todayBookings,
       customers: new Set(bookings.map(b => b.name)).size,
       revenue: totalRevenue >= 1000 ? `${(totalRevenue / 1000).toFixed(1)}k` : `${totalRevenue}`,
-      pendingCount: bookings.filter(b => b.status === "Pending").length
+      pendingCount: bookings.filter(b => String(b.status || "").toLowerCase() === "pending").length
     };
   }, [bookings]);
 
   const getStatusStyle = (status) => {
-    if (status === "Approved") return "bg-emerald-50 border border-emerald-200/60 text-emerald-700 font-bold";
-    if (status === "Rejected") return "bg-rose-50 border border-rose-200/60 text-rose-700 font-bold";
+    const s = String(status || "").toLowerCase();
+    if (s === "completed" || s === "confirmed" || s === "in-progress") return "bg-emerald-50 border border-emerald-200/60 text-emerald-700 font-bold";
+    if (s === "cancelled" || s === "noshow") return "bg-rose-50 border border-rose-200/60 text-rose-700 font-bold";
     return "bg-amber-50 border border-amber-200/60 text-amber-700 font-bold";
   };
 
@@ -1240,18 +1244,32 @@ export default function BookingManagement() {
                             </td>
                             <td className="py-4 pr-4">
                               <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border font-sans ${
-                                booking.status === "Approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (
-                                  booking.status === "Rejected" ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-amber-50 text-amber-600 border-amber-200/60"
+                                booking.status === "completed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (
+                                  booking.status === "confirmed" ? "bg-blue-50 text-blue-700 border-blue-200" : (
+                                    booking.status === "in-progress" ? "bg-purple-50 text-purple-700 border-purple-200" : (
+                                      booking.status === "cancelled" ? "bg-rose-50 text-rose-700 border-rose-200" : (
+                                        booking.status === "noshow" ? "bg-stone-50 text-stone-600 border-stone-200" : "bg-amber-50 text-amber-600 border-amber-200/60"
+                                      )
+                                    )
+                                  )
                                 )
                               }`}>
-                                {booking.status}
+                                {booking.status === "completed" ? "Completed" : (
+                                  booking.status === "confirmed" ? "Confirmed" : (
+                                    booking.status === "in-progress" ? "In Progress" : (
+                                      booking.status === "cancelled" ? "Cancelled" : (
+                                        booking.status === "noshow" ? "No Show" : "Pending"
+                                      )
+                                    )
+                                  )
+                                )}
                               </span>
                             </td>
                             <td className="py-4 text-right">
                               <div className="flex items-center justify-end gap-1.5">
                                 <button
                                   onClick={() => approveBooking(booking.id)}
-                                  disabled={booking.status === "Approved"}
+                                  disabled={booking.status !== "pending"}
                                   className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
                                   title="Approve Slot"
                                 >
@@ -1259,7 +1277,7 @@ export default function BookingManagement() {
                                 </button>
                                 <button
                                   onClick={() => rejectBooking(booking.id)}
-                                  disabled={booking.status === "Rejected"}
+                                  disabled={booking.status === "cancelled" || booking.status === "completed" || booking.status === "noshow"}
                                   className="bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100 p-2 rounded-xl transition shrink-0 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer outline-none"
                                   title="Reject Slot"
                                 >

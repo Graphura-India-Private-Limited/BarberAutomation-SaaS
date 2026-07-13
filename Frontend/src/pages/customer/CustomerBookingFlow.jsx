@@ -242,18 +242,24 @@ export default function Wrapper() {
         let bookingDateObj = new Date();
         if (finalBookingData.date === "Tomorrow") bookingDateObj.setDate(bookingDateObj.getDate() + 1);
         else if (finalBookingData.date === "Day After") bookingDateObj.setDate(bookingDateObj.getDate() + 2);
-        let dateStr = bookingDateObj.toISOString().split("T")[0];
+        
         let timeStr = finalBookingData.time;
         let [timePart, modifier] = timeStr.split(" ");
         let [hours, minutes] = timePart.split(":");
-        if (hours === "12") hours = "00";
-        if (modifier === "PM") hours = parseInt(hours, 10) + 12;
-        hours = String(hours).padStart(2, "0");
-        formattedSlot = `${dateStr}T${hours}:${minutes}:00.000Z`;
+        let hrs = parseInt(hours, 10);
+        let mins = parseInt(minutes, 10);
+        
+        const isPM = modifier && modifier.toUpperCase() === "PM";
+        if (isPM && hrs !== 12) hrs += 12;
+        if (!isPM && hrs === 12) hrs = 0;
+        
+        bookingDateObj.setHours(hrs, mins, 0, 0);
+        formattedSlot = bookingDateObj.toISOString();
       } else {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        formattedSlot = `${tomorrow.toISOString().split("T")[0]}T11:00:00.000Z`;
+        tomorrow.setHours(11, 0, 0, 0);
+        formattedSlot = tomorrow.toISOString();
       }
 
       const payload = {
@@ -285,11 +291,15 @@ export default function Wrapper() {
           bookingId: bookingResult.booking._id,
           price: matchedPrice
         }));
+        setCurrentStep(6);
+      } else {
+        alert(bookingResult.message || "Booking failed. Please try again.");
       }
     } catch (err) {
       console.error("Booking API pipeline error.", err.message);
+      alert("Failed to submit booking. Please check your network connection.");
     } finally {
-      setCurrentStep(6);
+      // Finished processing
     }
   };
 

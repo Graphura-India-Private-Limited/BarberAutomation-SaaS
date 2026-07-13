@@ -262,18 +262,25 @@ export default function OwnerDashboard() {
   // const statusMeta = useMemo(() => {
     const paymentButtonStats = useMemo(() => {
     const tokenPayments = rawPayments.filter(p => p.payment_type === "TOKEN");
-    const pendingPayments = rawPayments.filter(p => p.status === "PENDING");
+    
+    const counterPendingPayments = tokenPayments.filter(
+      p => p.status === "SUCCESS" && p.counter_settled_status === "PENDING"
+    );
 
     const tokenAmount = tokenPayments
       .filter(p => p.status === "SUCCESS")
       .reduce((sum, p) => sum + (p.amount || 0), 0);
 
-    const pendingAmount = pendingPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const pendingAmount = counterPendingPayments.reduce((sum, p) => {
+      const totalAmt = p.booking_id?.total_amount || p.amount;
+      const paidAmt = p.amount || 0;
+      return sum + Math.max(0, totalAmt - paidAmt);
+    }, 0);
 
     return {
-      tokenCount: tokenPayments.length,
+      tokenCount: tokenPayments.filter(p => p.status === "SUCCESS").length,
       tokenAmount,
-      pendingCount: pendingPayments.length,
+      pendingCount: counterPendingPayments.length,
       pendingAmount
     };
   }, [rawPayments]);

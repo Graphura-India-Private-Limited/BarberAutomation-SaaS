@@ -53,7 +53,7 @@ const BarberAvatar = ({ name, photo, sizeClass = "w-12 h-12", iconSize = 20 }) =
       <img
         src={imgUrl}
         alt={name}
-        className={`${sizeClass} rounded-xl object-cover border border-[#EADBCE] shadow-2xs shrink-0`}
+        className={`${sizeClass} aspect-square rounded-xl object-cover border border-[#EADBCE] shadow-2xs shrink-0`}
       />
     );
   }
@@ -322,12 +322,36 @@ export default function CustomerProfile() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  const getLocalTodayStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatLocalDate = (dateVal) => {
+    if (!dateVal) return "";
+    const d = new Date(dateVal);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const compileNotifications = (uProfile, uAppts, dbNotifs = [], stampsCount = 0) => {
     const list = [...dbNotifs];
     let idCounter = list.length > 0 ? Math.max(...list.map(l => typeof l.id === 'number' ? l.id : 0)) + 1 : 1;
     if (isNaN(idCounter) || idCounter === -Infinity || idCounter === Infinity) idCounter = 1;
 
-    const upcoming = uAppts.filter(a => a.status === "Upcoming" || a.status === "Pending" || a.status === "Confirmed" || a.status === "In-progress");
+    const todayStr = getLocalTodayStr();
+    const upcoming = uAppts.filter(a => {
+      const s = String(a.status || "").toLowerCase();
+      const isStatusUpcoming = s === "upcoming" || s === "pending" || s === "confirmed" || s === "in-progress";
+      if (!isStatusUpcoming) return false;
+      if (a.date && a.date < todayStr) return false;
+      return true;
+    });
     if (upcoming.length > 0) {
       list.push({ id: idCounter++, type: "status", title: "Booking Active", message: `Your appointment for ${upcoming[0].service} with ${upcoming[0].barberName} is scheduled for ${upcoming[0].date} at ${upcoming[0].time}.`, date: "Active", read: false });
     } else {
@@ -394,7 +418,7 @@ export default function CustomerProfile() {
           salonName: b.salon_id?.salon_name || "The Royal Blade",
           barberImage: b.barber_id?.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
           barberPhoto: b.barber_id?.photo || "",
-          date: b.slot_time ? b.slot_time.split("T")[0] : new Date(b.created_at).toISOString().split("T")[0],
+          date: b.slot_time ? formatLocalDate(b.slot_time) : formatLocalDate(b.created_at),
           time: b.slot_time ? new Date(b.slot_time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "10:30 AM",
           status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
           servicesList: b.services?.map(s => ({ name: s.service_name, price: s.price, member_name: s.member_name })) || [{ name: "Custom Haircut", price: 400, member_name: "Self" }],
@@ -610,7 +634,13 @@ export default function CustomerProfile() {
 
   const upcomingAppts = appointments.filter(a => {
     const s = String(a.status || "").toLowerCase();
-    return s === "upcoming" || s === "pending" || s === "confirmed" || s === "in-progress";
+    const isStatusUpcoming = s === "upcoming" || s === "pending" || s === "confirmed" || s === "in-progress";
+    if (!isStatusUpcoming) return false;
+    if (a.date) {
+      const todayStr = getLocalTodayStr();
+      if (a.date < todayStr) return false;
+    }
+    return true;
   });
   const completedAppts = appointments.filter(a => String(a.status || "").toLowerCase() === "completed");
 

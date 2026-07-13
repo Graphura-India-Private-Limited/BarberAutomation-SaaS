@@ -107,26 +107,12 @@ exports.createBooking = async (req, res) => {
       }
 
       const now = new Date();
-      const istTimeStr = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-      const nowIST = new Date(istTimeStr);
+      const slotCompare = new Date(slotDate);
+      slotCompare.setSeconds(0, 0);
+      const nowCompare = new Date(now);
+      nowCompare.setSeconds(0, 0);
 
-      const slotUTC = Date.UTC(
-        slotDate.getUTCFullYear(),
-        slotDate.getUTCMonth(),
-        slotDate.getUTCDate(),
-        slotDate.getUTCHours(),
-        slotDate.getUTCMinutes()
-      );
-
-      const nowLocalComponents = Date.UTC(
-        nowIST.getFullYear(),
-        nowIST.getMonth(),
-        nowIST.getDate(),
-        nowIST.getHours(),
-        nowIST.getMinutes()
-      );
-
-      if (slotUTC < nowLocalComponents) {
+      if (slotCompare < nowCompare) {
         return res.status(400).json({ success: false, message: "Cannot book a slot in the past." });
       }
 
@@ -149,7 +135,7 @@ exports.createBooking = async (req, res) => {
 
         // Check overlap: StartA < EndB and EndA > StartB
         if (newStart < obEnd && newEnd > obStart) {
-          const timeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'UTC' };
+          const timeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' };
           const formattedStart = obStart.toLocaleTimeString('en-US', timeFormatOptions);
           const formattedEnd = obEnd.toLocaleTimeString('en-US', timeFormatOptions);
           return res.status(400).json({
@@ -245,17 +231,12 @@ exports.getMyBookings = async (req, res) => {
 // @access  Private (Owner/Admin)
 exports.getSalonBookings = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     const bookings = await Booking.find({
-      salon_id: req.params.id,
-      status: { $in: ["confirmed", "pending", "in-progress"] },
-      slot_time: { $gte: today }
+      salon_id: req.params.id
     })
       .populate("customer_id", "name mobile email")
       .populate("barber_id", "name")
-      .sort({ slot_time: 1 });
+      .sort({ created_at: -1 });
 
     res.json({ success: true, bookings });
   } catch (err) {

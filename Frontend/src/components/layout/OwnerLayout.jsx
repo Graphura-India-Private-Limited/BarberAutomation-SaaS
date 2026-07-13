@@ -21,6 +21,36 @@ export default function OwnerLayout() {
 
   useEffect(() => {
     const token = localStorage.getItem("token") || localStorage.getItem("ownerToken");
+    if (!token) {
+      navigate("/owner/login");
+      return;
+    }
+
+    const checkApprovalStatus = async () => {
+      try {
+        const res = await fetch(`${API}/auth/owner/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.salon) {
+          if (data.salon.status !== "approved") {
+            localStorage.clear();
+            navigate("/owner/login");
+          }
+        } else {
+          localStorage.clear();
+          navigate("/owner/login");
+        }
+      } catch (err) {
+        console.error("Error checking salon approval in layout:", err);
+      }
+    };
+
+    checkApprovalStatus();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token") || localStorage.getItem("ownerToken");
     if (!token) return;
 
     const checkPendingBreaks = async () => {
@@ -29,7 +59,8 @@ export default function OwnerLayout() {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
-        if (data.success && data.requests && data.requests.length > 0) {
+        const pendingList = data.data || data.requests || [];
+        if (data.success && pendingList.length > 0) {
           setHasPendingBreaks(true);
         } else {
           setHasPendingBreaks(false);
@@ -153,8 +184,8 @@ export default function OwnerLayout() {
                 
                 {n.id === "barbers" && hasPendingBreaks && (
                   <span className="relative flex h-2.5 w-2.5 ml-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                   </span>
                 )}
 

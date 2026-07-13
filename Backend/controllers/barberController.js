@@ -374,19 +374,10 @@ exports.submitBreakRequest = async (req, res) => {
       start_time: start_time || new Date(),
       duration_mins: duration_mins || 15,
       reason: reason || "",
-      status: "approved"
+      status: "pending"
     });
 
-    // Auto-approve: Update barber status to "break"
-    await Barber.findByIdAndUpdate(req.params.id, { status: "break" });
-
-    // Auto-approve: Pause any waiting queue entries for this barber
-    await Queue.updateMany(
-      { barber_id: req.params.id, status: "waiting" },
-      { status: "paused" }
-    );
-
-    res.json({ success: true, break: breakReq, autoApproved: true });
+    res.json({ success: true, break: breakReq, autoApproved: false });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
