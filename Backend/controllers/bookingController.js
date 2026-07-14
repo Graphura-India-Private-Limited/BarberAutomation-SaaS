@@ -336,7 +336,23 @@ exports.updateBookingStatus = async (req, res) => {
 // @access  Private
 exports.cancelBooking = async (req, res) => {
   try {
-    await Booking.findByIdAndUpdate(req.params.id, { status: "cancelled" });
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    if (["completed", "noshow", "in-progress", "cancelled"].includes(booking.status)) {
+      return res.status(400).json({ success: false, message: `Cannot cancel a booking that is ${booking.status}.` });
+    }
+
+    if (booking.booking_type === "slot" && booking.slot_time) {
+      if (new Date(booking.slot_time) < new Date()) {
+        return res.status(400).json({ success: false, message: "Cannot cancel a booking that has already started or passed." });
+      }
+    }
+
+    booking.status = "cancelled";
+    await booking.save();
     
     const cancelledEntry = await Queue.findOne({ booking_id: req.params.id });
     if (cancelledEntry) {
@@ -369,6 +385,16 @@ exports.getRefundEstimation = async (req, res) => {
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    if (["completed", "noshow", "in-progress", "cancelled"].includes(booking.status)) {
+      return res.status(400).json({ success: false, message: `Cannot cancel a booking that is ${booking.status}.` });
+    }
+
+    if (booking.booking_type === "slot" && booking.slot_time) {
+      if (new Date(booking.slot_time) < new Date()) {
+        return res.status(400).json({ success: false, message: "Cannot cancel a booking that has already started or passed." });
+      }
     }
 
     // Find the successful payment associated with this booking
@@ -431,8 +457,14 @@ exports.cancelWithRefund = async (req, res) => {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
-    if (booking.status === "cancelled") {
-      return res.status(400).json({ success: false, message: "Booking is already cancelled" });
+    if (["completed", "noshow", "in-progress", "cancelled"].includes(booking.status)) {
+      return res.status(400).json({ success: false, message: `Cannot cancel a booking that is ${booking.status}.` });
+    }
+
+    if (booking.booking_type === "slot" && booking.slot_time) {
+      if (new Date(booking.slot_time) < new Date()) {
+        return res.status(400).json({ success: false, message: "Cannot cancel a booking that has already started or passed." });
+      }
     }
 
     // Find payment

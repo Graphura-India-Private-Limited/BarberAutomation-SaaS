@@ -421,12 +421,21 @@ export default function CustomerProfile() {
           barberImage: b.barber_id?.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
           barberPhoto: b.barber_id?.photo || "",
           date: b.slot_time ? formatLocalDate(b.slot_time) : (b.created_at ? formatLocalDate(b.created_at) : getLocalTodayStr()),
-          time: b.slot_time ? new Date(b.slot_time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "10:30 AM",
+          time: b.slot_time
+            ? new Date(b.slot_time).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+            : (b.created_at
+                ? new Date(b.created_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+                : "10:30 AM"),
           status: b.status ? (b.status.charAt(0).toUpperCase() + b.status.slice(1)) : "Pending",
-          servicesList: b.services?.map(s => ({ name: s.service_name, price: s.price, member_name: s.member_name })) || [{ name: "Custom Haircut", price: 400, member_name: "Self" }],
+          servicesList: b.services?.map(s => ({ name: s.service_name, price: s.price, duration: s.duration, member_name: s.member_name })) || [{ name: "Custom Haircut", price: 400, duration: 30, member_name: "Self" }],
           total: b.total_amount || 400, paymentMethod: "Razorpay Secure",
           styleNotes: b.notes || "Standard clean fade cut.",
-          promoCode: b.promo_code || ""
+          promoCode: b.promo_code || "",
+          slot_time: b.slot_time,
+          duration: b.services?.reduce((sum, s) => sum + (s.duration || 30), 0) || 30,
+          bookedOn: b.created_at
+            ? `${new Date(b.created_at).toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' })} @ ${new Date(b.created_at).toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' })}`
+            : "—"
         }));
         setAppointments(currentAppts);
 
@@ -648,6 +657,13 @@ export default function CustomerProfile() {
     setTimeout(() => {
       navigate("/customer/barber", { state: { service: serviceObj } });
     }, 1200);
+  };
+
+  const canCancelAppt = (appt) => {
+    const s = String(appt.status || "").toLowerCase();
+    if (["completed", "noshow", "in-progress", "cancelled"].includes(s)) return false;
+    if (!appt.slot_time) return true;
+    return new Date(appt.slot_time) > new Date();
   };
 
   const upcomingAppts = appointments.filter(a => {
@@ -1225,7 +1241,9 @@ export default function CustomerProfile() {
                               <div className="flex items-center gap-2 text-stone-400 text-xs font-bold py-1.5 px-3 bg-white rounded-lg border border-[#EADBCE]">
                                 <span className="flex items-center gap-1 font-mono text-[10px] text-[#B58B67]"><Clock size={11} /> {appt.date} @ {appt.time}</span>
                               </div>
-                              <button onClick={() => handleCancelBooking(appt._id)} className="px-3.5 py-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer">Cancel</button>
+                              {canCancelAppt(appt) && (
+                                <button onClick={() => handleCancelBooking(appt._id)} className="px-3.5 py-1.5 border border-red-200 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors cursor-pointer">Cancel</button>
+                              )}
                             </div>
                           ))
                         )}
@@ -1355,7 +1373,9 @@ export default function CustomerProfile() {
                               <span className="flex items-center gap-1 font-sans"><Clock size={13} className="text-[#B58B67]" /> {appt.time}</span>
                             </div>
                             <div className="flex gap-2 w-full md:w-auto shrink-0">
-                              <button onClick={(e) => { e.stopPropagation(); handleCancelBooking(appt._id); }} className="flex-1 md:flex-none px-4 py-2.5 bg-rose-50 text-rose-500 border border-rose-200 rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-rose-100 transition-colors cursor-pointer">Cancel Booking</button>
+                              {canCancelAppt(appt) && (
+                                <button onClick={(e) => { e.stopPropagation(); handleCancelBooking(appt._id); }} className="flex-1 md:flex-none px-4 py-2.5 bg-rose-50 text-rose-500 border border-rose-200 rounded-xl text-[9px] font-black uppercase tracking-wider hover:bg-rose-100 transition-colors cursor-pointer">Cancel Booking</button>
+                              )}
                             </div>
                           </div>
                         ))
@@ -1633,12 +1653,20 @@ export default function CustomerProfile() {
                 </div>
 
                 <div className="flex justify-between border-b border-stone-100 pb-2">
-                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Date</span>
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Appointment Date</span>
                   <span className="font-extrabold text-[#3D3126] font-mono">{selectedApptDetails.date}</span>
                 </div>
                 <div className="flex justify-between border-b border-stone-100 pb-2">
                   <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Time Slot</span>
                   <span className="font-extrabold text-[#3D3126] font-mono">{selectedApptDetails.time}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Booked On</span>
+                  <span className="font-extrabold text-[#3D3126] font-mono">{selectedApptDetails.bookedOn}</span>
+                </div>
+                <div className="flex justify-between border-b border-stone-100 pb-2">
+                  <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Service Duration</span>
+                  <span className="font-extrabold text-[#3D3126] font-mono">{selectedApptDetails.duration} mins</span>
                 </div>
                 <div className="flex justify-between border-b border-stone-100 pb-2">
                   <span className="text-stone-500 font-bold uppercase tracking-wider text-[10px]">Status</span>

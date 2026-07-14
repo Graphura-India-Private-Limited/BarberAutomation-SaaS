@@ -157,6 +157,7 @@ export default function BookingHistory() {
     members: b.services?.filter(s => s.member_name && s.member_name !== 'Self').map(s => s.member_name) || [],
     amountPaid: b.total_amount || 0,
     status: b.status,
+    slot_time: b.slot_time,
     salonId: b.salon_id?._id || b.salon_id,
     barberId: b.barber_id?._id || b.barber_id,
     barber: b.barber_id?.name || 'Assigned Barber',
@@ -220,7 +221,7 @@ export default function BookingHistory() {
             </span>
           </div>
 
-          {tab === 'upcoming' && booking.status !== 'cancelled' && (
+          {tab === 'upcoming' && booking.status !== 'cancelled' && (!booking.slot_time || new Date(booking.slot_time) > new Date()) && (
             <button
               type="button"
               onClick={() => handleCancelVisit(booking.id)}
